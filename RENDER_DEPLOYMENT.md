@@ -20,15 +20,14 @@ backend
 
 #### Build Command
 ```bash
-npm install --include=dev && npm run build
+npm run build
 ```
-**重要**: 
-- **必須使用 `--include=dev`** 確保安裝 devDependencies（包含所有 `@types/*` 類型定義包）
+**注意**: 
+- `prebuild` 腳本會自動運行 `npm install --include=dev`，確保安裝 devDependencies
 - 如果使用分號 `;`，請改為 `&&` 以確保命令順序執行
-- `prebuild` 腳本會再次運行 `npm install --include=dev`，但這是安全的（npm 會跳過已安裝的包）
 
 這個命令會：
-- 安裝所有依賴（包括 devDependencies）
+- 自動運行 `prebuild` 腳本安裝所有依賴（包括 devDependencies）
 - 清理舊的編譯文件
 - 生成 Prisma Client
 - 編譯 TypeScript
@@ -37,7 +36,7 @@ npm install --include=dev && npm run build
 ```bash
 npm start
 ```
-這會執行 `node dist/app.js`
+這會執行 `node dist/server.js`（啟動服務器的入口文件）
 
 ### 環境變量設置
 
