@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { orderApi } from '@/services/orders';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { ArrowLeft, Package, MapPin, CreditCard, Calendar } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Calendar } from 'lucide-react';
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();

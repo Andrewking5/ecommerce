@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { apiClient } from '@/services/api';
 import Card from '@/components/ui/Card';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -31,20 +30,15 @@ const AuthCallback: React.FC = () => {
       }, 1000);
     } else if (error) {
       // 根据错误类型显示友好的错误消息
-      let errorMessage = '登录失败';
       let toastMessage = '登录失败';
       
       if (error === 'EMAIL_REQUIRED') {
-        errorMessage = '无法获取邮箱信息，请确保已授权邮箱访问权限';
         toastMessage = '无法获取邮箱信息';
       } else if (error === 'EMAIL_ALREADY_REGISTERED') {
-        errorMessage = '该邮箱已被注册，请使用邮箱和密码登录';
         toastMessage = '该邮箱已被注册，请使用邮箱登录';
       } else if (error === 'EMAIL_ALREADY_EXISTS') {
-        errorMessage = '该邮箱已被其他账号使用，请使用其他邮箱或登录方式';
         toastMessage = '该邮箱已被使用';
       } else {
-        errorMessage = error;
         toastMessage = error;
       }
       

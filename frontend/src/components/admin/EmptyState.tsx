@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, ShoppingBag, Users } from 'lucide-react';
+import { Package } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface EmptyStateProps {

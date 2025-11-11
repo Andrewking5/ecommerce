@@ -21,19 +21,22 @@ export const productApi = {
 
   // 獲取單一商品
   getProduct: async (id: string): Promise<Product> => {
-    const response = await apiClient.get<Product>(`/products/${id}`);
+    const response = await apiClient.get<any>(`/products/${id}`);
+    // 后端返回格式: { success: true, data: product }
     return response.data || response;
   },
 
   // 搜尋商品
   searchProducts: async (query: string): Promise<Product[]> => {
-    const response = await apiClient.get<Product[]>(`/products/search?q=${encodeURIComponent(query)}`);
+    const response = await apiClient.get<any>(`/products/search?q=${encodeURIComponent(query)}`);
+    // 后端返回格式: { success: true, data: products[] }
     return response.data || response;
   },
 
   // 獲取商品分類
   getCategories: async (): Promise<Category[]> => {
-    const response = await apiClient.get<Category[]>('/products/categories');
+    const response = await apiClient.get<any>('/products/categories');
+    // 后端返回格式: { success: true, data: categories[] }
     return response.data || response;
   },
 

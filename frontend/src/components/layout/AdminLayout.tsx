@@ -12,7 +12,6 @@ import {
   ChevronRight,
   Home
 } from 'lucide-react';
-import Button from '@/components/ui/Button';
 
 const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

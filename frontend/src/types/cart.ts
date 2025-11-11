@@ -19,6 +19,7 @@ export interface CartActions {
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  calculateTotals: () => void;
   syncWithServer: () => Promise<void>;
 }
 

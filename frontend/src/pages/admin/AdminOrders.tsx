@@ -50,7 +50,7 @@ const AdminOrders: React.FC = () => {
   }, [user, isAuthenticated]);
 
   // 获取订单列表
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['admin-orders', page, statusFilter],
     queryFn: () => orderApi.getAllOrders(page, 20, statusFilter || undefined),
     retry: false,

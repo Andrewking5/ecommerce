@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product, CartItem, CartState, CartActions } from '@/types/cart';
+import { CartState, CartActions } from '@/types/cart';
+import { Product } from '@/types/product';
 import toast from 'react-hot-toast';
 
 interface CartStore extends CartState, CartActions {}

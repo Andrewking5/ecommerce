@@ -38,7 +38,8 @@ export const userApi = {
 
   // 获取单个用户（管理员）
   getUserById: async (id: string): Promise<User> => {
-    const response = await apiClient.get<User>(`/users/${id}`);
+    const response = await apiClient.get<any>(`/users/${id}`);
+    // 后端返回格式: { success: true, data: user }
     return response.data || response;
   },
 

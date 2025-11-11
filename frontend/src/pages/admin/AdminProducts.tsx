@@ -123,7 +123,7 @@ const AdminProducts: React.FC = () => {
       name: formData.name,
       description: formData.description,
       price: Number(formData.price),
-      category: formData.category,
+      categoryId: categoryObj.id,
       stock: Number(formData.stock),
       images: formData.images,
       isActive: formData.isActive,
