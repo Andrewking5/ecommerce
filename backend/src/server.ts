@@ -1,5 +1,26 @@
-import app from './app';
-import { prisma } from './app';
+// 立即輸出日誌，確保能看到任何輸出
+console.log('📦 Loading server module...');
+console.log('📦 Node version:', process.version);
+console.log('📦 Working directory:', process.cwd());
+
+let app: any;
+let prisma: any;
+
+// 使用 try-catch 包裝導入，防止導入錯誤導致無聲失敗
+try {
+  console.log('📦 Importing app module...');
+  const appModule = require('./app');
+  app = appModule.default;
+  prisma = appModule.prisma;
+  console.log('✅ App module imported successfully');
+} catch (error: any) {
+  console.error('❌ Failed to import app module:');
+  console.error('  Error message:', error?.message || 'Unknown error');
+  console.error('  Error stack:', error?.stack || 'No stack trace');
+  console.error('  Error code:', error?.code || 'N/A');
+  process.exit(1);
+}
+
 import { Server } from 'http';
 
 const PORT = process.env.PORT || 3001;
@@ -30,15 +51,17 @@ async function startServer() {
     });
 
     // 處理伺服器錯誤
-    server.on('error', (error: any) => {
-      if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${PORT} is already in use. Please free the port or use a different port.`);
-        process.exit(1);
-      } else {
-        console.error('❌ Server error:', error);
-        process.exit(1);
-      }
-    });
+    if (server) {
+      server.on('error', (error: any) => {
+        if (error.code === 'EADDRINUSE') {
+          console.error(`❌ Port ${PORT} is already in use. Please free the port or use a different port.`);
+          process.exit(1);
+        } else {
+          console.error('❌ Server error:', error);
+          process.exit(1);
+        }
+      });
+    }
   } catch (error: any) {
     console.error('❌ Failed to start server:');
     console.error('  Error message:', error?.message || 'Unknown error');
@@ -54,19 +77,43 @@ async function startServer() {
 async function shutdown() {
   console.log('Shutting down gracefully...');
   
-  if (server) {
+  if (server !== null) {
     server.close(() => {
       console.log('HTTP server closed');
     });
   }
   
-  await prisma.$disconnect();
+  if (prisma) {
+    await prisma.$disconnect();
+  }
   process.exit(0);
 }
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-startServer();
+// 捕獲未處理的異常
+process.on('uncaughtException', (error: Error) => {
+  console.error('❌ Uncaught Exception:');
+  console.error('  Error message:', error.message);
+  console.error('  Error stack:', error.stack);
+  process.exit(1);
+});
+
+// 捕獲未處理的 Promise 拒絕
+process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
+  console.error('❌ Unhandled Rejection at:', promise);
+  console.error('  Reason:', reason);
+  process.exit(1);
+});
+
+// 啟動服務器
+console.log('📦 Starting server...');
+startServer().catch((error: any) => {
+  console.error('❌ startServer() failed:');
+  console.error('  Error message:', error?.message || 'Unknown error');
+  console.error('  Error stack:', error?.stack || 'No stack trace');
+  process.exit(1);
+});
 
 
