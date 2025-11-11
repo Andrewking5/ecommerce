@@ -1,4 +1,4 @@
-/// <reference types="multer" />
+import 'multer';
 
 declare global {
   namespace Express {
