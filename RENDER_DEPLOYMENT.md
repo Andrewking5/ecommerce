@@ -22,10 +22,13 @@ backend
 ```bash
 npm install && npm run build
 ```
+**注意**: 如果使用分號 `;`，請改為 `&&` 以確保命令順序執行。
+
 這個命令會：
 - 安裝依賴
-- 編譯 TypeScript
+- 清理舊的編譯文件
 - 生成 Prisma Client
+- 編譯 TypeScript
 
 #### Start Command
 ```bash
