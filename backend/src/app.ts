@@ -61,7 +61,7 @@ app.use(helmet({
 
 // CORS 設定
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:5173',

@@ -20,12 +20,14 @@ backend
 
 #### Build Command
 ```bash
-npm install && npm run build
+npm install --include=dev && npm run build
 ```
-**注意**: 如果使用分號 `;`，請改為 `&&` 以確保命令順序執行。
+**注意**: 
+- 使用 `--include=dev` 確保安裝 devDependencies（包含 TypeScript 類型定義）
+- 如果使用分號 `;`，請改為 `&&` 以確保命令順序執行
 
 這個命令會：
-- 安裝依賴
+- 安裝所有依賴（包括 devDependencies）
 - 清理舊的編譯文件
 - 生成 Prisma Client
 - 編譯 TypeScript

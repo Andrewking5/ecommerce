@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import multer, { FileFilterCallback } from 'multer';
 import sharp from 'sharp';
 import { v2 as cloudinary } from 'cloudinary';
+import '../types/express';
 
 // 設定 Cloudinary
 cloudinary.config({
@@ -17,7 +18,7 @@ const upload = multer({
   limits: {
     fileSize: Number(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024, // 10MB
   },
-  fileFilter: (req, file, cb: FileFilterCallback) => {
+  fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     const allowedTypes = (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp').split(',');
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
