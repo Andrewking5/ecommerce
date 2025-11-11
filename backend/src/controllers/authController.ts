@@ -294,9 +294,10 @@ export class AuthController {
   }
 }
 
-// 確保 JWT secrets 存在
+// 確保 JWT secrets 存在（僅在啟動時檢查，不阻止應用啟動）
 if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-  console.error('❌ JWT_SECRET and JWT_REFRESH_SECRET must be set in environment variables');
+  console.warn('⚠️  WARNING: JWT_SECRET and JWT_REFRESH_SECRET must be set in environment variables');
+  console.warn('⚠️  Authentication features will not work without these variables');
 }
 
 

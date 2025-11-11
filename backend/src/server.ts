@@ -8,11 +8,21 @@ let server: Server | null = null;
 
 async function startServer() {
   try {
+    console.log('🔍 Starting server...');
+    console.log('🔍 Environment variables check:');
+    console.log('  - DATABASE_URL:', process.env.DATABASE_URL ? '✅ Set' : '❌ Missing');
+    console.log('  - JWT_SECRET:', process.env.JWT_SECRET ? '✅ Set' : '❌ Missing');
+    console.log('  - JWT_REFRESH_SECRET:', process.env.JWT_REFRESH_SECRET ? '✅ Set' : '❌ Missing');
+    console.log('  - NODE_ENV:', process.env.NODE_ENV || 'development');
+    console.log('  - PORT:', process.env.PORT || 3001);
+
     // 測試資料庫連線
+    console.log('🔍 Connecting to database...');
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
     // 啟動伺服器
+    console.log('🔍 Starting HTTP server...');
     server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 API URL: http://localhost:${PORT}/api`);
@@ -29,8 +39,13 @@ async function startServer() {
         process.exit(1);
       }
     });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
+  } catch (error: any) {
+    console.error('❌ Failed to start server:');
+    console.error('  Error message:', error?.message || 'Unknown error');
+    console.error('  Error stack:', error?.stack || 'No stack trace');
+    if (error?.code) {
+      console.error('  Error code:', error.code);
+    }
     process.exit(1);
   }
 }
