@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import multer, { FileFilterCallback } from 'multer';
 import sharp from 'sharp';
 import { v2 as cloudinary } from 'cloudinary';
-import '../types/express';
 
 // 設定 Cloudinary
 cloudinary.config({
