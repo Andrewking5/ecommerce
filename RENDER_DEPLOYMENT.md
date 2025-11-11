@@ -20,14 +20,15 @@ backend
 
 #### Build Command
 ```bash
-npm install && npm run build
+npm install --include=dev && npm run build
 ```
-**注意**: 
-- 項目包含 `backend/.npmrc` 文件，設置 `production=false` 確保安裝 devDependencies
+**重要**: 
+- **必須使用 `--include=dev`** 確保安裝 devDependencies（包含所有 `@types/*` 類型定義包）
 - 如果使用分號 `;`，請改為 `&&` 以確保命令順序執行
+- `prebuild` 腳本會再次運行 `npm install --include=dev`，但這是安全的（npm 會跳過已安裝的包）
 
 這個命令會：
-- 安裝所有依賴（包括 devDependencies，因為 .npmrc 設置）
+- 安裝所有依賴（包括 devDependencies）
 - 清理舊的編譯文件
 - 生成 Prisma Client
 - 編譯 TypeScript
