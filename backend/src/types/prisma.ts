@@ -1,4 +1,4 @@
-import { Prisma, Decimal } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 // Product 类型定义（包含 category 和 reviews）
 export type ProductWithRelations = Prisma.ProductGetPayload<{

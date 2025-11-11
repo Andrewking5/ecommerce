@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/app.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -41,7 +41,6 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
     "passport": "^0.7.0",
-    "passport-apple": "^2.0.2",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "redis": "^4.6.12",
