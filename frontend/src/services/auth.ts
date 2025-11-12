@@ -72,6 +72,16 @@ export const authApi = {
   resetPassword: async (token: string, newPassword: string): Promise<void> => {
     await apiClient.post('/auth/reset-password', { token, newPassword });
   },
+
+  // 獲取用戶資料
+  getProfile: async (): Promise<{ success: boolean; user?: any; message?: string }> => {
+    const response = await apiClient.get('/users/profile');
+    return {
+      success: response.success || false,
+      user: response.data || response.user,
+      message: response.message,
+    };
+  },
 };
 
 

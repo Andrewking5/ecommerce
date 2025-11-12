@@ -98,7 +98,10 @@ export const useAuthStore = create<AuthStore>()(
         // 同步更新 apiClient 的 token
         apiClient.setToken(token);
         localStorage.setItem('token', token);
-        set({ token });
+        set({ 
+          token,
+          isAuthenticated: !!token, // 如果有 token，设置为已认证
+        });
       },
 
       clearAuth: () => {

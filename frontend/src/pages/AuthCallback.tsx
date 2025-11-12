@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setToken } = useAuthStore();
+  const { setToken, setUser } = useAuthStore();
 
   useEffect(() => {
     const success = searchParams.get('success');
@@ -21,6 +21,41 @@ const AuthCallback: React.FC = () => {
       setToken(token);
       localStorage.setItem('token', token);
       localStorage.setItem('refreshToken', refreshToken);
+      
+      // 获取用户信息并更新完整状态
+      const fetchUserProfile = async () => {
+        try {
+          const { authApi } = await import('@/services/auth');
+          const profileResponse = await authApi.getProfile();
+          
+          if (profileResponse.success && profileResponse.user) {
+            // 更新 store 的完整状态（包括 user, token, refreshToken, isAuthenticated）
+            useAuthStore.setState({
+              user: profileResponse.user,
+              token: token,
+              refreshToken: refreshToken,
+              isAuthenticated: true,
+            });
+          } else {
+            // 即使获取用户信息失败，也设置基本认证状态
+            useAuthStore.setState({
+              token: token,
+              refreshToken: refreshToken,
+              isAuthenticated: true,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          // 即使获取用户信息失败，也设置基本认证状态
+          useAuthStore.setState({
+            token: token,
+            refreshToken: refreshToken,
+            isAuthenticated: true,
+          });
+        }
+      };
+      
+      fetchUserProfile();
       
       toast.success('登录成功！');
       
@@ -52,7 +87,7 @@ const AuthCallback: React.FC = () => {
         navigate('/auth/login');
       }, 2000);
     }
-  }, [searchParams, navigate, setToken]);
+  }, [searchParams, navigate, setToken, setUser]);
 
   const success = searchParams.get('success');
   const error = searchParams.get('error');
