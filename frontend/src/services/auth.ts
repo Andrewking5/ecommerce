@@ -75,7 +75,8 @@ export const authApi = {
 
   // 獲取用戶資料
   getProfile: async (): Promise<{ success: boolean; user?: any; message?: string }> => {
-    const response = await apiClient.get('/users/profile');
+    const response = await apiClient.get<any>('/users/profile');
+    // 后端返回格式: { success: true, data: user }
     return {
       success: response.success || false,
       user: response.data || response.user,
