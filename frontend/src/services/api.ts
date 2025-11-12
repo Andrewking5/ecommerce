@@ -29,7 +29,15 @@ class ApiClient {
             });
           }
         } else {
-          console.warn('⚠️ API Request without token:', config.url);
+          // 嘗試從 localStorage 重新加載 token
+          const storedToken = localStorage.getItem('token');
+          if (storedToken) {
+            console.warn('⚠️ API Request: Token not in memory, reloading from localStorage');
+            this.token = storedToken;
+            config.headers.Authorization = `Bearer ${this.token}`;
+          } else {
+            console.warn('⚠️ API Request without token:', config.url);
+          }
         }
         // 如果是 FormData，不设置 Content-Type，让浏览器自动设置
         if (config.data instanceof FormData) {
@@ -141,10 +149,13 @@ if (import.meta.env.PROD) {
 
 export const apiClient = new ApiClient(apiBaseURL);
 
-// 從本地儲存載入 token
+// 從本地儲存載入 token（在模組初始化時）
 const token = localStorage.getItem('token');
 if (token) {
   apiClient.setToken(token);
+  if (import.meta.env.DEV) {
+    console.log('🔑 Token loaded from localStorage on module init');
+  }
 }
 
 
