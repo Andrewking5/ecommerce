@@ -37,34 +37,55 @@ async function startServer() {
     console.log('  - NODE_ENV:', process.env.NODE_ENV || 'development');
     console.log('  - PORT:', process.env.PORT || 3001);
 
-    // 測試資料庫連線
+    // 測試資料庫連線（添加超時）
     console.log('🔍 Connecting to database...');
-    await prisma.$connect();
-    console.log('✅ Database connected successfully');
-
-    // 創建初始管理員（如果環境變量已設置）
-    const { createInitialAdminIfNeeded } = require('./utils/createInitialAdmin');
-    await createInitialAdminIfNeeded();
-
-    // 運行數據庫遷移（生產環境）
-    // 注意：遷移在服務器啟動時運行，而不是在構建時
-    if (process.env.NODE_ENV === 'production') {
-      console.log('🔍 Running database migrations...');
-      try {
-        const { execSync } = require('child_process');
-        execSync('npx prisma migrate deploy', { 
-          stdio: 'inherit',
-          cwd: process.cwd(),
-          env: { ...process.env },
-          timeout: 30000, // 30秒超時
-        });
-        console.log('✅ Database migrations completed');
-      } catch (error: any) {
-        console.warn('⚠️  Database migration warning:', error?.message || error);
-        console.warn('⚠️  This is usually safe - migrations may have already been applied');
-        // 不阻止服務器啟動，因為遷移可能已經運行過
-      }
+    try {
+      await Promise.race([
+        prisma.$connect(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database connection timeout after 10s')), 10000)
+        )
+      ]);
+      console.log('✅ Database connected successfully');
+    } catch (error: any) {
+      console.error('❌ Database connection failed:', error.message);
+      console.error('⚠️  Server will continue to start, but database operations may fail');
+      // 不阻止服務器啟動，讓它繼續運行
     }
+
+    // 運行數據庫遷移（生產環境）- 在後台運行，不阻塞啟動
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🔍 Running database migrations in background...');
+      // 在後台運行遷移，不阻塞服務器啟動
+      Promise.resolve().then(async () => {
+        try {
+          const { execSync } = require('child_process');
+          execSync('npx prisma migrate deploy', { 
+            stdio: 'inherit',
+            cwd: process.cwd(),
+            env: { ...process.env },
+            timeout: 20000, // 20秒超時
+          });
+          console.log('✅ Database migrations completed');
+        } catch (error: any) {
+          console.warn('⚠️  Database migration warning:', error?.message || error);
+          console.warn('⚠️  This is usually safe - migrations may have already been applied');
+        }
+      }).catch(() => {
+        // 靜默處理錯誤，不影響服務器啟動
+      });
+    }
+
+    // 創建初始管理員（如果環境變量已設置）- 在後台運行
+    Promise.resolve().then(async () => {
+      try {
+        const { createInitialAdminIfNeeded } = require('./utils/createInitialAdmin');
+        await createInitialAdminIfNeeded();
+      } catch (error: any) {
+        console.warn('⚠️  Failed to create initial admin:', error?.message || error);
+        // 不阻止服務器啟動
+      }
+    });
 
     // 啟動伺服器
     console.log('🔍 Starting HTTP server...');
