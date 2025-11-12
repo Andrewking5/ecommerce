@@ -24,8 +24,16 @@ const Profile: React.FC = () => {
 
         <Card className="p-8">
           <div className="flex items-center space-x-6 mb-8">
-            <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-              <User size={32} className="text-gray-500" />
+            <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+              {user.avatar ? (
+                <img 
+                  src={user.avatar} 
+                  alt={`${user.firstName} ${user.lastName}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={32} className="text-gray-500" />
+              )}
             </div>
             <div>
               <h2 className="text-2xl font-semibold">

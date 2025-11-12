@@ -16,6 +16,7 @@ export class UserController {
           firstName: true,
           lastName: true,
           phone: true,
+          avatar: true,
           role: true,
           createdAt: true,
           updatedAt: true,
