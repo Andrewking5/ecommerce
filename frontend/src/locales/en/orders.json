@@ -1,0 +1,35 @@
+{
+  "title": "My Orders",
+  "noOrders": "No orders yet",
+  "noOrdersDesc": "You haven't placed any orders yet.",
+  "startShopping": "Start Shopping",
+  "orderNumber": "Order Number",
+  "orderDate": "Order Date",
+  "total": "Total",
+  "status": "Status",
+  "viewDetails": "View Details",
+  "detail": {
+    "title": "Order Details",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "status": "Status",
+    "items": "Items",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "paymentMethod": "Payment Method",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total"
+  },
+  "statuses": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded"
+  }
+}
+

@@ -46,6 +46,7 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: true,
               isLoading: false,
             });
+            // Toast message will be translated in the component
             toast.success('Login successful!');
           } else {
             throw new Error(response.message);

@@ -45,11 +45,18 @@ export interface ProductQueryParams {
   page?: number;
   limit?: number;
   category?: string;
+  categoryId?: string;
   search?: string;
-  sortBy?: 'price' | 'name' | 'createdAt';
+  sortBy?: 'price' | 'name' | 'createdAt' | 'updatedAt' | 'stock';
   sortOrder?: 'asc' | 'desc';
   minPrice?: number;
   maxPrice?: number;
+  stockStatus?: 'in_stock' | 'out_of_stock' | 'low_stock';
+  isActive?: boolean | string;
+  minStock?: number;
+  maxStock?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ProductListResponse {

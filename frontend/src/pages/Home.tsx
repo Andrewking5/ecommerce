@@ -1,10 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { ArrowRight, Star, Shield, Truck, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import ProductCard from '@/components/product/ProductCard';
+import { productApi } from '@/services/products';
+import { useLocalizedNavigate } from '@/hooks/useLocalizedNavigate';
 
 const Home: React.FC = () => {
+  const { t } = useTranslation(['products', 'common']);
+  const { navigate } = useLocalizedNavigate();
+
+  // 获取热门商品
+  const { data: featuredProducts, isLoading: productsLoading } = useQuery({
+    queryKey: ['featured-products'],
+    queryFn: () => productApi.getProducts({ page: 1, limit: 8, sortBy: 'createdAt', sortOrder: 'desc' }),
+  });
+
+  // 获取分类
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => productApi.getCategories(),
+  });
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -12,24 +31,19 @@ const Home: React.FC = () => {
         <div className="container-apple">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="heading-1 mb-6">
-              Discover Amazing Products
+              {t('home.title')}
             </h1>
             <p className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
-              Experience the future of online shopping with our curated collection 
-              of premium products designed for the modern lifestyle.
+              {t('home.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/products">
-                <Button size="lg" className="w-full sm:w-auto">
-                  Shop Now
-                  <ArrowRight className="ml-2" size={20} />
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  Learn More
-                </Button>
-              </Link>
+              <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/products')}>
+                {t('home.shopNow')}
+                <ArrowRight className="ml-2" size={20} />
+              </Button>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={() => navigate('/about')}>
+                {t('home.learnMore')}
+              </Button>
             </div>
           </div>
         </div>
@@ -39,10 +53,9 @@ const Home: React.FC = () => {
       <section className="py-20 bg-white">
         <div className="container-apple">
           <div className="text-center mb-16">
-            <h2 className="heading-2 mb-4">Why Choose Us</h2>
+            <h2 className="heading-2 mb-4">{t('home.whyChooseUs')}</h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              We're committed to providing the best shopping experience with 
-              quality products and exceptional service.
+              {t('home.whyChooseUsDesc')}
             </p>
           </div>
 
@@ -51,10 +64,9 @@ const Home: React.FC = () => {
               <div className="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Star className="text-brand-blue" size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Premium Quality</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('home.premiumQuality')}</h3>
               <p className="text-text-secondary">
-                Every product is carefully selected and tested to ensure 
-                the highest quality standards.
+                {t('home.premiumQualityDesc')}
               </p>
             </Card>
 
@@ -62,10 +74,9 @@ const Home: React.FC = () => {
               <div className="w-16 h-16 bg-brand-green/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="text-brand-green" size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Secure Shopping</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('home.secureShopping')}</h3>
               <p className="text-text-secondary">
-                Your data and payments are protected with industry-leading 
-                security measures.
+                {t('home.secureShoppingDesc')}
               </p>
             </Card>
 
@@ -73,31 +84,106 @@ const Home: React.FC = () => {
               <div className="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Truck className="text-brand-blue" size={32} />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Fast Delivery</h3>
+              <h3 className="text-xl font-semibold mb-4">{t('home.fastDelivery')}</h3>
               <p className="text-text-secondary">
-                Get your orders delivered quickly with our reliable 
-                shipping partners.
+                {t('home.fastDeliveryDesc')}
               </p>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container-apple">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="heading-2 mb-6">Ready to Start Shopping?</h2>
-            <p className="text-lg text-text-secondary mb-8">
-              Join thousands of satisfied customers and discover products 
-              that enhance your lifestyle.
-            </p>
-            <Link to="/products">
-              <Button size="lg">
-                Browse Products
+      {/* Featured Products Section */}
+      {featuredProducts && featuredProducts.products && featuredProducts.products.length > 0 && (
+        <section className="py-20 bg-white">
+          <div className="container-apple">
+            <div className="text-center mb-16">
+              <h2 className="heading-2 mb-4">{t('home.featuredProducts')}</h2>
+              <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                {t('home.featuredProductsDesc')}
+              </p>
+            </div>
+
+            {productsLoading ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {featuredProducts.products.slice(0, 4).map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+
+            <div className="text-center">
+              <Button variant="outline" size="lg" onClick={() => navigate('/products')}>
+                {t('home.viewAllProducts')}
                 <ArrowRight className="ml-2" size={20} />
               </Button>
-            </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Categories Section */}
+      {categories && categories.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="container-apple">
+            <div className="text-center mb-16">
+              <h2 className="heading-2 mb-4">{t('home.shopByCategory')}</h2>
+              <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+                {t('home.shopByCategoryDesc')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {categories.slice(0, 8).map((category) => (
+                <div key={category.id} onClick={() => navigate(`/products?category=${category.slug}`)}>
+                  <Card hover className="p-6 text-center group">
+                    {category.image ? (
+                      <div className="aspect-square rounded-xl overflow-hidden mb-4 bg-gray-100">
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-square rounded-xl bg-gray-100 mb-4 flex items-center justify-center">
+                        <span className="text-4xl text-text-tertiary">
+                          {category.name[0]}
+                        </span>
+                      </div>
+                    )}
+                    <h3 className="text-lg font-semibold text-text-primary group-hover:text-brand-blue transition-colors">
+                      {category.name}
+                    </h3>
+                    {category.description && (
+                      <p className="text-sm text-text-secondary mt-2 line-clamp-2">
+                        {category.description}
+                      </p>
+                    )}
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="py-20 bg-white">
+        <div className="container-apple">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="heading-2 mb-6">{t('home.readyToShop')}</h2>
+            <p className="text-lg text-text-secondary mb-8">
+              {t('home.readyToShopDesc')}
+            </p>
+            <Button size="lg" onClick={() => navigate('/products')}>
+              {t('home.browseProducts')}
+              <ArrowRight className="ml-2" size={20} />
+            </Button>
           </div>
         </div>
       </section>

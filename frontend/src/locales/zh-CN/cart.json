@@ -1,0 +1,20 @@
+{
+  "title": "购物车",
+  "empty": {
+    "title": "您的购物车是空的",
+    "description": "看起来您还没有将任何商品加入购物车。",
+    "startShopping": "开始购物"
+  },
+  "clearCart": "清空购物车",
+  "orderSummary": "订单摘要",
+  "subtotal": "小计",
+  "shipping": "运费",
+  "free": "免费",
+  "tax": "税金",
+  "total": "总计",
+  "proceedToCheckout": "前往结账",
+  "continueShopping": "继续购物",
+  "itemsInCart": "件商品在购物车中",
+  "itemInCart": "件商品在购物车中"
+}
+

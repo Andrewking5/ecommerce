@@ -1,0 +1,20 @@
+{
+  "title": "Shopping Cart",
+  "empty": {
+    "title": "Your cart is empty",
+    "description": "Looks like you haven't added any items to your cart yet.",
+    "startShopping": "Start Shopping"
+  },
+  "clearCart": "Clear Cart",
+  "orderSummary": "Order Summary",
+  "subtotal": "Subtotal",
+  "shipping": "Shipping",
+  "free": "Free",
+  "tax": "Tax",
+  "total": "Total",
+  "proceedToCheckout": "Proceed to Checkout",
+  "continueShopping": "Continue Shopping",
+  "itemsInCart": "items in cart",
+  "itemInCart": "item in cart"
+}
+

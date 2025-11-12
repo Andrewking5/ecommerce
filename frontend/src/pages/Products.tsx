@@ -1,19 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { productApi } from '@/services/products';
-import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { ShoppingCart, Star } from 'lucide-react';
-import { useCartStore } from '@/store/cartStore';
+import ProductCard from '@/components/product/ProductCard';
+import { Filter, X } from 'lucide-react';
+import Card from '@/components/ui/Card';
+import { ProductQueryParams } from '@/types/product';
 
 const Products: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
-  const { addItem } = useCartStore();
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // 从URL参数获取筛选条件
+  const category = searchParams.get('category') || undefined;
+  const sortBy = (searchParams.get('sortBy') as ProductQueryParams['sortBy']) || 'createdAt';
+  const sortOrder = (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc';
+  const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
+  const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['products', page],
-    queryFn: () => productApi.getProducts({ page, limit: 12 }),
+  // 获取分类列表
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => productApi.getCategories(),
   });
+
+  // 获取商品列表
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products', page, category, sortBy, sortOrder, minPrice, maxPrice],
+    queryFn: () => productApi.getProducts({ 
+      page, 
+      limit: 12,
+      category,
+      sortBy,
+      sortOrder,
+      minPrice,
+      maxPrice,
+    }),
+  });
+
+  // 当筛选条件改变时重置到第一页
+  useEffect(() => {
+    setPage(1);
+  }, [category, sortBy, sortOrder, minPrice, maxPrice]);
 
   if (isLoading) {
     return (
@@ -39,6 +69,22 @@ const Products: React.FC = () => {
   const products = data?.products || [];
   const pagination = data?.pagination;
 
+  const handleFilterChange = (key: string, value: string | number | undefined) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === undefined || value === '') {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, String(value));
+    }
+    setSearchParams(newParams);
+  };
+
+  const clearFilters = () => {
+    setSearchParams({});
+  };
+
+  const hasActiveFilters = category || minPrice || maxPrice || sortBy !== 'createdAt' || sortOrder !== 'desc';
+
   return (
     <div className="container-apple py-12">
       <div className="text-center mb-12">
@@ -47,6 +93,102 @@ const Products: React.FC = () => {
           Discover our curated collection of premium products designed for the modern lifestyle.
         </p>
       </div>
+
+      {/* 筛选和排序栏 */}
+      <div className="mb-8 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="flex items-center space-x-4 flex-1">
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2"
+          >
+            <Filter size={16} />
+            <span>Filters</span>
+          </Button>
+          
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+            >
+              <X size={16} />
+              <span>Clear Filters</span>
+            </Button>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-text-secondary">Sort by:</span>
+          <select
+            value={`${sortBy}-${sortOrder}`}
+            onChange={(e) => {
+              const [newSortBy, newSortOrder] = e.target.value.split('-');
+              handleFilterChange('sortBy', newSortBy);
+              handleFilterChange('sortOrder', newSortOrder);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
+          >
+            <option value="createdAt-desc">Newest First</option>
+            <option value="createdAt-asc">Oldest First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
+      </div>
+
+      {/* 筛选面板 */}
+      {showFilters && (
+        <Card className="p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 分类筛选 */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">Category</label>
+              <select
+                value={category || ''}
+                onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              >
+                <option value="">All Categories</option>
+                {categories?.map((cat) => (
+                  <option key={cat.id} value={cat.slug}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 价格范围 */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">Min Price</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={minPrice || ''}
+                onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="0.00"
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">Max Price</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={maxPrice || ''}
+                onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
+                placeholder="No limit"
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              />
+            </div>
+          </div>
+        </Card>
+      )}
 
       {products.length === 0 ? (
         <div className="text-center py-12">
@@ -57,52 +199,7 @@ const Products: React.FC = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {products.map((product) => (
-              <Card key={product.id} hover className="overflow-hidden">
-                <div className="relative">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-64 object-cover"
-                  />
-                  {product.averageRating && (
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center space-x-1">
-                      <Star size={14} className="text-yellow-500 fill-current" />
-                      <span className="text-sm font-medium">
-                        {product.averageRating.toFixed(1)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-text-secondary text-sm mb-4 line-clamp-2">
-                    {product.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-text-primary">
-                        ${product.price}
-                      </span>
-                    </div>
-                    <span className="text-sm text-text-tertiary">
-                      {product.stock} in stock
-                    </span>
-                  </div>
-                  
-                  <Button
-                    onClick={() => addItem(product)}
-                    className="w-full"
-                    disabled={product.stock === 0}
-                  >
-                    <ShoppingCart size={16} className="mr-2" />
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </Button>
-                </div>
-              </Card>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 

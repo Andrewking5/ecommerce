@@ -7,11 +7,13 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Breadcrumb from '@/components/admin/Breadcrumb';
 import ImageUpload from '@/components/admin/ImageUpload';
+import ProductFilters from '@/components/admin/ProductFilters';
+import BulkActions from '@/components/admin/BulkActions';
 import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import EmptyState from '@/components/admin/EmptyState';
-import { Plus, Search, Edit, Trash2, Loader2, X, Package } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Loader2, X, Package, ArrowUpDown, CheckSquare, Square } from 'lucide-react';
 import { productApi } from '@/services/products';
-import { Product, Category } from '@/types/product';
+import { Product, Category, ProductQueryParams } from '@/types/product';
 import toast from 'react-hot-toast';
 
 const AdminProducts: React.FC = () => {
@@ -19,11 +21,22 @@ const AdminProducts: React.FC = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState<ProductQueryParams>({
+    page: 1,
+    limit: 20,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: string | null }>({
     isOpen: false,
     productId: null,
+  });
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkActionModal, setBulkActionModal] = useState<{ isOpen: boolean; action: string; data?: any }>({
+    isOpen: false,
+    action: '',
   });
   const [formData, setFormData] = useState({
     name: '',
@@ -35,16 +48,21 @@ const AdminProducts: React.FC = () => {
     isActive: true,
   });
 
-  // 获取商品列表
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-products', page, search],
-    queryFn: () => productApi.getProducts({ page, limit: 20, search }),
-  });
-
-  // 获取分类
+  // 获取分类（用于筛选）
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => productApi.getCategories(),
+  });
+
+  // 获取商品列表（使用筛选参数）
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-products', page, search, filters],
+    queryFn: () => productApi.getProducts({ 
+      ...filters, 
+      page, 
+      limit: 20, 
+      search: search || undefined,
+    }),
   });
 
   // 删除商品
@@ -54,9 +72,42 @@ const AdminProducts: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       toast.success('商品删除成功');
       setDeleteConfirm({ isOpen: false, productId: null });
+      setSelectedIds([]);
     },
     onError: () => {
       toast.error('删除失败');
+    },
+  });
+
+  // 批量删除
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => productApi.deleteProduct(id)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      toast.success(`成功删除 ${selectedIds.length} 个商品`);
+      setSelectedIds([]);
+      setBulkActionModal({ isOpen: false, action: '' });
+    },
+    onError: () => {
+      toast.error('批量删除失败');
+    },
+  });
+
+  // 批量更新商品
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, data }: { ids: string[]; data: any }) => {
+      await Promise.all(ids.map(id => productApi.updateProduct(id, data)));
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      toast.success(`成功更新 ${variables.ids.length} 个商品`);
+      setSelectedIds([]);
+      setBulkActionModal({ isOpen: false, action: '' });
+    },
+    onError: () => {
+      toast.error('批量更新失败');
     },
   });
 
@@ -136,6 +187,73 @@ const AdminProducts: React.FC = () => {
     resetForm();
   };
 
+  const handleFiltersChange = (newFilters: ProductQueryParams) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      page: 1,
+      limit: 20,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+    setPage(1);
+  };
+
+  const handleSortChange = (sortBy: ProductQueryParams['sortBy']) => {
+    const currentSort = filters.sortBy === sortBy ? filters.sortOrder : 'desc';
+    const newOrder = currentSort === 'desc' ? 'asc' : 'desc';
+    setFilters({
+      ...filters,
+      sortBy,
+      sortOrder: newOrder,
+    });
+  };
+
+  const handleSelectProduct = (productId: string, selected: boolean) => {
+    if (selected) {
+      setSelectedIds([...selectedIds, productId]);
+    } else {
+      setSelectedIds(selectedIds.filter(id => id !== productId));
+    }
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedIds(data?.products.map(p => p.id) || []);
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleBulkUpdate = (action: string, data?: any) => {
+    if (selectedIds.length === 0) {
+      toast.error('请先选择商品');
+      return;
+    }
+
+    switch (action) {
+      case 'delete':
+        setBulkActionModal({ isOpen: true, action: 'delete' });
+        break;
+      case 'activate':
+        bulkUpdateMutation.mutate({ ids: selectedIds, data: { isActive: true } });
+        break;
+      case 'deactivate':
+        bulkUpdateMutation.mutate({ ids: selectedIds, data: { isActive: false } });
+        break;
+      case 'changeCategory':
+      case 'changePrice':
+      case 'changeStock':
+        setBulkActionModal({ isOpen: true, action, data });
+        break;
+      default:
+        toast.error('未知操作');
+    }
+  };
+
   if (!isAuthenticated || user?.role !== 'ADMIN') {
     return <Navigate to="/" replace />;
   }
@@ -172,7 +290,7 @@ const AdminProducts: React.FC = () => {
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary" size={20} />
             <Input
-              placeholder="搜索商品名称或描述..."
+              placeholder="搜索商品名称、描述或ID..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -183,6 +301,23 @@ const AdminProducts: React.FC = () => {
           </div>
         </div>
       </Card>
+
+      {/* 筛选组件 */}
+      <ProductFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        categories={categories}
+        onReset={handleResetFilters}
+      />
+
+      {/* 批量操作 */}
+      <BulkActions
+        selectedIds={selectedIds}
+        products={data?.products || []}
+        onSelectAll={handleSelectAll}
+        onBulkUpdate={handleBulkUpdate}
+        totalCount={data?.pagination.total || 0}
+      />
 
       {/* 商品列表 */}
       <Card className="overflow-hidden">
@@ -207,6 +342,19 @@ const AdminProducts: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider w-12">
+                      <button
+                        onClick={() => handleSelectAll(selectedIds.length !== (data?.products.length || 0))}
+                        className="p-1 hover:bg-gray-200 rounded transition-colors"
+                        title="全选"
+                      >
+                        {selectedIds.length === (data?.products.length || 0) && (data?.products.length || 0) > 0 ? (
+                          <CheckSquare size={18} className="text-brand-blue" />
+                        ) : (
+                          <Square size={18} className="text-text-tertiary" />
+                        )}
+                      </button>
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                       商品
                     </th>
@@ -214,10 +362,22 @@ const AdminProducts: React.FC = () => {
                       分类
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      价格
+                      <button
+                        onClick={() => handleSortChange('price')}
+                        className="flex items-center space-x-1 hover:text-text-primary transition-colors"
+                      >
+                        <span>价格</span>
+                        <ArrowUpDown size={14} />
+                      </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      库存
+                      <button
+                        onClick={() => handleSortChange('stock')}
+                        className="flex items-center space-x-1 hover:text-text-primary transition-colors"
+                      >
+                        <span>库存</span>
+                        <ArrowUpDown size={14} />
+                      </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                       状态
@@ -228,8 +388,22 @@ const AdminProducts: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {data.products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  {data.products.map((product) => {
+                    const isSelected = selectedIds.includes(product.id);
+                    return (
+                    <tr key={product.id} className={`hover:bg-gray-50 transition-colors ${isSelected ? 'bg-blue-50' : ''}`}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleSelectProduct(product.id, !isSelected)}
+                          className="p-1 hover:bg-gray-200 rounded transition-colors"
+                        >
+                          {isSelected ? (
+                            <CheckSquare size={18} className="text-brand-blue" />
+                          ) : (
+                            <Square size={18} className="text-text-tertiary" />
+                          )}
+                        </button>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {product.images?.[0] && (
@@ -288,7 +462,8 @@ const AdminProducts: React.FC = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -465,6 +640,20 @@ const AdminProducts: React.FC = () => {
           }
         }}
         onCancel={() => setDeleteConfirm({ isOpen: false, productId: null })}
+      />
+
+      {/* 批量删除确认对话框 */}
+      <ConfirmDialog
+        isOpen={bulkActionModal.isOpen && bulkActionModal.action === 'delete'}
+        title="批量删除商品"
+        message={`确定要删除选中的 ${selectedIds.length} 个商品吗？此操作无法撤销。`}
+        confirmText="删除"
+        cancelText="取消"
+        variant="danger"
+        onConfirm={() => {
+          bulkDeleteMutation.mutate(selectedIds);
+        }}
+        onCancel={() => setBulkActionModal({ isOpen: false, action: '' })}
       />
     </div>
   );

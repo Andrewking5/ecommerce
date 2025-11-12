@@ -1,16 +1,19 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { productApi } from '@/services/products';
 import { useCartStore } from '@/store/cartStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { ShoppingCart, Star, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import ProductImageGallery from '@/components/product/ProductImageGallery';
+import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Heart, Loader2 } from 'lucide-react';
+import ProductCard from '@/components/product/ProductCard';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { addItem } = useCartStore();
+  const [quantity, setQuantity] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -56,29 +59,10 @@ const ProductDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Images */}
-        <div className="space-y-4">
-          <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100">
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.slice(1, 5).map((image, index) => (
-                <div key={index} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
-                  <img
-                    src={image}
-                    alt={`${product.name} ${index + 2}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ProductImageGallery 
+          images={product.images || []} 
+          productName={product.name} 
+        />
 
         {/* Product Info */}
         <div className="space-y-6">
@@ -134,17 +118,60 @@ const ProductDetail: React.FC = () => {
             </Card>
           )}
 
+          {/* Quantity Selector */}
+          {product.stock > 0 && (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-text-primary">Quantity:</span>
+              <div className="flex items-center space-x-2 border border-gray-300 rounded-lg">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                  className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="px-4 py-2 min-w-[60px] text-center font-medium">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                  disabled={quantity >= product.stock}
+                  className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              <span className="text-sm text-text-tertiary">
+                Max: {product.stock}
+              </span>
+            </div>
+          )}
+
           {/* Add to Cart */}
           <div className="space-y-4">
-            <Button
-              onClick={() => addItem(product)}
-              disabled={product.stock === 0}
-              size="lg"
-              className="w-full"
-            >
-              <ShoppingCart size={20} className="mr-2" />
-              {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </Button>
+            <div className="flex space-x-4">
+              <Button
+                onClick={() => {
+                  for (let i = 0; i < quantity; i++) {
+                    addItem(product);
+                  }
+                }}
+                disabled={product.stock === 0}
+                size="lg"
+                className="flex-1"
+              >
+                <ShoppingCart size={20} className="mr-2" />
+                {product.stock === 0 ? 'Out of Stock' : `Add ${quantity} to Cart`}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`${isFavorite ? 'text-red-500 border-red-500' : ''}`}
+              >
+                <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -192,6 +219,50 @@ const ProductDetail: React.FC = () => {
               </Card>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Related Products */}
+      {product.category && (
+        <RelatedProducts 
+          categoryId={product.categoryId} 
+          excludeProductId={product.id} 
+        />
+      )}
+    </div>
+  );
+};
+
+// 相关商品组件
+const RelatedProducts: React.FC<{ categoryId: string; excludeProductId: string }> = ({ 
+  categoryId, 
+  excludeProductId 
+}) => {
+  const { data: relatedProducts, isLoading } = useQuery({
+    queryKey: ['related-products', categoryId],
+    queryFn: () => productApi.getProducts({ 
+      page: 1, 
+      limit: 4, 
+      categoryId,
+    }),
+  });
+
+  const products = relatedProducts?.products?.filter(p => p.id !== excludeProductId).slice(0, 4) || [];
+
+  if (products.length === 0) return null;
+
+  return (
+    <div className="mt-16">
+      <h2 className="heading-2 mb-8">Related Products</h2>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       )}
     </div>

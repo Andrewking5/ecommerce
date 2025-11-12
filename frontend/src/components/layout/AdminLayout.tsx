@@ -10,7 +10,8 @@ import {
   X,
   LogOut,
   ChevronRight,
-  Home
+  Home,
+  FolderTree
 } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
@@ -27,6 +28,7 @@ const AdminLayout: React.FC = () => {
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: '仪表板' },
     { path: '/admin/products', icon: Package, label: '商品管理' },
+    { path: '/admin/categories', icon: FolderTree, label: '分类管理' },
     { path: '/admin/orders', icon: ShoppingBag, label: '订单管理' },
     { path: '/admin/users', icon: Users, label: '用户管理' },
   ];

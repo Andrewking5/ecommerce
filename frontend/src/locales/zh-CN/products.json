@@ -1,0 +1,58 @@
+{
+  "home": {
+    "title": "发现精彩商品",
+    "subtitle": "体验未来购物，探索我们精心策划的优质商品系列，专为现代生活方式设计。",
+    "shopNow": "立即购物",
+    "learnMore": "了解更多",
+    "whyChooseUs": "为什么选择我们",
+    "whyChooseUsDesc": "我们致力于提供最佳的购物体验，提供优质商品和卓越服务。",
+    "premiumQuality": "优质品质",
+    "premiumQualityDesc": "每件商品都经过精心挑选和测试，确保最高品质标准。",
+    "secureShopping": "安全购物",
+    "secureShoppingDesc": "您的数据和付款受到业界领先的安全措施保护。",
+    "fastDelivery": "快速配送",
+    "fastDeliveryDesc": "通过我们可靠的物流合作伙伴，快速配送您的订单。",
+    "featuredProducts": "精选商品",
+    "featuredProductsDesc": "探索我们精心挑选的优质商品",
+    "viewAllProducts": "查看所有商品",
+    "shopByCategory": "按分类购物",
+    "shopByCategoryDesc": "按分类浏览我们的商品",
+    "readyToShop": "准备开始购物了吗？",
+    "readyToShopDesc": "加入数千名满意客户的行列，发现提升您生活品质的商品。",
+    "browseProducts": "浏览商品"
+  },
+  "list": {
+    "title": "我们的商品",
+    "subtitle": "探索我们精心策划的优质商品系列，专为现代生活方式设计。",
+    "filters": "筛选",
+    "clearFilters": "清除筛选",
+    "sortBy": "排序方式：",
+    "newestFirst": "最新优先",
+    "oldestFirst": "最旧优先",
+    "priceLowToHigh": "价格：低到高",
+    "priceHighToLow": "价格：高到低",
+    "nameAToZ": "名称：A 到 Z",
+    "nameZToA": "名称：Z 到 A",
+    "category": "分类",
+    "allCategories": "全部分类",
+    "minPrice": "最低价格",
+    "maxPrice": "最高价格",
+    "noLimit": "无限制",
+    "noProducts": "找不到商品",
+    "checkBack": "请稍后再来查看新商品。",
+    "page": "第",
+    "of": "页，共"
+  },
+  "detail": {
+    "addToCart": "加入购物车",
+    "buyNow": "立即购买",
+    "inStock": "有库存",
+    "outOfStock": "缺货",
+    "specifications": "规格",
+    "reviews": "评论",
+    "writeReview": "撰写评论",
+    "noReviews": "尚无评论",
+    "relatedProducts": "相关商品"
+  }
+}
+

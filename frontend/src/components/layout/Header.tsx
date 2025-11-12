@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ShoppingCart, Search, User, Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useLocalizedNavigate } from '@/hooks/useLocalizedNavigate';
 import Button from '@/components/ui/Button';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const { itemCount } = useCartStore();
-  const navigate = useNavigate();
+  const { t } = useTranslation('common');
+  const { navigate } = useLocalizedNavigate();
 
   const handleLogout = async () => {
     await logout();
@@ -34,24 +38,27 @@ const Header: React.FC = () => {
               to="/products"
               className="text-text-secondary hover:text-text-primary transition-colors duration-200"
             >
-              Products
+              {t('navigation.products')}
             </Link>
             <Link
               to="/about"
               className="text-text-secondary hover:text-text-primary transition-colors duration-200"
             >
-              About
+              {t('navigation.about')}
             </Link>
             <Link
               to="/contact"
               className="text-text-secondary hover:text-text-primary transition-colors duration-200"
             >
-              Contact
+              {t('navigation.contact')}
             </Link>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
             {/* Search */}
             <button className="p-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
               <Search size={20} />
@@ -78,7 +85,7 @@ const Header: React.FC = () => {
                     to="/admin"
                     className="px-3 py-1.5 text-sm font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
                   >
-                    管理后台
+                    {t('navigation.admin')}
                   </Link>
                 )}
                 <Link
@@ -92,19 +99,19 @@ const Header: React.FC = () => {
                   size="sm"
                   onClick={handleLogout}
                 >
-                  Logout
+                  {t('buttons.logout')}
                 </Button>
               </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link to="/auth/login">
                   <Button variant="ghost" size="sm">
-                    Login
+                    {t('buttons.login')}
                   </Button>
                 </Link>
                 <Link to="/auth/register">
                   <Button variant="primary" size="sm">
-                    Sign Up
+                    {t('buttons.signUp')}
                   </Button>
                 </Link>
               </div>
@@ -124,26 +131,31 @@ const Header: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <nav className="flex flex-col space-y-4">
+              {/* Language Switcher in Mobile Menu */}
+              <div className="px-4 pb-2">
+                <LanguageSwitcher />
+              </div>
+              
               <Link
                 to="/products"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Products
+                {t('navigation.products')}
               </Link>
               <Link
                 to="/about"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About
+                {t('navigation.about')}
               </Link>
               <Link
                 to="/contact"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Contact
+                {t('navigation.contact')}
               </Link>
             </nav>
           </div>

@@ -8,13 +8,19 @@ export const productApi = {
     
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
+        if (value !== undefined && value !== null && value !== '') {
+          // 处理布尔值
+          if (typeof value === 'boolean') {
+            queryParams.append(key, value.toString());
+          } else {
+            queryParams.append(key, value.toString());
+          }
         }
       });
     }
 
-    const response = await apiClient.get<any>(`/products?${queryParams}`);
+    const queryString = queryParams.toString();
+    const response = await apiClient.get<any>(`/products${queryString ? `?${queryString}` : ''}`);
     // 后端返回格式: { success: true, data: { products, pagination } }
     // apiClient.get 返回 response.data，所以 response 就是 { success: true, data: { products, pagination } }
     

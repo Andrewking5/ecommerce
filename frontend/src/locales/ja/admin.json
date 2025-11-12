@@ -1,0 +1,69 @@
+{
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "管理ダッシュボードへようこそ"
+  },
+  "products": {
+    "title": "商品管理",
+    "subtitle": "すべての商品情報を管理",
+    "addProduct": "商品を追加",
+    "editProduct": "商品を編集",
+    "deleteProduct": "商品を削除",
+    "productName": "商品名",
+    "productDescription": "商品説明",
+    "price": "価格",
+    "stock": "在庫",
+    "category": "カテゴリ",
+    "selectCategory": "カテゴリを選択",
+    "images": "商品画像",
+    "isActive": "すぐに商品を公開",
+    "create": "商品を作成",
+    "update": "商品を更新",
+    "deleteConfirm": "商品を削除",
+    "deleteMessage": "この商品を削除してもよろしいですか？この操作は元に戻せません。",
+    "bulkDelete": "商品を一括削除",
+    "bulkDeleteMessage": "選択した商品を削除してもよろしいですか？この操作は元に戻せません。",
+    "searchPlaceholder": "商品名、説明、またはIDを検索...",
+    "noProducts": "商品がありません",
+    "noProductsDesc": "検索条件に一致する商品が見つかりません。他の検索キーワードをお試しください",
+    "noProductsEmpty": "まだ商品がありません。最初の商品を追加してください",
+    "addFirstProduct": "商品を追加",
+    "product": "商品",
+    "category": "カテゴリ",
+    "price": "価格",
+    "stock": "在庫",
+    "status": "ステータス",
+    "actions": "操作",
+    "active": "公開中",
+    "inactive": "非公開",
+    "selectAll": "すべて選択",
+    "showing": "表示",
+    "to": "から",
+    "of": "件、合計",
+    "entries": "件",
+    "page": "ページ",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "categories": {
+    "title": "カテゴリ管理"
+  },
+  "orders": {
+    "title": "注文管理"
+  },
+  "users": {
+    "title": "ユーザー管理"
+  },
+  "messages": {
+    "productCreated": "商品が作成されました",
+    "productUpdated": "商品が更新されました",
+    "productDeleted": "商品が削除されました",
+    "bulkDeleteSuccess": "個の商品を削除しました",
+    "bulkUpdateSuccess": "個の商品を更新しました",
+    "selectProducts": "まず商品を選択してください",
+    "selectCategory": "カテゴリを選択してください",
+    "uploadImage": "少なくとも1つの画像をアップロードしてください",
+    "unknownAction": "不明な操作"
+  }
+}
+
