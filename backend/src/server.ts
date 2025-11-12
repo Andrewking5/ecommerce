@@ -42,6 +42,22 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
+    // 運行數據庫遷移（生產環境）
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🔍 Running database migrations...');
+      try {
+        const { execSync } = require('child_process');
+        execSync('npx prisma migrate deploy', { 
+          stdio: 'inherit',
+          cwd: process.cwd()
+        });
+        console.log('✅ Database migrations completed');
+      } catch (error: any) {
+        console.warn('⚠️  Database migration warning:', error?.message || error);
+        // 不阻止服務器啟動，因為遷移可能已經運行過
+      }
+    }
+
     // 啟動伺服器
     console.log('🔍 Starting HTTP server...');
     server = app.listen(PORT, () => {

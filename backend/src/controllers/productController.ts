@@ -90,18 +90,39 @@ export class ProductController {
       });
       return;
     } catch (error: any) {
-      console.error('Get products error:', error);
+      console.error('❌ Get products error:', error);
       console.error('Error details:', {
         message: error?.message,
         code: error?.code,
-        stack: error?.stack,
+        meta: error?.meta,
+        stack: error?.stack?.split('\n').slice(0, 5).join('\n'), // 只顯示前5行堆棧
       });
+      
+      // 如果是 Prisma 錯誤，提供更詳細的信息
+      if (error?.code === 'P2002') {
+        res.status(400).json({
+          success: false,
+          message: 'Unique constraint violation',
+          details: error?.meta,
+        });
+        return;
+      }
+      
+      if (error?.code === 'P2025') {
+        res.status(404).json({
+          success: false,
+          message: 'Record not found',
+        });
+        return;
+      }
+
       res.status(500).json({
         success: false,
         message: error?.message || 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { 
+        ...(process.env.NODE_ENV !== 'production' && { 
           error: error?.stack,
-          details: error 
+          code: error?.code,
+          meta: error?.meta,
         }),
       });
       return;
