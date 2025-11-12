@@ -43,17 +43,21 @@ async function startServer() {
     console.log('✅ Database connected successfully');
 
     // 運行數據庫遷移（生產環境）
+    // 注意：遷移在服務器啟動時運行，而不是在構建時
     if (process.env.NODE_ENV === 'production') {
       console.log('🔍 Running database migrations...');
       try {
         const { execSync } = require('child_process');
         execSync('npx prisma migrate deploy', { 
           stdio: 'inherit',
-          cwd: process.cwd()
+          cwd: process.cwd(),
+          env: { ...process.env },
+          timeout: 30000, // 30秒超時
         });
         console.log('✅ Database migrations completed');
       } catch (error: any) {
         console.warn('⚠️  Database migration warning:', error?.message || error);
+        console.warn('⚠️  This is usually safe - migrations may have already been applied');
         // 不阻止服務器啟動，因為遷移可能已經運行過
       }
     }
@@ -68,15 +72,15 @@ async function startServer() {
 
     // 處理伺服器錯誤
     if (server) {
-      server.on('error', (error: any) => {
-        if (error.code === 'EADDRINUSE') {
-          console.error(`❌ Port ${PORT} is already in use. Please free the port or use a different port.`);
-          process.exit(1);
-        } else {
-          console.error('❌ Server error:', error);
-          process.exit(1);
-        }
-      });
+    server.on('error', (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use. Please free the port or use a different port.`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', error);
+        process.exit(1);
+      }
+    });
     }
   } catch (error: any) {
     console.error('❌ Failed to start server:');
@@ -100,7 +104,7 @@ async function shutdown() {
   }
   
   if (prisma) {
-    await prisma.$disconnect();
+  await prisma.$disconnect();
   }
   process.exit(0);
 }
