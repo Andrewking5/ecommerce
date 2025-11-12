@@ -150,11 +150,20 @@ if (import.meta.env.PROD) {
 export const apiClient = new ApiClient(apiBaseURL);
 
 // 從本地儲存載入 token（在模組初始化時）
+// 這確保頁面刷新後 token 仍然可用（正式版和本地都適用）
 const token = localStorage.getItem('token');
 if (token) {
   apiClient.setToken(token);
-  if (import.meta.env.DEV) {
-    console.log('🔑 Token loaded from localStorage on module init');
+  // 生產環境也輸出，幫助診斷問題
+  if (import.meta.env.PROD) {
+    console.log('🔑 Token loaded from localStorage (production)');
+  } else {
+    console.log('🔑 Token loaded from localStorage (development)');
+  }
+} else {
+  // 生產環境也輸出，幫助診斷
+  if (import.meta.env.PROD) {
+    console.log('⚠️ No token found in localStorage (production)');
   }
 }
 
