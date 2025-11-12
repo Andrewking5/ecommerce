@@ -27,6 +27,7 @@ import uploadRoutes from './routes/upload';
 import healthRoutes from './routes/health';
 import adminRoutes from './routes/admin';
 import categoryRoutes from './routes/categories';
+import inventoryRoutes from './routes/inventory';
 
 // 初始化 Prisma 客戶端
 export const prisma = new PrismaClient({
@@ -129,6 +130,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/categories', categoryRoutes);
+app.use('/api/admin/inventory', inventoryRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

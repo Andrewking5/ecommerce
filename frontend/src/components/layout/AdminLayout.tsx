@@ -12,7 +12,8 @@ import {
   LogOut,
   ChevronRight,
   Home,
-  FolderTree
+  FolderTree,
+  AlertTriangle
 } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
@@ -31,6 +32,7 @@ const AdminLayout: React.FC = () => {
     { path: '/admin', icon: LayoutDashboard, label: t('menu.dashboard') },
     { path: '/admin/products', icon: Package, label: t('menu.products') },
     { path: '/admin/categories', icon: FolderTree, label: t('menu.categories') },
+    { path: '/admin/inventory', icon: AlertTriangle, label: t('menu.inventory') },
     { path: '/admin/orders', icon: ShoppingBag, label: t('menu.orders') },
     { path: '/admin/users', icon: Users, label: t('menu.users') },
   ];

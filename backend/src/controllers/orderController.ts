@@ -207,13 +207,69 @@ export class OrderController {
   // 獲取所有訂單（管理員）
   static async getAllOrders(req: Request, res: Response): Promise<void> {
     try {
-      const { page = 1, limit = 20, status } = req.query;
+      const {
+        page = 1,
+        limit = 20,
+        status,
+        search,
+        startDate,
+        endDate,
+        minAmount,
+        maxAmount,
+        userId,
+      } = req.query;
 
       const skip = (Number(page) - 1) * Number(limit);
 
       const where: any = {};
+      
+      // 状态筛选
       if (status) {
         where.status = status;
+      }
+
+      // 搜索（订单号、客户邮箱、商品名称）
+      if (search) {
+        where.OR = [
+          { id: { contains: search as string, mode: 'insensitive' } },
+          { user: { email: { contains: search as string, mode: 'insensitive' } } },
+          {
+            orderItems: {
+              some: {
+                product: {
+                  name: { contains: search as string, mode: 'insensitive' },
+                },
+              },
+            },
+          },
+        ];
+      }
+
+      // 用户筛选
+      if (userId) {
+        where.userId = userId as string;
+      }
+
+      // 日期范围筛选
+      if (startDate || endDate) {
+        where.createdAt = {};
+        if (startDate) {
+          where.createdAt.gte = new Date(startDate as string);
+        }
+        if (endDate) {
+          where.createdAt.lte = new Date(endDate as string);
+        }
+      }
+
+      // 金额范围筛选
+      if (minAmount || maxAmount) {
+        where.totalAmount = {};
+        if (minAmount) {
+          where.totalAmount.gte = Number(minAmount);
+        }
+        if (maxAmount) {
+          where.totalAmount.lte = Number(maxAmount);
+        }
       }
 
       const [orders, total] = await Promise.all([

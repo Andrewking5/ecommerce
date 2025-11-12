@@ -15,6 +15,7 @@ import OrderDetail from '@/pages/OrderDetail'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminProducts from '@/pages/admin/AdminProducts'
 import AdminCategories from '@/pages/admin/AdminCategories'
+import AdminInventory from '@/pages/admin/AdminInventory'
 import AdminOrders from '@/pages/admin/AdminOrders'
 import AdminUsers from '@/pages/admin/AdminUsers'
 import NotFound from '@/pages/NotFound'
@@ -50,6 +51,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
+          <Route path="inventory" element={<AdminInventory />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
         </Route>
