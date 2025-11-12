@@ -151,13 +151,20 @@ dist
 
 ### 環境變量
 
-在 Render 的環境變量部分添加：
+**重要**: 前端部署在 Vercel，需要在 Vercel 項目設置中添加環境變量：
+
+1. 進入 Vercel 項目設置
+2. 點擊 "Environment Variables"
+3. 添加以下環境變量：
 
 ```env
-VITE_API_URL=https://your-backend-url.onrender.com/api
+VITE_API_URL=https://ecommerce-1w9j.onrender.com/api
 ```
 
-**注意**: Vite 環境變量必須以 `VITE_` 開頭才能在客戶端使用。
+**注意**: 
+- Vite 環境變量必須以 `VITE_` 開頭才能在客戶端使用
+- 添加環境變量後，需要重新部署前端應用
+- 後端 API URL: `https://ecommerce-1w9j.onrender.com`
 
 ---
 
