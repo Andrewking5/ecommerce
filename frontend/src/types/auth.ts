@@ -4,6 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   phone?: string;
+  avatar?: string;
   role: 'USER' | 'ADMIN';
   isActive: boolean;
   createdAt: string;
