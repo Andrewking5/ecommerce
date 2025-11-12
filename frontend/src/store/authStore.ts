@@ -105,11 +105,11 @@ export const useAuthStore = create<AuthStore>()(
         // 同步清除 apiClient 的 token
         apiClient.clearToken();
         set({
-          user: null,
-          token: null,
-          refreshToken: null,
-          isAuthenticated: false,
-          isLoading: false,
+        user: null,
+        token: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        isLoading: false,
         });
       },
 

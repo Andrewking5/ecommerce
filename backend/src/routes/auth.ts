@@ -10,7 +10,7 @@ const router = Router();
 
 // 應用認證限制（社交登录路由除外）
 router.use((req, res, next) => {
-  if (!req.path.includes('/google') && !req.path.includes('/facebook') && !req.path.includes('/apple')) {
+  if (!req.path.includes('/google') && !req.path.includes('/facebook')) {
     authLimiter(req, res, next);
   } else {
     next();
@@ -54,13 +54,6 @@ router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }))
 router.get('/facebook/callback',
   passport.authenticate('facebook', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/auth/login?error=facebook_auth_failed` }),
   SocialAuthController.facebookCallback
-);
-
-// Apple
-router.post('/apple', passport.authenticate('apple'));
-router.post('/apple/callback',
-  passport.authenticate('apple', { session: false }),
-  SocialAuthController.appleCallback
 );
 
 export default router;

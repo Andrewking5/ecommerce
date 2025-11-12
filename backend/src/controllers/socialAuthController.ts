@@ -7,8 +7,8 @@ interface SocialUserProfile {
   email: string;
   firstName: string;
   lastName: string;
-  avatar?: string | null; // 允许 null，因为 Apple 不提供头像
-  provider: 'GOOGLE' | 'APPLE' | 'FACEBOOK';
+  avatar?: string | null;
+  provider: 'GOOGLE' | 'FACEBOOK';
   providerData?: any;
 }
 
@@ -235,57 +235,6 @@ export class SocialAuthController {
       
       // 根据错误类型设置友好的错误消息
       let errorMessage = 'Facebook authentication failed';
-      if (error.message === 'EMAIL_REQUIRED') {
-        errorMessage = 'EMAIL_REQUIRED';
-      } else if (error.message === 'EMAIL_ALREADY_REGISTERED') {
-        errorMessage = 'EMAIL_ALREADY_REGISTERED';
-      } else if (error.message === 'EMAIL_ALREADY_EXISTS') {
-        errorMessage = 'EMAIL_ALREADY_EXISTS';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      redirectUrl.searchParams.set('error', errorMessage);
-      res.redirect(redirectUrl.toString());
-      return;
-    }
-  }
-
-  // Apple 登录回调
-  static async appleCallback(req: Request, res: Response): Promise<void> {
-    try {
-      const profile = req.user as any;
-      
-      if (!profile) {
-        throw new Error('No profile data received from Apple');
-      }
-
-      // Apple 可能不提供 email（如果用户选择隐藏）
-      // 如果没有 email，使用私有中继邮箱
-      const email = profile.email || `${profile.sub}@privaterelay.appleid.com`;
-      const name = profile.name || {};
-      
-      const socialProfile: SocialUserProfile = {
-        id: profile.sub,
-        email,
-        firstName: name.firstName || 'User',
-        lastName: name.lastName || '',
-        avatar: null, // Apple 不提供头像
-        provider: 'APPLE',
-        providerData: {
-          name: profile.name,
-        },
-      };
-
-      await SocialAuthController.handleSocialCallback(socialProfile, res);
-      return;
-    } catch (error: any) {
-      console.error('Apple callback error:', error);
-      const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
-      redirectUrl.searchParams.set('success', 'false');
-      
-      // 根据错误类型设置友好的错误消息
-      let errorMessage = 'Apple authentication failed';
       if (error.message === 'EMAIL_REQUIRED') {
         errorMessage = 'EMAIL_REQUIRED';
       } else if (error.message === 'EMAIL_ALREADY_REGISTERED') {

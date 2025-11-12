@@ -4,11 +4,12 @@
 
 ✅ Google OAuth 登录
 ✅ Facebook OAuth 登录  
-✅ Apple OAuth 登录
 ✅ 自动创建/更新用户账户
 ✅ 记录社交登录信息（provider, providerId, providerData）
 ✅ 头像自动同步
 ✅ 前端社交登录按钮
+
+**注意：** Apple OAuth 登录已移除（需要付费 Apple Developer 账号，年费 $99 USD）
 
 ## 数据库迁移
 
@@ -65,26 +66,23 @@ FACEBOOK_APP_SECRET="your-facebook-app-secret"
 FACEBOOK_CALLBACK_URL="http://localhost:3001/api/auth/facebook/callback"
 ```
 
-### Apple OAuth
-1. 访问 [Apple Developer](https://developer.apple.com/)
-2. 创建 App ID 和 Service ID
-3. 配置 Sign in with Apple
-4. 创建私钥文件
+### Apple OAuth（已移除）
 
-```env
-APPLE_CLIENT_ID="your-apple-service-id"
-APPLE_TEAM_ID="your-apple-team-id"
-APPLE_KEY_ID="your-apple-key-id"
-APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-APPLE_CALLBACK_URL="http://localhost:3001/api/auth/apple/callback"
-```
+Apple OAuth 登录功能已从项目中移除，原因：
+- 需要付费 Apple Developer 账号（年费 $99 USD）
+- 配置过程较为复杂
+- 对于大多数项目，Google 和 Facebook 登录已足够
+
+如果需要重新启用 Apple 登录，可以：
+1. 申请 Apple Developer Program
+2. 参考之前的配置文档恢复相关代码
 
 ## 功能说明
 
 ### 用户数据记录
 
 系统会自动记录以下信息：
-- **provider**: 登录方式 (GOOGLE, APPLE, FACEBOOK, EMAIL)
+- **provider**: 登录方式 (GOOGLE, FACEBOOK, EMAIL)
 - **providerId**: 第三方平台的用户 ID
 - **providerData**: 第三方平台的额外信息（JSON 格式）
 - **avatar**: 用户头像 URL（自动从第三方平台获取）
@@ -116,7 +114,7 @@ APPLE_CALLBACK_URL="http://localhost:3001/api/auth/apple/callback"
 ## 注意事项
 
 - 生产环境需要更新回调 URL
-- Apple 登录需要 HTTPS（生产环境）
 - 确保 CORS 配置正确
 - 定期更新 OAuth 密钥
+- Google 和 Facebook 登录都是免费的，适合大多数项目使用
 
