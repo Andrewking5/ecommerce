@@ -16,6 +16,11 @@ export const productApi = {
 
     const response = await apiClient.get<any>(`/products?${queryParams}`);
     // 后端返回格式: { success: true, data: { products, pagination } }
+    // apiClient.get 已经返回了 response.data，所以 response 就是 { success: true, data: { products, pagination } }
+    if (response.success && response.data) {
+      return response.data; // 返回 { products, pagination }
+    }
+    // 兼容旧格式或错误情况
     return response.data || response;
   },
 
