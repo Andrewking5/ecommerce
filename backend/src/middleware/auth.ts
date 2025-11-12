@@ -19,7 +19,17 @@ export const authenticateToken = async (
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  // 調試日誌：記錄認證請求
+  console.log('🔑 Authentication check:', {
+    path: req.path,
+    method: req.method,
+    hasAuthHeader: !!authHeader,
+    hasToken: !!token,
+    tokenPrefix: token ? token.substring(0, 20) + '...' : 'none',
+  });
+
   if (!token) {
+    console.warn('⚠️  No token provided for:', req.path);
     res.status(401).json({ 
       success: false,
       message: 'Access token required' 
@@ -63,7 +73,12 @@ export const authenticateToken = async (
     
     next();
     return;
-  } catch (error) {
+  } catch (error: any) {
+    console.error('❌ Token verification failed:', {
+      path: req.path,
+      error: error?.message || error,
+      errorName: error?.name,
+    });
     res.status(403).json({ 
       success: false,
       message: 'Invalid or expired token' 
@@ -79,15 +94,20 @@ export const requireAdmin = (
 ): void => {
   const authReq = req as AuthRequest;
   
-  // 調試信息
-  console.log('🔐 Admin check:', {
+  // 調試信息（生產環境也輸出，幫助診斷）
+  const userRole = String(authReq.user?.role || '').toUpperCase();
+  const debugInfo = {
     hasUser: !!authReq.user,
     userId: authReq.user?.id,
     userEmail: authReq.user?.email,
     userRole: authReq.user?.role,
     roleType: typeof authReq.user?.role,
-    isAdmin: authReq.user?.role === 'ADMIN',
-  });
+    roleValue: userRole,
+    isAdmin: userRole === 'ADMIN',
+    requestPath: req.path,
+    requestMethod: req.method,
+  };
+  console.log('🔐 Admin check:', debugInfo);
   
   if (!authReq.user) {
     res.status(403).json({ 
