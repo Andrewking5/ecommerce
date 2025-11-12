@@ -15,29 +15,46 @@ export async function createInitialAdminIfNeeded(): Promise<void> {
       return;
     }
 
-    // 檢查是否已有管理員
-    const existingAdmin = await prisma.user.findFirst({
-      where: { role: 'ADMIN' },
-    });
-
-    if (existingAdmin) {
-      console.log('ℹ️  Admin account already exists, skipping initial admin creation');
-      return;
-    }
-
-    // 檢查 Email 是否已存在
+    // 檢查 Email 是否已存在（優先檢查，因為即使已有其他 ADMIN，也要確保指定 email 是 ADMIN）
     const existingUser = await prisma.user.findUnique({
       where: { email: adminEmail },
     });
 
     if (existingUser) {
-      console.log(`⚠️  User with email ${adminEmail} already exists, updating to ADMIN...`);
-      await prisma.user.update({
-        where: { email: adminEmail },
-        data: { role: 'ADMIN' },
+      // 如果用戶已存在，檢查是否需要升級為 ADMIN
+      if (existingUser.role !== 'ADMIN') {
+        console.log(`⚠️  User with email ${adminEmail} already exists, updating to ADMIN...`);
+        await prisma.user.update({
+          where: { email: adminEmail },
+          data: { role: 'ADMIN' },
+        });
+        console.log(`✅ User ${adminEmail} has been upgraded to ADMIN`);
+      } else {
+        console.log(`ℹ️  User ${adminEmail} already exists and is ADMIN`);
+      }
+      
+      // 檢查是否已有其他管理員
+      const existingAdmin = await prisma.user.findFirst({
+        where: { 
+          role: 'ADMIN',
+          email: { not: adminEmail }, // 排除當前用戶
+        },
       });
-      console.log(`✅ User ${adminEmail} has been upgraded to ADMIN`);
+      
+      if (existingAdmin) {
+        console.log(`ℹ️  Admin account already exists (${existingAdmin.email}), but ${adminEmail} is also ADMIN`);
+      }
       return;
+    }
+
+    // 檢查是否已有管理員（如果指定 email 不存在，才檢查是否有其他管理員）
+    const existingAdmin = await prisma.user.findFirst({
+      where: { role: 'ADMIN' },
+    });
+
+    if (existingAdmin) {
+      console.log(`ℹ️  Admin account already exists (${existingAdmin.email}), but will create new admin: ${adminEmail}`);
+      // 不返回，繼續創建新的管理員
     }
 
     // 驗證密碼長度
