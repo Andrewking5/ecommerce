@@ -29,14 +29,23 @@ class ApiClient {
             });
           }
         } else {
-          // 嘗試從 localStorage 重新加載 token
+          // 嘗試從 localStorage 重新加載 token（防止 token 丟失）
+          // 這確保即使內存中的 token 丟失，也能從 localStorage 恢復
           const storedToken = localStorage.getItem('token');
           if (storedToken) {
-            console.warn('⚠️ API Request: Token not in memory, reloading from localStorage');
+            // 生產環境也輸出警告，幫助診斷
+            console.warn('⚠️ API Request: Token not in memory, reloading from localStorage', {
+              url: config.url,
+              hasStoredToken: !!storedToken,
+            });
             this.token = storedToken;
             config.headers.Authorization = `Bearer ${this.token}`;
           } else {
-            console.warn('⚠️ API Request without token:', config.url);
+            // 生產環境也輸出警告
+            console.warn('⚠️ API Request without token:', {
+              url: config.url,
+              method: config.method,
+            });
           }
         }
         // 如果是 FormData，不设置 Content-Type，让浏览器自动设置
