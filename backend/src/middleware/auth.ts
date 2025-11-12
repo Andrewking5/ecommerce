@@ -94,8 +94,18 @@ export const requireAdmin = (
 ): void => {
   const authReq = req as AuthRequest;
   
+  if (!authReq.user) {
+    res.status(403).json({ 
+      success: false,
+      message: 'Authentication required' 
+    });
+    return;
+  }
+  
+  // 檢查角色（支持字符串和枚舉類型）
+  const userRole = String(authReq.user.role).toUpperCase();
+  
   // 調試信息（生產環境也輸出，幫助診斷）
-  const userRole = String(authReq.user?.role || '').toUpperCase();
   const debugInfo = {
     hasUser: !!authReq.user,
     userId: authReq.user?.id,
@@ -109,16 +119,6 @@ export const requireAdmin = (
   };
   console.log('🔐 Admin check:', debugInfo);
   
-  if (!authReq.user) {
-    res.status(403).json({ 
-      success: false,
-      message: 'Authentication required' 
-    });
-    return;
-  }
-  
-  // 檢查角色（支持字符串和枚舉類型）
-  const userRole = String(authReq.user.role).toUpperCase();
   if (userRole !== 'ADMIN') {
     res.status(403).json({ 
       success: false,
