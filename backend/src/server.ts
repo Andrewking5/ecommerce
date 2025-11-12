@@ -42,6 +42,10 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
+    // 創建初始管理員（如果環境變量已設置）
+    const { createInitialAdminIfNeeded } = require('./utils/createInitialAdmin');
+    await createInitialAdminIfNeeded();
+
     // 運行數據庫遷移（生產環境）
     // 注意：遷移在服務器啟動時運行，而不是在構建時
     if (process.env.NODE_ENV === 'production') {
