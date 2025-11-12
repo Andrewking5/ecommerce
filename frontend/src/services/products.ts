@@ -16,12 +16,26 @@ export const productApi = {
 
     const response = await apiClient.get<any>(`/products?${queryParams}`);
     // 后端返回格式: { success: true, data: { products, pagination } }
-    // apiClient.get 已经返回了 response.data，所以 response 就是 { success: true, data: { products, pagination } }
-    if (response.success && response.data) {
-      return response.data; // 返回 { products, pagination }
+    // apiClient.get 返回 response.data，所以 response 就是 { success: true, data: { products, pagination } }
+    
+    // 检查响应格式
+    if (response && typeof response === 'object') {
+      if (response.success && response.data) {
+        // 标准格式: { success: true, data: { products, pagination } }
+        return response.data;
+      }
+      if (response.products && response.pagination) {
+        // 直接格式: { products, pagination }
+        return response;
+      }
+      if (response.data) {
+        // 只有 data: { products, pagination }
+        return response.data;
+      }
     }
+    
     // 兼容旧格式或错误情况
-    return response.data || response;
+    return response;
   },
 
   // 獲取單一商品
