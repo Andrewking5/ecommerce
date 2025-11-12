@@ -41,13 +41,20 @@ export class ProductController {
         if (maxPrice) where.price.lte = Number(maxPrice);
       }
 
+      // 驗證 sortBy 字段
+      const allowedSortFields = ['createdAt', 'updatedAt', 'name', 'price'];
+      const sortField = allowedSortFields.includes(sortBy as string) 
+        ? (sortBy as string) 
+        : 'createdAt';
+      const sortDirection = sortOrder === 'asc' ? 'asc' : 'desc';
+
       // 執行查詢
       const [products, total] = await Promise.all([
         prisma.product.findMany({
           where,
           skip,
           take: Number(limit),
-          orderBy: { [sortBy as string]: sortOrder },
+          orderBy: { [sortField]: sortDirection },
           include: {
             category: true,
             reviews: {
@@ -82,11 +89,20 @@ export class ProductController {
         },
       });
       return;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Get products error:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
+      });
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: error?.message || 'Internal server error',
+        ...(process.env.NODE_ENV === 'development' && { 
+          error: error?.stack,
+          details: error 
+        }),
       });
       return;
     }
