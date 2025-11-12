@@ -7,7 +7,6 @@ export interface User {
   avatar?: string;
   role: 'USER' | 'ADMIN';
   isActive: boolean;
-  preferredLanguage?: string;
   createdAt: string;
   updatedAt: string;
 }

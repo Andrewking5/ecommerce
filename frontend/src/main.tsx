@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
-import './i18n/config'
 import './styles/index.css'
+import './i18n/config'
 
 // 建立 React Query 客戶端
 const queryClient = new QueryClient({

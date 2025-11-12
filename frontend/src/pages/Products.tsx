@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { productApi } from '@/services/products';
 import Button from '@/components/ui/Button';
 import ProductCard from '@/components/product/ProductCard';
@@ -9,6 +10,7 @@ import Card from '@/components/ui/Card';
 import { ProductQueryParams } from '@/types/product';
 
 const Products: React.FC = () => {
+  const { t } = useTranslation(['products', 'common']);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
@@ -50,6 +52,7 @@ const Products: React.FC = () => {
       <div className="container-apple py-12">
         <div className="flex justify-center items-center h-64">
           <div className="spinner w-8 h-8"></div>
+          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -59,8 +62,8 @@ const Products: React.FC = () => {
     return (
       <div className="container-apple py-12">
         <div className="text-center">
-          <h2 className="heading-2 mb-4">Error Loading Products</h2>
-          <p className="text-text-secondary">Please try again later.</p>
+          <h2 className="heading-2 mb-4">{t('common:error')}</h2>
+          <p className="text-text-secondary">{t('common:error', { defaultValue: 'Please try again later.' })}</p>
         </div>
       </div>
     );
@@ -88,9 +91,9 @@ const Products: React.FC = () => {
   return (
     <div className="container-apple py-12">
       <div className="text-center mb-12">
-        <h1 className="heading-1 mb-4">Our Products</h1>
+        <h1 className="heading-1 mb-4">{t('products:title')}</h1>
         <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-          Discover our curated collection of premium products designed for the modern lifestyle.
+          {t('products:featuredDescription')}
         </p>
       </div>
 
@@ -103,7 +106,7 @@ const Products: React.FC = () => {
             className="flex items-center space-x-2"
           >
             <Filter size={16} />
-            <span>Filters</span>
+            <span>{t('products:filter.title')}</span>
           </Button>
           
           {hasActiveFilters && (
@@ -113,13 +116,13 @@ const Products: React.FC = () => {
               className="flex items-center space-x-2 text-red-600 hover:text-red-700"
             >
               <X size={16} />
-              <span>Clear Filters</span>
+              <span>{t('common:buttons.reset')}</span>
             </Button>
           )}
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-text-secondary">Sort by:</span>
+          <span className="text-sm text-text-secondary">{t('products:filter.sortBy')}:</span>
           <select
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
@@ -129,12 +132,12 @@ const Products: React.FC = () => {
             }}
             className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
           >
-            <option value="createdAt-desc">Newest First</option>
-            <option value="createdAt-asc">Oldest First</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name-asc">Name: A to Z</option>
-            <option value="name-desc">Name: Z to A</option>
+            <option value="createdAt-desc">{t('products:filter.sortOptions.newest')}</option>
+            <option value="createdAt-asc">{t('products:filter.sortOptions.oldest')}</option>
+            <option value="price-asc">{t('products:filter.sortOptions.priceLow')}</option>
+            <option value="price-desc">{t('products:filter.sortOptions.priceHigh')}</option>
+            <option value="name-asc">{t('products:filter.sortOptions.nameAZ')}</option>
+            <option value="name-desc">{t('products:filter.sortOptions.nameZA')}</option>
           </select>
         </div>
       </div>
@@ -151,7 +154,7 @@ const Products: React.FC = () => {
                 onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
               >
-                <option value="">All Categories</option>
+                <option value="">{t('common:buttons.viewAll', { defaultValue: 'All Categories' })}</option>
                 {categories?.map((cat) => (
                   <option key={cat.id} value={cat.slug}>
                     {cat.name}
@@ -162,7 +165,7 @@ const Products: React.FC = () => {
 
             {/* 价格范围 */}
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">Min Price</label>
+              <label className="block text-sm font-medium text-text-primary mb-2">{t('products:filter.priceRange')} (Min)</label>
               <input
                 type="number"
                 min="0"
@@ -175,14 +178,15 @@ const Products: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">Max Price</label>
+              <label className="block text-sm font-medium text-text-primary mb-2">{t('products:filter.priceRange')} (Max)</label>
               <input
                 type="number"
                 min="0"
                 step="0.01"
                 value={maxPrice || ''}
                 onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-                placeholder="No limit"
+                placeholder={t('common:noLimit', { defaultValue: 'No limit' })}
+                aria-label={t('products:filter.priceRange')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
               />
             </div>
@@ -211,11 +215,11 @@ const Products: React.FC = () => {
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
               >
-                Previous
+                {t('common:buttons.previous')}
               </Button>
               
               <span className="flex items-center px-4 text-text-secondary">
-                Page {page} of {pagination.totalPages}
+                {t('common:buttons.page', { defaultValue: 'Page' })} {page} {t('common:buttons.of', { defaultValue: 'of' })} {pagination.totalPages}
               </span>
               
               <Button
@@ -223,7 +227,7 @@ const Products: React.FC = () => {
                 onClick={() => setPage(page + 1)}
                 disabled={page === pagination.totalPages}
               >
-                Next
+                {t('common:buttons.next')}
               </Button>
             </div>
           )}

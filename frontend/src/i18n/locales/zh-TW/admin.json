@@ -1,0 +1,79 @@
+{
+  "dashboard": {
+    "title": "儀表板",
+    "welcome": "歡迎回來, {{firstName}} {{lastName}}",
+    "totalProducts": "商品總數",
+    "totalOrders": "訂單總數",
+    "totalUsers": "用戶總數",
+    "revenue": "營收",
+    "totalProductsDesc": "商品總數",
+    "totalOrdersDesc": "所有訂單數量",
+    "totalUsersDesc": "註冊用戶總數",
+    "revenueDesc": "累計收入"
+  },
+  "products": {
+    "title": "商品管理",
+    "addProduct": "新增商品",
+    "editProduct": "編輯商品",
+    "deleteProduct": "刪除商品",
+    "name": "商品名稱",
+    "description": "描述",
+    "price": "價格",
+    "stock": "庫存",
+    "category": "分類",
+    "images": "圖片",
+    "isActive": "啟用"
+  },
+  "categories": {
+    "title": "分類管理",
+    "addCategory": "新增分類",
+    "editCategory": "編輯分類",
+    "deleteCategory": "刪除分類",
+    "name": "分類名稱",
+    "slug": "別名",
+    "description": "描述",
+    "image": "圖片"
+  },
+  "orders": {
+    "title": "訂單管理",
+    "viewOrder": "查看訂單",
+    "updateStatus": "更新狀態"
+  },
+  "users": {
+    "title": "用戶管理",
+    "viewUser": "查看用戶",
+    "editUser": "編輯用戶",
+    "deleteUser": "刪除用戶"
+  },
+  "menu": {
+    "dashboard": "儀表板",
+    "products": "商品",
+    "categories": "分類",
+    "orders": "訂單",
+    "users": "用戶"
+  },
+  "imageUpload": {
+    "label": "商品圖片",
+    "mainImage": "主圖",
+    "maxImages": "最多只能上傳 {{max}} 張圖片",
+    "selectImage": "請選擇圖片文件",
+    "uploadSuccess": "成功上傳 {{count}} 張圖片",
+    "uploadFailed": "圖片上傳失敗",
+    "uploading": "上傳中...",
+    "dragDrop": "拖拽圖片到此處或",
+    "clickUpload": "點擊上傳",
+    "formatInfo": "支持 JPG、PNG、WebP 格式，最多 {{max}} 張，單張最大 10MB",
+    "urlInput": "或輸入圖片 URL（用逗號分隔多個 URL）"
+  },
+  "quickActions": {
+    "productManagement": "商品管理",
+    "productManagementDesc": "管理商品、分類和庫存",
+    "manageProducts": "管理商品",
+    "orderManagement": "訂單管理",
+    "orderManagementDesc": "查看和處理訂單",
+    "manageOrders": "管理訂單",
+    "userManagement": "用戶管理",
+    "userManagementDesc": "查看和管理用戶帳戶",
+    "manageUsers": "管理用戶"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "required": "{{field}} is required",
+  "email": "Please enter a valid email address",
+  "password": "Password must be at least 8 characters",
+  "passwordMatch": "Passwords do not match",
+  "minLength": "{{field}} must be at least {{min}} characters",
+  "maxLength": "{{field}} must be at most {{max}} characters",
+  "invalid": "Invalid {{field}}"
+}
+

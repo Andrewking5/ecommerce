@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation('common');
   return (
     <footer className="bg-gray-50 border-t border-gray-200">
       <div className="container-apple py-12">
@@ -15,21 +17,20 @@ const Footer: React.FC = () => {
               <span className="text-xl font-semibold text-text-primary">Store</span>
             </div>
             <p className="text-text-secondary text-sm">
-              Modern e-commerce platform with Apple-inspired design. 
-              Quality products for the modern lifestyle.
+              {t('footer.description')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-text-primary">Quick Links</h3>
+            <h3 className="font-semibold text-text-primary">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/products"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Products
+                  {t('navigation.products')}
                 </Link>
               </li>
               <li>
@@ -37,7 +38,7 @@ const Footer: React.FC = () => {
                   to="/about"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  About Us
+                  {t('navigation.about')}
                 </Link>
               </li>
               <li>
@@ -45,7 +46,7 @@ const Footer: React.FC = () => {
                   to="/contact"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Contact
+                  {t('navigation.contact')}
                 </Link>
               </li>
             </ul>
@@ -53,14 +54,14 @@ const Footer: React.FC = () => {
 
           {/* Customer Service */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-text-primary">Customer Service</h3>
+            <h3 className="font-semibold text-text-primary">{t('footer.customerService')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/help"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Help Center
+                  {t('footer.helpCenter')}
                 </Link>
               </li>
               <li>
@@ -68,7 +69,7 @@ const Footer: React.FC = () => {
                   to="/shipping"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Shipping Info
+                  {t('footer.shippingInfo')}
                 </Link>
               </li>
               <li>
@@ -76,7 +77,7 @@ const Footer: React.FC = () => {
                   to="/returns"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Returns
+                  {t('footer.returns')}
                 </Link>
               </li>
             </ul>
@@ -84,14 +85,14 @@ const Footer: React.FC = () => {
 
           {/* Legal */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-text-primary">Legal</h3>
+            <h3 className="font-semibold text-text-primary">{t('footer.legal')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/privacy"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Privacy Policy
+                  {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
@@ -99,7 +100,7 @@ const Footer: React.FC = () => {
                   to="/terms"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Terms of Service
+                  {t('footer.termsOfService')}
                 </Link>
               </li>
               <li>
@@ -107,7 +108,7 @@ const Footer: React.FC = () => {
                   to="/cookies"
                   className="text-text-secondary hover:text-text-primary transition-colors duration-200 text-sm"
                 >
-                  Cookie Policy
+                  {t('footer.cookiePolicy')}
                 </Link>
               </li>
             </ul>
@@ -116,7 +117,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
           <p className="text-text-tertiary text-sm">
-            © 2024 E-commerce Store. All rights reserved.
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

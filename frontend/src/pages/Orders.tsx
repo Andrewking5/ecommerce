@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { orderApi } from '@/services/orders';
 import Card from '@/components/ui/Card';
@@ -7,6 +8,7 @@ import Button from '@/components/ui/Button';
 import { Package, Calendar, DollarSign } from 'lucide-react';
 
 const Orders: React.FC = () => {
+  const { t } = useTranslation(['orders', 'common']);
   const { data, isLoading, error } = useQuery({
     queryKey: ['user-orders'],
     queryFn: () => orderApi.getUserOrders(),
@@ -17,6 +19,7 @@ const Orders: React.FC = () => {
       <div className="container-apple py-12">
         <div className="flex justify-center items-center h-64">
           <div className="spinner w-8 h-8"></div>
+          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -26,8 +29,8 @@ const Orders: React.FC = () => {
     return (
       <div className="container-apple py-12">
         <div className="text-center">
-          <h2 className="heading-2 mb-4">Error Loading Orders</h2>
-          <p className="text-text-secondary">Please try again later.</p>
+          <h2 className="heading-2 mb-4">{t('common:error')}</h2>
+          <p className="text-text-secondary">{t('common:error', { defaultValue: 'Please try again later.' })}</p>
         </div>
       </div>
     );
@@ -37,17 +40,17 @@ const Orders: React.FC = () => {
 
   return (
     <div className="container-apple py-12">
-      <h1 className="heading-1 mb-8">My Orders</h1>
+      <h1 className="heading-1 mb-8">{t('orders:title')}</h1>
 
       {orders.length === 0 ? (
         <Card className="p-12 text-center">
           <Package size={64} className="mx-auto text-gray-400 mb-6" />
-          <h2 className="heading-2 mb-4">No orders yet</h2>
+          <h2 className="heading-2 mb-4">{t('orders:noOrders')}</h2>
           <p className="text-text-secondary mb-8">
-            You haven't placed any orders yet. Start shopping to see your orders here.
+            {t('orders:noOrders', { defaultValue: 'You haven\'t placed any orders yet. Start shopping to see your orders here.' })}
           </p>
           <Link to="/products">
-            <Button size="lg">Start Shopping</Button>
+            <Button size="lg">{t('common:buttons.shopNow')}</Button>
           </Link>
         </Card>
       ) : (
@@ -58,7 +61,7 @@ const Orders: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <Package size={24} className="text-text-tertiary" />
                   <div>
-                    <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>
+                    <h3 className="font-semibold">{t('orders:orderNumber')} #{order.id.slice(-8)}</h3>
                     <p className="text-sm text-text-tertiary">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </p>
@@ -89,7 +92,7 @@ const Orders: React.FC = () => {
                     <div className="flex-1">
                       <p className="font-medium">{item.product?.name}</p>
                       <p className="text-sm text-text-tertiary">
-                        Qty: {item.quantity} × ${item.price.toFixed(2)}
+                        {t('orders:detail.quantity')}: {item.quantity} × ${item.price.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -100,7 +103,7 @@ const Orders: React.FC = () => {
                 <div className="flex items-center space-x-6 text-sm text-text-tertiary">
                   <div className="flex items-center space-x-2">
                     <Calendar size={16} />
-                    <span>Ordered on {new Date(order.createdAt).toLocaleDateString()}</span>
+                    <span>{t('orders:date')}: {new Date(order.createdAt).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <DollarSign size={16} />
@@ -110,7 +113,7 @@ const Orders: React.FC = () => {
                 
                 <Link to={`/user/orders/${order.id}`}>
                   <Button variant="outline" size="sm">
-                    View Details
+                    {t('orders:viewDetails')}
                   </Button>
                 </Link>
               </div>

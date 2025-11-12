@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,13 +9,14 @@ interface ProductImageGalleryProps {
 }
 
 const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, productName }) => {
+  const { t } = useTranslation('common');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
 
   if (!images || images.length === 0) {
     return (
       <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
-        <span className="text-text-tertiary">No Image</span>
+        <span className="text-text-tertiary">{t('noImage', { defaultValue: 'No Image' })}</span>
       </div>
     );
   }

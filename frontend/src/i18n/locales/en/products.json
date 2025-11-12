@@ -1,0 +1,39 @@
+{
+  "title": "Products",
+  "featured": "Featured Products",
+  "featuredDescription": "Discover our handpicked selection of premium products",
+  "categories": "Shop by Category",
+  "categoriesDescription": "Browse our products by category",
+  "noProducts": "No products found",
+  "filter": {
+    "title": "Filter Products",
+    "category": "Category",
+    "priceRange": "Price Range",
+    "sortBy": "Sort By",
+    "sortOptions": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "nameAZ": "Name: A to Z",
+      "nameZA": "Name: Z to A"
+    }
+  },
+  "detail": {
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "writeReview": "Write a Review",
+    "stock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Only {{count}} left in stock",
+    "availability": "Availability"
+  },
+  "related": "Related Products",
+  "errors": {
+    "notFound": "Product Not Found"
+  }
+}
+

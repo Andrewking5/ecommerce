@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { orderApi } from '@/services/orders';
 import Card from '@/components/ui/Card';
@@ -7,6 +8,7 @@ import Button from '@/components/ui/Button';
 import { ArrowLeft, MapPin, CreditCard, Calendar } from 'lucide-react';
 
 const OrderDetail: React.FC = () => {
+  const { t } = useTranslation(['orders', 'common']);
   const { id } = useParams<{ id: string }>();
 
   const { data: order, isLoading, error } = useQuery({
@@ -20,6 +22,7 @@ const OrderDetail: React.FC = () => {
       <div className="container-apple py-12">
         <div className="flex justify-center items-center h-64">
           <div className="spinner w-8 h-8"></div>
+          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -29,10 +32,10 @@ const OrderDetail: React.FC = () => {
     return (
       <div className="container-apple py-12">
         <div className="text-center">
-          <h2 className="heading-2 mb-4">Order Not Found</h2>
-          <p className="text-text-secondary mb-6">The order you're looking for doesn't exist.</p>
+          <h2 className="heading-2 mb-4">{t('orders:errors.notFound', { defaultValue: 'Order Not Found' })}</h2>
+          <p className="text-text-secondary mb-6">{t('orders:errors.notFound', { defaultValue: 'The order you\'re looking for doesn\'t exist.' })}</p>
           <Link to="/user/orders">
-            <Button>Back to Orders</Button>
+            <Button>{t('common:buttons.back')} {t('orders:title')}</Button>
           </Link>
         </div>
       </div>
@@ -47,7 +50,7 @@ const OrderDetail: React.FC = () => {
           className="inline-flex items-center text-text-secondary hover:text-text-primary transition-colors duration-200"
         >
           <ArrowLeft size={16} className="mr-2" />
-          Back to Orders
+          {t('common:buttons.back')} {t('orders:title')}
         </Link>
       </div>
 
@@ -57,7 +60,7 @@ const OrderDetail: React.FC = () => {
           {/* Order Header */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="heading-2">Order #{order.id.slice(-8)}</h1>
+              <h1 className="heading-2">{t('orders:orderNumber')} #{order.id.slice(-8)}</h1>
               <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
                 order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
                 order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' :
@@ -71,12 +74,12 @@ const OrderDetail: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <Calendar size={16} className="text-text-tertiary" />
-                <span className="text-text-tertiary">Ordered:</span>
+                <span className="text-text-tertiary">{t('orders:date')}:</span>
                 <span>{new Date(order.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <CreditCard size={16} className="text-text-tertiary" />
-                <span className="text-text-tertiary">Payment:</span>
+                <span className="text-text-tertiary">{t('orders:detail.paymentMethod')}:</span>
                 <span className="capitalize">{order.paymentMethod}</span>
               </div>
             </div>
@@ -84,7 +87,7 @@ const OrderDetail: React.FC = () => {
 
           {/* Order Items */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Order Items</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('orders:detail.items')}</h3>
             <div className="space-y-4">
               {order.orderItems.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
@@ -96,7 +99,7 @@ const OrderDetail: React.FC = () => {
                   <div className="flex-1">
                     <h4 className="font-medium">{item.product?.name}</h4>
                     <p className="text-sm text-text-tertiary">
-                      Quantity: {item.quantity}
+                      {t('orders:detail.quantity')}: {item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
@@ -104,7 +107,7 @@ const OrderDetail: React.FC = () => {
                       ${(item.price * item.quantity).toFixed(2)}
                     </p>
                     <p className="text-sm text-text-tertiary">
-                      ${item.price.toFixed(2)} each
+                      ${item.price.toFixed(2)} {t('common:each', { defaultValue: 'each' })}
                     </p>
                   </div>
                 </div>
@@ -116,7 +119,7 @@ const OrderDetail: React.FC = () => {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center">
               <MapPin size={20} className="mr-2" />
-              Shipping Address
+              {t('orders:detail.shippingAddress')}
             </h3>
             <div className="text-text-secondary">
               <p>{order.shippingAddress.street}</p>
@@ -131,24 +134,24 @@ const OrderDetail: React.FC = () => {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <Card className="p-6 sticky top-24">
-            <h3 className="text-lg font-semibold mb-6">Order Summary</h3>
+            <h3 className="text-lg font-semibold mb-6">{t('orders:detail.title', { defaultValue: 'Order Summary' })}</h3>
             
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
-                <span className="text-text-secondary">Subtotal</span>
+                <span className="text-text-secondary">{t('cart:subtotal')}</span>
                 <span>${order.totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-secondary">Shipping</span>
-                <span>Free</span>
+                <span className="text-text-secondary">{t('cart:shipping')}</span>
+                <span>{t('common:free', { defaultValue: 'Free' })}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-secondary">Tax</span>
+                <span className="text-text-secondary">{t('cart:tax')}</span>
                 <span>${(order.totalAmount * 0.08).toFixed(2)}</span>
               </div>
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
+                  <span>{t('cart:total')}</span>
                   <span>${(order.totalAmount * 1.08).toFixed(2)}</span>
                 </div>
               </div>
@@ -156,10 +159,10 @@ const OrderDetail: React.FC = () => {
             
             <div className="space-y-3">
               <Button size="lg" className="w-full">
-                Track Package
+                {t('orders:trackPackage', { defaultValue: 'Track Package' })}
               </Button>
               <Button variant="outline" size="lg" className="w-full">
-                Reorder Items
+                {t('orders:reorder', { defaultValue: 'Reorder Items' })}
               </Button>
             </div>
           </Card>

@@ -1,0 +1,101 @@
+{
+  "appName": "Eコマースストア",
+  "buttons": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "signUp": "登録",
+    "register": "登録",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "submit": "送信",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "close": "閉じる",
+    "search": "検索",
+    "filter": "フィルター",
+    "reset": "リセット",
+    "apply": "適用",
+    "viewAll": "すべて表示",
+    "shopNow": "今すぐ購入",
+    "learnMore": "詳細を見る",
+    "browseProducts": "商品を閲覧",
+    "addToCart": "カートに追加",
+    "buyNow": "今すぐ購入",
+    "checkout": "チェックアウト",
+    "continueShopping": "買い物を続ける",
+    "placeOrder": "注文する"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "products": "商品",
+    "about": "について",
+    "contact": "お問い合わせ",
+    "cart": "カート",
+    "profile": "プロフィール",
+    "orders": "注文",
+    "admin": "管理パネル"
+  },
+  "footer": {
+    "quickLinks": "クイックリンク",
+    "customerService": "カスタマーサービス",
+    "legal": "法的情報",
+    "helpCenter": "ヘルプセンター",
+    "shippingInfo": "配送情報",
+    "returns": "返品",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "cookiePolicy": "Cookieポリシー",
+    "copyright": "© 2024 Eコマースストア。全著作権所有。",
+    "description": "Apple風のデザインを採用したモダンなEコマースプラットフォーム。現代的なライフスタイルに適した高品質な商品を提供します。"
+  },
+  "loading": "読み込み中...",
+  "error": "エラーが発生しました",
+  "noData": "データがありません",
+  "language": "言語",
+  "hero": {
+    "title": "素晴らしい商品を発見",
+    "description": "厳選されたプレミアム商品のコレクションで、オンラインショッピングの未来を体験してください。"
+  },
+  "features": {
+    "title": "なぜ私たちを選ぶのか",
+    "description": "高品質な商品と優れたサービスで、最高のショッピング体験を提供することに取り組んでいます。",
+    "premiumQuality": {
+      "title": "プレミアム品質",
+      "description": "すべての商品は慎重に選ばれ、テストされ、最高の品質基準を確保しています。"
+    },
+    "secureShopping": {
+      "title": "安全なショッピング",
+      "description": "お客様のデータと支払いは、業界をリードするセキュリティ対策で保護されています。"
+    },
+    "fastDelivery": {
+      "title": "迅速な配送",
+      "description": "信頼できる配送パートナーを通じて、お客様の注文を迅速にお届けします。"
+    }
+  },
+  "cta": {
+    "title": "ショッピングを始める準備はできましたか？",
+    "description": "何千人もの満足したお客様に参加し、あなたのライフスタイルを向上させる商品を発見してください。"
+  },
+  "rememberMe": "ログイン情報を記憶",
+  "demoCredentials": "デモ認証情報：user@example.com / User123!",
+  "termsAgreement": "アカウントを作成することで、以下に同意したことになります",
+  "max": "最大",
+  "free": "無料",
+  "each": "各",
+  "optional": "任意",
+  "and": "と",
+  "noLimit": "制限なし",
+  "profile": {
+    "pleaseLogin": "プロフィールを表示するにはログインしてください",
+    "myProfile": "マイプロフィール",
+    "email": "メール",
+    "phone": "電話",
+    "memberSince": "メンバー登録日"
+  }
+}
+

@@ -17,6 +17,10 @@ class ApiClient {
     // 請求攔截器
     this.client.interceptors.request.use(
       (config) => {
+        // 添加 Accept-Language header（預設為英文）
+        const language = localStorage.getItem('i18nextLng') || 'en';
+        config.headers['Accept-Language'] = language;
+        
         if (this.token) {
           config.headers.Authorization = `Bearer ${this.token}`;
           // 調試信息（僅在開發環境）

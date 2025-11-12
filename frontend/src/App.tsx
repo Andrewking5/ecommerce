@@ -1,18 +1,61 @@
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import LanguageRoute, { LanguageRedirect } from '@/components/LanguageRoute'
+import Layout from '@/components/layout/Layout'
+import AdminLayout from '@/components/layout/AdminLayout'
+import Home from '@/pages/Home'
+import Products from '@/pages/Products'
+import ProductDetail from '@/pages/ProductDetail'
+import Cart from '@/pages/Cart'
+import Login from '@/pages/Login'
+import Register from '@/pages/Register'
+import AuthCallback from '@/pages/AuthCallback'
+import Profile from '@/pages/Profile'
+import Orders from '@/pages/Orders'
+import OrderDetail from '@/pages/OrderDetail'
+import AdminDashboard from '@/pages/admin/AdminDashboard'
+import AdminProducts from '@/pages/admin/AdminProducts'
+import AdminCategories from '@/pages/admin/AdminCategories'
+import AdminOrders from '@/pages/admin/AdminOrders'
+import AdminUsers from '@/pages/admin/AdminUsers'
+import NotFound from '@/pages/NotFound'
 
 function App() {
   return (
     <div className="min-h-screen bg-background-primary">
-      {/* 处理不带语言前缀的 URL */}
       <Routes>
-        <Route path="/*" element={<LanguageRedirect />} />
-      </Routes>
+        {/* 公開路由 */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="products" element={<Products />} />
+          <Route path="products/:id" element={<ProductDetail />} />
+          <Route path="cart" element={<Cart />} />
+        </Route>
 
-      {/* 带语言前缀的路由 */}
-      <Routes>
-        <Route path="/:locale?" element={<LanguageRoute />} />
+        {/* 認證路由 */}
+        <Route path="/auth">
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="callback" element={<AuthCallback />} />
+        </Route>
+
+        {/* 受保護路由 */}
+        <Route path="/user" element={<Layout />}>
+          <Route path="profile" element={<Profile />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
+        </Route>
+
+        {/* 管理員路由 */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
+
+        {/* 404 頁面 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       
       {/* Toast 通知 */}

@@ -4,6 +4,7 @@ import { User, AuthState } from '@/types/auth';
 import { authApi } from '@/services/auth';
 import { apiClient } from '@/services/api';
 import toast from 'react-hot-toast';
+import i18n from '@/i18n/config';
 
 interface AuthStore extends AuthState {
   // Actions
@@ -46,14 +47,13 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: true,
               isLoading: false,
             });
-            // Toast message will be translated in the component
-            toast.success('Login successful!');
+            toast.success(i18n.t('auth:messages.loginSuccess'));
           } else {
             throw new Error(response.message);
           }
         } catch (error: any) {
           set({ isLoading: false });
-          toast.error(error.message || 'Login failed');
+          toast.error(error.message || i18n.t('auth:messages.loginFailed'));
           throw error;
         }
       },
@@ -71,13 +71,13 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: true,
               isLoading: false,
             });
-            toast.success('Registration successful!');
+            toast.success(i18n.t('auth:messages.registerSuccess'));
           } else {
             throw new Error(response.message);
           }
         } catch (error: any) {
           set({ isLoading: false });
-          toast.error(error.message || 'Registration failed');
+          toast.error(error.message || i18n.t('auth:messages.registerFailed'));
           throw error;
         }
       },
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthStore>()(
           console.error('Logout error:', error);
         } finally {
           get().clearAuth();
-          toast.success('Logged out successfully');
+          toast.success(i18n.t('auth:messages.logoutSuccess'));
         }
       },
 

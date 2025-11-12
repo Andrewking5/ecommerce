@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ShoppingCart, Star, Eye, Package } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -11,6 +12,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { t } = useTranslation(['products', 'common']);
   const { addItem } = useCartStore();
   const [imageError, setImageError] = useState(false);
   const [hoveredImage, setHoveredImage] = useState(0);
@@ -78,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {product.stock === 0 && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
-                    Out of Stock
+                    {t('products:detail.outOfStock')}
                   </span>
                 </div>
               )}
@@ -95,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   }}
                 >
                   <Eye size={16} className="mr-1" />
-                  Quick View
+                  {t('common:buttons.viewAll', { defaultValue: 'Quick View' })}
                 </Button>
               </div>
             </>
@@ -132,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
             {product.stock > 0 && (
               <span className="text-xs text-text-tertiary bg-green-50 text-green-700 px-2 py-1 rounded">
-                In Stock
+                {t('products:detail.stock')}
               </span>
             )}
           </div>
@@ -144,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             size="sm"
           >
             <ShoppingCart size={16} className="mr-2" />
-            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            {product.stock === 0 ? t('products:detail.outOfStock') : t('products:detail.addToCart')}
           </Button>
         </div>
       </Card>

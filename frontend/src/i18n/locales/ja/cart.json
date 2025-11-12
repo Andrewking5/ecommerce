@@ -1,0 +1,17 @@
+{
+  "title": "ショッピングカート",
+  "empty": "カートは空です",
+  "emptyDescription": "ショッピングを開始してカートに商品を追加してください",
+  "items": "点の商品",
+  "item": "点の商品",
+  "subtotal": "小計",
+  "shipping": "配送料",
+  "tax": "税",
+  "total": "合計",
+  "checkout": "チェックアウトに進む",
+  "continueShopping": "買い物を続ける",
+  "remove": "削除",
+  "quantity": "数量",
+  "price": "価格"
+}
+

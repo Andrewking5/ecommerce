@@ -1,0 +1,39 @@
+{
+  "title": "商品",
+  "featured": "精選商品",
+  "featuredDescription": "探索我們精心挑選的優質商品",
+  "categories": "按分類購物",
+  "categoriesDescription": "按分類瀏覽我們的商品",
+  "noProducts": "找不到商品",
+  "filter": {
+    "title": "篩選商品",
+    "category": "分類",
+    "priceRange": "價格範圍",
+    "sortBy": "排序方式",
+    "sortOptions": {
+      "newest": "最新",
+      "oldest": "最舊",
+      "priceLow": "價格：低到高",
+      "priceHigh": "價格：高到低",
+      "nameAZ": "名稱：A 到 Z",
+      "nameZA": "名稱：Z 到 A"
+    }
+  },
+  "detail": {
+    "addToCart": "加入購物車",
+    "buyNow": "立即購買",
+    "description": "商品描述",
+    "specifications": "規格",
+    "reviews": "評論",
+    "writeReview": "撰寫評論",
+    "stock": "有庫存",
+    "outOfStock": "缺貨",
+    "lowStock": "僅剩 {{count}} 件",
+    "availability": "可用性"
+  },
+  "related": "相關商品",
+  "errors": {
+    "notFound": "找不到商品"
+  }
+}
+

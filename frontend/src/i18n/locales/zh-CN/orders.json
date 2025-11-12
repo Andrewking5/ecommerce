@@ -1,0 +1,33 @@
+{
+  "title": "我的订单",
+  "noOrders": "您还没有下过任何订单",
+  "orderNumber": "订单",
+  "date": "订购日期",
+  "status": "状态",
+  "total": "总计",
+  "actions": "操作",
+  "viewDetails": "查看详情",
+  "statuses": {
+    "pending": "待处理",
+    "confirmed": "已确认",
+    "processing": "处理中",
+    "shipped": "已发货",
+    "delivered": "已送达",
+    "cancelled": "已取消",
+    "refunded": "已退款"
+  },
+  "detail": {
+    "title": "订单详情",
+    "shippingAddress": "配送地址",
+    "billingAddress": "账单地址",
+    "paymentMethod": "支付方式",
+    "items": "订单项目",
+    "quantity": "数量",
+    "price": "价格"
+  },
+  "errors": {
+    "notFound": "找不到订单"
+  },
+  "trackPackage": "追踪包裹",
+  "reorder": "重新订购"
+}

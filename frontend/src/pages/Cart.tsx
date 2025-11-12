@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCartStore } from '@/store/cartStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 
 const Cart: React.FC = () => {
+  const { t } = useTranslation(['cart', 'common']);
   const { items, total, itemCount, updateQuantity, removeItem, clearCart } = useCartStore();
 
   if (items.length === 0) {
@@ -13,12 +15,12 @@ const Cart: React.FC = () => {
       <div className="container-apple py-12">
         <div className="text-center max-w-md mx-auto">
           <ShoppingBag size={64} className="mx-auto text-gray-400 mb-6" />
-          <h2 className="heading-2 mb-4">Your cart is empty</h2>
+          <h2 className="heading-2 mb-4">{t('cart:empty')}</h2>
           <p className="text-text-secondary mb-8">
-            Looks like you haven't added any items to your cart yet.
+            {t('cart:emptyDescription')}
           </p>
           <Link to="/products">
-            <Button size="lg">Start Shopping</Button>
+            <Button size="lg">{t('common:buttons.shopNow')}</Button>
           </Link>
         </div>
       </div>
@@ -28,9 +30,9 @@ const Cart: React.FC = () => {
   return (
     <div className="container-apple py-12">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="heading-1">Shopping Cart</h1>
+        <h1 className="heading-1">{t('cart:title')}</h1>
         <Button variant="outline" onClick={clearCart}>
-          Clear Cart
+          {t('common:buttons.delete')} {t('cart:title', { defaultValue: 'Cart' })}
         </Button>
       </div>
 
@@ -95,24 +97,24 @@ const Cart: React.FC = () => {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <Card className="p-6 sticky top-24">
-            <h3 className="text-lg font-semibold mb-6">Order Summary</h3>
+            <h3 className="text-lg font-semibold mb-6">{t('cart:title', { defaultValue: 'Order Summary' })}</h3>
             
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
-                <span className="text-text-secondary">Subtotal</span>
+                <span className="text-text-secondary">{t('cart:subtotal')}</span>
                 <span>${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-secondary">Shipping</span>
-                <span>Free</span>
+                <span className="text-text-secondary">{t('cart:shipping')}</span>
+                <span>{t('common:free', { defaultValue: 'Free' })}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-secondary">Tax</span>
+                <span className="text-text-secondary">{t('cart:tax')}</span>
                 <span>${(total * 0.08).toFixed(2)}</span>
               </div>
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
+                  <span>{t('cart:total')}</span>
                   <span>${(total * 1.08).toFixed(2)}</span>
                 </div>
               </div>
@@ -120,18 +122,18 @@ const Cart: React.FC = () => {
             
             <div className="space-y-3">
               <Button size="lg" className="w-full">
-                Proceed to Checkout
+                {t('cart:checkout')}
               </Button>
               <Link to="/products" className="block">
                 <Button variant="outline" size="lg" className="w-full">
-                  Continue Shopping
+                  {t('cart:continueShopping')}
                 </Button>
               </Link>
             </div>
             
             <div className="mt-6 text-center">
               <p className="text-sm text-text-tertiary">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'} in cart
+                {itemCount} {itemCount === 1 ? t('cart:item') : t('cart:items')}
               </p>
             </div>
           </Card>

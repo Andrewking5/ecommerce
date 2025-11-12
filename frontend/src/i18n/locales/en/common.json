@@ -1,0 +1,108 @@
+{
+  "appName": "E-commerce Store",
+  "buttons": {
+    "login": "Login",
+    "logout": "Logout",
+    "signUp": "Sign Up",
+    "register": "Register",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "viewAll": "View All",
+    "shopNow": "Shop Now",
+    "learnMore": "Learn More",
+    "browseProducts": "Browse Products",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping",
+    "placeOrder": "Place Order",
+    "max": "Max",
+    "free": "Free",
+    "each": "each",
+    "optional": "Optional",
+    "and": "and",
+    "page": "Page",
+    "of": "of"
+  },
+  "navigation": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "profile": "Profile",
+    "orders": "Orders",
+    "admin": "Admin Panel"
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "customerService": "Customer Service",
+    "legal": "Legal",
+    "helpCenter": "Help Center",
+    "shippingInfo": "Shipping Info",
+    "returns": "Returns",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "copyright": "© 2024 E-commerce Store. All rights reserved.",
+    "description": "Modern e-commerce platform with Apple-inspired design. Quality products for the modern lifestyle."
+  },
+  "loading": "Loading...",
+  "error": "An error occurred",
+  "noData": "No data available",
+  "language": "Language",
+  "noImage": "No Image",
+  "hero": {
+    "title": "Discover Amazing Products",
+    "description": "Experience the future of online shopping with our curated collection of premium products designed for the modern lifestyle."
+  },
+  "features": {
+    "title": "Why Choose Us",
+    "description": "We're committed to providing the best shopping experience with quality products and exceptional service.",
+    "premiumQuality": {
+      "title": "Premium Quality",
+      "description": "Every product is carefully selected and tested to ensure the highest quality standards."
+    },
+    "secureShopping": {
+      "title": "Secure Shopping",
+      "description": "Your data and payments are protected with industry-leading security measures."
+    },
+    "fastDelivery": {
+      "title": "Fast Delivery",
+      "description": "Get your orders delivered quickly with our reliable shipping partners."
+    }
+  },
+  "cta": {
+    "title": "Ready to Start Shopping?",
+    "description": "Join thousands of satisfied customers and discover products that enhance your lifestyle."
+  },
+  "rememberMe": "Remember me",
+  "demoCredentials": "Demo credentials: user@example.com / User123!",
+  "termsAgreement": "By creating an account, you agree to our",
+  "max": "Max",
+  "free": "Free",
+  "each": "each",
+  "optional": "Optional",
+  "and": "and",
+  "noLimit": "No limit",
+  "profile": {
+    "pleaseLogin": "Please log in to view your profile",
+    "myProfile": "My Profile",
+    "email": "Email",
+    "phone": "Phone",
+    "memberSince": "Member since"
+  }
+}

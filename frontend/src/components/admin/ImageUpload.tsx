@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { uploadApi } from '@/services/upload';
@@ -15,8 +16,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   images,
   onChange,
   maxImages = 10,
-  label = '商品图片',
+  label,
 }) => {
+  const { t } = useTranslation('admin');
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,12 +54,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const imageFiles = fileArray.filter((file) => file.type.startsWith('image/'));
 
     if (images.length + imageFiles.length > maxImages) {
-      toast.error(`最多只能上传 ${maxImages} 张图片`);
+      toast.error(t('imageUpload.maxImages', { max: maxImages, defaultValue: `最多只能上传 ${maxImages} 张图片` }));
       return;
     }
 
     if (imageFiles.length === 0) {
-      toast.error('请选择图片文件');
+      toast.error(t('imageUpload.selectImage', { defaultValue: '请选择图片文件' }));
       return;
     }
 
@@ -66,9 +68,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       // 上传到服务器
       const uploadedUrls = await uploadApi.uploadImages(imageFiles);
       onChange([...images, ...uploadedUrls]);
-      toast.success(`成功上传 ${uploadedUrls.length} 张图片`);
+      toast.success(t('imageUpload.uploadSuccess', { count: uploadedUrls.length, defaultValue: `成功上传 ${uploadedUrls.length} 张图片` }));
     } catch (error: any) {
-      toast.error(error.message || '图片上传失败');
+      toast.error(error.message || t('imageUpload.uploadFailed', { defaultValue: '图片上传失败' }));
     } finally {
       setUploading(false);
     }
@@ -84,7 +86,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-text-primary mb-2">{label}</label>
+      <label className="block text-sm font-medium text-text-primary mb-2">
+        {label || t('imageUpload.label', { defaultValue: '商品图片' })}
+      </label>
       
       {/* 图片预览网格 */}
       {images.length > 0 && (
@@ -107,7 +111,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               </button>
               {index === 0 && (
                 <div className="absolute bottom-2 left-2 bg-brand-blue text-white text-xs px-2 py-1 rounded">
-                  主图
+                  {t('imageUpload.mainImage', { defaultValue: '主图' })}
                 </div>
               )}
             </div>
@@ -142,7 +146,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             {uploading ? (
               <>
                 <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
-                <p className="text-sm text-text-secondary">上传中...</p>
+                <p className="text-sm text-text-secondary">{t('imageUpload.uploading', { defaultValue: '上传中...' })}</p>
               </>
             ) : (
               <>
@@ -151,17 +155,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 </div>
                 <div>
                   <p className="text-sm text-text-primary font-medium">
-                    拖拽图片到此处或
+                    {t('imageUpload.dragDrop', { defaultValue: '拖拽图片到此处或' })}
                     <button
                       type="button"
                       onClick={openFileDialog}
                       className="text-brand-blue hover:text-brand-blue/80 ml-1"
                     >
-                      点击上传
+                      {t('imageUpload.clickUpload', { defaultValue: '点击上传' })}
                     </button>
                   </p>
                   <p className="text-xs text-text-tertiary mt-1">
-                    支持 JPG、PNG、WebP 格式，最多 {maxImages} 张，单张最大 10MB
+                    {t('imageUpload.formatInfo', { max: maxImages, defaultValue: `支持 JPG、PNG、WebP 格式，最多 ${maxImages} 张，单张最大 10MB` })}
                   </p>
                 </div>
                 <Button
@@ -172,7 +176,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   className="flex items-center space-x-2"
                 >
                   <ImageIcon size={16} />
-                  <span>选择图片</span>
+                  <span>{t('imageUpload.selectImage', { defaultValue: '选择图片' })}</span>
                 </Button>
               </>
             )}
@@ -183,7 +187,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       {/* URL 输入方式 */}
       <div className="mt-4">
         <label className="block text-sm font-medium text-text-secondary mb-2">
-          或输入图片 URL（用逗号分隔多个 URL）
+          {t('imageUpload.urlInput', { defaultValue: '或输入图片 URL（用逗号分隔多个 URL）' })}
         </label>
         <textarea
           placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"

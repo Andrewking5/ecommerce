@@ -1,0 +1,39 @@
+{
+  "title": "商品",
+  "featured": "おすすめ商品",
+  "featuredDescription": "厳選されたプレミアム商品をご紹介します",
+  "categories": "カテゴリ別に購入",
+  "categoriesDescription": "カテゴリ別に商品を閲覧",
+  "noProducts": "商品が見つかりません",
+  "filter": {
+    "title": "商品をフィルター",
+    "category": "カテゴリ",
+    "priceRange": "価格帯",
+    "sortBy": "並び替え",
+    "sortOptions": {
+      "newest": "新着順",
+      "oldest": "古い順",
+      "priceLow": "価格：安い順",
+      "priceHigh": "価格：高い順",
+      "nameAZ": "名前：あいうえお順",
+      "nameZA": "名前：わをん順"
+    }
+  },
+  "detail": {
+    "addToCart": "カートに追加",
+    "buyNow": "今すぐ購入",
+    "description": "商品説明",
+    "specifications": "仕様",
+    "reviews": "レビュー",
+    "writeReview": "レビューを書く",
+    "stock": "在庫あり",
+    "outOfStock": "在庫切れ",
+    "lowStock": "残り {{count}} 点のみ",
+    "availability": "在庫状況"
+  },
+  "related": "関連商品",
+  "errors": {
+    "notFound": "商品が見つかりません"
+  }
+}
+

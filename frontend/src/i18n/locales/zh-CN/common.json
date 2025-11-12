@@ -1,0 +1,101 @@
+{
+  "appName": "电商商店",
+  "buttons": {
+    "login": "登录",
+    "logout": "登出",
+    "signUp": "注册",
+    "register": "注册",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "reset": "重置",
+    "apply": "应用",
+    "viewAll": "查看全部",
+    "shopNow": "立即购物",
+    "learnMore": "了解更多",
+    "browseProducts": "浏览商品",
+    "addToCart": "加入购物车",
+    "buyNow": "立即购买",
+    "checkout": "结账",
+    "continueShopping": "继续购物",
+    "placeOrder": "下单"
+  },
+  "navigation": {
+    "home": "首页",
+    "products": "商品",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "cart": "购物车",
+    "profile": "个人资料",
+    "orders": "订单",
+    "admin": "管理后台"
+  },
+  "footer": {
+    "quickLinks": "快速链接",
+    "customerService": "客户服务",
+    "legal": "法律信息",
+    "helpCenter": "帮助中心",
+    "shippingInfo": "配送信息",
+    "returns": "退货",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "cookiePolicy": "Cookie 政策",
+    "copyright": "© 2024 电商商店。版权所有。",
+    "description": "采用 Apple 风格设计的现代电商平台。为现代生活方式提供优质商品。"
+  },
+  "loading": "加载中...",
+  "error": "发生错误",
+  "noData": "没有数据",
+  "language": "语言",
+  "hero": {
+    "title": "发现优质商品",
+    "description": "体验未来购物，探索我们精心挑选的优质商品，专为现代生活方式设计。"
+  },
+  "features": {
+    "title": "为什么选择我们",
+    "description": "我们致力于提供最佳的购物体验，提供优质商品和卓越服务。",
+    "premiumQuality": {
+      "title": "优质品质",
+      "description": "每个商品都经过精心挑选和测试，确保最高品质标准。"
+    },
+    "secureShopping": {
+      "title": "安全购物",
+      "description": "您的数据和付款受到业界领先的安全措施保护。"
+    },
+    "fastDelivery": {
+      "title": "快速配送",
+      "description": "通过我们可靠的配送合作伙伴快速送达您的订单。"
+    }
+  },
+  "cta": {
+    "title": "准备开始购物了吗？",
+    "description": "加入数千名满意客户，发现提升您生活方式的商品。"
+  },
+  "rememberMe": "记住我",
+  "demoCredentials": "演示账号：user@example.com / User123!",
+  "termsAgreement": "创建账号即表示您同意我们的",
+  "max": "最大",
+  "free": "免费",
+  "each": "每个",
+  "optional": "选填",
+  "and": "和",
+  "noLimit": "无限制",
+  "profile": {
+    "pleaseLogin": "请登录以查看您的个人资料",
+    "myProfile": "我的个人资料",
+    "email": "电子邮件",
+    "phone": "电话",
+    "memberSince": "会员自"
+  }
+}
+

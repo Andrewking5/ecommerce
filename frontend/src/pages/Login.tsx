@@ -3,20 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-
 const Login: React.FC = () => {
+  const { t } = useTranslation(['auth', 'validation', 'common']);
+  
+  const loginSchema = z.object({
+    email: z.string().email(t('validation:email')),
+    password: z.string().min(1, t('validation:required', { field: t('auth:form.password') })),
+  });
+
+  type LoginForm = z.infer<typeof loginSchema>;
+  
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthStore();
   const navigate = useNavigate();
@@ -51,15 +54,15 @@ const Login: React.FC = () => {
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-text-primary">
-            Sign in to your account
+            {t('auth:title.login')}
           </h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Or{' '}
+            {t('auth:links.alreadyHaveAccount')}{' '}
             <Link
               to="/auth/register"
               className="font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
             >
-              create a new account
+              {t('auth:links.createAccount')}
             </Link>
           </p>
         </div>
@@ -67,7 +70,7 @@ const Login: React.FC = () => {
         <Card className="p-8">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <Input
-              label="Email address"
+              label={t('auth:form.email')}
               type="email"
               autoComplete="email"
               {...register('email')}
@@ -75,7 +78,7 @@ const Login: React.FC = () => {
             />
 
             <Input
-              label="Password"
+              label={t('auth:form.password')}
               type="password"
               autoComplete="current-password"
               {...register('password')}
@@ -91,7 +94,7 @@ const Login: React.FC = () => {
                   className="h-4 w-4 text-brand-blue focus:ring-brand-blue border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-text-secondary">
-                  Remember me
+                  {t('common:rememberMe')}
                 </label>
               </div>
 
@@ -100,7 +103,7 @@ const Login: React.FC = () => {
                   to="/auth/forgot-password"
                   className="font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
                 >
-                  Forgot your password?
+                  {t('auth:messages.forgotPassword')}
                 </Link>
               </div>
             </div>
@@ -111,7 +114,7 @@ const Login: React.FC = () => {
               className="w-full"
               loading={isLoading}
             >
-              Sign in
+              {t('common:buttons.login')}
             </Button>
 
             <SocialLoginButtons />
@@ -120,7 +123,7 @@ const Login: React.FC = () => {
 
         <div className="text-center">
           <p className="text-sm text-text-tertiary">
-            Demo credentials: user@example.com / User123!
+            {t('common:demoCredentials')}
           </p>
         </div>
       </div>

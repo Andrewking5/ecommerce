@@ -1,17 +1,19 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { User, Mail, Phone, Calendar } from 'lucide-react';
 
 const Profile: React.FC = () => {
+  const { t } = useTranslation('common');
   const { user } = useAuthStore();
 
   if (!user) {
     return (
       <div className="container-apple py-12">
         <div className="text-center">
-          <h2 className="heading-2 mb-4">Please log in to view your profile</h2>
+          <h2 className="heading-2 mb-4">{t('profile:pleaseLogin', { defaultValue: 'Please log in to view your profile' })}</h2>
         </div>
       </div>
     );
@@ -20,7 +22,7 @@ const Profile: React.FC = () => {
   return (
     <div className="container-apple py-12">
       <div className="max-w-2xl mx-auto">
-        <h1 className="heading-1 mb-8">My Profile</h1>
+        <h1 className="heading-1 mb-8">{t('profile:myProfile', { defaultValue: 'My Profile' })}</h1>
 
         <Card className="p-8">
           <div className="flex items-center space-x-6 mb-8">
@@ -47,7 +49,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-4">
               <Mail size={20} className="text-text-tertiary" />
               <div>
-                <p className="text-sm text-text-tertiary">Email</p>
+                <p className="text-sm text-text-tertiary">{t('profile:email', { defaultValue: 'Email' })}</p>
                 <p className="font-medium">{user.email}</p>
               </div>
             </div>
@@ -56,7 +58,7 @@ const Profile: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <Phone size={20} className="text-text-tertiary" />
                 <div>
-                  <p className="text-sm text-text-tertiary">Phone</p>
+                  <p className="text-sm text-text-tertiary">{t('profile:phone', { defaultValue: 'Phone' })}</p>
                   <p className="font-medium">{user.phone}</p>
                 </div>
               </div>
@@ -65,7 +67,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-4">
               <Calendar size={20} className="text-text-tertiary" />
               <div>
-                <p className="text-sm text-text-tertiary">Member since</p>
+                <p className="text-sm text-text-tertiary">{t('profile:memberSince', { defaultValue: 'Member since' })}</p>
                 <p className="font-medium">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </p>
@@ -75,7 +77,7 @@ const Profile: React.FC = () => {
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <Button variant="outline" className="w-full">
-              Edit Profile
+              {t('common:buttons.edit')} {t('profile:myProfile', { defaultValue: 'Profile' })}
             </Button>
           </div>
         </Card>

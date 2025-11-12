@@ -17,11 +17,6 @@ export interface UpdateUserRequest {
   phone?: string;
   role?: 'USER' | 'ADMIN';
   isActive?: boolean;
-  preferredLanguage?: string;
-}
-
-export interface UpdateLanguageRequest {
-  preferredLanguage: string;
 }
 
 export const userApi = {
@@ -59,14 +54,5 @@ export const userApi = {
   deleteUser: async (id: string): Promise<void> => {
     await apiClient.delete(`/users/${id}`);
   },
-
-  // 更新用户语言偏好
-  updateLanguage: async (data: UpdateLanguageRequest): Promise<{ preferredLanguage: string }> => {
-    const response = await apiClient.put<any>('/users/language', data);
-    return response.data || response;
-  },
 };
-
-// 导出为 usersApi 以保持一致性
-export const usersApi = userApi;
 

@@ -1,0 +1,10 @@
+{
+  "required": "{{field}}は必須です",
+  "email": "有効なメールアドレスを入力してください",
+  "password": "パスワードは少なくとも8文字である必要があります",
+  "passwordMatch": "パスワードが一致しません",
+  "minLength": "{{field}}は少なくとも{{min}}文字である必要があります",
+  "maxLength": "{{field}}は最大{{max}}文字です",
+  "invalid": "無効な{{field}}です"
+}
+

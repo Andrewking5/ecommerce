@@ -1,0 +1,17 @@
+{
+  "title": "購物車",
+  "empty": "您的購物車是空的",
+  "emptyDescription": "開始購物以將商品加入購物車",
+  "items": "件商品",
+  "item": "件商品",
+  "subtotal": "小計",
+  "shipping": "運費",
+  "tax": "稅",
+  "total": "總計",
+  "checkout": "前往結帳",
+  "continueShopping": "繼續購物",
+  "remove": "移除",
+  "quantity": "數量",
+  "price": "價格"
+}
+

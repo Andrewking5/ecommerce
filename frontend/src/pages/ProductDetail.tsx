@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { productApi } from '@/services/products';
 import { useCartStore } from '@/store/cartStore';
@@ -10,6 +11,7 @@ import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Heart, Loader2 } from 'luci
 import ProductCard from '@/components/product/ProductCard';
 
 const ProductDetail: React.FC = () => {
+  const { t } = useTranslation(['products', 'common']);
   const { id } = useParams<{ id: string }>();
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
@@ -26,6 +28,7 @@ const ProductDetail: React.FC = () => {
       <div className="container-apple py-12">
         <div className="flex justify-center items-center h-64">
           <div className="spinner w-8 h-8"></div>
+          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
         </div>
       </div>
     );
@@ -35,10 +38,10 @@ const ProductDetail: React.FC = () => {
     return (
       <div className="container-apple py-12">
         <div className="text-center">
-          <h2 className="heading-2 mb-4">Product Not Found</h2>
-          <p className="text-text-secondary mb-6">The product you're looking for doesn't exist.</p>
+          <h2 className="heading-2 mb-4">{t('products:errors.notFound')}</h2>
+          <p className="text-text-secondary mb-6">{t('products:errors.notFound', { defaultValue: 'The product you\'re looking for doesn\'t exist.' })}</p>
           <Link to="/products">
-            <Button>Back to Products</Button>
+            <Button>{t('common:buttons.back')} {t('common:navigation.products')}</Button>
           </Link>
         </div>
       </div>
@@ -53,7 +56,7 @@ const ProductDetail: React.FC = () => {
           className="inline-flex items-center text-text-secondary hover:text-text-primary transition-colors duration-200"
         >
           <ArrowLeft size={16} className="mr-2" />
-          Back to Products
+          {t('common:buttons.back')} {t('common:navigation.products')}
         </Link>
       </div>
 
@@ -84,7 +87,7 @@ const ProductDetail: React.FC = () => {
                     {product.averageRating.toFixed(1)}
                   </span>
                   <span className="text-text-tertiary">
-                    ({product.reviewCount} reviews)
+                    ({product.reviewCount} {t('products:detail.reviews', { defaultValue: 'reviews' })})
                   </span>
                 </div>
               )}
@@ -93,18 +96,20 @@ const ProductDetail: React.FC = () => {
 
           {/* Stock Status */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-text-tertiary">Availability:</span>
+            <span className="text-sm text-text-tertiary">{t('products:detail.availability', { defaultValue: 'Availability' })}:</span>
             <span className={`text-sm font-medium ${
               product.stock > 0 ? 'text-brand-green' : 'text-red-500'
             }`}>
-              {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+              {product.stock > 0 
+                ? `${product.stock} ${t('products:detail.stock')}` 
+                : t('products:detail.outOfStock')}
             </span>
           </div>
 
           {/* Specifications */}
           {product.specifications && (
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Specifications</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('products:detail.specifications')}</h3>
               <div className="space-y-2">
                 {Object.entries(product.specifications).map(([key, value]) => (
                   <div key={key} className="flex justify-between">
@@ -121,7 +126,7 @@ const ProductDetail: React.FC = () => {
           {/* Quantity Selector */}
           {product.stock > 0 && (
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-text-primary">Quantity:</span>
+              <span className="text-sm font-medium text-text-primary">{t('cart:quantity')}:</span>
               <div className="flex items-center space-x-2 border border-gray-300 rounded-lg">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -142,7 +147,7 @@ const ProductDetail: React.FC = () => {
                 </button>
               </div>
               <span className="text-sm text-text-tertiary">
-                Max: {product.stock}
+                {t('common:max', { defaultValue: 'Max' })}: {product.stock}
               </span>
             </div>
           )}
@@ -161,7 +166,9 @@ const ProductDetail: React.FC = () => {
                 className="flex-1"
               >
                 <ShoppingCart size={20} className="mr-2" />
-                {product.stock === 0 ? 'Out of Stock' : `Add ${quantity} to Cart`}
+                {product.stock === 0 
+                  ? t('products:detail.outOfStock') 
+                  : t('products:detail.addToCart', { count: quantity })}
               </Button>
               <Button
                 variant="outline"
@@ -179,7 +186,7 @@ const ProductDetail: React.FC = () => {
       {/* Reviews Section */}
       {product.reviews && product.reviews.length > 0 && (
         <div className="mt-16">
-          <h2 className="heading-2 mb-8">Customer Reviews</h2>
+          <h2 className="heading-2 mb-8">{t('products:detail.reviews', { defaultValue: 'Customer Reviews' })}</h2>
           <div className="space-y-6">
             {product.reviews.map((review) => (
               <Card key={review.id} className="p-6">
@@ -238,6 +245,7 @@ const RelatedProducts: React.FC<{ categoryId: string; excludeProductId: string }
   categoryId, 
   excludeProductId 
 }) => {
+  const { t } = useTranslation(['products', 'common']);
   const { data: relatedProducts, isLoading } = useQuery({
     queryKey: ['related-products', categoryId],
     queryFn: () => productApi.getProducts({ 
@@ -253,10 +261,11 @@ const RelatedProducts: React.FC<{ categoryId: string; excludeProductId: string }
 
   return (
     <div className="mt-16">
-      <h2 className="heading-2 mb-8">Related Products</h2>
+      <h2 className="heading-2 mb-8">{t('products:related', { defaultValue: 'Related Products' })}</h2>
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
+          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

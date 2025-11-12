@@ -1,0 +1,33 @@
+{
+  "title": "注文履歴",
+  "noOrders": "まだ注文がありません",
+  "orderNumber": "注文",
+  "date": "注文日",
+  "status": "ステータス",
+  "total": "合計",
+  "actions": "操作",
+  "viewDetails": "詳細を見る",
+  "statuses": {
+    "pending": "保留中",
+    "confirmed": "確認済み",
+    "processing": "処理中",
+    "shipped": "発送済み",
+    "delivered": "配達済み",
+    "cancelled": "キャンセル済み",
+    "refunded": "返金済み"
+  },
+  "detail": {
+    "title": "注文詳細",
+    "shippingAddress": "配送先住所",
+    "billingAddress": "請求先住所",
+    "paymentMethod": "支払い方法",
+    "items": "注文項目",
+    "quantity": "数量",
+    "price": "価格"
+  },
+  "errors": {
+    "notFound": "注文が見つかりません"
+  },
+  "trackPackage": "パッケージを追跡",
+  "reorder": "再注文"
+}

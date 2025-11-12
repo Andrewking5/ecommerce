@@ -1,0 +1,105 @@
+{
+  "appName": "電商商店",
+  "buttons": {
+    "login": "登入",
+    "logout": "登出",
+    "signUp": "註冊",
+    "register": "註冊",
+    "cancel": "取消",
+    "confirm": "確認",
+    "save": "儲存",
+    "delete": "刪除",
+    "edit": "編輯",
+    "add": "新增",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "關閉",
+    "search": "搜尋",
+    "filter": "篩選",
+    "reset": "重置",
+    "apply": "套用",
+    "viewAll": "查看全部",
+    "shopNow": "立即購物",
+    "learnMore": "了解更多",
+    "browseProducts": "瀏覽商品",
+    "addToCart": "加入購物車",
+    "buyNow": "立即購買",
+    "checkout": "結帳",
+    "continueShopping": "繼續購物",
+    "placeOrder": "下訂單",
+    "max": "最大",
+    "free": "免費",
+    "each": "每個",
+    "optional": "選填",
+    "and": "和"
+  },
+  "navigation": {
+    "home": "首頁",
+    "products": "商品",
+    "about": "關於我們",
+    "contact": "聯絡我們",
+    "cart": "購物車",
+    "profile": "個人資料",
+    "orders": "訂單",
+    "admin": "管理後台"
+  },
+  "footer": {
+    "quickLinks": "快速連結",
+    "customerService": "客戶服務",
+    "legal": "法律資訊",
+    "helpCenter": "幫助中心",
+    "shippingInfo": "運送資訊",
+    "returns": "退貨",
+    "privacyPolicy": "隱私政策",
+    "termsOfService": "服務條款",
+    "cookiePolicy": "Cookie 政策",
+    "copyright": "© 2024 電商商店。版權所有。",
+    "description": "採用 Apple 風格設計的現代電商平台。為現代生活方式提供優質商品。"
+  },
+  "loading": "載入中...",
+  "error": "發生錯誤",
+  "noData": "沒有資料",
+  "language": "語言",
+  "hero": {
+    "title": "發現優質商品",
+    "description": "體驗未來購物，探索我們精心挑選的優質商品，專為現代生活方式設計。"
+  },
+  "features": {
+    "title": "為什麼選擇我們",
+    "description": "我們致力於提供最佳的購物體驗，提供優質商品和卓越服務。",
+    "premiumQuality": {
+      "title": "優質品質",
+      "description": "每個商品都經過精心挑選和測試，確保最高品質標準。"
+    },
+    "secureShopping": {
+      "title": "安全購物",
+      "description": "您的數據和付款受到業界領先的安全措施保護。"
+    },
+    "fastDelivery": {
+      "title": "快速配送",
+      "description": "通過我們可靠的配送合作夥伴快速送達您的訂單。"
+    }
+  },
+  "cta": {
+    "title": "準備開始購物了嗎？",
+    "description": "加入數千名滿意客戶，發現提升您生活方式的商品。"
+  },
+  "rememberMe": "記住我",
+  "demoCredentials": "示範帳號：user@example.com / User123!",
+  "termsAgreement": "建立帳號即表示您同意我們的",
+  "max": "最大",
+  "free": "免費",
+  "each": "每個",
+  "optional": "選填",
+  "and": "和",
+  "noLimit": "無限制",
+  "profile": {
+    "pleaseLogin": "請登入以查看您的個人資料",
+    "myProfile": "我的個人資料",
+    "email": "電子郵件",
+    "phone": "電話",
+    "memberSince": "會員自"
+  }
+}

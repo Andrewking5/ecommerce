@@ -1,0 +1,33 @@
+{
+  "title": "My Orders",
+  "noOrders": "You haven't placed any orders yet",
+  "orderNumber": "Order",
+  "date": "Ordered on",
+  "status": "Status",
+  "total": "Total",
+  "actions": "Actions",
+  "viewDetails": "View Details",
+  "statuses": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded"
+  },
+  "detail": {
+    "title": "Order Details",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "paymentMethod": "Payment Method",
+    "items": "Order Items",
+    "quantity": "Quantity",
+    "price": "Price"
+  },
+  "errors": {
+    "notFound": "Order Not Found"
+  },
+  "trackPackage": "Track Package",
+  "reorder": "Reorder Items"
+}

@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Search, User, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import { useLocalizedNavigate } from '@/hooks/useLocalizedNavigate';
 import Button from '@/components/ui/Button';
-import LanguageSwitcher from './LanguageSwitcher';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const { itemCount } = useCartStore();
+  const navigate = useNavigate();
   const { t } = useTranslation('common');
-  const { navigate } = useLocalizedNavigate();
 
   const handleLogout = async () => {
     await logout();
@@ -131,11 +130,6 @@ const Header: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <nav className="flex flex-col space-y-4">
-              {/* Language Switcher in Mobile Menu */}
-              <div className="px-4 pb-2">
-                <LanguageSwitcher />
-              </div>
-              
               <Link
                 to="/products"
                 className="text-text-secondary hover:text-text-primary transition-colors duration-200"

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { 
   LayoutDashboard, 
@@ -19,6 +20,7 @@ const AdminLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation('admin');
 
   const handleLogout = async () => {
     await logout();
@@ -26,11 +28,11 @@ const AdminLayout: React.FC = () => {
   };
 
   const menuItems = [
-    { path: '/admin', icon: LayoutDashboard, label: '仪表板' },
-    { path: '/admin/products', icon: Package, label: '商品管理' },
-    { path: '/admin/categories', icon: FolderTree, label: '分类管理' },
-    { path: '/admin/orders', icon: ShoppingBag, label: '订单管理' },
-    { path: '/admin/users', icon: Users, label: '用户管理' },
+    { path: '/admin', icon: LayoutDashboard, label: t('menu.dashboard') },
+    { path: '/admin/products', icon: Package, label: t('menu.products') },
+    { path: '/admin/categories', icon: FolderTree, label: t('menu.categories') },
+    { path: '/admin/orders', icon: ShoppingBag, label: t('menu.orders') },
+    { path: '/admin/users', icon: Users, label: t('menu.users') },
   ];
 
   const isActive = (path: string) => {
@@ -56,12 +58,12 @@ const AdminLayout: React.FC = () => {
                 <Link
                   to="/"
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-                  title="返回首页"
+                  title={t('menu.dashboard', { defaultValue: 'Back to Home' })}
                 >
                   <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-lg">E</span>
                   </div>
-                  <span className="text-lg font-semibold text-text-primary">管理后台</span>
+                  <span className="text-lg font-semibold text-text-primary">{t('menu.dashboard', { defaultValue: 'Admin Panel' })}</span>
                 </Link>
               </div>
             )}

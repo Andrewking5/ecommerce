@@ -3,25 +3,28 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 
-const registerSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number'),
-  phone: z.string().optional(),
-});
-
-type RegisterForm = z.infer<typeof registerSchema>;
-
 const Register: React.FC = () => {
+  const { t } = useTranslation(['auth', 'validation', 'common']);
+  
+  const registerSchema = z.object({
+    firstName: z.string().min(2, t('validation:minLength', { field: t('auth:form.firstName'), min: 2 })),
+    lastName: z.string().min(2, t('validation:minLength', { field: t('auth:form.lastName'), min: 2 })),
+    email: z.string().email(t('validation:email')),
+    password: z.string()
+      .min(8, t('validation:password'))
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t('validation:password')),
+    phone: z.string().optional(),
+  });
+
+  type RegisterForm = z.infer<typeof registerSchema>;
+  
   const [isLoading, setIsLoading] = useState(false);
   const { register: registerUser } = useAuthStore();
   const navigate = useNavigate();
@@ -56,15 +59,15 @@ const Register: React.FC = () => {
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-text-primary">
-            Create your account
+            {t('auth:title.register')}
           </h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Or{' '}
+            {t('auth:links.alreadyHaveAccount')}{' '}
             <Link
               to="/auth/login"
               className="font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
             >
-              sign in to your existing account
+              {t('auth:links.signIn')}
             </Link>
           </p>
         </div>
@@ -73,14 +76,14 @@ const Register: React.FC = () => {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="First name"
+                label={t('auth:form.firstName')}
                 autoComplete="given-name"
                 {...register('firstName')}
                 error={errors.firstName?.message}
               />
 
               <Input
-                label="Last name"
+                label={t('auth:form.lastName')}
                 autoComplete="family-name"
                 {...register('lastName')}
                 error={errors.lastName?.message}
@@ -88,7 +91,7 @@ const Register: React.FC = () => {
             </div>
 
             <Input
-              label="Email address"
+              label={t('auth:form.email')}
               type="email"
               autoComplete="email"
               {...register('email')}
@@ -96,21 +99,21 @@ const Register: React.FC = () => {
             />
 
             <Input
-              label="Phone number"
+              label={t('auth:form.phone')}
               type="tel"
               autoComplete="tel"
               {...register('phone')}
               error={errors.phone?.message}
-              helperText="Optional"
+              helperText={t('common:buttons.optional', { defaultValue: 'Optional' })}
             />
 
             <Input
-              label="Password"
+              label={t('auth:form.password')}
               type="password"
               autoComplete="new-password"
               {...register('password')}
               error={errors.password?.message}
-              helperText="Must be at least 8 characters with uppercase, lowercase, and number"
+              helperText={t('validation:password')}
             />
 
             <Button
@@ -119,7 +122,7 @@ const Register: React.FC = () => {
               className="w-full"
               loading={isLoading}
             >
-              Create account
+              {t('common:buttons.register')}
             </Button>
 
             <SocialLoginButtons />
@@ -128,13 +131,13 @@ const Register: React.FC = () => {
 
         <div className="text-center">
           <p className="text-sm text-text-tertiary">
-            By creating an account, you agree to our{' '}
+            {t('common:termsAgreement')}{' '}
             <Link to="/terms" className="text-brand-blue hover:text-brand-blue/80">
-              Terms of Service
+              {t('common:footer.termsOfService')}
             </Link>{' '}
-            and{' '}
+            {t('common:and', { defaultValue: 'and' })}{' '}
             <Link to="/privacy" className="text-brand-blue hover:text-brand-blue/80">
-              Privacy Policy
+              {t('common:footer.privacyPolicy')}
             </Link>
           </p>
         </div>

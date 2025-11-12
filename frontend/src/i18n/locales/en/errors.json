@@ -1,0 +1,11 @@
+{
+  "notFound": "Page not found",
+  "notFoundDescription": "The page you're looking for doesn't exist",
+  "goHome": "Go to Home",
+  "unauthorized": "Unauthorized",
+  "forbidden": "Forbidden",
+  "serverError": "Server error",
+  "networkError": "Network error",
+  "unknownError": "An unknown error occurred"
+}
+

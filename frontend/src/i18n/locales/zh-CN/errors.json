@@ -1,0 +1,11 @@
+{
+  "notFound": "找不到页面",
+  "notFoundDescription": "您要寻找的页面不存在",
+  "goHome": "返回首页",
+  "unauthorized": "未授权",
+  "forbidden": "禁止访问",
+  "serverError": "服务器错误",
+  "networkError": "网络错误",
+  "unknownError": "发生未知错误"
+}
+

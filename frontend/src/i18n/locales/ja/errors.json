@@ -1,0 +1,11 @@
+{
+  "notFound": "ページが見つかりません",
+  "notFoundDescription": "お探しのページは存在しません",
+  "goHome": "ホームに戻る",
+  "unauthorized": "認証が必要です",
+  "forbidden": "アクセスが拒否されました",
+  "serverError": "サーバーエラー",
+  "networkError": "ネットワークエラー",
+  "unknownError": "不明なエラーが発生しました"
+}
+

@@ -1,0 +1,79 @@
+{
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "おかえりなさい, {{firstName}} {{lastName}}",
+    "totalProducts": "商品総数",
+    "totalOrders": "注文総数",
+    "totalUsers": "ユーザー総数",
+    "revenue": "収益",
+    "totalProductsDesc": "商品の総数",
+    "totalOrdersDesc": "すべての注文数",
+    "totalUsersDesc": "登録ユーザー総数",
+    "revenueDesc": "累計収益"
+  },
+  "products": {
+    "title": "商品管理",
+    "addProduct": "商品を追加",
+    "editProduct": "商品を編集",
+    "deleteProduct": "商品を削除",
+    "name": "商品名",
+    "description": "説明",
+    "price": "価格",
+    "stock": "在庫",
+    "category": "カテゴリ",
+    "images": "画像",
+    "isActive": "有効"
+  },
+  "categories": {
+    "title": "カテゴリ管理",
+    "addCategory": "カテゴリを追加",
+    "editCategory": "カテゴリを編集",
+    "deleteCategory": "カテゴリを削除",
+    "name": "カテゴリ名",
+    "slug": "スラッグ",
+    "description": "説明",
+    "image": "画像"
+  },
+  "orders": {
+    "title": "注文管理",
+    "viewOrder": "注文を表示",
+    "updateStatus": "ステータスを更新"
+  },
+  "users": {
+    "title": "ユーザー管理",
+    "viewUser": "ユーザーを表示",
+    "editUser": "ユーザーを編集",
+    "deleteUser": "ユーザーを削除"
+  },
+  "menu": {
+    "dashboard": "ダッシュボード",
+    "products": "商品",
+    "categories": "カテゴリ",
+    "orders": "注文",
+    "users": "ユーザー"
+  },
+  "imageUpload": {
+    "label": "商品画像",
+    "mainImage": "メイン画像",
+    "maxImages": "最大 {{max}} 枚の画像までアップロードできます",
+    "selectImage": "画像ファイルを選択してください",
+    "uploadSuccess": "{{count}} 枚の画像を正常にアップロードしました",
+    "uploadFailed": "画像のアップロードに失敗しました",
+    "uploading": "アップロード中...",
+    "dragDrop": "画像をここにドラッグするか、",
+    "clickUpload": "クリックしてアップロード",
+    "formatInfo": "JPG、PNG、WebP 形式をサポート、最大 {{max}} 枚、1枚あたり最大 10MB",
+    "urlInput": "または画像 URL を入力（複数の URL はカンマで区切る）"
+  },
+  "quickActions": {
+    "productManagement": "商品管理",
+    "productManagementDesc": "商品、カテゴリ、在庫を管理",
+    "manageProducts": "商品を管理",
+    "orderManagement": "注文管理",
+    "orderManagementDesc": "注文を表示および処理",
+    "manageOrders": "注文を管理",
+    "userManagement": "ユーザー管理",
+    "userManagementDesc": "ユーザーアカウントを表示および管理",
+    "manageUsers": "ユーザーを管理"
+  }
+}

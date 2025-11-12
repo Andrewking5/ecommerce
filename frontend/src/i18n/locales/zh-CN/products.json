@@ -1,0 +1,39 @@
+{
+  "title": "商品",
+  "featured": "精选商品",
+  "featuredDescription": "探索我们精心挑选的优质商品",
+  "categories": "按分类购物",
+  "categoriesDescription": "按分类浏览我们的商品",
+  "noProducts": "找不到商品",
+  "filter": {
+    "title": "筛选商品",
+    "category": "分类",
+    "priceRange": "价格范围",
+    "sortBy": "排序方式",
+    "sortOptions": {
+      "newest": "最新",
+      "oldest": "最旧",
+      "priceLow": "价格：低到高",
+      "priceHigh": "价格：高到低",
+      "nameAZ": "名称：A 到 Z",
+      "nameZA": "名称：Z 到 A"
+    }
+  },
+  "detail": {
+    "addToCart": "加入购物车",
+    "buyNow": "立即购买",
+    "description": "商品描述",
+    "specifications": "规格",
+    "reviews": "评论",
+    "writeReview": "撰写评论",
+    "stock": "有库存",
+    "outOfStock": "缺货",
+    "lowStock": "仅剩 {{count}} 件",
+    "availability": "可用性"
+  },
+  "related": "相关商品",
+  "errors": {
+    "notFound": "找不到商品"
+  }
+}
+

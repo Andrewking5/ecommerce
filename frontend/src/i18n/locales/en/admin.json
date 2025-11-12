@@ -1,0 +1,80 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{firstName}} {{lastName}}",
+    "totalProducts": "Total Products",
+    "totalOrders": "Total Orders",
+    "totalUsers": "Total Users",
+    "revenue": "Revenue",
+    "totalProductsDesc": "Total number of products",
+    "totalOrdersDesc": "Total number of orders",
+    "totalUsersDesc": "Total registered users",
+    "revenueDesc": "Total revenue"
+  },
+  "products": {
+    "title": "Product Management",
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "deleteProduct": "Delete Product",
+    "name": "Product Name",
+    "description": "Description",
+    "price": "Price",
+    "stock": "Stock",
+    "category": "Category",
+    "images": "Images",
+    "isActive": "Active"
+  },
+  "categories": {
+    "title": "Category Management",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "deleteCategory": "Delete Category",
+    "name": "Category Name",
+    "slug": "Slug",
+    "description": "Description",
+    "image": "Image"
+  },
+  "orders": {
+    "title": "Order Management",
+    "viewOrder": "View Order",
+    "updateStatus": "Update Status"
+  },
+  "users": {
+    "title": "User Management",
+    "viewUser": "View User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "users": "Users"
+  },
+  "imageUpload": {
+    "label": "Product Images",
+    "mainImage": "Main Image",
+    "maxImages": "You can upload up to {{max}} images",
+    "selectImage": "Please select image files",
+    "uploadSuccess": "Successfully uploaded {{count}} images",
+    "uploadFailed": "Image upload failed",
+    "uploading": "Uploading...",
+    "dragDrop": "Drag images here or",
+    "clickUpload": "click to upload",
+    "formatInfo": "Supports JPG, PNG, WebP formats, up to {{max}} images, max 10MB per image",
+    "urlInput": "Or enter image URLs (separate multiple URLs with commas)"
+  },
+  "quickActions": {
+    "productManagement": "Product Management",
+    "productManagementDesc": "Manage products, categories and inventory",
+    "manageProducts": "Manage Products",
+    "orderManagement": "Order Management",
+    "orderManagementDesc": "View and process orders",
+    "manageOrders": "Manage Orders",
+    "userManagement": "User Management",
+    "userManagementDesc": "View and manage user accounts",
+    "manageUsers": "Manage Users"
+  }
+}
+
