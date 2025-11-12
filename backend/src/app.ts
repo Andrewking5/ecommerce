@@ -81,7 +81,8 @@ app.use(cors({
     }
     
     if (!origin) {
-      // 允許沒有 origin 的請求（例如 Postman、服務器端請求）
+      // 允許沒有 origin 的請求（例如 Postman、服務器端請求、健康檢查等）
+      // 這是正常的，因為某些請求（如 Render 的健康檢查、curl、Postman）沒有 origin 頭
       return callback(null, true);
     }
     

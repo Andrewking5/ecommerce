@@ -147,18 +147,33 @@ export class SocialAuthController {
     try {
       const profile = req.user as any;
       
+      // 調試日誌：查看完整的 profile 數據
+      console.log('📧 Google profile data:', {
+        id: profile?.id || profile?.sub,
+        email: profile?.email,
+        emails: profile?.emails,
+        name: profile?.name,
+        given_name: profile?.given_name,
+        family_name: profile?.family_name,
+        hasEmail: !!profile?.email,
+        profileKeys: profile ? Object.keys(profile) : [],
+      });
+      
       if (!profile) {
         throw new Error('No profile data received from Google');
       }
 
-      // 验证 email 是否存在
-      if (!profile.email) {
+      // 尝试多种方式获取 email
+      const email = profile.email || profile.emails?.[0]?.value || profile.emails?.[0];
+      
+      if (!email) {
+        console.error('❌ Google profile missing email:', JSON.stringify(profile, null, 2));
         throw new Error('EMAIL_REQUIRED');
       }
 
       const socialProfile: SocialUserProfile = {
         id: profile.id || profile.sub,
-        email: profile.email,
+        email: email, // 使用提取的 email
         firstName: profile.given_name || profile.firstName || 'User',
         lastName: profile.family_name || profile.lastName || '',
         avatar: profile.picture || profile.avatar || undefined, // 确保类型正确
@@ -167,6 +182,7 @@ export class SocialAuthController {
           name: profile.name,
           verified_email: profile.verified_email,
           locale: profile.locale,
+          rawProfile: profile, // 保存完整 profile 用于调试
         },
       };
 
@@ -200,12 +216,25 @@ export class SocialAuthController {
     try {
       const profile = req.user as any;
       
+      // 調試日誌：查看完整的 profile 數據
+      console.log('📧 Facebook profile data:', {
+        id: profile?.id,
+        email: profile?.email,
+        emails: profile?.emails,
+        name: profile?.name,
+        hasEmail: !!profile?.email,
+        profileKeys: profile ? Object.keys(profile) : [],
+      });
+      
       if (!profile) {
         throw new Error('No profile data received from Facebook');
       }
 
-      // 验证 email 是否存在
-      if (!profile.email) {
+      // 尝试多种方式获取 email
+      const email = profile.email || profile.emails?.[0]?.value || profile.emails?.[0];
+      
+      if (!email) {
+        console.error('❌ Facebook profile missing email:', JSON.stringify(profile, null, 2));
         throw new Error('EMAIL_REQUIRED');
       }
 
@@ -216,13 +245,14 @@ export class SocialAuthController {
 
       const socialProfile: SocialUserProfile = {
         id: profile.id,
-        email: profile.email,
+        email: email, // 使用提取的 email
         firstName,
         lastName,
         avatar: profile.picture?.data?.url || profile.photos?.[0]?.value || undefined, // 确保类型正确
         provider: 'FACEBOOK',
         providerData: {
           name: profile.name,
+          rawProfile: profile, // 保存完整 profile 用于调试
         },
       };
 
