@@ -1,0 +1,12 @@
+{
+  "required": "{{field}}為必填項",
+  "invalid": "無效的{{field}}",
+  "minLength": "{{field}}至少需要{{min}}個字符",
+  "maxLength": "{{field}}最多{{max}}個字符",
+  "email": "無效的電子郵件格式",
+  "password": "密碼至少需要8個字符",
+  "number": "{{field}}必須是數字",
+  "positive": "{{field}}必須是正數"
+}
+
+

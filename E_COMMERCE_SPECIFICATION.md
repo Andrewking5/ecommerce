@@ -1,7 +1,7 @@
 # E-commerce 平台開發規範
 
-> **版本**: 1.1.0  
-> **最後更新**: 2024-11-12  
+> **版本**: 1.0.0  
+> **最後更新**: 2024-11-11  
 > **目的**: 提供完整的開發規範，確保每次開發都能清楚了解製作方向，避免錯誤設定
 
 ---
@@ -16,11 +16,10 @@
 6. [代碼規範](#代碼規範)
 7. [API 設計規範](#api-設計規範)
 8. [資料庫規範](#資料庫規範)
-9. [國際化 (i18n) 規範](#國際化-i18n-規範)
-10. [部署規範](#部署規範)
-11. [安全規範](#安全規範)
-12. [測試規範](#測試規範)
-13. [常見問題與解決方案](#常見問題與解決方案)
+9. [部署規範](#部署規範)
+10. [安全規範](#安全規範)
+11. [測試規範](#測試規範)
+12. [常見問題與解決方案](#常見問題與解決方案)
 
 ---
 
@@ -97,9 +96,6 @@ E-commerce/
 | Axios | ^1.6.2 | HTTP 客戶端 | 統一使用 Axios |
 | React Hook Form | ^7.48.2 | 表單處理 | 配合 Zod 驗證 |
 | Framer Motion | ^10.16.16 | 動畫庫 | 僅用於複雜動畫 |
-| react-i18next | ^13.5.0 | 國際化 | React i18n 庫 |
-| i18next | ^23.7.16 | 國際化核心 | i18n 框架 |
-| i18next-browser-languagedetector | ^7.2.0 | 語言檢測 | 自動檢測瀏覽器語言 |
 
 ### 後端技術棧（必須遵守）
 
@@ -332,24 +328,7 @@ frontend/src/
 ├── hooks/             # 自定義 Hooks
 │   ├── useAuth.ts
 │   ├── useCart.ts
-│   ├── useProducts.ts
-│   ├── useLanguage.ts      # 語言管理 Hook
-│   └── useLocalizedNavigate.ts  # 本地化導航 Hook
-│
-├── i18n/              # 國際化配置
-│   └── config.ts      # i18next 配置
-│
-├── locales/           # 翻譯文件
-│   ├── en/            # 英文翻譯
-│   │   ├── common.json
-│   │   ├── auth.json
-│   │   ├── products.json
-│   │   ├── cart.json
-│   │   ├── orders.json
-│   │   └── admin.json
-│   ├── zh-TW/         # 繁體中文翻譯
-│   ├── zh-CN/         # 簡體中文翻譯
-│   └── ja/            # 日文翻譯
+│   └── useProducts.ts
 │
 ├── utils/              # 工具函數
 │   ├── constants.ts   # 常量定義
@@ -389,27 +368,18 @@ backend/src/
 │   ├── validation.ts  # 請求驗證
 │   ├── errorHandler.ts # 錯誤處理
 │   ├── rateLimiter.ts # 請求限制
-│   ├── requestLogger.ts # 請求日誌
-│   └── language.ts   # 語言檢測中間件
+│   └── requestLogger.ts # 請求日誌
 │
 ├── routes/            # 路由定義
 │   ├── auth.ts
 │   ├── products.ts
 │   ├── orders.ts
 │   ├── users.ts
-│   ├── admin.ts
-│   └── categories.ts
-│
-├── locales/           # 翻譯文件
-│   ├── en.json        # 英文翻譯
-│   ├── zh-TW.json     # 繁體中文翻譯
-│   ├── zh-CN.json     # 簡體中文翻譯
-│   └── ja.json        # 日文翻譯
+│   └── admin.ts
 │
 ├── utils/             # 工具函數
 │   ├── validation.ts  # 驗證工具
-│   ├── helpers.ts     # 輔助函數
-│   └── i18n.ts        # 國際化工具
+│   └── helpers.ts     # 輔助函數
 │
 ├── types/             # TypeScript 類型定義
 │   └── prisma.d.ts    # Prisma 類型擴展
@@ -598,19 +568,7 @@ POST   /api/auth/register       # 註冊
 POST   /api/auth/login         # 登入
 POST   /api/auth/refresh        # 刷新 Token
 POST   /api/auth/logout         # 登出
-
-PUT    /api/users/language      # 更新用戶語言偏好
 ```
-
-### 語言參數
-
-API 請求支持以下方式指定語言：
-
-1. **查詢參數**: `GET /api/products?lang=zh-TW`
-2. **Accept-Language Header**: `Accept-Language: zh-TW,zh;q=0.9`
-3. **自動檢測**: 根據用戶偏好或瀏覽器設置自動選擇
-
-**注意**: 所有 API 響應中的錯誤消息和成功消息都會根據請求語言自動翻譯。
 
 ### 回應格式規範
 
@@ -699,249 +657,9 @@ npx prisma migrate dev --name add_user_avatar
 npx prisma migrate deploy
 ```
 
-### 用戶語言偏好
-
-User 模型包含 `preferredLanguage` 字段，用於存儲用戶的語言偏好：
-
-```prisma
-model User {
-  // ... 其他字段
-  preferredLanguage String? @default("en") // 用戶語言偏好: en, zh-TW, zh-CN, ja
-}
-```
-
-**支持的语言代码**:
-- `en`: 英文（默认）
-- `zh-TW`: 繁體中文
-- `zh-CN`: 简体中文
-- `ja`: 日本語
-
 ---
 
-## 國際化 (i18n) 規範
-
-### 支持的语言
-
-平台支持以下 4 种语言：
-
-| 语言代码 | 语言名称 | 说明 |
-|---------|---------|------|
-| `en` | English | 英文（默认语言） |
-| `zh-TW` | 繁體中文 | 繁体中文 |
-| `zh-CN` | 简体中文 | 简体中文 |
-| `ja` | 日本語 | 日文 |
-
-### 前端 i18n 規範
-
-#### 技術選型
-
-- **react-i18next**: React 國際化庫
-- **i18next**: 核心國際化框架
-- **i18next-browser-languagedetector**: 自動檢測瀏覽器語言
-
-#### 翻譯文件結構
-
-翻譯文件按功能模塊組織，位於 `frontend/src/locales/{language}/` 目錄：
-
-```
-locales/
-├── en/
-│   ├── common.json      # 通用文本（按鈕、標籤、導航等）
-│   ├── auth.json        # 認證相關
-│   ├── products.json    # 商品相關
-│   ├── cart.json        # 購物車相關
-│   ├── orders.json      # 訂單相關
-│   └── admin.json       # 管理後台相關
-├── zh-TW/              # 繁體中文（相同結構）
-├── zh-CN/              # 简体中文（相同結構）
-└── ja/                 # 日文（相同結構）
-```
-
-#### 使用規範
-
-1. **導入翻譯 Hook**:
-```typescript
-import { useTranslation } from 'react-i18next';
-
-const MyComponent: React.FC = () => {
-  const { t } = useTranslation('common'); // 指定命名空間
-  // 或使用多個命名空間
-  const { t } = useTranslation(['common', 'products']);
-  
-  return <h1>{t('navigation.home')}</h1>;
-};
-```
-
-2. **翻譯鍵命名規範**:
-   - 使用點號分隔的層級結構: `namespace.section.key`
-   - 範例: `common.buttons.save`, `auth.login.title`, `products.list.title`
-
-3. **替換硬編碼文本**:
-```typescript
-// ❌ 錯誤：硬編碼
-<h1>Welcome</h1>
-<button>Save</button>
-
-// ✅ 正確：使用翻譯
-<h1>{t('common.welcome')}</h1>
-<button>{t('common.buttons.save')}</button>
-```
-
-4. **本地化導航**:
-```typescript
-import { useLocalizedNavigate } from '@/hooks/useLocalizedNavigate';
-
-const MyComponent: React.FC = () => {
-  const { navigate } = useLocalizedNavigate();
-  
-  // 自動添加語言前綴
-  navigate('/products'); // 會自動變成 /en/products 或 /zh-TW/products
-};
-```
-
-#### URL 路由規範
-
-- **默認語言（英文）**: `/products` 或 `/en/products` 都可以
-- **其他語言**: 必須包含語言前綴，例如 `/zh-TW/products`, `/zh-CN/products`, `/ja/products`
-- **語言切換**: 切換語言時保持當前路徑，只改變語言前綴
-
-#### 語言檢測優先級
-
-1. **URL 路徑中的語言代碼**（最高優先級）
-2. **用戶賬戶中的語言偏好**（登錄用戶）
-3. **localStorage 中的語言偏好**
-4. **瀏覽器語言設置**
-5. **默認語言**（英文）
-
-### 後端 i18n 規範
-
-#### 語言檢測中間件
-
-後端使用 `languageMiddleware` 自動檢測請求語言：
-
-1. **查詢參數**: `?lang=en`
-2. **Accept-Language Header**: `Accept-Language: zh-TW,zh;q=0.9,en;q=0.8`
-3. **默認語言**: 英文（en）
-
-#### 翻譯文件結構
-
-後端翻譯文件位於 `backend/src/locales/` 目錄：
-
-```
-locales/
-├── en.json      # 英文翻譯
-├── zh-TW.json   # 繁體中文翻譯
-├── zh-CN.json   # 简体中文翻譯
-└── ja.json      # 日文翻譯
-```
-
-#### 使用翻譯工具
-
-```typescript
-import { t } from '../utils/i18n';
-
-// 在控制器中使用
-export class ProductController {
-  static async getProducts(req: Request, res: Response) {
-    // 使用翻譯
-    res.json({
-      success: true,
-      message: t(req, 'success.productCreated', 'Product created successfully'),
-      data: product
-    });
-  }
-}
-```
-
-#### 錯誤消息翻譯
-
-所有錯誤消息和驗證消息都支持多語言：
-
-```typescript
-// 錯誤處理中間件自動翻譯
-res.status(400).json({
-  success: false,
-  message: t(req, 'errors.validation', 'Validation error')
-});
-
-// 驗證消息自動翻譯
-const messages = {
-  'string.email': t(req, 'validation.email.invalid', 'Invalid email'),
-  'any.required': t(req, 'validation.email.required', 'Email is required')
-};
-```
-
-### 語言偏好存儲
-
-#### 用戶語言偏好
-
-1. **登錄用戶**: 語言偏好保存在數據庫 `User.preferredLanguage` 字段
-2. **未登錄用戶**: 語言偏好保存在瀏覽器 `localStorage`（鍵名: `i18nextLng`）
-
-#### API 端點
-
-```
-PUT /api/users/language
-Body: { preferredLanguage: "zh-TW" }
-```
-
-#### 自動同步
-
-- 用戶登錄時，如果數據庫中有語言偏好，自動同步到前端
-- 用戶切換語言時，如果已登錄，自動同步到數據庫
-
-### 開發規範
-
-#### 添加新翻譯
-
-1. **前端**: 在對應語言的 JSON 文件中添加翻譯鍵
-2. **後端**: 在對應語言的 JSON 文件中添加翻譯鍵
-3. **保持一致性**: 確保所有語言都有對應的翻譯
-
-#### 翻譯鍵命名
-
-- 使用描述性的鍵名
-- 按功能模塊組織（common, auth, products 等）
-- 使用點號分隔層級
-
-```json
-{
-  "common": {
-    "buttons": {
-      "save": "Save",
-      "cancel": "Cancel"
-    },
-    "navigation": {
-      "home": "Home",
-      "products": "Products"
-    }
-  }
-}
-```
-
-#### 注意事項
-
-1. **不要翻譯用戶輸入內容**: 只翻譯程序內的硬編碼文本
-2. **產品信息不翻譯**: 產品名稱、描述等由用戶輸入的內容保持原樣
-3. **URL 參數**: 語言代碼使用標準格式（en, zh-TW, zh-CN, ja）
-4. **日期和數字格式**: 根據語言自動格式化（使用 i18n 的格式化功能）
-
-### 測試規範
-
-#### 語言切換測試
-
-1. 測試所有語言切換功能
-2. 測試 URL 語言路由
-3. 測試語言偏好持久化
-4. 測試錯誤消息的多語言顯示
-
-#### 翻譯完整性檢查
-
-1. 確保所有硬編碼文本都已翻譯
-2. 確保所有語言都有對應的翻譯鍵
-3. 檢查翻譯文本的長度（避免 UI 溢出）
-
----
+## 部署規範
 
 ### Render 後端部署
 
@@ -1110,48 +828,6 @@ npm run test:coverage # 測試覆蓋率
 2. 確認所有依賴已正確安裝
 3. 檢查 TypeScript 編譯錯誤
 
-### i18n 問題
-
-#### 問題 1: 翻譯不顯示或顯示翻譯鍵
-
-**症狀**: 頁面顯示 `common.buttons.save` 而不是 "Save"
-
-**解決方案**:
-1. 檢查翻譯文件路徑是否正確
-2. 確認翻譯鍵是否存在於對應語言的 JSON 文件中
-3. 檢查命名空間是否正確（`useTranslation('common')`）
-4. 確認 i18n 配置已正確初始化（檢查 `main.tsx`）
-
-#### 問題 2: 語言切換不生效
-
-**症狀**: 切換語言後頁面內容沒有變化
-
-**解決方案**:
-1. 檢查 `useLanguage` hook 是否正確使用
-2. 確認語言代碼是否正確（en, zh-TW, zh-CN, ja）
-3. 檢查瀏覽器控制台是否有錯誤
-4. 確認翻譯文件已正確加載
-
-#### 問題 3: URL 語言路由不工作
-
-**症狀**: 訪問 `/zh-TW/products` 顯示 404
-
-**解決方案**:
-1. 檢查 `LanguageRoute` 組件是否正確配置
-2. 確認路由結構是否正確
-3. 檢查 `useLocalizedNavigate` hook 是否正確使用
-4. 確認語言代碼在 `SUPPORTED_LANGUAGES` 中
-
-#### 問題 4: 後端錯誤消息未翻譯
-
-**症狀**: API 返回的錯誤消息是英文
-
-**解決方案**:
-1. 檢查 `languageMiddleware` 是否已添加到 `app.ts`
-2. 確認請求中包含語言信息（查詢參數或 Accept-Language header）
-3. 檢查翻譯文件是否存在對應的翻譯鍵
-4. 確認 `t()` 函數正確使用
-
 ---
 
 ## 檢查清單
@@ -1171,8 +847,6 @@ npm run test:coverage # 測試覆蓋率
 - [ ] 測試通過
 - [ ] 沒有硬編碼的配置
 - [ ] 環境變數使用正確
-- [ ] 所有硬編碼文本已使用翻譯鍵替換
-- [ ] 翻譯文件已更新（如需要）
 
 ### 部署前檢查
 
@@ -1202,18 +876,10 @@ npm run test:coverage # 測試覆蓋率
 - `04_backend_architecture.md` - 後端架構
 - `RENDER_DEPLOYMENT.md` - Render 部署指南
 - `VERCEL_ENV_SETUP.md` - Vercel 環境變數設置
-- `E_COMMERCE_SPECIFICATION.md` - 完整開發規範（本文檔）
 
 ---
 
 ## 更新日誌
-
-### v1.1.0 (2024-11-12)
-
-- 添加 i18n 國際化支持
-- 支持 4 種語言：英文、繁體中文、簡體中文、日文
-- 添加語言路由和語言偏好存儲
-- 更新項目結構規範
 
 ### v1.0.0 (2024-11-11)
 

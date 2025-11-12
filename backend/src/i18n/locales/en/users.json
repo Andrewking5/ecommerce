@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "User not found",
+    "alreadyExists": "User already exists",
+    "cannotDeleteSelf": "Cannot delete your own account",
+    "cannotChangeOwnRole": "Cannot change your own role",
+    "invalidRole": "Invalid role"
+  },
+  "success": {
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully",
+    "retrieved": "User retrieved successfully",
+    "languageUpdated": "Language preference updated successfully"
+  }
+}
+
+

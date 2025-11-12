@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "找不到商品",
+    "alreadyExists": "商品已存在",
+    "invalidData": "無效的商品資料",
+    "insufficientStock": "庫存不足",
+    "uniqueConstraintViolation": "唯一約束違反",
+    "recordNotFound": "找不到記錄"
+  },
+  "success": {
+    "created": "商品創建成功",
+    "updated": "商品更新成功",
+    "deleted": "商品刪除成功",
+    "retrieved": "商品獲取成功"
+  }
+}
+
+

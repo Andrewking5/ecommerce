@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "商品が見つかりません",
+    "alreadyExists": "商品は既に存在します",
+    "invalidData": "無効な商品データです",
+    "insufficientStock": "在庫が不足しています",
+    "uniqueConstraintViolation": "一意制約違反",
+    "recordNotFound": "レコードが見つかりません"
+  },
+  "success": {
+    "created": "商品の作成に成功しました",
+    "updated": "商品の更新に成功しました",
+    "deleted": "商品の削除に成功しました",
+    "retrieved": "商品の取得に成功しました"
+  }
+}
+
+

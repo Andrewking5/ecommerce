@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "Category not found",
+    "nameRequired": "Name and slug are required",
+    "slugExists": "Category with this slug already exists",
+    "nameExists": "Category with this name already exists",
+    "nameOrSlugExists": "Category with this name or slug already exists",
+    "cannotDelete": "Cannot delete category with products"
+  },
+  "success": {
+    "created": "Category created successfully",
+    "updated": "Category updated successfully",
+    "deleted": "Category deleted successfully",
+    "retrieved": "Category retrieved successfully"
+  }
+}
+
+

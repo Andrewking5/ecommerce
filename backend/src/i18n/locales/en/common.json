@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "internalServerError": "Internal server error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "badRequest": "Bad request",
+    "validationError": "Validation error"
+  },
+  "success": {
+    "operationSuccess": "Operation successful",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully"
+  }
+}
+
+

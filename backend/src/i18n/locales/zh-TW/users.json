@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "找不到用戶",
+    "alreadyExists": "用戶已存在",
+    "cannotDeleteSelf": "無法刪除自己的帳號",
+    "cannotChangeOwnRole": "無法更改自己的角色",
+    "invalidRole": "無效的角色"
+  },
+  "success": {
+    "updated": "用戶更新成功",
+    "deleted": "用戶刪除成功",
+    "retrieved": "用戶獲取成功",
+    "languageUpdated": "語言偏好更新成功"
+  }
+}
+
+

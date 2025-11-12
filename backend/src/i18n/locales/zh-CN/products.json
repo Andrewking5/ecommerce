@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "找不到商品",
+    "alreadyExists": "商品已存在",
+    "invalidData": "无效的商品数据",
+    "insufficientStock": "库存不足",
+    "uniqueConstraintViolation": "唯一约束违反",
+    "recordNotFound": "找不到记录"
+  },
+  "success": {
+    "created": "商品创建成功",
+    "updated": "商品更新成功",
+    "deleted": "商品删除成功",
+    "retrieved": "商品获取成功"
+  }
+}
+
+

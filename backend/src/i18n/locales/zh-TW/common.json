@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "internalServerError": "伺服器內部錯誤",
+    "notFound": "找不到資源",
+    "unauthorized": "未授權",
+    "forbidden": "禁止訪問",
+    "badRequest": "請求錯誤",
+    "validationError": "驗證錯誤"
+  },
+  "success": {
+    "operationSuccess": "操作成功",
+    "created": "創建成功",
+    "updated": "更新成功",
+    "deleted": "刪除成功"
+  }
+}
+
+

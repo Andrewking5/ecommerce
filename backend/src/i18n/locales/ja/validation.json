@@ -1,0 +1,12 @@
+{
+  "required": "{{field}}は必須です",
+  "invalid": "無効な{{field}}です",
+  "minLength": "{{field}}は少なくとも{{min}}文字である必要があります",
+  "maxLength": "{{field}}は最大{{max}}文字です",
+  "email": "無効なメールアドレス形式です",
+  "password": "パスワードは少なくとも8文字である必要があります",
+  "number": "{{field}}は数字である必要があります",
+  "positive": "{{field}}は正の数である必要があります"
+}
+
+

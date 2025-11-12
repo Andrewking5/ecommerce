@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "找不到分類",
+    "nameRequired": "名稱和別名為必填項",
+    "slugExists": "此別名的分類已存在",
+    "nameExists": "此名稱的分類已存在",
+    "nameOrSlugExists": "此名稱或別名的分類已存在",
+    "cannotDelete": "無法刪除包含商品的分類"
+  },
+  "success": {
+    "created": "分類創建成功",
+    "updated": "分類更新成功",
+    "deleted": "分類刪除成功",
+    "retrieved": "分類獲取成功"
+  }
+}
+
+

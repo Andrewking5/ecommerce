@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "注文が見つかりません",
+    "invalidStatus": "無効な注文ステータスです",
+    "cannotCancel": "この注文をキャンセルできません",
+    "paymentFailed": "支払いに失敗しました",
+    "insufficientStock": "1つ以上の商品の在庫が不足しています"
+  },
+  "success": {
+    "created": "注文の作成に成功しました",
+    "updated": "注文の更新に成功しました",
+    "cancelled": "注文のキャンセルに成功しました",
+    "retrieved": "注文の取得に成功しました"
+  }
+}
+
+

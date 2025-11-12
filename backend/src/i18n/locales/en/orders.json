@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "Order not found",
+    "invalidStatus": "Invalid order status",
+    "cannotCancel": "Cannot cancel this order",
+    "paymentFailed": "Payment failed",
+    "insufficientStock": "Insufficient stock for one or more products"
+  },
+  "success": {
+    "created": "Order created successfully",
+    "updated": "Order updated successfully",
+    "cancelled": "Order cancelled successfully",
+    "retrieved": "Order retrieved successfully"
+  }
+}
+
+

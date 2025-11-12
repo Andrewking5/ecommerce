@@ -156,7 +156,7 @@ export class ProductController {
       if (error?.code === 'P2002') {
         res.status(400).json({
           success: false,
-          message: 'Unique constraint violation',
+          message: req.t('products:errors.uniqueConstraintViolation'),
           details: error?.meta,
         });
         return;
@@ -165,14 +165,14 @@ export class ProductController {
       if (error?.code === 'P2025') {
         res.status(404).json({
           success: false,
-          message: 'Record not found',
+          message: req.t('products:errors.recordNotFound'),
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        message: error?.message || 'Internal server error',
+        message: error?.message || req.t('common:errors.internalServerError'),
         ...(process.env.NODE_ENV !== 'production' && { 
           error: error?.stack,
           code: error?.code,
@@ -223,7 +223,7 @@ export class ProductController {
       console.error('Get product error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -237,7 +237,7 @@ export class ProductController {
       if (!q) {
         res.status(400).json({
           success: false,
-          message: 'Search query is required',
+          message: req.t('validation:required', { field: 'Search query' }),
         });
         return;
       }
@@ -265,7 +265,7 @@ export class ProductController {
       console.error('Search products error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -288,7 +288,7 @@ export class ProductController {
       console.error('Get categories error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -308,7 +308,7 @@ export class ProductController {
       if (!category) {
         res.status(400).json({
           success: false,
-          message: 'Category not found',
+          message: req.t('categories:errors.notFound'),
         });
         return;
       }
@@ -330,7 +330,7 @@ export class ProductController {
 
       res.status(201).json({
         success: true,
-        message: 'Product created successfully',
+        message: req.t('products:success.created'),
         data: product,
       });
       return;
@@ -338,7 +338,7 @@ export class ProductController {
       console.error('Create product error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -357,7 +357,7 @@ export class ProductController {
       if (!product) {
         res.status(404).json({
           success: false,
-          message: 'Product not found',
+          message: req.t('products:errors.notFound'),
         });
         return;
       }
@@ -372,7 +372,7 @@ export class ProductController {
 
       res.json({
         success: true,
-        message: 'Product updated successfully',
+        message: req.t('products:success.updated'),
         data: updatedProduct,
       });
       return;
@@ -380,7 +380,7 @@ export class ProductController {
       console.error('Update product error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -398,7 +398,7 @@ export class ProductController {
       if (!product) {
         res.status(404).json({
           success: false,
-          message: 'Product not found',
+          message: req.t('products:errors.notFound'),
         });
         return;
       }
@@ -411,14 +411,14 @@ export class ProductController {
 
       res.json({
         success: true,
-        message: 'Product deleted successfully',
+        message: req.t('products:success.deleted'),
       });
       return;
     } catch (error) {
       console.error('Delete product error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }

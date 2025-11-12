@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../app';
-import { t } from '../utils/i18n';
 
 export class AuthController {
   // 用戶註冊
@@ -26,7 +25,7 @@ export class AuthController {
         }
         res.status(400).json({
           success: false,
-          message: t(req, 'errors.userExists', 'User already exists'),
+          message: req.t('auth:errors.userAlreadyExists'),
         });
         return;
       }
@@ -52,7 +51,7 @@ export class AuthController {
 
       res.status(201).json({
         success: true,
-        message: t(req, 'success.userRegistered', 'User registered successfully'),
+        message: req.t('auth:success.registered'),
         user: AuthController.sanitizeUser(user),
         ...tokens,
       });
@@ -90,7 +89,7 @@ export class AuthController {
       if (!user) {
         res.status(401).json({
           success: false,
-          message: t(req, 'errors.invalidCredentials', 'Invalid credentials'),
+          message: req.t('auth:errors.invalidCredentials'),
         });
         return;
       }
@@ -99,7 +98,7 @@ export class AuthController {
       if (!user.password) {
         res.status(401).json({
           success: false,
-          message: 'This account was created with social login. Please use social login to sign in.',
+          message: req.t('auth:errors.passwordRequired'),
         });
         return;
       }
@@ -109,7 +108,7 @@ export class AuthController {
       if (!isValidPassword) {
         res.status(401).json({
           success: false,
-          message: t(req, 'errors.invalidCredentials', 'Invalid credentials'),
+          message: req.t('auth:errors.invalidCredentials'),
         });
         return;
       }
@@ -119,7 +118,7 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: t(req, 'success.userLoggedIn', 'Login successful'),
+        message: req.t('auth:success.loggedIn'),
         user: AuthController.sanitizeUser(user),
         ...tokens,
       });
@@ -129,8 +128,8 @@ export class AuthController {
       
       // 提供更详细的错误信息（开发环境）
       const errorMessage = process.env.NODE_ENV === 'development' 
-        ? error.message || 'Internal server error'
-        : 'Internal server error';
+        ? error.message || req.t('common:errors.internalServerError')
+        : req.t('common:errors.internalServerError');
       
       res.status(500).json({
         success: false,
@@ -152,7 +151,7 @@ export class AuthController {
       if (!refreshToken) {
         res.status(401).json({
           success: false,
-          message: 'Refresh token required',
+          message: req.t('auth:errors.refreshTokenInvalid'),
         });
         return;
       }
@@ -166,7 +165,7 @@ export class AuthController {
       if (!user) {
         res.status(403).json({
           success: false,
-          message: 'Invalid refresh token',
+          message: req.t('auth:errors.refreshTokenInvalid'),
         });
         return;
       }
@@ -175,7 +174,7 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Token refreshed successfully',
+        message: req.t('auth:success.tokenRefreshed'),
         ...tokens,
       });
       return;
@@ -183,7 +182,7 @@ export class AuthController {
       console.error('Refresh token error:', error);
       res.status(403).json({
         success: false,
-        message: 'Invalid refresh token',
+        message: req.t('auth:errors.refreshTokenInvalid'),
       });
       return;
     }
@@ -195,14 +194,14 @@ export class AuthController {
       // 在實際應用中，這裡應該將 token 加入黑名單
       res.json({
         success: true,
-        message: 'Logout successful',
+        message: req.t('auth:success.loggedOut'),
       });
       return;
     } catch (error) {
       console.error('Logout error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -220,7 +219,7 @@ export class AuthController {
       if (!user) {
         res.status(404).json({
           success: false,
-          message: 'User not found',
+          message: req.t('auth:errors.userNotFound'),
         });
         return;
       }
@@ -235,7 +234,7 @@ export class AuthController {
       console.error('Forgot password error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }
@@ -256,7 +255,7 @@ export class AuthController {
       console.error('Reset password error:', error);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: req.t('common:errors.internalServerError'),
       });
       return;
     }

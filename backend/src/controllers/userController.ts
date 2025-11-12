@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { prisma } from '../app';
-import { t } from '../utils/i18n';
-import { isValidLanguage } from '../utils/i18n';
 
 export class UserController {
   // 獲取用戶個人資料
@@ -20,7 +18,6 @@ export class UserController {
           phone: true,
           avatar: true,
           role: true,
-          preferredLanguage: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -53,16 +50,7 @@ export class UserController {
   static async updateProfile(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
-      const { firstName, lastName, phone, preferredLanguage } = req.body;
-
-      // 验证语言代码
-      if (preferredLanguage && !isValidLanguage(preferredLanguage)) {
-        res.status(400).json({
-          success: false,
-          message: 'Invalid language code',
-        });
-        return;
-      }
+      const { firstName, lastName, phone } = req.body;
 
       const user = await prisma.user.update({
         where: { id: userId },
@@ -70,7 +58,6 @@ export class UserController {
           firstName,
           lastName,
           phone,
-          ...(preferredLanguage && { preferredLanguage }),
         },
         select: {
           id: true,
@@ -79,14 +66,13 @@ export class UserController {
           lastName: true,
           phone: true,
           role: true,
-          preferredLanguage: true,
           updatedAt: true,
         },
       });
 
       res.json({
         success: true,
-        message: t(req, 'success.userUpdated', 'Profile updated successfully'),
+        message: 'Profile updated successfully',
         data: user,
       });
       return;
@@ -317,47 +303,6 @@ export class UserController {
       return;
     } catch (error) {
       console.error('Delete user error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-      });
-      return;
-    }
-  }
-
-  // 更新用戶語言偏好
-  static async updateLanguage(req: Request, res: Response): Promise<void> {
-    try {
-      const userId = (req as any).user.id;
-      const { preferredLanguage } = req.body;
-
-      // 验证语言代码
-      if (!preferredLanguage || !isValidLanguage(preferredLanguage)) {
-        res.status(400).json({
-          success: false,
-          message: 'Invalid language code. Supported languages: en, zh-TW, zh-CN, ja',
-        });
-        return;
-      }
-
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: { preferredLanguage },
-        select: {
-          id: true,
-          email: true,
-          preferredLanguage: true,
-        },
-      });
-
-      res.json({
-        success: true,
-        message: 'Language preference updated successfully',
-        data: user,
-      });
-      return;
-    } catch (error) {
-      console.error('Update language error:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error',

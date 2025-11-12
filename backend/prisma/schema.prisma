@@ -21,12 +21,14 @@ model User {
   avatar    String?  // 头像 URL
   role      Role     @default(USER)
   isActive  Boolean  @default(true)
-  preferredLanguage String?  @default("en") // 用户语言偏好: en, zh-TW, zh-CN, ja
   
   // 社交登录相关
   provider      AuthProvider? @default(EMAIL) // 登录方式
   providerId    String?      // 第三方平台的用户 ID
   providerData  Json?        // 存储第三方平台的额外信息
+  
+  // 国际化相关
+  preferredLanguage String?  @default("en") // 用户语言偏好: en, zh-TW, zh-CN, ja
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

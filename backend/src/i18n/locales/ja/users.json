@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "ユーザーが見つかりません",
+    "alreadyExists": "ユーザーは既に存在します",
+    "cannotDeleteSelf": "自分のアカウントを削除できません",
+    "cannotChangeOwnRole": "自分の役割を変更できません",
+    "invalidRole": "無効な役割です"
+  },
+  "success": {
+    "updated": "ユーザーの更新に成功しました",
+    "deleted": "ユーザーの削除に成功しました",
+    "retrieved": "ユーザーの取得に成功しました",
+    "languageUpdated": "言語設定の更新に成功しました"
+  }
+}
+
+

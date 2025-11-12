@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "notFound": "Product not found",
+    "alreadyExists": "Product already exists",
+    "invalidData": "Invalid product data",
+    "insufficientStock": "Insufficient stock",
+    "uniqueConstraintViolation": "Unique constraint violation",
+    "recordNotFound": "Record not found"
+  },
+  "success": {
+    "created": "Product created successfully",
+    "updated": "Product updated successfully",
+    "deleted": "Product deleted successfully",
+    "retrieved": "Product retrieved successfully"
+  }
+}
+
+

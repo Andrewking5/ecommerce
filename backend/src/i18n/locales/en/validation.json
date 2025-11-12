@@ -1,0 +1,12 @@
+{
+  "required": "{{field}} is required",
+  "invalid": "Invalid {{field}}",
+  "minLength": "{{field}} must be at least {{min}} characters",
+  "maxLength": "{{field}} must be at most {{max}} characters",
+  "email": "Invalid email format",
+  "password": "Password must be at least 8 characters",
+  "number": "{{field}} must be a number",
+  "positive": "{{field}} must be a positive number"
+}
+
+

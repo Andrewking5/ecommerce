@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "找不到订单",
+    "invalidStatus": "无效的订单状态",
+    "cannotCancel": "无法取消此订单",
+    "paymentFailed": "付款失败",
+    "insufficientStock": "一个或多个商品库存不足"
+  },
+  "success": {
+    "created": "订单创建成功",
+    "updated": "订单更新成功",
+    "cancelled": "订单取消成功",
+    "retrieved": "订单获取成功"
+  }
+}
+
+

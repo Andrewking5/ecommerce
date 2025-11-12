@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "internalServerError": "サーバー内部エラー",
+    "notFound": "見つかりません",
+    "unauthorized": "認証が必要です",
+    "forbidden": "アクセスが拒否されました",
+    "badRequest": "リクエストエラー",
+    "validationError": "バリデーションエラー"
+  },
+  "success": {
+    "operationSuccess": "操作が成功しました",
+    "created": "作成に成功しました",
+    "updated": "更新に成功しました",
+    "deleted": "削除に成功しました"
+  }
+}
+
+

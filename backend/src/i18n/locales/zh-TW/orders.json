@@ -1,0 +1,17 @@
+{
+  "errors": {
+    "notFound": "找不到訂單",
+    "invalidStatus": "無效的訂單狀態",
+    "cannotCancel": "無法取消此訂單",
+    "paymentFailed": "付款失敗",
+    "insufficientStock": "一個或多個商品庫存不足"
+  },
+  "success": {
+    "created": "訂單創建成功",
+    "updated": "訂單更新成功",
+    "cancelled": "訂單取消成功",
+    "retrieved": "訂單獲取成功"
+  }
+}
+
+

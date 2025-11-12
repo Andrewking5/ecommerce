@@ -16,7 +16,7 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { securityMiddleware } from './middleware/security';
 import { generalLimiter } from './middleware/rateLimiter';
-import { languageMiddleware } from './middleware/language';
+import { i18nMiddleware } from './i18n/config';
 
 // 導入路由
 import authRoutes from './routes/auth';
@@ -107,8 +107,8 @@ app.use(compression());
 // 請求限制
 app.use(generalLimiter);
 
-// 語言檢測（必須在請求日誌之前）
-app.use(languageMiddleware);
+// i18n 國際化中間件（必須在請求日誌之前，以便錯誤處理可以使用翻譯）
+app.use(i18nMiddleware);
 
 // 請求日誌
 app.use(requestLogger);
