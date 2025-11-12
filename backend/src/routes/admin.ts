@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // 創建第一個管理員帳號（僅在沒有管理員時可用）
-router.post('/create-first-admin', async (req, res) => {
+router.post('/create-first-admin', async (req, res): Promise<void> => {
   try {
     // 檢查是否已有管理員
     const existingAdmin = await prisma.user.findFirst({
@@ -14,27 +14,30 @@ router.post('/create-first-admin', async (req, res) => {
     });
 
     if (existingAdmin) {
-      return res.status(403).json({
+      res.status(403).json({
         success: false,
         message: 'Admin account already exists. Please use the script to create additional admins.',
       });
+      return;
     }
 
     const { email, password, firstName, lastName } = req.body;
 
     // 驗證輸入
     if (!email || !password) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Email and password are required',
       });
+      return;
     }
 
     if (password.length < 8) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Password must be at least 8 characters',
       });
+      return;
     }
 
     // 檢查 Email 是否已存在
@@ -43,10 +46,11 @@ router.post('/create-first-admin', async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'User with this email already exists',
       });
+      return;
     }
 
     // 加密密碼
@@ -81,12 +85,14 @@ router.post('/create-first-admin', async (req, res) => {
         role: admin.role,
       },
     });
+    return;
   } catch (error: any) {
     console.error('Create admin error:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to create admin account',
     });
+    return;
   }
 });
 
