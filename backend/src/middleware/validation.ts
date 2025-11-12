@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
+import { t } from '../utils/i18n';
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -24,7 +25,7 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
       
       res.status(400).json({
         success: false,
-        message: errorMessages.length === 1 ? errorMessages[0] : 'Validation error',
+        message: errorMessages.length === 1 ? errorMessages[0] : t(req, 'errors.validation', 'Validation error'),
         details: errorMessages,
       });
       return;

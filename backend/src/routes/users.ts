@@ -11,6 +11,7 @@ router.use(authenticateToken);
 router.get('/profile', UserController.getProfile);
 router.put('/profile', UserController.updateProfile);
 router.put('/password', UserController.changePassword);
+router.put('/language', UserController.updateLanguage);
 
 // 管理員路由
 router.get('/', requireAdmin, UserController.getAllUsers);

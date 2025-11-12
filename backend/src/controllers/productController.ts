@@ -10,39 +10,93 @@ export class ProductController {
         page = 1,
         limit = 20,
         category,
+        categoryId,
         search,
         sortBy = 'createdAt',
         sortOrder = 'desc',
         minPrice,
         maxPrice,
+        stockStatus, // 'in_stock', 'out_of_stock', 'low_stock'
+        isActive, // 用于管理员筛选
+        minStock,
+        maxStock,
+        startDate,
+        endDate,
       } = req.query;
 
       const skip = (Number(page) - 1) * Number(limit);
 
       // 建構查詢條件
-      const where: any = {
-        isActive: true,
-      };
+      const where: any = {};
 
-      if (category) {
+      // 如果不是管理员，只显示活跃商品
+      const authReq = req as any;
+      if (!authReq.user || authReq.user.role !== 'ADMIN') {
+        where.isActive = true;
+      } else if (isActive !== undefined) {
+        // 管理员可以筛选状态
+        const isActiveValue = String(isActive).toLowerCase();
+        where.isActive = isActiveValue === 'true';
+      }
+
+      // 分类筛选
+      if (categoryId) {
+        where.categoryId = categoryId as string;
+      } else if (category) {
         where.category = { slug: category };
       }
 
+      // 搜索
       if (search) {
         where.OR = [
           { name: { contains: search as string, mode: 'insensitive' } },
           { description: { contains: search as string, mode: 'insensitive' } },
+          { id: { contains: search as string, mode: 'insensitive' } },
         ];
       }
 
+      // 价格筛选
       if (minPrice || maxPrice) {
         where.price = {};
         if (minPrice) where.price.gte = Number(minPrice);
         if (maxPrice) where.price.lte = Number(maxPrice);
       }
 
+      // 库存筛选
+      if (stockStatus) {
+        switch (stockStatus) {
+          case 'in_stock':
+            where.stock = { gt: 0 };
+            break;
+          case 'out_of_stock':
+            where.stock = { lte: 0 };
+            break;
+          case 'low_stock':
+            where.stock = { gt: 0, lte: 10 }; // 低库存定义为 <= 10
+            break;
+        }
+      }
+
+      // 库存范围筛选
+      if (minStock !== undefined || maxStock !== undefined) {
+        where.stock = {};
+        if (minStock !== undefined) where.stock.gte = Number(minStock);
+        if (maxStock !== undefined) where.stock.lte = Number(maxStock);
+      }
+
+      // 日期范围筛选
+      if (startDate || endDate) {
+        where.createdAt = {};
+        if (startDate) {
+          where.createdAt.gte = new Date(startDate as string);
+        }
+        if (endDate) {
+          where.createdAt.lte = new Date(endDate as string);
+        }
+      }
+
       // 驗證 sortBy 字段
-      const allowedSortFields = ['createdAt', 'updatedAt', 'name', 'price'];
+      const allowedSortFields = ['createdAt', 'updatedAt', 'name', 'price', 'stock'];
       const sortField = allowedSortFields.includes(sortBy as string) 
         ? (sortBy as string) 
         : 'createdAt';

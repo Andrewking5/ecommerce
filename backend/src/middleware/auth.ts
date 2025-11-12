@@ -56,7 +56,7 @@ export const authenticateToken = async (
 
     // 確保 role 是字符串類型
     const userRole = String(user.role);
-    
+
     authReq.user = {
       id: user.id,
       email: user.email,

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../app';
+import { t } from '../utils/i18n';
 
 export class AuthController {
   // 用戶註冊
@@ -25,7 +26,7 @@ export class AuthController {
         }
         res.status(400).json({
           success: false,
-          message: 'User already exists',
+          message: t(req, 'errors.userExists', 'User already exists'),
         });
         return;
       }
@@ -51,7 +52,7 @@ export class AuthController {
 
       res.status(201).json({
         success: true,
-        message: 'User registered successfully',
+        message: t(req, 'success.userRegistered', 'User registered successfully'),
         user: AuthController.sanitizeUser(user),
         ...tokens,
       });
@@ -89,7 +90,7 @@ export class AuthController {
       if (!user) {
         res.status(401).json({
           success: false,
-          message: 'Invalid credentials',
+          message: t(req, 'errors.invalidCredentials', 'Invalid credentials'),
         });
         return;
       }
@@ -108,7 +109,7 @@ export class AuthController {
       if (!isValidPassword) {
         res.status(401).json({
           success: false,
-          message: 'Invalid credentials',
+          message: t(req, 'errors.invalidCredentials', 'Invalid credentials'),
         });
         return;
       }
@@ -118,7 +119,7 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Login successful',
+        message: t(req, 'success.userLoggedIn', 'Login successful'),
         user: AuthController.sanitizeUser(user),
         ...tokens,
       });

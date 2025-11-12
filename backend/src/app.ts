@@ -16,6 +16,7 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { securityMiddleware } from './middleware/security';
 import { generalLimiter } from './middleware/rateLimiter';
+import { languageMiddleware } from './middleware/language';
 
 // 導入路由
 import authRoutes from './routes/auth';
@@ -25,6 +26,7 @@ import userRoutes from './routes/users';
 import uploadRoutes from './routes/upload';
 import healthRoutes from './routes/health';
 import adminRoutes from './routes/admin';
+import categoryRoutes from './routes/categories';
 
 // 初始化 Prisma 客戶端
 export const prisma = new PrismaClient({
@@ -105,6 +107,9 @@ app.use(compression());
 // 請求限制
 app.use(generalLimiter);
 
+// 語言檢測（必須在請求日誌之前）
+app.use(languageMiddleware);
+
 // 請求日誌
 app.use(requestLogger);
 
@@ -123,6 +128,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/categories', categoryRoutes);
 
 // 根路由
 app.get('/', (req, res) => {
