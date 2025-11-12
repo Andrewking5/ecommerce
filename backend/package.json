@@ -21,7 +21,10 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "admin:create": "ts-node scripts/create-admin.ts",
+    "admin:check": "ts-node scripts/check-user-role.ts",
+    "admin:update": "ts-node scripts/update-user-role.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.7.1",
