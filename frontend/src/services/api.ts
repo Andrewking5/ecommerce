@@ -129,7 +129,17 @@ class ApiClient {
 }
 
 // 建立 API 客戶端實例
-export const apiClient = new ApiClient(import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
+const apiBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+// 調試：在控制台顯示當前使用的 API URL
+if (import.meta.env.PROD) {
+  console.log('🌐 Production API URL:', apiBaseURL);
+  console.log('🌐 VITE_API_URL from env:', import.meta.env.VITE_API_URL || 'NOT SET');
+} else {
+  console.log('🔧 Development API URL:', apiBaseURL);
+}
+
+export const apiClient = new ApiClient(apiBaseURL);
 
 // 從本地儲存載入 token
 const token = localStorage.getItem('token');

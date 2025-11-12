@@ -45,9 +45,19 @@
 ## 驗證
 
 部署完成後，訪問前端應用：
-- 打開瀏覽器開發者工具（F12）
-- 查看 Network 標籤
-- 檢查 API 請求是否指向 `https://ecommerce-1w9j.onrender.com/api`
+1. 打開瀏覽者開發者工具（F12）
+2. 查看 **Console** 標籤，應該看到：
+   ```
+   🌐 Production API URL: https://ecommerce-1w9j.onrender.com/api
+   🌐 VITE_API_URL from env: https://ecommerce-1w9j.onrender.com/api
+   ```
+3. 查看 **Network** 標籤
+4. 檢查 API 請求是否指向 `https://ecommerce-1w9j.onrender.com/api`
+
+**如果仍然看到 `localhost:3001`**：
+- 檢查 Console 中的環境變量值
+- 如果顯示 `NOT SET`，說明環境變量沒有正確設置
+- 確認已經重新部署應用
 
 ## 當前配置
 
