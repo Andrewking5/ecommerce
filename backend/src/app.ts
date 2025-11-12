@@ -66,13 +66,28 @@ app.use(cors({
       'http://localhost:3000',
       'http://localhost:5173',
       process.env.FRONTEND_URL,
+      'https://ecommerce-frontend-liard-omega.vercel.app',
     ].filter(Boolean);
     
-    if (!origin) return callback(null, true);
+    // 調試日誌
+    if (process.env.NODE_ENV === 'production') {
+      console.log('🌐 CORS check:', {
+        origin,
+        allowedOrigins,
+        frontendUrl: process.env.FRONTEND_URL,
+        isAllowed: !origin || allowedOrigins.includes(origin || ''),
+      });
+    }
+    
+    if (!origin) {
+      // 允許沒有 origin 的請求（例如 Postman、服務器端請求）
+      return callback(null, true);
+    }
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn('⚠️ CORS blocked:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
