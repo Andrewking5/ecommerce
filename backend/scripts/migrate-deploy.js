@@ -57,11 +57,13 @@ async function runMigration() {
       } else {
         console.error(`❌ Migration failed after ${MAX_RETRIES} attempts`);
         console.warn('⚠️  Migration will be skipped. You can run it manually later.');
-        // 在构建阶段，不退出进程，让构建继续
+        // 在构建阶段，如果设置了 SKIP_MIGRATION_ON_ERROR，不退出进程，让构建继续
+        // 否则正常退出（让调用者决定如何处理）
         if (process.env.SKIP_MIGRATION_ON_ERROR === 'true') {
           console.log('ℹ️  SKIP_MIGRATION_ON_ERROR=true, continuing build...');
           process.exit(0);
         }
+        // 默认情况下，迁移失败应该退出，但可以在 Build Command 中使用 || true 来忽略
         process.exit(1);
       }
     }

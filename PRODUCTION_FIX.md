@@ -76,7 +76,7 @@ npm run db:deploy
 
 **注意**：如果数据库连接有问题，迁移可能会失败。建议先使用方法 1 手动运行一次，确认迁移成功后再使用方法 2。
 
-**方法 3: 更新 Build Command（可选，用于在构建时运行迁移）**
+**方法 3: 在 Build Command 中运行迁移（最简单，推荐）**
 
 1. 在 Render Dashboard 中，选择你的 Web Service
 2. 点击 **"Settings"** 标签
@@ -84,18 +84,24 @@ npm run db:deploy
 4. 更新为：
 
 ```bash
-cd backend && npm install && npm run build && npm run db:deploy || true
+cd backend && npm install && npm run build && npm run db:deploy
 ```
 
-**注意**：
-- `|| true` 确保即使迁移失败，构建也会继续
-- 迁移脚本已简化，可以直接使用 `DATABASE_URL`（Prisma 5.x 支持连接池 URL）
-- 如果迁移在构建时失败，可以在启动时通过 `RUN_MIGRATIONS_ON_START=true` 重试
+**说明**：
+- 这是最直接的方法：在构建时运行迁移
+- 迁移脚本会自动重试 3 次，如果都失败才会报错
+- 如果迁移失败导致构建失败，可以：
+  - 检查 `DATABASE_URL` 是否正确
+  - 或者使用 `cd backend && npm install && npm run build && (npm run db:deploy || true)` 让构建继续（不推荐，因为迁移失败会导致运行时错误）
 
-**推荐配置**：
-- **DATABASE_URL**（必需）：你的 Neon 数据库连接 URL（可以是连接池 URL）
-- **DIRECT_DATABASE_URL**（可选）：如果迁移时遇到连接问题，可以设置直接连接 URL
-- **RUN_MIGRATIONS_ON_START**（推荐）：设置为 `true`，在应用启动时自动运行迁移
+**推荐配置（最简单）**：
+- **Build Command**: `cd backend && npm install && npm run build && npm run db:deploy`
+- **DATABASE_URL**（必需）：你的 Neon 数据库连接 URL（Prisma 5.x 支持连接池 URL，无需额外配置）
+
+**如果构建时迁移失败**：
+- 检查 Render 日志查看具体错误
+- 确认 `DATABASE_URL` 环境变量正确设置
+- 可以临时使用 `RUN_MIGRATIONS_ON_START=true` 在启动时运行迁移
 
 ### 步骤 2: 验证迁移
 
