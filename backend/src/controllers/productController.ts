@@ -300,15 +300,53 @@ export class ProductController {
       const productData = req.body;
       const userId = (req as any).user.id;
 
-      // 查找分類
-      const category = await prisma.category.findUnique({
-        where: { slug: productData.category },
-      });
-
-      if (!category) {
+      // 驗證必要字段
+      if (!productData.name || !productData.description || productData.price === undefined) {
         res.status(400).json({
           success: false,
-          message: req.t('categories:errors.notFound'),
+          message: req.t('products:errors.missingFields'),
+        });
+        return;
+      }
+
+      // 處理分類：優先使用 categoryId，如果沒有則使用 category slug
+      let categoryId: string;
+      
+      if (productData.categoryId) {
+        // 前端直接提供 categoryId（推薦方式）
+        categoryId = productData.categoryId;
+        
+        // 驗證分類是否存在
+        const category = await prisma.category.findUnique({
+          where: { id: categoryId },
+        });
+
+        if (!category) {
+          res.status(400).json({
+            success: false,
+            message: req.t('categories:errors.notFound'),
+          });
+          return;
+        }
+      } else if (productData.category) {
+        // 兼容舊方式：使用 category slug
+        const category = await prisma.category.findUnique({
+          where: { slug: productData.category },
+        });
+
+        if (!category) {
+          res.status(400).json({
+            success: false,
+            message: req.t('categories:errors.notFound'),
+          });
+          return;
+        }
+        
+        categoryId = category.id;
+      } else {
+        res.status(400).json({
+          success: false,
+          message: req.t('products:errors.categoryRequired'),
         });
         return;
       }
@@ -318,10 +356,11 @@ export class ProductController {
           name: productData.name,
           description: productData.description,
           price: productData.price,
-          categoryId: category.id,
-          images: productData.images,
-          stock: productData.stock,
-          specifications: productData.specifications,
+          categoryId: categoryId,
+          images: productData.images || [],
+          stock: productData.stock || 0,
+          specifications: productData.specifications || {},
+          isActive: productData.isActive !== undefined ? productData.isActive : true,
         },
         include: {
           category: true,
@@ -334,11 +373,15 @@ export class ProductController {
         data: product,
       });
       return;
-    } catch (error) {
-      console.error('Create product error:', error);
+    } catch (error: any) {
+      console.error('Create product error:', {
+        message: error?.message,
+        code: error?.code,
+        meta: error?.meta,
+      });
       res.status(500).json({
         success: false,
-        message: req.t('common:errors.internalServerError'),
+        message: error?.message || req.t('common:errors.internalServerError'),
       });
       return;
     }
