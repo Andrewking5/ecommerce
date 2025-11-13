@@ -173,6 +173,8 @@ export class UserController {
             firstName: true,
             lastName: true,
             phone: true,
+            avatar: true,
+            provider: true,
             role: true,
             isActive: true,
             createdAt: true,

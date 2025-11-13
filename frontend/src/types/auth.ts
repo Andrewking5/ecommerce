@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   phone?: string;
   avatar?: string;
+  provider?: 'EMAIL' | 'GOOGLE' | 'FACEBOOK' | 'APPLE';
   role: 'USER' | 'ADMIN';
   isActive: boolean;
   createdAt: string;

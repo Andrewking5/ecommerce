@@ -189,6 +189,9 @@ const AdminUsers: React.FC = () => {
                       电话
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
+                      登录方式
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                       角色
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
@@ -207,28 +210,28 @@ const AdminUsers: React.FC = () => {
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          {user.avatar ? (
-                            <img
-                              src={user.avatar}
-                              alt={`${user.firstName} ${user.lastName}`}
-                              className="w-10 h-10 rounded-full object-cover mr-3"
-                              onError={(e) => {
-                                // 如果头像加载失败，隐藏图片，显示首字母
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                                const fallback = target.nextElementSibling as HTMLElement;
-                                if (fallback) fallback.style.display = 'flex';
-                              }}
-                            />
-                          ) : null}
-                          <div
-                            className={`w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center mr-3 ${
-                              user.avatar ? 'hidden' : ''
-                            }`}
-                          >
-                            <span className="text-white font-semibold">
-                              {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
-                            </span>
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden mr-3 bg-gray-200">
+                            {user.avatar ? (
+                              <img
+                                src={user.avatar}
+                                alt={`${user.firstName} ${user.lastName}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // 如果头像加载失败，隐藏图片，显示首字母
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const fallback = target.nextElementSibling as HTMLElement;
+                                  if (fallback) fallback.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            {!user.avatar && (
+                              <div className="w-full h-full bg-brand-blue flex items-center justify-center">
+                                <span className="text-white font-semibold text-sm">
+                                  {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <div>
                             <div className="text-sm font-medium text-text-primary">
@@ -242,6 +245,27 @@ const AdminUsers: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-text-secondary">{user.phone || '-'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            user.provider === 'GOOGLE'
+                              ? 'bg-red-100 text-red-800'
+                              : user.provider === 'FACEBOOK'
+                              ? 'bg-blue-100 text-blue-800'
+                              : user.provider === 'APPLE'
+                              ? 'bg-gray-100 text-gray-800'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {user.provider === 'GOOGLE'
+                            ? 'Google'
+                            : user.provider === 'FACEBOOK'
+                            ? 'Facebook'
+                            : user.provider === 'APPLE'
+                            ? 'Apple'
+                            : '邮箱注册'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

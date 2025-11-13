@@ -119,10 +119,20 @@ const AdminLayout: React.FC = () => {
           {sidebarOpen && user && (
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold">
-                    {user.firstName?.[0]}{user.lastName?.[0]}
-                  </span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-gray-200">
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-brand-blue flex items-center justify-center">
+                      <span className="text-white font-semibold text-sm">
+                        {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text-primary truncate">
