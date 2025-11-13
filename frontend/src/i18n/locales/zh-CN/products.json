@@ -6,10 +6,24 @@
   "categoriesDescription": "按分类浏览我们的商品",
   "noProducts": "找不到商品",
   "filter": {
-    "title": "筛选商品",
+    "title": "筛选",
     "category": "分类",
+    "price": "价格",
     "priceRange": "价格范围",
+    "customRange": "自定义范围",
     "sortBy": "排序方式",
+    "results": "找到 {{count}} 个商品",
+    "showing": "显示 {{count}} 个商品",
+    "noResults": "找不到商品",
+    "tryDifferentFilters": "请尝试调整筛选条件或搜索关键词",
+    "pageInfo": "第 {{current}} 页，共 {{total}} 页",
+    "priceRanges": {
+      "under50": "$50 以下",
+      "50to100": "$50 - $100",
+      "100to200": "$100 - $200",
+      "200to500": "$200 - $500",
+      "over500": "$500 以上"
+    },
     "sortOptions": {
       "newest": "最新",
       "oldest": "最旧",
@@ -18,6 +32,10 @@
       "nameAZ": "名称：A 到 Z",
       "nameZA": "名称：Z 到 A"
     }
+  },
+  "search": {
+    "placeholder": "搜索商品名称、描述...",
+    "noResults": "找不到符合搜索条件的商品"
   },
   "detail": {
     "addToCart": "加入购物车",

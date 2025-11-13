@@ -6,10 +6,24 @@
   "categoriesDescription": "Browse our products by category",
   "noProducts": "No products found",
   "filter": {
-    "title": "Filter Products",
+    "title": "Filters",
     "category": "Category",
+    "price": "Price",
     "priceRange": "Price Range",
+    "customRange": "Custom Range",
     "sortBy": "Sort By",
+    "results": "{{count}} products found",
+    "showing": "Showing {{count}} products",
+    "noResults": "No products found",
+    "tryDifferentFilters": "Try adjusting your filters or search terms",
+    "pageInfo": "Page {{current}} of {{total}}",
+    "priceRanges": {
+      "under50": "Under $50",
+      "50to100": "$50 - $100",
+      "100to200": "$100 - $200",
+      "200to500": "$200 - $500",
+      "over500": "Over $500"
+    },
     "sortOptions": {
       "newest": "Newest",
       "oldest": "Oldest",
@@ -18,6 +32,10 @@
       "nameAZ": "Name: A to Z",
       "nameZA": "Name: Z to A"
     }
+  },
+  "search": {
+    "placeholder": "Search products by name, description...",
+    "noResults": "No products found matching your search"
   },
   "detail": {
     "addToCart": "Add to Cart",

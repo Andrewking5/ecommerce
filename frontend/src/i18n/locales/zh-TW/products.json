@@ -6,10 +6,24 @@
   "categoriesDescription": "按分類瀏覽我們的商品",
   "noProducts": "找不到商品",
   "filter": {
-    "title": "篩選商品",
+    "title": "篩選",
     "category": "分類",
+    "price": "價格",
     "priceRange": "價格範圍",
+    "customRange": "自訂範圍",
     "sortBy": "排序方式",
+    "results": "找到 {{count}} 個商品",
+    "showing": "顯示 {{count}} 個商品",
+    "noResults": "找不到商品",
+    "tryDifferentFilters": "請嘗試調整篩選條件或搜尋關鍵字",
+    "pageInfo": "第 {{current}} 頁，共 {{total}} 頁",
+    "priceRanges": {
+      "under50": "$50 以下",
+      "50to100": "$50 - $100",
+      "100to200": "$100 - $200",
+      "200to500": "$200 - $500",
+      "over500": "$500 以上"
+    },
     "sortOptions": {
       "newest": "最新",
       "oldest": "最舊",
@@ -18,6 +32,10 @@
       "nameAZ": "名稱：A 到 Z",
       "nameZA": "名稱：Z 到 A"
     }
+  },
+  "search": {
+    "placeholder": "搜尋商品名稱、描述...",
+    "noResults": "找不到符合搜尋條件的商品"
   },
   "detail": {
     "addToCart": "加入購物車",

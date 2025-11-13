@@ -87,16 +87,21 @@ class ApiClient {
 
         // 401 错误：尝试刷新 token
         if (error.response?.status === 401) {
-          console.log('🔍 401 Unauthorized detected:', {
-            url: originalRequest?.url,
-            method: originalRequest?.method,
-            hasRetry: originalRequest?._retry,
-            isRefreshing: this.isRefreshing,
-          });
+          // 只在开发环境显示详细日志，避免控制台混乱
+          if (import.meta.env.DEV) {
+            console.log('🔍 401 Unauthorized detected (will auto-retry):', {
+              url: originalRequest?.url,
+              method: originalRequest?.method,
+              hasRetry: originalRequest?._retry,
+              isRefreshing: this.isRefreshing,
+            });
+          }
 
           // 如果已经在刷新 token，将请求加入队列
           if (this.isRefreshing) {
-            console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
+            if (import.meta.env.DEV) {
+              console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
+            }
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject });
             })
@@ -121,7 +126,10 @@ class ApiClient {
           originalRequest._retry = true;
           this.isRefreshing = true;
 
-          console.log('🔄 Attempting to refresh token...');
+          // 只在开发环境显示详细日志
+          if (import.meta.env.DEV) {
+            console.log('🔄 Token expired, automatically refreshing...');
+          }
 
           try {
             const refreshToken = localStorage.getItem('refreshToken');
@@ -131,7 +139,9 @@ class ApiClient {
             }
 
             // 调用刷新 token API（不使用 apiClient，避免循环）
-            console.log('🔄 Calling refresh token API...');
+            if (import.meta.env.DEV) {
+              console.log('🔄 Calling refresh token API...');
+            }
             const response = await axios.post(
               `${this.client.defaults.baseURL}/auth/refresh`,
               { refreshToken },
@@ -146,7 +156,9 @@ class ApiClient {
               const newToken = response.data.accessToken;
               const newRefreshToken = response.data.refreshToken;
 
-              console.log('✅ Token refreshed successfully');
+              if (import.meta.env.DEV) {
+                console.log('✅ Token refreshed successfully, retrying request...');
+              }
 
               // 更新 token
               this.setToken(newToken);
@@ -161,8 +173,7 @@ class ApiClient {
               // 处理队列中的请求
               this.processQueue(null, newToken);
 
-              // 重新发送原始请求
-              console.log('🔄 Retrying original request:', originalRequest.url);
+              // 重新发送原始请求（静默重试，不显示错误）
               return this.client(originalRequest);
             } else {
               console.error('❌ Token refresh failed: Invalid response format');
