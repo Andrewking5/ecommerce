@@ -49,8 +49,8 @@ const AdminLayout: React.FC = () => {
       {/* 侧边栏 */}
       <aside
         className={`${
-          sidebarOpen ? 'w-64' : 'w-20'
-        } bg-white border-r border-gray-200 transition-all duration-300 fixed h-screen z-40`}
+          sidebarOpen ? 'w-64 min-w-[256px]' : 'w-20'
+        } bg-white border-r border-gray-200 transition-all duration-300 fixed h-screen z-40 overflow-hidden`}
       >
         <div className="flex flex-col h-full">
           {/* Logo 和切换按钮 */}
@@ -60,12 +60,12 @@ const AdminLayout: React.FC = () => {
                 <Link
                   to="/"
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-                  title={t('menu.dashboard', { defaultValue: 'Back to Home' })}
+                  title={t('menu.backToHome')}
                 >
                   <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-lg">E</span>
                   </div>
-                  <span className="text-lg font-semibold text-text-primary">{t('menu.dashboard', { defaultValue: 'Admin Panel' })}</span>
+                  <span className="text-lg font-semibold text-text-primary">Store</span>
                 </Link>
               </div>
             )}
@@ -106,7 +106,7 @@ const AdminLayout: React.FC = () => {
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-text-secondary hover:bg-gray-100 hover:text-text-primary"
                 >
                   <Home size={20} />
-                  {sidebarOpen && <span className="flex-1">返回首页</span>}
+                  {sidebarOpen && <span className="flex-1 truncate">{t('menu.backToHome')}</span>}
                 </Link>
               </li>
               
@@ -133,8 +133,8 @@ const AdminLayout: React.FC = () => {
                       <Icon size={20} />
                       {sidebarOpen && (
                         <>
-                          <span className="flex-1">{item.label}</span>
-                          {active && <ChevronRight size={16} />}
+                          <span className="flex-1 truncate">{item.label}</span>
+                          {active && <ChevronRight size={16} className="flex-shrink-0" />}
                         </>
                       )}
                     </Link>
@@ -151,7 +151,7 @@ const AdminLayout: React.FC = () => {
               className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-text-secondary hover:bg-gray-100 hover:text-text-primary transition-all duration-200"
             >
               <LogOut size={20} />
-              {sidebarOpen && <span>退出登录</span>}
+              {sidebarOpen && <span className="truncate">{t('layout.logout')}</span>}
             </button>
           </div>
         </div>
