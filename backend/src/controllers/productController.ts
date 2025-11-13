@@ -208,39 +208,69 @@ export class ProductController {
         return;
       }
 
-      const product = await prisma.product.findUnique({
-        where: { id, isActive: true },
-        include: {
-          category: true,
-          variants: {
-            where: { isActive: true },
-            include: {
-              attributes: {
-                include: {
-                  attribute: true,
+      // 尝试查询产品，如果 variants 表不存在则只查询基本信息
+      let product;
+      try {
+        product = await prisma.product.findUnique({
+          where: { id, isActive: true },
+          include: {
+            category: true,
+            variants: {
+              where: { isActive: true },
+              include: {
+                attributes: {
+                  include: {
+                    attribute: true,
+                  },
                 },
               },
+              orderBy: [
+                { isDefault: 'desc' },
+                { createdAt: 'asc' },
+              ],
             },
-            orderBy: [
-              { isDefault: 'desc' },
-              { createdAt: 'asc' },
-            ],
-          },
-          reviews: {
-            include: {
-              user: {
-                select: {
-                  firstName: true,
-                  lastName: true,
-                  avatar: true,
+            reviews: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                  },
                 },
               },
+              orderBy: { createdAt: 'desc' },
+              take: 50, // 限制评论数量，避免数据过大
             },
-            orderBy: { createdAt: 'desc' },
-            take: 50, // 限制评论数量，避免数据过大
           },
-        },
-      });
+        });
+      } catch (variantError: any) {
+        // 如果 variants 查询失败（表不存在或字段不匹配），尝试不包含 variants
+        console.warn('⚠️  Variants query failed, trying without variants:', variantError?.message);
+        product = await prisma.product.findUnique({
+          where: { id, isActive: true },
+          include: {
+            category: true,
+            reviews: {
+              include: {
+                user: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                  },
+                },
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 50,
+            },
+          },
+        });
+        // 如果产品存在但没有 variants，添加空数组
+        if (product) {
+          (product as any).variants = [];
+        }
+      }
 
       if (!product) {
         res.status(404).json({
@@ -258,12 +288,21 @@ export class ProductController {
         data: product,
       });
       return;
-    } catch (error) {
-      console.error('Get product error:', error);
-      res.status(500).json({
-        success: false,
-        message: req.t('common:errors.internalServerError'),
+    } catch (error: any) {
+      console.error('Get product error:', {
+        message: error?.message,
+        code: error?.code,
+        stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
       });
+      
+      // 处理 Prisma 错误
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const appError = handlePrismaError(error);
+        sendErrorResponse(res, appError, req);
+        return;
+      }
+      
+      sendErrorResponse(res, error, req);
       return;
     }
   }

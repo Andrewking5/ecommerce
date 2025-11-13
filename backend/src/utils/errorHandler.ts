@@ -77,14 +77,25 @@ export function handlePrismaError(error: any): AppError {
     );
   }
 
-  // Prisma 查询错误（可能是字段不存在）
-  if (error.code === 'P2010' || error.message?.includes('Unknown column') || error.message?.includes('does not exist')) {
+  // Prisma 查询错误（可能是字段不存在或表不存在）
+  if (
+    error.code === 'P2010' || 
+    error.code === 'P2021' || // Table does not exist
+    error.code === 'P2022' || // Column does not exist
+    error.message?.includes('Unknown column') || 
+    error.message?.includes('does not exist') ||
+    error.message?.includes('relation') && error.message?.includes('does not exist')
+  ) {
     return new AppError(
-      'Database schema mismatch. Please run database migrations.',
+      'Database schema mismatch. Please run database migrations: npm run db:deploy',
       500,
       'SCHEMA_MISMATCH',
       false,
-      { originalError: error.message }
+      { 
+        originalError: error.message,
+        code: error.code,
+        hint: 'Run migrations in Render Shell: cd backend && npm run db:deploy'
+      }
     );
   }
 

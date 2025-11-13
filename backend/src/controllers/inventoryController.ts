@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
+import { Prisma } from '@prisma/client';
+import { handlePrismaError, sendErrorResponse } from '../utils/errorHandler';
 
 export class InventoryController {
   // 获取库存预警列表
@@ -44,18 +46,21 @@ export class InventoryController {
         },
       });
     } catch (error: any) {
-      console.error('Get low stock products error:', error);
-      const errorMessage = error?.message || 'Internal server error';
-      const errorCode = error?.code || 'INTERNAL_ERROR';
-      
-      res.status(500).json({
-        success: false,
-        message: errorMessage,
-        code: errorCode,
-        ...(process.env.NODE_ENV === 'development' && {
-          stack: error?.stack,
-        }),
+      console.error('Get low stock products error:', {
+        message: error?.message,
+        code: error?.code,
+        stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
       });
+      
+      // 处理 Prisma 错误
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const appError = handlePrismaError(error);
+        sendErrorResponse(res, appError, req);
+        return;
+      }
+      
+      sendErrorResponse(res, error, req);
+      return;
     }
   }
 

@@ -51,7 +51,7 @@ cd backend
 npm run db:deploy
 ```
 
-**方法 2: 通过环境变量自动迁移**
+**方法 2: 通过环境变量自动迁移（推荐用于生产环境）**
 
 1. 在 Render Dashboard 中，选择你的 Web Service
 2. 点击 **"Environment"** 标签
@@ -59,6 +59,9 @@ npm run db:deploy
    - Key: `RUN_MIGRATIONS_ON_START`
    - Value: `true`
 4. 点击 **"Save Changes"**（会自动重新部署）
+5. **重要**：部署完成后，检查日志确认迁移已运行
+
+**注意**：如果数据库连接有问题，迁移可能会失败。建议先使用方法 1 手动运行一次，确认迁移成功后再使用方法 2。
 
 **方法 3: 更新 Build Command（推荐用于生产环境）**
 
@@ -80,9 +83,22 @@ cd backend && npm install && npm run build
 
 迁移完成后，检查：
 
-1. 访问 `https://ecommerce-1w9j.onrender.com/api/health`
-2. 检查 Render 日志，确认没有数据库错误
-3. 测试产品列表 API：`https://ecommerce-1w9j.onrender.com/api/products?page=1&limit=8`
+1. **检查迁移日志**：
+   - 在 Render Dashboard 中查看 "Logs"
+   - 应该看到 "✅ Migration deployed successfully"
+   - 不应该有 "Table does not exist" 或 "Column does not exist" 错误
+
+2. **测试 API**：
+   - 访问 `https://ecommerce-1w9j.onrender.com/api/health`（应该返回 200）
+   - 测试产品列表：`https://ecommerce-1w9j.onrender.com/api/products?page=1&limit=8`（应该返回 200，不是 500）
+   - 测试产品详情：选择一个产品 ID，访问 `/api/products/{id}`
+
+3. **检查数据库表**（可选）：
+   - 如果可以使用数据库客户端，检查以下表是否存在：
+     - `product_variants`
+     - `product_attributes`
+     - `product_variant_attributes`
+   - 检查 `product_variants` 表是否有 `displayOrder` 字段
 
 ### 步骤 3: 恢复完整功能（迁移完成后）
 
