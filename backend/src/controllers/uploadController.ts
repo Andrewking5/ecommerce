@@ -215,22 +215,40 @@ export class UploadController {
         }
 
         const files = req.files as Express.Multer.File[];
-        const uploadPromises = files.map(async (file) => {
-          // 壓縮圖片
-          const compressedBuffer = await sharp(file.buffer)
-            .jpeg({ quality: 80 })
-            .png({ quality: 80 })
-            .webp({ quality: 80 })
-            .toBuffer();
+        console.log(`📤 Processing ${files.length} file(s) for upload...`);
+        
+        const uploadPromises = files.map(async (file, index) => {
+          try {
+            console.log(`📤 Processing file ${index + 1}/${files.length}: ${file.originalname} (${file.size} bytes)`);
+            
+            // 壓縮圖片
+            const compressedBuffer = await sharp(file.buffer)
+              .jpeg({ quality: 80 })
+              .png({ quality: 80 })
+              .webp({ quality: 80 })
+              .toBuffer();
 
-          // 根據環境選擇存儲方式
-          if (useLocalStorage()) {
-            return await uploadToLocal(compressedBuffer, file.originalname, req);
-          } else {
-            if (!isCloudinaryConfigured()) {
-              throw new Error('Cloudinary is not configured');
+            console.log(`✅ File ${index + 1} compressed: ${compressedBuffer.length} bytes`);
+
+            // 根據環境選擇存儲方式
+            if (useLocalStorage()) {
+              const result = await uploadToLocal(compressedBuffer, file.originalname, req);
+              console.log(`✅ File ${index + 1} saved to local storage: ${result.url}`);
+              return result;
+            } else {
+              if (!isCloudinaryConfigured()) {
+                throw new Error('Cloudinary is not configured');
+              }
+              const result = await uploadToCloudinary(compressedBuffer);
+              console.log(`✅ File ${index + 1} uploaded to Cloudinary: ${result.url}`);
+              return result;
             }
-            return await uploadToCloudinary(compressedBuffer);
+          } catch (fileError: any) {
+            console.error(`❌ Error processing file ${index + 1} (${file.originalname}):`, {
+              message: fileError?.message,
+              stack: fileError?.stack,
+            });
+            throw fileError;
           }
         });
 
@@ -245,10 +263,12 @@ export class UploadController {
         });
         return;
       } catch (error: any) {
-        console.error('Upload images error:', {
+        console.error('❌ Upload images error:', {
           message: error?.message,
           http_code: error?.http_code,
           name: error?.name,
+          code: error?.code,
+          errno: error?.errno,
           stack: error?.stack,
         });
         
@@ -261,9 +281,22 @@ export class UploadController {
           return;
         }
         
+        // 文件系统错误处理
+        if (error?.code === 'ENOENT' || error?.code === 'EACCES' || error?.errno) {
+          res.status(500).json({
+            success: false,
+            message: `File system error: ${error.message}. Please check uploads directory permissions.`,
+          });
+          return;
+        }
+        
         res.status(500).json({
           success: false,
           message: error?.message || 'Failed to upload images',
+          ...(process.env.NODE_ENV === 'development' && { 
+            error: error?.message,
+            stack: error?.stack 
+          }),
         });
         return;
       }

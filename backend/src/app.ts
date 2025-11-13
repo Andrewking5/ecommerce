@@ -49,12 +49,12 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https:", "http://localhost:3001", "http://localhost:5173", "http://localhost:3000"],
       scriptSrc: ["'self'"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "http://localhost:3001", "http://localhost:5173", "http://localhost:3000"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null, // 开发环境不强制 HTTPS
     },
   },
   crossOriginEmbedderPolicy: false,
@@ -123,8 +123,35 @@ app.use(requestLogger);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 靜態檔案服務
-app.use('/uploads', express.static('uploads'));
+// 靜態檔案服務（添加 CORS 支持）
+app.use('/uploads', (req, res, next): void => {
+  // 設置 CORS 頭
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    process.env.FRONTEND_URL,
+    'https://ecommerce-frontend-liard-omega.vercel.app',
+  ].filter(Boolean);
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else if (!origin) {
+    // 允许没有 origin 的请求（直接访问图片）
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+}, express.static('uploads'));
 
 // API 路由
 app.use('/api/auth', authRoutes);
