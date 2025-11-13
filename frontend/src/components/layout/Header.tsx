@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, User, Menu, X } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { getImageUrl } from '@/utils/imageUrl';
 import Button from '@/components/ui/Button';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
@@ -80,7 +81,7 @@ const Header: React.FC = () => {
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 {user?.role === 'ADMIN' && (
                   <Link
                     to="/admin"
@@ -89,12 +90,46 @@ const Header: React.FC = () => {
                     {t('navigation.admin')}
                   </Link>
                 )}
+                
+                {/* User Avatar and Name */}
                 <Link
                   to="/user/profile"
-                  className="p-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
+                  className="flex items-center space-x-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
                 >
-                  <User size={20} />
+                  {/* Avatar */}
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-brand-blue to-purple-500 flex items-center justify-center flex-shrink-0">
+                    {user?.avatar ? (
+                      <img
+                        src={getImageUrl(user.avatar)}
+                        alt={`${user.firstName} ${user.lastName}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 如果图片加载失败，显示首字母
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `
+                              <span class="text-white text-xs font-semibold">
+                                ${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}
+                              </span>
+                            `;
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span className="text-white text-xs font-semibold">
+                        {user?.firstName?.[0] || ''}{user?.lastName?.[0] || ''}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Name - Desktop only */}
+                  <span className="hidden sm:block text-sm font-medium text-text-primary group-hover:text-brand-blue transition-colors">
+                    {user?.firstName} {user?.lastName}
+                  </span>
                 </Link>
+                
                 <Button
                   variant="outline"
                   size="sm"
