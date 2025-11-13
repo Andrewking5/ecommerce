@@ -30,8 +30,13 @@ import categoryRoutes from './routes/categories';
 import inventoryRoutes from './routes/inventory';
 
 // 初始化 Prisma 客戶端
+// 注意：在 Render 上，数据库连接可能会因为空闲而关闭
+// 确保 DATABASE_URL 包含连接池参数，例如：
+// postgresql://user:pass@host:5432/db?connection_limit=10&pool_timeout=20
 export const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
+  log: process.env.NODE_ENV === 'development' 
+    ? ['query', 'info', 'warn', 'error'] 
+    : ['warn', 'error'],
 });
 
 // 建立 Express 應用程式

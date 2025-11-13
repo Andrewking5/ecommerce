@@ -37,20 +37,39 @@ async function startServer() {
     console.log('  - NODE_ENV:', process.env.NODE_ENV || 'development');
     console.log('  - PORT:', process.env.PORT || 3001);
 
-    // 測試資料庫連線（添加超時）
+    // 測試資料庫連線（添加超時和重試）
     console.log('🔍 Connecting to database...');
-    try {
-      await Promise.race([
-        prisma.$connect(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database connection timeout after 10s')), 10000)
-        )
-      ]);
-      console.log('✅ Database connected successfully');
-    } catch (error: any) {
-      console.error('❌ Database connection failed:', error.message);
-      console.error('⚠️  Server will continue to start, but database operations may fail');
-      // 不阻止服務器啟動，讓它繼續運行
+    const maxRetries = 3;
+    let retryCount = 0;
+    let connected = false;
+
+    while (retryCount < maxRetries && !connected) {
+      try {
+        await Promise.race([
+          prisma.$connect(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Database connection timeout after 10s')), 10000)
+          )
+        ]);
+        console.log('✅ Database connected successfully');
+        connected = true;
+      } catch (error: any) {
+        retryCount++;
+        console.error(`❌ Database connection attempt ${retryCount}/${maxRetries} failed:`, error.message);
+        
+        if (retryCount < maxRetries) {
+          console.log(`🔄 Retrying in 2 seconds...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+          console.error('❌ All database connection attempts failed');
+          console.error('⚠️  Server will continue to start, but database operations may fail');
+          console.error('💡 Please check:');
+          console.error('   1. DATABASE_URL environment variable is set correctly');
+          console.error('   2. Database service is running and accessible');
+          console.error('   3. DATABASE_URL includes connection pool parameters if needed');
+          // 不阻止服務器啟動，讓它繼續運行
+        }
+      }
     }
 
     // 運行數據庫遷移（生產環境）- 在後台運行，不阻塞啟動
