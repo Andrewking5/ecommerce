@@ -298,21 +298,30 @@ export class SocialAuthController {
       // - name: 'John Doe' (完整姓名)
       // - picture: { data: { url: 'https://...' } } 或 photos: [{ value: 'https://...' }]
       
-      // 提取姓名
+      // 提取姓名（Facebook 可能返回多种格式）
       let firstName = 'User';
       let lastName = '';
       
-      if (profile.name) {
-        if (typeof profile.name === 'string') {
-          // name 是字符串，需要拆分
-          const nameParts = profile.name.trim().split(/\s+/);
-          firstName = nameParts[0] || 'User';
-          lastName = nameParts.slice(1).join(' ') || '';
-        } else if (profile.name.givenName) {
-          // name 是对象
-          firstName = profile.name.givenName;
-          lastName = profile.name.familyName || '';
-        }
+      // 方式1: 使用 first_name 和 last_name（如果 Passport 配置了这些字段）
+      if ((profile as any).first_name) {
+        firstName = (profile as any).first_name;
+        lastName = (profile as any).last_name || '';
+      }
+      // 方式2: 使用 name 对象
+      else if (profile.name?.givenName) {
+        firstName = profile.name.givenName;
+        lastName = profile.name.familyName || '';
+      }
+      // 方式3: name 是字符串，需要拆分
+      else if (profile.name && typeof profile.name === 'string') {
+        const nameParts = profile.name.trim().split(/\s+/);
+        firstName = nameParts[0] || 'User';
+        lastName = nameParts.slice(1).join(' ') || '';
+      }
+      // 方式4: 从 _json 获取
+      else if ((profile as any)._json?.first_name) {
+        firstName = (profile as any)._json.first_name;
+        lastName = (profile as any)._json.last_name || '';
       }
       
       // 提取头像（Facebook 可能返回多种结构）
