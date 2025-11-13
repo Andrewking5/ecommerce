@@ -3,7 +3,7 @@
  * 用于检查和验证 token 状态
  */
 
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 interface TokenPayload {
   userId: string;
