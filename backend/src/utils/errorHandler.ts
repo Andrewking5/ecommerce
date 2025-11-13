@@ -77,6 +77,17 @@ export function handlePrismaError(error: any): AppError {
     );
   }
 
+  // Prisma 查询错误（可能是字段不存在）
+  if (error.code === 'P2010' || error.message?.includes('Unknown column') || error.message?.includes('does not exist')) {
+    return new AppError(
+      'Database schema mismatch. Please run database migrations.',
+      500,
+      'SCHEMA_MISMATCH',
+      false,
+      { originalError: error.message }
+    );
+  }
+
   // 默认 Prisma 错误
   return new AppError(
     error.message || 'Database error',

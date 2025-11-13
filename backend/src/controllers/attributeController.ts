@@ -27,8 +27,8 @@ export class AttributeController {
         },
       },
       orderBy: [
-        { displayOrder: 'asc' },
         { name: 'asc' },
+        { createdAt: 'asc' },
       ],
     });
 

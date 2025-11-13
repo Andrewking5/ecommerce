@@ -45,9 +45,16 @@ export class InventoryController {
       });
     } catch (error: any) {
       console.error('Get low stock products error:', error);
+      const errorMessage = error?.message || 'Internal server error';
+      const errorCode = error?.code || 'INTERNAL_ERROR';
+      
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: errorMessage,
+        code: errorCode,
+        ...(process.env.NODE_ENV === 'development' && {
+          stack: error?.stack,
+        }),
       });
     }
   }

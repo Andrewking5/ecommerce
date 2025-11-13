@@ -47,7 +47,6 @@ export class VariantController {
         },
       },
       orderBy: [
-        { displayOrder: 'asc' },
         { isDefault: 'desc' },
         { createdAt: 'asc' },
       ],

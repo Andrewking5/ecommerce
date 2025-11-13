@@ -7,7 +7,7 @@
     "dev": "nodemon src/server.ts",
     "clean": "node -e \"try { require('fs').rmSync('dist', {recursive: true, force: true}) } catch(e) {}\"",
     "prebuild": "npm install --include=dev || true",
-    "build": "npm run clean && npm run db:generate:no-validate && tsc",
+    "build": "npm run clean && npm run db:generate:no-validate && tsc && npm run db:deploy || echo 'Migration skipped - will run on startup if RUN_MIGRATIONS_ON_START=true'",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",

@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { prisma } from '../app';
 import { ProductWithRelations, ReviewWithRating } from '../types/prisma';
 import { CacheService, CACHE_KEYS } from '../services/cacheService';
-import { asyncHandler, sendErrorResponse } from '../utils/errorHandler';
+import { asyncHandler, sendErrorResponse, handlePrismaError } from '../utils/errorHandler';
+import { Prisma } from '@prisma/client';
 
 export class ProductController {
   // 獲取商品列表
@@ -180,6 +181,12 @@ export class ProductController {
       });
       return;
     } catch (error: any) {
+      // 处理 Prisma 错误
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        const appError = handlePrismaError(error);
+        sendErrorResponse(res, appError, req);
+        return;
+      }
       sendErrorResponse(res, error, req);
       return;
     }
