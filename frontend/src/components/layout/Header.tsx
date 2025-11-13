@@ -82,10 +82,11 @@ const Header: React.FC = () => {
             {/* User Menu */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-2 sm:space-x-3">
+                {/* Admin Button - Desktop only */}
                 {user?.role === 'ADMIN' && (
                   <Link
                     to="/admin"
-                    className="px-3 py-1.5 text-sm font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
+                    className="hidden md:block px-3 py-1.5 text-sm font-medium text-brand-blue hover:text-brand-blue/80 transition-colors duration-200"
                   >
                     {t('navigation.admin')}
                   </Link>
@@ -130,10 +131,12 @@ const Header: React.FC = () => {
                   </span>
                 </Link>
                 
+                {/* Logout Button - Desktop only */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
+                  className="hidden sm:flex"
                 >
                   {t('buttons.logout')}
                 </Button>
@@ -188,6 +191,41 @@ const Header: React.FC = () => {
               >
                 {t('navigation.contact')}
               </Link>
+              
+              {/* Admin Link - Mobile only */}
+              {isAuthenticated && user?.role === 'ADMIN' && (
+                <Link
+                  to="/admin"
+                  className="px-4 py-2 text-brand-blue hover:text-brand-blue/80 hover:bg-blue-50 transition-colors duration-200 rounded-lg font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('navigation.admin')}
+                </Link>
+              )}
+              
+              {/* User Profile - Mobile only */}
+              {isAuthenticated && (
+                <Link
+                  to="/user/profile"
+                  className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors duration-200 rounded-lg"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('navigation.profile')}
+                </Link>
+              )}
+              
+              {/* Logout Button - Mobile only */}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="px-4 py-2 text-left text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors duration-200 rounded-lg"
+                >
+                  {t('buttons.logout')}
+                </button>
+              )}
               
               {/* Language Switcher - Mobile */}
               <div className="px-4 pt-2 border-t border-gray-200 mt-2">
