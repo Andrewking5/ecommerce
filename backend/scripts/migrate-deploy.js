@@ -47,8 +47,8 @@ async function runMigration() {
     console.warn('⚠️  Could not parse DATABASE_URL:', error.message);
   }
 
-  // 设置环境变量
-  process.env.PRISMA_MIGRATE_SKIP_GENERATE = '1';
+  // Prisma 5.22.0+ 不再需要 PRISMA_MIGRATE_SKIP_GENERATE
+  // 因为我们在构建阶段已经运行了 prisma generate
 
   let retryCount = 0;
   let success = false;
