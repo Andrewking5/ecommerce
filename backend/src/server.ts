@@ -72,27 +72,33 @@ async function startServer() {
       }
     }
 
-    // 運行數據庫遷移（生產環境）- 在後台運行，不阻塞啟動
-    if (process.env.NODE_ENV === 'production') {
-      console.log('🔍 Running database migrations in background...');
-      // 在後台運行遷移，不阻塞服務器啟動
+    // 運行數據庫遷移（生產環境）
+    // 注意：在 Render 上，迁移应该在构建阶段完成（在 build command 中）
+    // 这里只在明确设置 RUN_MIGRATIONS_ON_START=true 时才运行
+    if (process.env.NODE_ENV === 'production' && process.env.RUN_MIGRATIONS_ON_START === 'true') {
+      console.log('🔍 Running database migrations at startup...');
       Promise.resolve().then(async () => {
         try {
           const { execSync } = require('child_process');
-          execSync('npx prisma migrate deploy', { 
+          // 使用迁移脚本，它有重试逻辑和更好的错误处理
+          execSync('node scripts/migrate-deploy.js', { 
             stdio: 'inherit',
             cwd: process.cwd(),
             env: { ...process.env },
-            timeout: 20000, // 20秒超時
+            timeout: 120000, // 120秒超時（迁移可能需要更长时间）
           });
           console.log('✅ Database migrations completed');
         } catch (error: any) {
           console.warn('⚠️  Database migration warning:', error?.message || error);
           console.warn('⚠️  This is usually safe - migrations may have already been applied');
+          console.warn('💡 Recommended: Run migrations in Render build command instead of at runtime');
         }
       }).catch(() => {
         // 靜默處理錯誤，不影響服務器啟動
       });
+    } else if (process.env.NODE_ENV === 'production') {
+      console.log('ℹ️  Skipping runtime migrations (should be done in build phase)');
+      console.log('💡 To run migrations at startup, set RUN_MIGRATIONS_ON_START=true');
     }
 
     // 創建初始管理員（如果環境變量已設置）- 在後台運行
