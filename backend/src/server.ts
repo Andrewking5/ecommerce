@@ -168,6 +168,20 @@ process.on('uncaughtException', (error: Error) => {
 process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
   console.error('❌ Unhandled Rejection at:', promise);
   console.error('  Reason:', reason);
+  
+  // 如果是 Cloudinary 错误，不退出服务，只记录错误
+  if (reason?.http_code === 401 || reason?.message?.includes('Invalid api_key') || reason?.message?.includes('Cloudinary')) {
+    console.error('⚠️  Cloudinary error detected. Service will continue running.');
+    console.error('⚠️  Please check CLOUDINARY environment variables.');
+    return; // 不退出服务
+  }
+  
+  // 其他未处理的拒绝，在开发环境不退出，生产环境退出
+  if (process.env.NODE_ENV === 'development') {
+    console.error('⚠️  Unhandled rejection in development mode. Service will continue running.');
+    return;
+  }
+  
   process.exit(1);
 });
 

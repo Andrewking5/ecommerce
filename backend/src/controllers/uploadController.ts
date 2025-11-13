@@ -83,7 +83,11 @@ export class UploadController {
             },
             (error, result) => {
               if (error) {
-                console.error('Cloudinary upload error:', error);
+                console.error('Cloudinary upload error:', {
+                  message: error.message,
+                  http_code: (error as any).http_code,
+                  name: error.name,
+                });
                 reject(error);
               } else {
                 resolve(result);
@@ -104,8 +108,20 @@ export class UploadController {
       } catch (error: any) {
         console.error('Upload image error:', {
           message: error?.message,
+          http_code: error?.http_code,
+          name: error?.name,
           stack: error?.stack,
         });
+        
+        // Cloudinary 错误特殊处理
+        if (error?.http_code === 401 || error?.message?.includes('Invalid api_key')) {
+          res.status(500).json({
+            success: false,
+            message: 'Cloudinary configuration error. Please check CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, and CLOUDINARY_CLOUD_NAME environment variables.',
+          });
+          return;
+        }
+        
         res.status(500).json({
           success: false,
           message: error?.message || 'Failed to upload image',
@@ -157,7 +173,11 @@ export class UploadController {
               },
               (error, result) => {
                 if (error) {
-                  console.error('Cloudinary upload error:', error);
+                  console.error('Cloudinary upload error:', {
+                    message: error.message,
+                    http_code: (error as any).http_code,
+                    name: error.name,
+                  });
                   reject(error);
                 } else {
                   resolve(result);
@@ -181,8 +201,20 @@ export class UploadController {
       } catch (error: any) {
         console.error('Upload images error:', {
           message: error?.message,
+          http_code: error?.http_code,
+          name: error?.name,
           stack: error?.stack,
         });
+        
+        // Cloudinary 错误特殊处理
+        if (error?.http_code === 401 || error?.message?.includes('Invalid api_key')) {
+          res.status(500).json({
+            success: false,
+            message: 'Cloudinary configuration error. Please check CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, and CLOUDINARY_CLOUD_NAME environment variables.',
+          });
+          return;
+        }
+        
         res.status(500).json({
           success: false,
           message: error?.message || 'Failed to upload images',
