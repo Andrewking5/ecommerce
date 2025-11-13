@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { orderApi } from '@/services/orders';
+import { getImageUrl } from '@/utils/imageUrl';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Package, Calendar, DollarSign } from 'lucide-react';
@@ -85,7 +86,7 @@ const Orders: React.FC = () => {
                 {order.orderItems.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3">
                     <img
-                      src={item.product?.images[0]}
+                      src={getImageUrl(item.product?.images[0])}
                       alt={item.product?.name}
                       className="w-12 h-12 object-cover rounded-lg"
                     />

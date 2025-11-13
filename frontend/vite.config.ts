@@ -27,6 +27,14 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    proxy: {
+      // 代理上传的静态文件，避免跨域问题
+      '/uploads': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   preview: {
     port: 3000,

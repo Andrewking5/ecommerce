@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Product } from '@/types/product';
 import { useCartStore } from '@/store/cartStore';
+import { getImageUrl } from '@/utils/imageUrl';
 
 interface ProductCardProps {
   product: Product;
@@ -35,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {mainImage && !imageError ? (
             <>
               <img
-                src={mainImage}
+                src={getImageUrl(mainImage)}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 onError={() => setImageError(true)}

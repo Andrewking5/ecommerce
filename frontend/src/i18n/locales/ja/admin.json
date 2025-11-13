@@ -13,6 +13,7 @@
   },
   "products": {
     "title": "商品管理",
+    "subtitle": "すべての商品情報を管理",
     "addProduct": "商品を追加",
     "editProduct": "商品を編集",
     "deleteProduct": "商品を削除",
@@ -22,35 +23,349 @@
     "stock": "在庫",
     "category": "カテゴリ",
     "images": "画像",
-    "isActive": "有効"
+    "isActive": "有効",
+    "searchPlaceholder": "商品名、説明、またはIDを検索...",
+    "table": {
+      "product": "商品",
+      "category": "カテゴリ",
+      "price": "価格",
+      "stock": "在庫",
+      "status": "ステータス",
+      "actions": "操作",
+      "selectAll": "すべて選択",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "status": {
+      "active": "公開中",
+      "inactive": "非公開"
+    },
+    "modal": {
+      "addTitle": "商品を追加",
+      "editTitle": "商品を編集",
+      "nameLabel": "商品名",
+      "namePlaceholder": "商品名を入力",
+      "descriptionLabel": "商品説明",
+      "descriptionPlaceholder": "商品の特徴、機能などを詳しく説明",
+      "priceLabel": "価格",
+      "stockLabel": "在庫",
+      "categoryLabel": "カテゴリ",
+      "selectCategory": "カテゴリを選択",
+      "imagesLabel": "商品画像",
+      "isActiveLabel": "すぐに商品を公開",
+      "cancel": "キャンセル",
+      "create": "商品を作成",
+      "update": "商品を更新"
+    },
+    "delete": {
+      "title": "商品を削除",
+      "message": "この商品を削除してもよろしいですか？この操作は元に戻せません。",
+      "confirm": "削除",
+      "cancel": "キャンセル",
+      "success": "商品の削除に成功しました",
+      "error": "削除に失敗しました"
+    },
+    "bulkDelete": {
+      "title": "商品を一括削除",
+      "message": "選択した {{count}} 個の商品を削除してもよろしいですか？この操作は元に戻せません。",
+      "confirm": "削除",
+      "cancel": "キャンセル",
+      "success": "{{count}} 個の商品を正常に削除しました",
+      "error": "一括削除に失敗しました"
+    },
+    "bulkUpdate": {
+      "success": "{{count}} 個の商品を正常に更新しました",
+      "error": "一括更新に失敗しました"
+    },
+    "create": {
+      "success": "商品の作成に成功しました",
+      "error": "作成に失敗しました"
+    },
+    "update": {
+      "success": "商品の更新に成功しました",
+      "error": "更新に失敗しました"
+    },
+    "validation": {
+      "selectCategory": "カテゴリを選択してください",
+      "uploadImage": "少なくとも1枚の画像をアップロードしてください",
+      "selectProducts": "まず商品を選択してください",
+      "unknownAction": "不明な操作"
+    },
+    "empty": {
+      "title": "商品がありません",
+      "noSearch": "検索条件に一致する商品が見つかりませんでした。他のキーワードをお試しください",
+      "noProducts": "まだ商品がありません。最初の商品を追加してください"
+    },
+    "pagination": {
+      "showing": "{{start}} - {{end}} 件を表示（全 {{total}} 件）",
+      "page": "{{current}} / {{total}} ページ"
+    }
   },
   "categories": {
     "title": "カテゴリ管理",
+    "subtitle": "すべての商品カテゴリを管理",
     "addCategory": "カテゴリを追加",
     "editCategory": "カテゴリを編集",
     "deleteCategory": "カテゴリを削除",
     "name": "カテゴリ名",
     "slug": "スラッグ",
     "description": "説明",
-    "image": "画像"
+    "image": "画像",
+    "searchPlaceholder": "カテゴリ名、スラッグ、または説明を検索...",
+    "table": {
+      "category": "カテゴリ",
+      "slug": "スラッグ",
+      "productCount": "商品数",
+      "status": "ステータス",
+      "actions": "操作",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "status": {
+      "active": "有効",
+      "inactive": "無効"
+    },
+    "modal": {
+      "addTitle": "カテゴリを追加",
+      "editTitle": "カテゴリを編集",
+      "nameLabel": "カテゴリ名",
+      "namePlaceholder": "カテゴリ名を入力",
+      "slugLabel": "カテゴリスラッグ",
+      "slugPlaceholder": "category-slug",
+      "slugHelper": "小文字、数字、ハイフンのみ、URLに使用",
+      "descriptionLabel": "カテゴリ説明",
+      "descriptionPlaceholder": "このカテゴリの特徴を説明...",
+      "imageLabel": "カテゴリ画像",
+      "isActiveLabel": "カテゴリを有効化",
+      "cancel": "キャンセル",
+      "create": "カテゴリを作成",
+      "update": "カテゴリを更新"
+    },
+    "delete": {
+      "title": "カテゴリを削除",
+      "message": "このカテゴリを削除してもよろしいですか？この操作は元に戻せません。このカテゴリに商品がある場合、削除できません。",
+      "confirm": "削除",
+      "cancel": "キャンセル",
+      "success": "カテゴリの削除に成功しました",
+      "error": "削除に失敗しました"
+    },
+    "create": {
+      "success": "カテゴリの作成に成功しました",
+      "error": "作成に失敗しました"
+    },
+    "update": {
+      "success": "カテゴリの更新に成功しました",
+      "error": "更新に失敗しました"
+    },
+    "validation": {
+      "nameRequired": "カテゴリ名を入力してください",
+      "slugRequired": "カテゴリスラッグを入力してください",
+      "slugInvalid": "カテゴリスラッグは小文字、数字、ハイフンのみ使用できます"
+    },
+    "empty": {
+      "title": "カテゴリがありません",
+      "noSearch": "検索条件に一致するカテゴリが見つかりませんでした。他のキーワードをお試しください",
+      "noCategories": "まだカテゴリがありません。最初のカテゴリを追加してください"
+    }
   },
   "orders": {
     "title": "注文管理",
+    "subtitle": "すべての注文を表示および管理",
     "viewOrder": "注文を表示",
-    "updateStatus": "ステータスを更新"
+    "updateStatus": "ステータスを更新",
+    "filter": {
+      "statusLabel": "注文ステータス",
+      "allStatuses": "すべてのステータス"
+    },
+    "status": {
+      "PENDING": "保留中",
+      "CONFIRMED": "確認済み",
+      "PROCESSING": "処理中",
+      "SHIPPED": "発送済み",
+      "DELIVERED": "配達済み",
+      "CANCELLED": "キャンセル済み",
+      "REFUNDED": "返金済み"
+    },
+    "table": {
+      "orderNumber": "注文番号",
+      "customer": "顧客",
+      "products": "商品",
+      "amount": "金額",
+      "status": "ステータス",
+      "date": "日付",
+      "actions": "操作",
+      "view": "表示",
+      "items": "{{count}} 点の商品",
+      "andMore": " 他 {{count}} 点"
+    },
+    "detail": {
+      "title": "注文詳細",
+      "orderInfo": "注文情報",
+      "customerInfo": "顧客情報",
+      "shippingAddress": "配送先住所",
+      "productList": "商品リスト",
+      "orderNumber": "注文番号",
+      "orderStatus": "注文ステータス",
+      "orderAmount": "注文金額",
+      "paymentMethod": "支払い方法",
+      "createdAt": "作成日時",
+      "quantity": "数量: {{count}}"
+    },
+    "update": {
+      "success": "注文ステータスの更新に成功しました",
+      "error": "更新に失敗しました"
+    },
+    "fetchError": "注文詳細の取得に失敗しました",
+    "empty": {
+      "title": "注文がありません",
+      "withFilter": "このステータスの注文が見つかりませんでした",
+      "noOrders": "まだ注文がありません"
+    },
+    "pagination": {
+      "showing": "{{start}} - {{end}} 件を表示（全 {{total}} 件）",
+      "page": "{{current}} / {{total}} ページ"
+    }
   },
   "users": {
     "title": "ユーザー管理",
+    "subtitle": "すべてのユーザーアカウントを表示および管理",
     "viewUser": "ユーザーを表示",
     "editUser": "ユーザーを編集",
-    "deleteUser": "ユーザーを削除"
+    "deleteUser": "ユーザーを削除",
+    "searchPlaceholder": "ユーザーのメールアドレスまたは名前を検索...",
+    "filter": {
+      "roleLabel": "役割",
+      "allRoles": "すべての役割",
+      "user": "一般ユーザー",
+      "admin": "管理者"
+    },
+    "table": {
+      "user": "ユーザー",
+      "email": "メール",
+      "phone": "電話",
+      "role": "役割",
+      "status": "ステータス",
+      "registeredAt": "登録日",
+      "actions": "操作",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "roles": {
+      "USER": "ユーザー",
+      "ADMIN": "管理者"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "無効"
+    },
+    "modal": {
+      "editTitle": "ユーザーを編集",
+      "firstNameLabel": "名",
+      "lastNameLabel": "姓",
+      "phoneLabel": "電話",
+      "roleLabel": "役割",
+      "isActiveLabel": "アカウントを有効化",
+      "cancel": "キャンセル",
+      "update": "更新"
+    },
+    "delete": {
+      "title": "ユーザーを削除",
+      "message": "このユーザーを削除してもよろしいですか？この操作は元に戻せず、ユーザーのすべてのデータが永久に削除されます。",
+      "confirm": "削除",
+      "cancel": "キャンセル",
+      "success": "ユーザーの削除に成功しました",
+      "error": "削除に失敗しました"
+    },
+    "update": {
+      "success": "ユーザーの更新に成功しました",
+      "error": "更新に失敗しました"
+    },
+    "empty": {
+      "title": "ユーザーがありません",
+      "withFilter": "条件に一致するユーザーが見つかりませんでした",
+      "noUsers": "まだユーザーがありません"
+    },
+    "pagination": {
+      "showing": "{{start}} - {{end}} 件を表示（全 {{total}} 件）",
+      "page": "{{current}} / {{total}} ページ"
+    }
+  },
+  "inventory": {
+    "title": "在庫管理",
+    "description": "商品の在庫レベルを監視および管理",
+    "totalProducts": "商品総数",
+    "inStock": "在庫あり",
+    "outOfStock": "在庫切れ",
+    "lowStock": "在庫不足",
+    "totalValue": "総価値",
+    "threshold": "在庫不足の警告閾値",
+    "thresholdDescription": "在庫不足の警告をトリガーする最小在庫レベルを設定",
+    "lowStockList": "在庫不足商品リスト",
+    "currentStock": "現在の在庫",
+    "actions": "操作",
+    "adjust": "調整",
+    "stockAdjusted": "在庫の調整に成功しました",
+    "invalidStock": "無効な在庫値",
+    "noLowStock": "在庫不足の商品はありません",
+    "table": {
+      "name": "商品名",
+      "category": "カテゴリ"
+    }
+  },
+  "filters": {
+    "category": "カテゴリ",
+    "allCategories": "すべてのカテゴリ",
+    "minPrice": "最低価格",
+    "maxPrice": "最高価格",
+    "stockStatus": "在庫ステータス",
+    "allStatuses": "すべて",
+    "inStock": "在庫あり",
+    "outOfStock": "在庫切れ",
+    "lowStock": "在庫不足",
+    "publishStatus": "公開ステータス",
+    "published": "公開中",
+    "unpublished": "非公開",
+    "minStock": "最低在庫",
+    "maxStock": "最高在庫",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "showAdvanced": "高度なフィルターを表示",
+    "hideAdvanced": "高度なフィルターを非表示",
+    "clearFilters": "フィルターをクリア",
+    "activeFilters": "{{count}} 個のフィルターが適用されています"
+  },
+  "bulkActions": {
+    "selected": "{{count}} / {{total}} 個の商品を選択",
+    "selectedCount": "{{count}} 個の商品を選択",
+    "selectAll": "すべて選択",
+    "deselectAll": "すべての選択を解除",
+    "cancelSelection": "選択をキャンセル",
+    "bulkOperations": "一括操作",
+    "activate": "一括公開",
+    "deactivate": "一括非公開",
+    "changeCategory": "カテゴリを一括変更",
+    "changePrice": "価格を一括変更",
+    "changeStock": "在庫を一括変更",
+    "delete": "一括削除"
+  },
+  "breadcrumb": {
+    "dashboard": "ダッシュボード"
+  },
+  "confirm": {
+    "confirm": "確認",
+    "cancel": "キャンセル"
   },
   "menu": {
     "dashboard": "ダッシュボード",
     "products": "商品",
     "categories": "カテゴリ",
+    "inventory": "在庫",
     "orders": "注文",
-    "users": "ユーザー"
+    "users": "ユーザー",
+    "backToHome": "ホームに戻る"
+  },
+  "layout": {
+    "logout": "ログアウト"
   },
   "imageUpload": {
     "label": "商品画像",
@@ -75,5 +390,15 @@
     "userManagement": "ユーザー管理",
     "userManagementDesc": "ユーザーアカウントを表示および管理",
     "manageUsers": "ユーザーを管理"
+  },
+  "common": {
+    "previous": "前へ",
+    "next": "次へ",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "edit": "編集",
+    "delete": "削除",
+    "view": "表示",
+    "close": "閉じる"
   }
 }

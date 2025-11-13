@@ -13,6 +13,7 @@
   },
   "products": {
     "title": "Product Management",
+    "subtitle": "Manage all product information",
     "addProduct": "Add Product",
     "editProduct": "Edit Product",
     "deleteProduct": "Delete Product",
@@ -22,35 +23,349 @@
     "stock": "Stock",
     "category": "Category",
     "images": "Images",
-    "isActive": "Active"
+    "isActive": "Active",
+    "searchPlaceholder": "Search product name, description or ID...",
+    "table": {
+      "product": "Product",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "actions": "Actions",
+      "selectAll": "Select All",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "addTitle": "Add Product",
+      "editTitle": "Edit Product",
+      "nameLabel": "Product Name",
+      "namePlaceholder": "Enter product name",
+      "descriptionLabel": "Product Description",
+      "descriptionPlaceholder": "Describe product features, functions, etc.",
+      "priceLabel": "Price",
+      "stockLabel": "Stock",
+      "categoryLabel": "Category",
+      "selectCategory": "Select Category",
+      "imagesLabel": "Product Images",
+      "isActiveLabel": "Publish product immediately",
+      "cancel": "Cancel",
+      "create": "Create Product",
+      "update": "Update Product"
+    },
+    "delete": {
+      "title": "Delete Product",
+      "message": "Are you sure you want to delete this product? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "success": "Product deleted successfully",
+      "error": "Delete failed"
+    },
+    "bulkDelete": {
+      "title": "Bulk Delete Products",
+      "message": "Are you sure you want to delete {{count}} selected products? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "success": "Successfully deleted {{count}} products",
+      "error": "Bulk delete failed"
+    },
+    "bulkUpdate": {
+      "success": "Successfully updated {{count}} products",
+      "error": "Bulk update failed"
+    },
+    "create": {
+      "success": "Product created successfully",
+      "error": "Create failed"
+    },
+    "update": {
+      "success": "Product updated successfully",
+      "error": "Update failed"
+    },
+    "validation": {
+      "selectCategory": "Please select a category",
+      "uploadImage": "Please upload at least one image",
+      "selectProducts": "Please select products first",
+      "unknownAction": "Unknown action"
+    },
+    "empty": {
+      "title": "No Products",
+      "noSearch": "No products found matching your search, please try other keywords",
+      "noProducts": "No products yet, start by adding your first product"
+    },
+    "pagination": {
+      "showing": "Showing {{start}} - {{end}} of {{total}} items",
+      "page": "Page {{current}} / {{total}}"
+    }
   },
   "categories": {
     "title": "Category Management",
+    "subtitle": "Manage all product categories",
     "addCategory": "Add Category",
     "editCategory": "Edit Category",
     "deleteCategory": "Delete Category",
     "name": "Category Name",
     "slug": "Slug",
     "description": "Description",
-    "image": "Image"
+    "image": "Image",
+    "searchPlaceholder": "Search category name, slug or description...",
+    "table": {
+      "category": "Category",
+      "slug": "Slug",
+      "productCount": "Product Count",
+      "status": "Status",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "addTitle": "Add Category",
+      "editTitle": "Edit Category",
+      "nameLabel": "Category Name",
+      "namePlaceholder": "Enter category name",
+      "slugLabel": "Category Slug",
+      "slugPlaceholder": "category-slug",
+      "slugHelper": "Only lowercase letters, numbers and hyphens, used for URL",
+      "descriptionLabel": "Category Description",
+      "descriptionPlaceholder": "Describe the characteristics of this category...",
+      "imageLabel": "Category Image",
+      "isActiveLabel": "Enable Category",
+      "cancel": "Cancel",
+      "create": "Create Category",
+      "update": "Update Category"
+    },
+    "delete": {
+      "title": "Delete Category",
+      "message": "Are you sure you want to delete this category? This action cannot be undone. If there are products under this category, it cannot be deleted.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "success": "Category deleted successfully",
+      "error": "Delete failed"
+    },
+    "create": {
+      "success": "Category created successfully",
+      "error": "Create failed"
+    },
+    "update": {
+      "success": "Category updated successfully",
+      "error": "Update failed"
+    },
+    "validation": {
+      "nameRequired": "Please enter category name",
+      "slugRequired": "Please enter category slug",
+      "slugInvalid": "Category slug can only contain lowercase letters, numbers and hyphens"
+    },
+    "empty": {
+      "title": "No Categories",
+      "noSearch": "No categories found matching your search, please try other keywords",
+      "noCategories": "No categories yet, start by adding your first category"
+    }
   },
   "orders": {
     "title": "Order Management",
+    "subtitle": "View and manage all orders",
     "viewOrder": "View Order",
-    "updateStatus": "Update Status"
+    "updateStatus": "Update Status",
+    "filter": {
+      "statusLabel": "Order Status",
+      "allStatuses": "All Statuses"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "PROCESSING": "Processing",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    },
+    "table": {
+      "orderNumber": "Order Number",
+      "customer": "Customer",
+      "products": "Products",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "view": "View",
+      "items": "{{count}} items",
+      "andMore": " and {{count}} more"
+    },
+    "detail": {
+      "title": "Order Details",
+      "orderInfo": "Order Information",
+      "customerInfo": "Customer Information",
+      "shippingAddress": "Shipping Address",
+      "productList": "Product List",
+      "orderNumber": "Order Number",
+      "orderStatus": "Order Status",
+      "orderAmount": "Order Amount",
+      "paymentMethod": "Payment Method",
+      "createdAt": "Created At",
+      "quantity": "Quantity: {{count}}"
+    },
+    "update": {
+      "success": "Order status updated successfully",
+      "error": "Update failed"
+    },
+    "fetchError": "Failed to fetch order details",
+    "empty": {
+      "title": "No Orders",
+      "withFilter": "No orders found with this status",
+      "noOrders": "No orders yet"
+    },
+    "pagination": {
+      "showing": "Showing {{start}} - {{end}} of {{total}} items",
+      "page": "Page {{current}} / {{total}}"
+    }
   },
   "users": {
     "title": "User Management",
+    "subtitle": "View and manage all user accounts",
     "viewUser": "View User",
     "editUser": "Edit User",
-    "deleteUser": "Delete User"
+    "deleteUser": "Delete User",
+    "searchPlaceholder": "Search user email or name...",
+    "filter": {
+      "roleLabel": "Role",
+      "allRoles": "All Roles",
+      "user": "User",
+      "admin": "Admin"
+    },
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "status": "Status",
+      "registeredAt": "Registered At",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "roles": {
+      "USER": "User",
+      "ADMIN": "Admin"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "editTitle": "Edit User",
+      "firstNameLabel": "First Name",
+      "lastNameLabel": "Last Name",
+      "phoneLabel": "Phone",
+      "roleLabel": "Role",
+      "isActiveLabel": "Account Active",
+      "cancel": "Cancel",
+      "update": "Update"
+    },
+    "delete": {
+      "title": "Delete User",
+      "message": "Are you sure you want to delete this user? This action cannot be undone, and all user data will be permanently deleted.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "success": "User deleted successfully",
+      "error": "Delete failed"
+    },
+    "update": {
+      "success": "User updated successfully",
+      "error": "Update failed"
+    },
+    "empty": {
+      "title": "No Users",
+      "withFilter": "No users found matching your criteria",
+      "noUsers": "No users yet"
+    },
+    "pagination": {
+      "showing": "Showing {{start}} - {{end}} of {{total}} items",
+      "page": "Page {{current}} / {{total}}"
+    }
+  },
+  "inventory": {
+    "title": "Inventory Management",
+    "description": "Monitor and manage product inventory levels",
+    "totalProducts": "Total Products",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "totalValue": "Total Value",
+    "threshold": "Low Stock Threshold",
+    "thresholdDescription": "Set the minimum stock level to trigger low stock alerts",
+    "lowStockList": "Low Stock Products",
+    "currentStock": "Current Stock",
+    "actions": "Actions",
+    "adjust": "Adjust",
+    "stockAdjusted": "Stock adjusted successfully",
+    "invalidStock": "Invalid stock value",
+    "noLowStock": "No low stock products",
+    "table": {
+      "name": "Product Name",
+      "category": "Category"
+    }
+  },
+  "filters": {
+    "category": "Category",
+    "allCategories": "All Categories",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "stockStatus": "Stock Status",
+    "allStatuses": "All",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "publishStatus": "Publish Status",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "minStock": "Min Stock",
+    "maxStock": "Max Stock",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "showAdvanced": "Show Advanced Filters",
+    "hideAdvanced": "Hide Advanced Filters",
+    "clearFilters": "Clear Filters",
+    "activeFilters": "{{count}} filters applied"
+  },
+  "bulkActions": {
+    "selected": "{{count}} / {{total}} products selected",
+    "selectedCount": "{{count}} products selected",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "cancelSelection": "Cancel Selection",
+    "bulkOperations": "Bulk Operations",
+    "activate": "Bulk Activate",
+    "deactivate": "Bulk Deactivate",
+    "changeCategory": "Bulk Change Category",
+    "changePrice": "Bulk Change Price",
+    "changeStock": "Bulk Change Stock",
+    "delete": "Bulk Delete"
+  },
+  "breadcrumb": {
+    "dashboard": "Dashboard"
+  },
+  "confirm": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   },
   "menu": {
     "dashboard": "Dashboard",
     "products": "Products",
     "categories": "Categories",
+    "inventory": "Inventory",
     "orders": "Orders",
-    "users": "Users"
+    "users": "Users",
+    "backToHome": "Back to Home"
+  },
+  "layout": {
+    "logout": "Logout"
   },
   "imageUpload": {
     "label": "Product Images",
@@ -75,6 +390,15 @@
     "userManagement": "User Management",
     "userManagementDesc": "View and manage user accounts",
     "manageUsers": "Manage Users"
+  },
+  "common": {
+    "previous": "Previous",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "close": "Close"
   }
 }
-

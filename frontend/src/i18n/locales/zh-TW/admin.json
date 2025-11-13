@@ -13,6 +13,7 @@
   },
   "products": {
     "title": "商品管理",
+    "subtitle": "管理所有商品資訊",
     "addProduct": "新增商品",
     "editProduct": "編輯商品",
     "deleteProduct": "刪除商品",
@@ -22,35 +23,349 @@
     "stock": "庫存",
     "category": "分類",
     "images": "圖片",
-    "isActive": "啟用"
+    "isActive": "啟用",
+    "searchPlaceholder": "搜尋商品名稱、描述或ID...",
+    "table": {
+      "product": "商品",
+      "category": "分類",
+      "price": "價格",
+      "stock": "庫存",
+      "status": "狀態",
+      "actions": "操作",
+      "selectAll": "全選",
+      "edit": "編輯",
+      "delete": "刪除"
+    },
+    "status": {
+      "active": "上架",
+      "inactive": "下架"
+    },
+    "modal": {
+      "addTitle": "新增商品",
+      "editTitle": "編輯商品",
+      "nameLabel": "商品名稱",
+      "namePlaceholder": "輸入商品名稱",
+      "descriptionLabel": "商品描述",
+      "descriptionPlaceholder": "詳細描述商品的特點、功能等",
+      "priceLabel": "價格",
+      "stockLabel": "庫存",
+      "categoryLabel": "分類",
+      "selectCategory": "選擇分類",
+      "imagesLabel": "商品圖片",
+      "isActiveLabel": "立即上架商品",
+      "cancel": "取消",
+      "create": "建立商品",
+      "update": "更新商品"
+    },
+    "delete": {
+      "title": "刪除商品",
+      "message": "確定要刪除這個商品嗎？此操作無法復原。",
+      "confirm": "刪除",
+      "cancel": "取消",
+      "success": "商品刪除成功",
+      "error": "刪除失敗"
+    },
+    "bulkDelete": {
+      "title": "批量刪除商品",
+      "message": "確定要刪除選中的 {{count}} 個商品嗎？此操作無法復原。",
+      "confirm": "刪除",
+      "cancel": "取消",
+      "success": "成功刪除 {{count}} 個商品",
+      "error": "批量刪除失敗"
+    },
+    "bulkUpdate": {
+      "success": "成功更新 {{count}} 個商品",
+      "error": "批量更新失敗"
+    },
+    "create": {
+      "success": "商品建立成功",
+      "error": "建立失敗"
+    },
+    "update": {
+      "success": "商品更新成功",
+      "error": "更新失敗"
+    },
+    "validation": {
+      "selectCategory": "請選擇分類",
+      "uploadImage": "請至少上傳一張圖片",
+      "selectProducts": "請先選擇商品",
+      "unknownAction": "未知操作"
+    },
+    "empty": {
+      "title": "暫無商品",
+      "noSearch": "沒有找到匹配的商品，請嘗試其他搜尋關鍵詞",
+      "noProducts": "還沒有商品，開始新增第一個商品吧"
+    },
+    "pagination": {
+      "showing": "顯示 {{start}} - {{end}} 條，共 {{total}} 條",
+      "page": "第 {{current}} / {{total}} 頁"
+    }
   },
   "categories": {
     "title": "分類管理",
+    "subtitle": "管理所有商品分類",
     "addCategory": "新增分類",
     "editCategory": "編輯分類",
     "deleteCategory": "刪除分類",
     "name": "分類名稱",
     "slug": "別名",
     "description": "描述",
-    "image": "圖片"
+    "image": "圖片",
+    "searchPlaceholder": "搜尋分類名稱、標識符或描述...",
+    "table": {
+      "category": "分類",
+      "slug": "標識符",
+      "productCount": "商品數量",
+      "status": "狀態",
+      "actions": "操作",
+      "edit": "編輯",
+      "delete": "刪除"
+    },
+    "status": {
+      "active": "啟用",
+      "inactive": "禁用"
+    },
+    "modal": {
+      "addTitle": "新增分類",
+      "editTitle": "編輯分類",
+      "nameLabel": "分類名稱",
+      "namePlaceholder": "輸入分類名稱",
+      "slugLabel": "分類標識符 (Slug)",
+      "slugPlaceholder": "category-slug",
+      "slugHelper": "只能包含小寫字母、數字和連字符，用於URL",
+      "descriptionLabel": "分類描述",
+      "descriptionPlaceholder": "描述這個分類的特點...",
+      "imageLabel": "分類圖片",
+      "isActiveLabel": "啟用分類",
+      "cancel": "取消",
+      "create": "建立分類",
+      "update": "更新分類"
+    },
+    "delete": {
+      "title": "刪除分類",
+      "message": "確定要刪除這個分類嗎？此操作無法復原。如果分類下有商品，將無法刪除。",
+      "confirm": "刪除",
+      "cancel": "取消",
+      "success": "分類刪除成功",
+      "error": "刪除失敗"
+    },
+    "create": {
+      "success": "分類建立成功",
+      "error": "建立失敗"
+    },
+    "update": {
+      "success": "分類更新成功",
+      "error": "更新失敗"
+    },
+    "validation": {
+      "nameRequired": "請輸入分類名稱",
+      "slugRequired": "請輸入分類標識符",
+      "slugInvalid": "分類標識符只能包含小寫字母、數字和連字符"
+    },
+    "empty": {
+      "title": "暫無分類",
+      "noSearch": "沒有找到匹配的分類，請嘗試其他搜尋關鍵詞",
+      "noCategories": "還沒有分類，開始新增第一個分類吧"
+    }
   },
   "orders": {
     "title": "訂單管理",
+    "subtitle": "查看和管理所有訂單",
     "viewOrder": "查看訂單",
-    "updateStatus": "更新狀態"
+    "updateStatus": "更新狀態",
+    "filter": {
+      "statusLabel": "訂單狀態",
+      "allStatuses": "全部狀態"
+    },
+    "status": {
+      "PENDING": "待處理",
+      "CONFIRMED": "已確認",
+      "PROCESSING": "處理中",
+      "SHIPPED": "已發貨",
+      "DELIVERED": "已送達",
+      "CANCELLED": "已取消",
+      "REFUNDED": "已退款"
+    },
+    "table": {
+      "orderNumber": "訂單號",
+      "customer": "客戶",
+      "products": "商品",
+      "amount": "金額",
+      "status": "狀態",
+      "date": "日期",
+      "actions": "操作",
+      "view": "查看",
+      "items": "{{count}} 件商品",
+      "andMore": " 等 {{count}} 件"
+    },
+    "detail": {
+      "title": "訂單詳情",
+      "orderInfo": "訂單資訊",
+      "customerInfo": "客戶資訊",
+      "shippingAddress": "配送地址",
+      "productList": "商品列表",
+      "orderNumber": "訂單號",
+      "orderStatus": "訂單狀態",
+      "orderAmount": "訂單金額",
+      "paymentMethod": "支付方式",
+      "createdAt": "建立時間",
+      "quantity": "數量: {{count}}"
+    },
+    "update": {
+      "success": "訂單狀態更新成功",
+      "error": "更新失敗"
+    },
+    "fetchError": "獲取訂單詳情失敗",
+    "empty": {
+      "title": "暫無訂單",
+      "withFilter": "沒有找到該狀態的訂單",
+      "noOrders": "還沒有訂單"
+    },
+    "pagination": {
+      "showing": "顯示 {{start}} - {{end}} 條，共 {{total}} 條",
+      "page": "第 {{current}} / {{total}} 頁"
+    }
   },
   "users": {
     "title": "用戶管理",
+    "subtitle": "查看和管理所有用戶帳戶",
     "viewUser": "查看用戶",
     "editUser": "編輯用戶",
-    "deleteUser": "刪除用戶"
+    "deleteUser": "刪除用戶",
+    "searchPlaceholder": "搜尋用戶郵箱或姓名...",
+    "filter": {
+      "roleLabel": "角色",
+      "allRoles": "全部角色",
+      "user": "普通用戶",
+      "admin": "管理員"
+    },
+    "table": {
+      "user": "用戶",
+      "email": "郵箱",
+      "phone": "電話",
+      "role": "角色",
+      "status": "狀態",
+      "registeredAt": "註冊時間",
+      "actions": "操作",
+      "edit": "編輯",
+      "delete": "刪除"
+    },
+    "roles": {
+      "USER": "用戶",
+      "ADMIN": "管理員"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "禁用"
+    },
+    "modal": {
+      "editTitle": "編輯用戶",
+      "firstNameLabel": "名",
+      "lastNameLabel": "姓",
+      "phoneLabel": "電話",
+      "roleLabel": "角色",
+      "isActiveLabel": "帳戶激活",
+      "cancel": "取消",
+      "update": "更新"
+    },
+    "delete": {
+      "title": "刪除用戶",
+      "message": "確定要刪除這個用戶嗎？此操作無法復原，用戶的所有資料將被永久刪除。",
+      "confirm": "刪除",
+      "cancel": "取消",
+      "success": "用戶刪除成功",
+      "error": "刪除失敗"
+    },
+    "update": {
+      "success": "用戶更新成功",
+      "error": "更新失敗"
+    },
+    "empty": {
+      "title": "暫無用戶",
+      "withFilter": "沒有找到匹配的用戶",
+      "noUsers": "還沒有用戶"
+    },
+    "pagination": {
+      "showing": "顯示 {{start}} - {{end}} 條，共 {{total}} 條",
+      "page": "第 {{current}} / {{total}} 頁"
+    }
+  },
+  "inventory": {
+    "title": "庫存管理",
+    "description": "監控和管理商品庫存水準",
+    "totalProducts": "商品總數",
+    "inStock": "有庫存",
+    "outOfStock": "缺貨",
+    "lowStock": "低庫存",
+    "totalValue": "總價值",
+    "threshold": "低庫存預警閾值",
+    "thresholdDescription": "設定觸發低庫存警示的最小庫存水準",
+    "lowStockList": "低庫存商品列表",
+    "currentStock": "當前庫存",
+    "actions": "操作",
+    "adjust": "調整",
+    "stockAdjusted": "庫存調整成功",
+    "invalidStock": "無效的庫存值",
+    "noLowStock": "沒有低庫存商品",
+    "table": {
+      "name": "商品名稱",
+      "category": "分類"
+    }
+  },
+  "filters": {
+    "category": "分類",
+    "allCategories": "全部分類",
+    "minPrice": "最低價格",
+    "maxPrice": "最高價格",
+    "stockStatus": "庫存狀態",
+    "allStatuses": "全部",
+    "inStock": "有庫存",
+    "outOfStock": "無庫存",
+    "lowStock": "低庫存",
+    "publishStatus": "上架狀態",
+    "published": "已上架",
+    "unpublished": "已下架",
+    "minStock": "最低庫存",
+    "maxStock": "最高庫存",
+    "startDate": "開始日期",
+    "endDate": "結束日期",
+    "showAdvanced": "展開高級篩選",
+    "hideAdvanced": "收起高級篩選",
+    "clearFilters": "清除篩選",
+    "activeFilters": "已應用 {{count}} 個篩選條件"
+  },
+  "bulkActions": {
+    "selected": "已選擇 {{count}} / {{total}} 個商品",
+    "selectedCount": "已選擇 {{count}} 個商品",
+    "selectAll": "全選",
+    "deselectAll": "取消全選",
+    "cancelSelection": "取消選擇",
+    "bulkOperations": "批量操作",
+    "activate": "批量上架",
+    "deactivate": "批量下架",
+    "changeCategory": "批量修改分類",
+    "changePrice": "批量修改價格",
+    "changeStock": "批量修改庫存",
+    "delete": "批量刪除"
+  },
+  "breadcrumb": {
+    "dashboard": "儀表板"
+  },
+  "confirm": {
+    "confirm": "確認",
+    "cancel": "取消"
   },
   "menu": {
     "dashboard": "儀表板",
     "products": "商品",
     "categories": "分類",
+    "inventory": "庫存",
     "orders": "訂單",
-    "users": "用戶"
+    "users": "用戶",
+    "backToHome": "返回首頁"
+  },
+  "layout": {
+    "logout": "退出登入"
   },
   "imageUpload": {
     "label": "商品圖片",
@@ -75,5 +390,15 @@
     "userManagement": "用戶管理",
     "userManagementDesc": "查看和管理用戶帳戶",
     "manageUsers": "管理用戶"
+  },
+  "common": {
+    "previous": "上一頁",
+    "next": "下一頁",
+    "save": "儲存",
+    "cancel": "取消",
+    "edit": "編輯",
+    "delete": "刪除",
+    "view": "查看",
+    "close": "關閉"
   }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCartStore } from '@/store/cartStore';
+import { getImageUrl } from '@/utils/imageUrl';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
@@ -43,7 +44,7 @@ const Cart: React.FC = () => {
             <Card key={item.id} className="p-6">
               <div className="flex items-center space-x-4">
                 <img
-                  src={item.product?.images[0]}
+                  src={getImageUrl(item.product?.images[0])}
                   alt={item.product?.name}
                   className="w-20 h-20 object-cover rounded-xl"
                 />

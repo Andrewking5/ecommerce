@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { uploadApi } from '@/services/upload';
+import { getImageUrl } from '@/utils/imageUrl';
 import toast from 'react-hot-toast';
 
 interface ImageUploadProps {
@@ -97,9 +98,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             <div key={index} className="relative group">
               <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
                 <img
-                  src={image}
+                  src={getImageUrl(image)}
                   alt={`Upload ${index + 1}`}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Image load error:', image);
+                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
+                  }}
                 />
               </div>
               <button

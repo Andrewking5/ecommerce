@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { Navigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
@@ -14,9 +15,11 @@ import EmptyState from '@/components/admin/EmptyState';
 import { Plus, Search, Edit, Trash2, Loader2, X, Package, ArrowUpDown, CheckSquare, Square } from 'lucide-react';
 import { productApi } from '@/services/products';
 import { Product, Category, ProductQueryParams } from '@/types/product';
+import { getImageUrl } from '@/utils/imageUrl';
 import toast from 'react-hot-toast';
 
 const AdminProducts: React.FC = () => {
+  const { t } = useTranslation('admin');
   const { user, isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -70,12 +73,12 @@ const AdminProducts: React.FC = () => {
     mutationFn: (id: string) => productApi.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success('商品删除成功');
+      toast.success(t('products.delete.success'));
       setDeleteConfirm({ isOpen: false, productId: null });
       setSelectedIds([]);
     },
     onError: () => {
-      toast.error('删除失败');
+      toast.error(t('products.delete.error'));
     },
   });
 
@@ -86,12 +89,12 @@ const AdminProducts: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success(`成功删除 ${selectedIds.length} 个商品`);
+      toast.success(t('products.bulkDelete.success', { count: selectedIds.length }));
       setSelectedIds([]);
       setBulkActionModal({ isOpen: false, action: '' });
     },
     onError: () => {
-      toast.error('批量删除失败');
+      toast.error(t('products.bulkDelete.error'));
     },
   });
 
@@ -102,12 +105,12 @@ const AdminProducts: React.FC = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success(`成功更新 ${variables.ids.length} 个商品`);
+      toast.success(t('products.bulkUpdate.success', { count: variables.ids.length }));
       setSelectedIds([]);
       setBulkActionModal({ isOpen: false, action: '' });
     },
     onError: () => {
-      toast.error('批量更新失败');
+      toast.error(t('products.bulkUpdate.error'));
     },
   });
 
@@ -121,12 +124,12 @@ const AdminProducts: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success(editingProduct ? '商品更新成功' : '商品创建成功');
+      toast.success(editingProduct ? t('products.update.success') : t('products.create.success'));
       setShowModal(false);
       resetForm();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || (editingProduct ? '更新失败' : '创建失败'));
+      toast.error(error?.response?.data?.message || (editingProduct ? t('products.update.error') : t('products.create.error')));
     },
   });
 
@@ -161,12 +164,12 @@ const AdminProducts: React.FC = () => {
     e.preventDefault();
     const categoryObj = categories?.find((c: Category) => c.slug === formData.category);
     if (!categoryObj) {
-      toast.error('请选择分类');
+      toast.error(t('products.validation.selectCategory'));
       return;
     }
 
     if (formData.images.length === 0) {
-      toast.error('请至少上传一张图片');
+      toast.error(t('products.validation.uploadImage'));
       return;
     }
 
@@ -230,7 +233,7 @@ const AdminProducts: React.FC = () => {
 
   const handleBulkUpdate = (action: string, data?: any) => {
     if (selectedIds.length === 0) {
-      toast.error('请先选择商品');
+      toast.error(t('products.validation.selectProducts'));
       return;
     }
 
@@ -250,7 +253,7 @@ const AdminProducts: React.FC = () => {
         setBulkActionModal({ isOpen: true, action, data });
         break;
       default:
-        toast.error('未知操作');
+        toast.error(t('products.validation.unknownAction'));
     }
   };
 
@@ -262,15 +265,15 @@ const AdminProducts: React.FC = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: '仪表板', path: '/admin' },
-          { label: '商品管理' },
+          { label: t('breadcrumb.dashboard'), path: '/admin' },
+          { label: t('products.title') },
         ]}
       />
 
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">商品管理</h1>
-          <p className="text-text-secondary mt-2">管理所有商品信息</p>
+          <h1 className="text-3xl font-bold text-text-primary">{t('products.title')}</h1>
+          <p className="text-text-secondary mt-2">{t('products.subtitle')}</p>
         </div>
         <Button
           onClick={() => {
@@ -280,7 +283,7 @@ const AdminProducts: React.FC = () => {
           className="flex items-center space-x-2"
         >
           <Plus size={20} />
-          <span>添加商品</span>
+          <span>{t('products.addProduct')}</span>
         </Button>
       </div>
 
@@ -290,7 +293,7 @@ const AdminProducts: React.FC = () => {
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary" size={20} />
             <Input
-              placeholder="搜索商品名称、描述或ID..."
+              placeholder={t('products.searchPlaceholder')}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -328,9 +331,9 @@ const AdminProducts: React.FC = () => {
         ) : !data?.products || data.products.length === 0 ? (
           <EmptyState
             icon={<Package className="w-12 h-12 text-text-tertiary" />}
-            title="暂无商品"
-            description={search ? '没有找到匹配的商品，请尝试其他搜索关键词' : '还没有商品，开始添加第一个商品吧'}
-            actionLabel={!search ? "添加商品" : undefined}
+            title={t('products.empty.title')}
+            description={search ? t('products.empty.noSearch') : t('products.empty.noProducts')}
+            actionLabel={!search ? t('products.addProduct') : undefined}
             onAction={!search ? () => {
               resetForm();
               setShowModal(true);
@@ -346,7 +349,7 @@ const AdminProducts: React.FC = () => {
                       <button
                         onClick={() => handleSelectAll(selectedIds.length !== (data?.products.length || 0))}
                         className="p-1 hover:bg-gray-200 rounded transition-colors"
-                        title="全选"
+                        title={t('products.table.selectAll')}
                       >
                         {selectedIds.length === (data?.products.length || 0) && (data?.products.length || 0) > 0 ? (
                           <CheckSquare size={18} className="text-brand-blue" />
@@ -356,17 +359,17 @@ const AdminProducts: React.FC = () => {
                       </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      商品
+                      {t('products.table.product')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      分类
+                      {t('products.table.category')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
                       <button
                         onClick={() => handleSortChange('price')}
                         className="flex items-center space-x-1 hover:text-text-primary transition-colors"
                       >
-                        <span>价格</span>
+                        <span>{t('products.table.price')}</span>
                         <ArrowUpDown size={14} />
                       </button>
                     </th>
@@ -375,15 +378,15 @@ const AdminProducts: React.FC = () => {
                         onClick={() => handleSortChange('stock')}
                         className="flex items-center space-x-1 hover:text-text-primary transition-colors"
                       >
-                        <span>库存</span>
+                        <span>{t('products.table.stock')}</span>
                         <ArrowUpDown size={14} />
                       </button>
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      状态
+                      {t('products.table.status')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-text-secondary uppercase tracking-wider">
-                      操作
+                      {t('products.table.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -408,7 +411,7 @@ const AdminProducts: React.FC = () => {
                         <div className="flex items-center">
                           {product.images?.[0] && (
                             <img
-                              src={product.images[0]}
+                              src={getImageUrl(product.images[0])}
                               alt={product.name}
                               className="w-12 h-12 object-cover rounded-lg mr-3"
                             />
@@ -440,7 +443,7 @@ const AdminProducts: React.FC = () => {
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {product.isActive ? '上架' : '下架'}
+                          {product.isActive ? t('products.status.active') : t('products.status.inactive')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -448,14 +451,14 @@ const AdminProducts: React.FC = () => {
                           <button
                             onClick={() => handleEdit(product)}
                             className="text-brand-blue hover:text-brand-blue/80 p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="编辑"
+                            title={t('products.table.edit')}
                           >
                             <Edit size={18} />
                           </button>
                           <button
                             onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
                             className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                            title="删除"
+                            title={t('products.table.delete')}
                           >
                             <Trash2 size={18} />
                           </button>
@@ -472,7 +475,11 @@ const AdminProducts: React.FC = () => {
             {data && data.pagination.totalPages > 1 && (
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                 <div className="text-sm text-text-secondary">
-                  显示 {((page - 1) * 20) + 1} - {Math.min(page * 20, data.pagination.total)} 条，共 {data.pagination.total} 条
+                  {t('products.pagination.showing', { 
+                    start: ((page - 1) * 20) + 1, 
+                    end: Math.min(page * 20, data.pagination.total), 
+                    total: data.pagination.total 
+                  })}
                 </div>
                 <div className="flex space-x-2">
                   <Button
@@ -481,10 +488,10 @@ const AdminProducts: React.FC = () => {
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
                   >
-                    上一页
+                    {t('common.previous')}
                   </Button>
                   <span className="flex items-center px-4 text-sm text-text-secondary">
-                    第 {page} / {data.pagination.totalPages} 页
+                    {t('products.pagination.page', { current: page, total: data.pagination.totalPages })}
                   </span>
                   <Button
                     variant="outline"
@@ -492,7 +499,7 @@ const AdminProducts: React.FC = () => {
                     onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
                     disabled={page === data.pagination.totalPages}
                   >
-                    下一页
+                    {t('common.next')}
                   </Button>
                 </div>
               </div>
@@ -515,7 +522,7 @@ const AdminProducts: React.FC = () => {
             {/* 模态框头部 */}
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-text-primary">
-                {editingProduct ? '编辑商品' : '添加商品'}
+                {editingProduct ? t('products.modal.editTitle') : t('products.modal.addTitle')}
               </h2>
               <button
                 onClick={handleCloseModal}
@@ -529,28 +536,28 @@ const AdminProducts: React.FC = () => {
             {/* 模态框内容 */}
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
               <Input
-                label="商品名称"
+                label={t('products.modal.nameLabel')}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                placeholder="输入商品名称"
+                placeholder={t('products.modal.namePlaceholder')}
               />
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">商品描述</label>
+                <label className="block text-sm font-medium text-text-primary mb-2">{t('products.modal.descriptionLabel')}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
                   rows={4}
                   required
-                  placeholder="详细描述商品的特点、功能等"
+                  placeholder={t('products.modal.descriptionPlaceholder')}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="价格"
+                  label={t('products.modal.priceLabel')}
                   type="number"
                   step="0.01"
                   min="0"
@@ -560,7 +567,7 @@ const AdminProducts: React.FC = () => {
                   placeholder="0.00"
                 />
                 <Input
-                  label="库存"
+                  label={t('products.modal.stockLabel')}
                   type="number"
                   min="0"
                   value={formData.stock}
@@ -571,14 +578,14 @@ const AdminProducts: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">分类</label>
+                <label className="block text-sm font-medium text-text-primary mb-2">{t('products.modal.categoryLabel')}</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
                   required
                 >
-                  <option value="">选择分类</option>
+                  <option value="">{t('products.modal.selectCategory')}</option>
                   {categories?.map((cat: Category) => (
                     <option key={cat.id} value={cat.slug}>
                       {cat.name}
@@ -591,7 +598,7 @@ const AdminProducts: React.FC = () => {
                 images={formData.images}
                 onChange={(images) => setFormData({ ...formData, images })}
                 maxImages={10}
-                label="商品图片"
+                label={t('products.modal.imagesLabel')}
               />
 
               <div className="flex items-center space-x-2">
@@ -603,7 +610,7 @@ const AdminProducts: React.FC = () => {
                   className="w-4 h-4 text-brand-blue rounded focus:ring-brand-blue"
                 />
                 <label htmlFor="isActive" className="text-sm text-text-secondary">
-                  立即上架商品
+                  {t('products.modal.isActiveLabel')}
                 </label>
               </div>
 
@@ -615,10 +622,10 @@ const AdminProducts: React.FC = () => {
                   onClick={handleCloseModal}
                   disabled={saveMutation.isPending}
                 >
-                  取消
+                  {t('products.modal.cancel')}
                 </Button>
                 <Button type="submit" loading={saveMutation.isPending}>
-                  {editingProduct ? '更新商品' : '创建商品'}
+                  {editingProduct ? t('products.modal.update') : t('products.modal.create')}
                 </Button>
               </div>
             </form>
@@ -629,10 +636,10 @@ const AdminProducts: React.FC = () => {
       {/* 删除确认对话框 */}
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
-        title="删除商品"
-        message="确定要删除这个商品吗？此操作无法撤销。"
-        confirmText="删除"
-        cancelText="取消"
+        title={t('products.delete.title')}
+        message={t('products.delete.message')}
+        confirmText={t('products.delete.confirm')}
+        cancelText={t('products.delete.cancel')}
         variant="danger"
         onConfirm={() => {
           if (deleteConfirm.productId) {
@@ -645,10 +652,10 @@ const AdminProducts: React.FC = () => {
       {/* 批量删除确认对话框 */}
       <ConfirmDialog
         isOpen={bulkActionModal.isOpen && bulkActionModal.action === 'delete'}
-        title="批量删除商品"
-        message={`确定要删除选中的 ${selectedIds.length} 个商品吗？此操作无法撤销。`}
-        confirmText="删除"
-        cancelText="取消"
+        title={t('products.bulkDelete.title')}
+        message={t('products.bulkDelete.message', { count: selectedIds.length })}
+        confirmText={t('products.bulkDelete.confirm')}
+        cancelText={t('products.bulkDelete.cancel')}
         variant="danger"
         onConfirm={() => {
           bulkDeleteMutation.mutate(selectedIds);

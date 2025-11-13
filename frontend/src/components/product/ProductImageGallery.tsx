@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getImageUrl } from '@/utils/imageUrl';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -40,7 +41,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
         <AnimatePresence mode="wait">
           <motion.img
             key={selectedIndex}
-            src={images[selectedIndex]}
+            src={getImageUrl(images[selectedIndex])}
             alt={`${productName} - Image ${selectedIndex + 1}`}
             className="w-full h-full object-cover"
             initial={{ opacity: 0 }}
@@ -112,7 +113,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
               }`}
             >
               <img
-                src={image}
+                src={getImageUrl(image)}
                 alt={`${productName} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -165,7 +166,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({ images, produ
             )}
 
             <motion.img
-              src={images[selectedIndex]}
+              src={getImageUrl(images[selectedIndex])}
               alt={`${productName} - Zoomed`}
               className="max-w-full max-h-[90vh] object-contain"
               initial={{ scale: 0.9 }}

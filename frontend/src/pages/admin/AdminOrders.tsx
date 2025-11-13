@@ -8,6 +8,7 @@ import Breadcrumb from '@/components/admin/Breadcrumb';
 import EmptyState from '@/components/admin/EmptyState';
 import { Loader2, ShoppingBag, Eye, X } from 'lucide-react';
 import { orderApi } from '@/services/orders';
+import { getImageUrl } from '@/utils/imageUrl';
 import { Order, OrderStatus } from '@/types/order';
 import toast from 'react-hot-toast';
 
@@ -357,7 +358,7 @@ const AdminOrders: React.FC = () => {
                     <div key={item.id} className="flex items-center space-x-4 bg-gray-50 rounded-xl p-4">
                       {item.product?.images?.[0] && (
                         <img
-                          src={item.product.images[0]}
+                          src={getImageUrl(item.product.images[0])}
                           alt={item.product.name}
                           className="w-16 h-16 object-cover rounded-lg"
                         />

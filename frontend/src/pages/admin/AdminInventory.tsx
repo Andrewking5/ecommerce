@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { inventoryApi, InventoryStats } from '@/services/inventory';
+import { getImageUrl } from '@/utils/imageUrl';
 import toast from 'react-hot-toast';
 import { Product } from '@/types/product';
 
@@ -187,7 +188,7 @@ const AdminInventory: React.FC = () => {
                         <div className="flex items-center">
                           {product.images?.[0] && (
                             <img
-                              src={product.images[0]}
+                              src={getImageUrl(product.images[0])}
                               alt={product.name}
                               className="w-10 h-10 object-cover rounded-lg mr-3"
                             />

@@ -79,21 +79,12 @@ const uploadToLocal = async (buffer: Buffer, originalName: string, req?: Request
   // 保存文件
   fs.writeFileSync(filePath, buffer);
   
-  // 構建完整的 URL
-  // 如果是開發環境，使用請求的協議和主機
-  // 如果是生產環境，使用 API_URL 環境變數
-  let baseUrl = '';
-  if (req) {
-    const protocol = req.protocol || 'http';
-    const host = req.get('host') || 'localhost:3001';
-    baseUrl = `${protocol}://${host}`;
-  } else {
-    // 從環境變數獲取 API URL（去掉 /api 後綴）
-    const apiUrl = process.env.API_URL || 'http://localhost:3001/api';
-    baseUrl = apiUrl.replace('/api', '');
-  }
-  
-  const url = `${baseUrl}/uploads/products/${fileName}`;
+  // 構建圖片 URL
+  // 核心原則：返回相對路徑，讓前端根據環境處理
+  // 這樣可以：
+  // 1. 本地開發：使用 Vite 代理（/uploads -> localhost:3001/uploads）
+  // 2. 生產環境：前端會自動添加後端基礎 URL
+  const url = `/uploads/products/${fileName}`;
   const publicId = `products/${fileName}`;
   
   return { url, publicId };
