@@ -5,7 +5,6 @@
  */
 
 const { execSync } = require('child_process');
-const { URL } = require('url');
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5000; // 5秒
@@ -22,29 +21,13 @@ async function runMigration() {
     process.exit(1);
   }
 
-  // 检查是否是 Neon 连接池 URL
-  try {
-    const url = new URL(databaseUrl);
-    if (url.hostname.includes('-pooler')) {
-      console.warn('⚠️  Detected Neon connection pooler URL');
-      console.warn('💡 Migrations should use direct connection, not pooler');
-      console.warn('📝 Please configure DIRECT_DATABASE_URL in Render for migrations');
-      console.warn('   Direct URL format: postgresql://user:pass@ep-xxx-xxx.region.aws.neon.tech:5432/dbname');
-      
-      // 如果有直接连接 URL，使用它
-      if (process.env.DIRECT_DATABASE_URL) {
-        console.log('✅ Using DIRECT_DATABASE_URL for migration');
-        process.env.DATABASE_URL = process.env.DIRECT_DATABASE_URL;
-      } else {
-        // 尝试从连接池 URL 转换为直接连接 URL
-        const directHostname = url.hostname.replace('-pooler', '');
-        const directUrl = `${url.protocol}//${directHostname}:${url.port || '5432'}${url.pathname}${url.search || ''}`;
-        console.log('🔄 Attempting to use direct connection URL:', directUrl.replace(/:[^:@]+@/, ':****@'));
-        process.env.DATABASE_URL = directUrl;
-      }
-    }
-  } catch (error) {
-    console.warn('⚠️  Could not parse DATABASE_URL:', error.message);
+  // 如果有 DIRECT_DATABASE_URL，优先使用它（用于迁移）
+  // 否则直接使用 DATABASE_URL（Prisma 5.x 可以处理 pooler URL）
+  if (process.env.DIRECT_DATABASE_URL) {
+    console.log('✅ Using DIRECT_DATABASE_URL for migration');
+    process.env.DATABASE_URL = process.env.DIRECT_DATABASE_URL;
+  } else {
+    console.log('ℹ️  Using DATABASE_URL for migration (Prisma 5.x supports pooler URLs)');
   }
 
   // Prisma 5.22.0+ 不再需要 PRISMA_MIGRATE_SKIP_GENERATE

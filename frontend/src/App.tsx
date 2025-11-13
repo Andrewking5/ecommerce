@@ -37,8 +37,8 @@ const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'))
 function App() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background-primary">
-        <Routes>
+    <div className="min-h-screen bg-background-primary">
+      <Routes>
         {/* 公開路由 */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
@@ -119,7 +119,7 @@ function App() {
           right: '20px',
         }}
       />
-      </div>
+    </div>
     </ErrorBoundary>
   )
 }
