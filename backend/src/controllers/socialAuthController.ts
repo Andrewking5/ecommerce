@@ -54,21 +54,22 @@ export class SocialAuthController {
               provider: provider as any,
               providerId: id,
               providerData: providerData || {},
-              // 如果新头像存在则使用，否则保留旧头像（null 或 undefined 都保留旧值）
-              avatar: avatar !== null && avatar !== undefined ? avatar : user.avatar,
-              firstName: firstName || user.firstName,
-              lastName: lastName || user.lastName,
+              // 优先使用新的头像和姓名（如果提供）
+              avatar: avatar !== null && avatar !== undefined && avatar !== '' ? avatar : (user.avatar || null),
+              firstName: firstName && firstName !== 'User' ? firstName : (user.firstName || firstName),
+              lastName: lastName || user.lastName || '',
             },
           });
         } else {
           // 更新用户信息（头像等可能变化）
+          // 每次登录时更新最新的头像和姓名
           user = await prisma.user.update({
             where: { id: user.id },
             data: {
-              // 如果新头像存在则使用，否则保留旧头像（null 或 undefined 都保留旧值）
-              avatar: avatar !== null && avatar !== undefined ? avatar : user.avatar,
-              firstName: firstName || user.firstName,
-              lastName: lastName || user.lastName,
+              // 优先使用新的头像和姓名（社交登录应该总是更新）
+              avatar: avatar !== null && avatar !== undefined && avatar !== '' ? avatar : (user.avatar || null),
+              firstName: firstName && firstName !== 'User' ? firstName : (user.firstName || firstName),
+              lastName: lastName || user.lastName || '',
               providerData: providerData || user.providerData,
             },
           });
@@ -171,12 +172,56 @@ export class SocialAuthController {
         throw new Error('EMAIL_REQUIRED');
       }
 
+      // Google profile 数据结构：
+      // - id 或 sub: 用户 ID
+      // - emails: [{ value: 'email@example.com' }] 或 email: 'email@example.com'
+      // - name: { givenName: 'John', familyName: 'Doe' } 或 given_name/family_name
+      // - photos: [{ value: 'https://...' }] 或 picture: 'https://...'
+      
+      // 提取姓名（多种可能的结构）
+      let firstName = 'User';
+      let lastName = '';
+      
+      if (profile.name?.givenName) {
+        firstName = profile.name.givenName;
+        lastName = profile.name.familyName || '';
+      } else if (profile.given_name) {
+        firstName = profile.given_name;
+        lastName = profile.family_name || '';
+      } else if (profile.firstName) {
+        firstName = profile.firstName;
+        lastName = profile.lastName || '';
+      } else if (profile.name && typeof profile.name === 'string') {
+        // 如果 name 是字符串，尝试拆分
+        const nameParts = profile.name.split(' ');
+        firstName = nameParts[0] || 'User';
+        lastName = nameParts.slice(1).join(' ') || '';
+      }
+      
+      // 提取头像（多种可能的结构）
+      let avatar: string | undefined = undefined;
+      
+      if (profile.photos && profile.photos.length > 0) {
+        // Google 返回 photos 数组
+        avatar = profile.photos[0].value || profile.photos[0];
+      } else if (profile.picture) {
+        // 直接是 URL 字符串
+        avatar = typeof profile.picture === 'string' ? profile.picture : profile.picture;
+      } else if (profile.avatar) {
+        avatar = typeof profile.avatar === 'string' ? profile.avatar : profile.avatar;
+      }
+      
+      // 确保头像 URL 是完整的 HTTPS URL
+      if (avatar && !avatar.startsWith('http')) {
+        avatar = `https://${avatar}`;
+      }
+
       const socialProfile: SocialUserProfile = {
         id: profile.id || profile.sub,
-        email: email, // 使用提取的 email
-        firstName: profile.given_name || profile.firstName || 'User',
-        lastName: profile.family_name || profile.lastName || '',
-        avatar: profile.picture || profile.avatar || undefined, // 确保类型正确
+        email: email,
+        firstName,
+        lastName,
+        avatar: avatar || undefined,
         provider: 'GOOGLE',
         providerData: {
           name: profile.name,
@@ -185,6 +230,15 @@ export class SocialAuthController {
           rawProfile: profile, // 保存完整 profile 用于调试
         },
       };
+      
+      console.log('✅ Google profile processed:', {
+        id: socialProfile.id,
+        email: socialProfile.email,
+        firstName: socialProfile.firstName,
+        lastName: socialProfile.lastName,
+        hasAvatar: !!socialProfile.avatar,
+        avatar: socialProfile.avatar,
+      });
 
       await SocialAuthController.handleSocialCallback(socialProfile, res);
       return;
@@ -238,23 +292,75 @@ export class SocialAuthController {
         throw new Error('EMAIL_REQUIRED');
       }
 
-      // Facebook 返回的 name 需要拆分
-      const nameParts = (profile.name || '').split(' ');
-      const firstName = nameParts[0] || 'User';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      // Facebook profile 数据结构：
+      // - id: 用户 ID
+      // - email: 'email@example.com'
+      // - name: 'John Doe' (完整姓名)
+      // - picture: { data: { url: 'https://...' } } 或 photos: [{ value: 'https://...' }]
+      
+      // 提取姓名
+      let firstName = 'User';
+      let lastName = '';
+      
+      if (profile.name) {
+        if (typeof profile.name === 'string') {
+          // name 是字符串，需要拆分
+          const nameParts = profile.name.trim().split(/\s+/);
+          firstName = nameParts[0] || 'User';
+          lastName = nameParts.slice(1).join(' ') || '';
+        } else if (profile.name.givenName) {
+          // name 是对象
+          firstName = profile.name.givenName;
+          lastName = profile.name.familyName || '';
+        }
+      }
+      
+      // 提取头像（Facebook 可能返回多种结构）
+      let avatar: string | undefined = undefined;
+      
+      // 方式1: picture.data.url (最常见)
+      if (profile.picture?.data?.url) {
+        avatar = profile.picture.data.url;
+      }
+      // 方式2: picture 直接是 URL
+      else if (profile.picture && typeof profile.picture === 'string') {
+        avatar = profile.picture;
+      }
+      // 方式3: photos 数组
+      else if (profile.photos && profile.photos.length > 0) {
+        avatar = profile.photos[0].value || profile.photos[0];
+      }
+      // 方式4: _json.picture.data.url
+      else if ((profile as any)._json?.picture?.data?.url) {
+        avatar = (profile as any)._json.picture.data.url;
+      }
+      
+      // 确保头像 URL 是完整的 HTTPS URL
+      if (avatar && !avatar.startsWith('http')) {
+        avatar = `https://${avatar}`;
+      }
 
       const socialProfile: SocialUserProfile = {
         id: profile.id,
-        email: email, // 使用提取的 email
+        email: email,
         firstName,
         lastName,
-        avatar: profile.picture?.data?.url || profile.photos?.[0]?.value || undefined, // 确保类型正确
+        avatar: avatar || undefined,
         provider: 'FACEBOOK',
         providerData: {
           name: profile.name,
           rawProfile: profile, // 保存完整 profile 用于调试
         },
       };
+      
+      console.log('✅ Facebook profile processed:', {
+        id: socialProfile.id,
+        email: socialProfile.email,
+        firstName: socialProfile.firstName,
+        lastName: socialProfile.lastName,
+        hasAvatar: !!socialProfile.avatar,
+        avatar: socialProfile.avatar,
+      });
 
       await SocialAuthController.handleSocialCallback(socialProfile, res);
       return;
