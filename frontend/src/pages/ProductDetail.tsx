@@ -3,13 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { productApi } from '@/services/products';
+import { variantApi } from '@/services/variants';
 import { useCartStore } from '@/store/cartStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ProductImageGallery from '@/components/product/ProductImageGallery';
+import VariantSelector from '@/components/product/VariantSelector';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Heart, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
+import { ProductVariant } from '@/types/variant';
+import { getImageUrl } from '@/utils/imageUrl';
 
 const ProductDetail: React.FC = () => {
   const { t } = useTranslation(['products', 'common']);
@@ -17,11 +21,19 @@ const ProductDetail: React.FC = () => {
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: () => productApi.getProduct(id!),
     enabled: !!id,
+  });
+
+  // 获取商品变体（如果商品有变体）
+  const { data: variants = [], isLoading: isLoadingVariants } = useQuery({
+    queryKey: ['variants', id],
+    queryFn: () => variantApi.getProductVariants(id!, { isActive: true }),
+    enabled: !!id && !!product?.hasVariants,
   });
 
   if (isLoading) {
@@ -61,7 +73,11 @@ const ProductDetail: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Images */}
         <ProductImageGallery 
-          images={product.images || []} 
+          images={
+            selectedVariant && selectedVariant.images && selectedVariant.images.length > 0
+              ? selectedVariant.images.map(img => getImageUrl(img))
+              : product.images || []
+          } 
           productName={product.name} 
         />
 
@@ -75,9 +91,28 @@ const ProductDetail: React.FC = () => {
           {/* Price and Rating */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-text-primary">
-                ${product.price}
-              </span>
+              <div className="flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <span className="text-3xl font-bold text-text-primary">
+                    ${selectedVariant ? Number(selectedVariant.price).toFixed(2) : Number(product.price).toFixed(2)}
+                  </span>
+                  {selectedVariant?.comparePrice && Number(selectedVariant.comparePrice) > Number(selectedVariant.price) && (
+                    <span className="text-lg text-text-secondary line-through">
+                      ${Number(selectedVariant.comparePrice).toFixed(2)}
+                    </span>
+                  )}
+                  {!selectedVariant && product.minPrice && product.maxPrice && product.minPrice !== product.maxPrice && (
+                    <span className="text-lg text-text-secondary">
+                      ${Number(product.minPrice).toFixed(2)} - ${Number(product.maxPrice).toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                {selectedVariant?.comparePrice && Number(selectedVariant.comparePrice) > Number(selectedVariant.price) && (
+                  <span className="text-sm text-red-500 font-medium">
+                    {Math.round((1 - Number(selectedVariant.price) / Number(selectedVariant.comparePrice)) * 100)}% {t('products:detail.discount', { defaultValue: 'off' })}
+                  </span>
+                )}
+              </div>
               {product.averageRating && (
                 <div className="flex items-center space-x-1">
                   <Star size={20} className="text-yellow-500 fill-current" />
@@ -92,15 +127,33 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
 
+          {/* Variant Selector */}
+          {product.hasVariants && variants.length > 0 && (
+            <div>
+              {isLoadingVariants ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-brand-blue" />
+                </div>
+              ) : (
+                <VariantSelector
+                  product={product}
+                  variants={variants}
+                  selectedVariant={selectedVariant}
+                  onVariantChange={setSelectedVariant}
+                />
+              )}
+            </div>
+          )}
+
           {/* Stock Status */}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-text-tertiary">{t('products:detail.availability', { defaultValue: 'Availability' })}:</span>
             <span className={`text-sm font-medium ${
-              product.stock > 0 ? 'text-brand-green' : 'text-red-500'
+              (selectedVariant ? selectedVariant.stock : product.stock) > 0 ? 'text-brand-green' : 'text-red-500'
             }`}>
-              {product.stock > 0 
-                ? `${product.stock} ${t('products:detail.stock')}` 
-                : t('products:detail.outOfStock')}
+              {(selectedVariant ? selectedVariant.stock : product.stock) > 0 
+                ? `${selectedVariant ? selectedVariant.stock : product.stock} ${t('products:detail.stock', { defaultValue: 'in stock' })}` 
+                : t('products:detail.outOfStock', { defaultValue: 'Out of stock' })}
             </span>
           </div>
 
@@ -122,14 +175,15 @@ const ProductDetail: React.FC = () => {
           )}
 
           {/* Quantity Selector */}
-          {product.stock > 0 && (
+          {(selectedVariant ? selectedVariant.stock : product.stock) > 0 && (
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-text-primary">{t('cart:quantity')}:</span>
+              <span className="text-sm font-medium text-text-primary">{t('cart:quantity', { defaultValue: 'Quantity' })}:</span>
               <div className="flex items-center space-x-2 border border-gray-300 rounded-lg">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={quantity <= 1}
                   className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  aria-label={t('common:decrease', { defaultValue: 'Decrease quantity' })}
                 >
                   <Minus size={16} />
                 </button>
@@ -137,15 +191,16 @@ const ProductDetail: React.FC = () => {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  disabled={quantity >= product.stock}
+                  onClick={() => setQuantity(Math.min(selectedVariant ? selectedVariant.stock : product.stock, quantity + 1))}
+                  disabled={quantity >= (selectedVariant ? selectedVariant.stock : product.stock)}
                   className="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  aria-label={t('common:increase', { defaultValue: 'Increase quantity' })}
                 >
                   <Plus size={16} />
                 </button>
               </div>
               <span className="text-sm text-text-tertiary">
-                {t('common:max', { defaultValue: 'Max' })}: {product.stock}
+                {t('common:max', { defaultValue: 'Max' })}: {selectedVariant ? selectedVariant.stock : product.stock}
               </span>
             </div>
           )}
@@ -155,24 +210,43 @@ const ProductDetail: React.FC = () => {
             <div className="flex space-x-4">
               <Button
                 onClick={() => {
+                  // 如果有变体且未选择变体，提示用户选择
+                  if (product.hasVariants && !selectedVariant) {
+                    return;
+                  }
+                  
+                  const stock = selectedVariant ? selectedVariant.stock : product.stock;
+                  if (stock === 0) return;
+                  
                   for (let i = 0; i < quantity; i++) {
-                    addItem(product);
+                    addItem(
+                      product,
+                      1,
+                      selectedVariant?.id,
+                      selectedVariant || undefined
+                    );
                   }
                 }}
-                disabled={product.stock === 0}
+                disabled={
+                  (selectedVariant ? selectedVariant.stock : product.stock) === 0 ||
+                  (product.hasVariants && !selectedVariant)
+                }
                 size="lg"
                 className="flex-1"
               >
                 <ShoppingCart size={20} className="mr-2" />
-                {product.stock === 0 
-                  ? t('products:detail.outOfStock') 
-                  : t('products:detail.addToCart', { count: quantity })}
+                {(selectedVariant ? selectedVariant.stock : product.stock) === 0
+                  ? t('products:detail.outOfStock', { defaultValue: 'Out of Stock' })
+                  : product.hasVariants && !selectedVariant
+                  ? t('products:detail.selectVariant', { defaultValue: 'Please select a variant' })
+                  : t('products:detail.addToCart', { count: quantity, defaultValue: `Add ${quantity} to Cart` })}
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => setIsFavorite(!isFavorite)}
                 className={`${isFavorite ? 'text-red-500 border-red-500' : ''}`}
+                aria-label={t('products:detail.toggleFavorite', { defaultValue: 'Toggle favorite' })}
               >
                 <Heart size={20} className={isFavorite ? 'fill-current' : ''} />
               </Button>

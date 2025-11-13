@@ -28,6 +28,7 @@ const OrderDetail = lazy(() => import('@/pages/OrderDetail'))
 // 管理后台路由 - 懒加载
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
 const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts'))
+const AdminProductForm = lazy(() => import('@/pages/admin/AdminProductForm'))
 const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories'))
 const AdminInventory = lazy(() => import('@/pages/admin/AdminInventory'))
 const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'))
@@ -72,6 +73,8 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminDashboard /></Suspense>} />
           <Route path="products" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProducts /></Suspense>} />
+          <Route path="products/new" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProductForm /></Suspense>} />
+          <Route path="products/:id/edit" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProductForm /></Suspense>} />
           <Route path="categories" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminCategories /></Suspense>} />
           <Route path="inventory" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminInventory /></Suspense>} />
           <Route path="orders" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminOrders /></Suspense>} />

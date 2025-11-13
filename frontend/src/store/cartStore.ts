@@ -15,15 +15,20 @@ export const useCartStore = create<CartStore>()(
       itemCount: 0,
 
       // Actions
-      addItem: (product: Product, quantity: number = 1) => {
+      addItem: (product: Product, quantity: number = 1, variantId?: string, variant?: any) => {
         const { items } = get();
-        const existingItem = items.find(item => item.productId === product.id);
+        // 如果有变体，需要同时匹配 productId 和 variantId
+        const existingItem = variantId
+          ? items.find(item => item.productId === product.id && item.variantId === variantId)
+          : items.find(item => item.productId === product.id && !item.variantId);
         
         if (existingItem) {
           // 更新現有商品數量
           set(state => ({
             items: state.items.map(item =>
-              item.productId === product.id
+              (variantId
+                ? item.productId === product.id && item.variantId === variantId
+                : item.productId === product.id && !item.variantId)
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
             ),
@@ -32,9 +37,11 @@ export const useCartStore = create<CartStore>()(
           // 新增商品到購物車
           set(state => ({
             items: [...state.items, {
-              id: `${product.id}-${Date.now()}`, // 生成唯一 ID
+              id: `${product.id}-${variantId || 'default'}-${Date.now()}`, // 生成唯一 ID
               userId: '', // 將在登入後更新
               productId: product.id,
+              variantId: variantId,
+              variant: variant,
               product,
               quantity,
             }],
@@ -43,7 +50,7 @@ export const useCartStore = create<CartStore>()(
         
         get().calculateTotals();
         // 使用更轻量的通知，不显示图标，更快消失
-        toast.success(`${product.name} 已加入購物車`, {
+        toast.success(`${product.name}${variant ? ` (${variant.attributes?.map((a: any) => a.value).join(', ') || ''})` : ''} 已加入購物車`, {
           duration: 1500,
           icon: null, // 移除图标，减少视觉干扰
           style: {
@@ -89,7 +96,8 @@ export const useCartStore = create<CartStore>()(
       calculateTotals: () => {
         const { items } = get();
         const total = items.reduce((sum, item) => {
-          const price = item.product?.price || 0;
+          // 优先使用变体价格，否则使用商品价格
+          const price = item.variant?.price ?? item.product?.price ?? 0;
           return sum + (price * item.quantity);
         }, 0);
         

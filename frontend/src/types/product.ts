@@ -1,3 +1,5 @@
+import { ProductVariant } from './variant';
+
 export interface Product {
   id: string;
   name: string;
@@ -14,6 +16,12 @@ export interface Product {
   reviews?: Review[];
   averageRating?: number;
   reviewCount?: number;
+  // 变体相关字段
+  hasVariants?: boolean;
+  basePrice?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  variants?: ProductVariant[];
 }
 
 export interface Category {

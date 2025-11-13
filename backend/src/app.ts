@@ -32,6 +32,8 @@ import paymentRoutes from './routes/payment';
 import couponRoutes from './routes/coupons';
 import reviewRoutes from './routes/reviews';
 import addressRoutes from './routes/addresses';
+import attributeRoutes from './routes/attributes';
+import variantRoutes from './routes/variants';
 
 // 初始化 Prisma 客戶端
 // 注意：在 Render 上，数据库连接可能会因为空闲而关闭
@@ -182,6 +184,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/attributes', attributeRoutes);
+app.use('/api/variants', variantRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

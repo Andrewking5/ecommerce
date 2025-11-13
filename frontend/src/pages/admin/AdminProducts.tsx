@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -22,6 +22,7 @@ const AdminProducts: React.FC = () => {
   const { t } = useTranslation('admin');
   const { user, isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<ProductQueryParams>({
@@ -146,19 +147,19 @@ const AdminProducts: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      description: product.description,
-      price: product.price.toString(),
-      category: product.category?.slug || '',
-      stock: product.stock.toString(),
-      images: product.images || [],
-      isActive: product.isActive,
-    });
-    setShowModal(true);
-  };
+  // const handleEdit = (product: Product) => {
+  //   setEditingProduct(product);
+  //   setFormData({
+  //     name: product.name,
+  //     description: product.description,
+  //     price: product.price.toString(),
+  //     category: product.category?.slug || '',
+  //     stock: product.stock.toString(),
+  //     images: product.images || [],
+  //     isActive: product.isActive,
+  //   });
+  //   setShowModal(true);
+  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,10 +277,7 @@ const AdminProducts: React.FC = () => {
           <p className="text-text-secondary mt-2 text-sm md:text-base">{t('products.subtitle')}</p>
         </div>
         <Button
-          onClick={() => {
-            resetForm();
-            setShowModal(true);
-          }}
+          onClick={() => navigate('/admin/products/new')}
           className="flex items-center space-x-2 w-full md:w-auto"
         >
           <Plus size={20} />
@@ -406,7 +404,7 @@ const AdminProducts: React.FC = () => {
                     </div>
                     <div className="flex justify-end space-x-2 pt-2 border-t border-gray-200">
                       <button
-                        onClick={() => handleEdit(product)}
+                        onClick={() => navigate(`/admin/products/${product.id}/edit`)}
                         className="text-brand-blue hover:text-brand-blue/80 p-2 hover:bg-blue-50 rounded-lg transition-colors"
                         title={t('products.table.edit')}
                       >
@@ -534,7 +532,7 @@ const AdminProducts: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
                           <button
-                            onClick={() => handleEdit(product)}
+                            onClick={() => navigate(`/admin/products/${product.id}/edit`)}
                             className="text-brand-blue hover:text-brand-blue/80 p-2 hover:bg-blue-50 rounded-lg transition-colors"
                             title={t('products.table.edit')}
                           >

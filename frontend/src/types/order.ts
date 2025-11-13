@@ -25,11 +25,17 @@ export interface OrderItem {
   id: string;
   orderId: string;
   productId: string;
+  variantId?: string; // 变体ID（可选）
   quantity: number;
   price: number;
   product?: {
     id: string;
     name: string;
+    images: string[];
+  };
+  variant?: {
+    id: string;
+    sku: string;
     images: string[];
   };
 }
@@ -54,6 +60,7 @@ export type OrderStatus =
 export interface CreateOrderRequest {
   items: {
     productId: string;
+    variantId?: string; // 变体ID（可选）
     quantity: number;
   }[];
   shippingAddress: Address;

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Loader2, GripVertical } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { uploadApi } from '@/services/upload';
 import { getImageUrl } from '@/utils/imageUrl';
@@ -22,6 +22,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const { t } = useTranslation('admin');
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -81,6 +82,29 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     onChange(images.filter((_, i) => i !== index));
   };
 
+  // 拖拽排序处理
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null) return;
+
+    if (draggedIndex !== index) {
+      const newImages = [...images];
+      const draggedItem = newImages[draggedIndex];
+      newImages.splice(draggedIndex, 1);
+      newImages.splice(index, 0, draggedItem);
+      onChange(newImages);
+      setDraggedIndex(index);
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
   const openFileDialog = () => {
     fileInputRef.current?.click();
   };
@@ -95,22 +119,36 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       {images.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           {images.map((image, index) => (
-            <div key={index} className="relative group">
+            <div
+              key={index}
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`relative group cursor-move ${
+                draggedIndex === index ? 'opacity-50' : ''
+              }`}
+            >
               <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
                 <img
                   src={getImageUrl(image)}
                   alt={`Upload ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover pointer-events-none"
                   onError={(e) => {
                     console.error('Image load error:', image);
                     (e.target as HTMLImageElement).src = '/placeholder-image.png';
                   }}
                 />
               </div>
+              {/* 拖拽手柄 */}
+              <div className="absolute top-2 left-2 w-6 h-6 bg-black/50 text-white rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+                <GripVertical size={14} />
+              </div>
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
+                aria-label={t('imageUpload.remove', { defaultValue: '删除图片' })}
               >
                 <X size={14} />
               </button>

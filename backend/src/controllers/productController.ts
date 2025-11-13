@@ -205,6 +205,20 @@ export class ProductController {
         where: { id, isActive: true },
         include: {
           category: true,
+          variants: {
+            where: { isActive: true },
+            include: {
+              attributes: {
+                include: {
+                  attribute: true,
+                },
+              },
+            },
+            orderBy: [
+              { isDefault: 'desc' },
+              { createdAt: 'asc' },
+            ],
+          },
           reviews: {
             include: {
               user: {
@@ -379,6 +393,11 @@ export class ProductController {
           stock: productData.stock || 0,
           specifications: productData.specifications || {},
           isActive: productData.isActive !== undefined ? productData.isActive : true,
+          // 变体相关字段
+          hasVariants: productData.hasVariants ?? false,
+          basePrice: productData.basePrice || productData.price,
+          minPrice: productData.minPrice,
+          maxPrice: productData.maxPrice,
         },
         include: {
           category: true,
