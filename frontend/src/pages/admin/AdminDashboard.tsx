@@ -72,9 +72,9 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary">{t('dashboard.title')}</h1>
-        <p className="text-text-secondary mt-2">{t('dashboard.welcome', { firstName: user?.firstName, lastName: user?.lastName, defaultValue: `欢迎回来, ${user?.firstName} ${user?.lastName}` })}</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-text-primary">{t('dashboard.title')}</h1>
+        <p className="text-text-secondary mt-2 text-sm md:text-base">{t('dashboard.welcome', { firstName: user?.firstName, lastName: user?.lastName, defaultValue: `欢迎回来, ${user?.firstName} ${user?.lastName}` })}</p>
       </div>
 
       {/* 统计卡片 */}

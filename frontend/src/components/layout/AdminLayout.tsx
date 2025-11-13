@@ -17,15 +17,36 @@ import {
 } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // 移动端默认关闭
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const { t } = useTranslation('admin');
 
+  // 桌面端默认打开侧边栏
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+    
+    handleResize(); // 初始化
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleLogout = async () => {
     await logout();
     navigate('/auth/login');
+  };
+
+  const closeSidebar = () => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const menuItems = [
@@ -46,11 +67,21 @@ const AdminLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* 移动端遮罩层 */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* 侧边栏 */}
       <aside
         className={`${
-          sidebarOpen ? 'w-64 min-w-[256px]' : 'w-20'
-        } bg-white border-r border-gray-200 transition-all duration-300 fixed h-screen z-40 overflow-hidden`}
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        } ${
+          sidebarOpen ? 'w-64' : 'w-20'
+        } bg-white border-r border-gray-200 transition-all duration-300 fixed h-screen z-40 overflow-hidden md:relative`}
       >
         <div className="flex flex-col h-full">
           {/* Logo 和切换按钮 */}
@@ -59,6 +90,7 @@ const AdminLayout: React.FC = () => {
               <div className="flex items-center space-x-2 flex-1">
                 <Link
                   to="/"
+                  onClick={closeSidebar}
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
                   title={t('menu.backToHome')}
                 >
@@ -71,9 +103,15 @@ const AdminLayout: React.FC = () => {
             )}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors hidden md:block"
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <button
+              onClick={closeSidebar}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors md:hidden"
+            >
+              <X size={20} />
             </button>
           </div>
 
@@ -103,6 +141,7 @@ const AdminLayout: React.FC = () => {
               <li>
                 <Link
                   to="/"
+                  onClick={closeSidebar}
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-text-secondary hover:bg-gray-100 hover:text-text-primary"
                 >
                   <Home size={20} />
@@ -124,6 +163,7 @@ const AdminLayout: React.FC = () => {
                   <li key={item.path}>
                     <Link
                       to={item.path}
+                      onClick={closeSidebar}
                       className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                         active
                           ? 'bg-brand-blue text-white shadow-sm'
@@ -157,9 +197,18 @@ const AdminLayout: React.FC = () => {
         </div>
       </aside>
 
+      {/* 移动端菜单按钮 */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 md:hidden p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors"
+        aria-label="Toggle menu"
+      >
+        <Menu size={24} />
+      </button>
+
       {/* 主内容区 */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
-        <main className="p-8">
+      <div className="flex-1 w-full md:ml-0 transition-all duration-300">
+        <main className="p-4 md:p-8 pt-16 md:pt-8">
           <Outlet />
         </main>
       </div>

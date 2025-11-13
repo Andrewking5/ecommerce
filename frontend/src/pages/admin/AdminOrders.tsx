@@ -97,9 +97,9 @@ const AdminOrders: React.FC = () => {
         ]}
       />
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary">订单管理</h1>
-        <p className="text-text-secondary mt-2">查看和管理所有订单</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-text-primary">订单管理</h1>
+        <p className="text-text-secondary mt-2 text-sm md:text-base">查看和管理所有订单</p>
       </div>
 
       {/* 筛选栏 */}
@@ -140,7 +140,73 @@ const AdminOrders: React.FC = () => {
           />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* 移动端卡片布局 */}
+            <div className="md:hidden space-y-4 p-4">
+              {data.orders.map((order: Order) => (
+                <div key={order.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-text-primary mb-1">
+                        #{order.id.slice(-8).toUpperCase()}
+                      </div>
+                      <div className="text-xs text-text-secondary">
+                        {new Date(order.createdAt).toLocaleDateString('zh-CN', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </div>
+                    </div>
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value as OrderStatus)}
+                      disabled={updateStatusMutation.isPending}
+                      className={`text-xs font-semibold px-2 py-1 rounded-full border-0 focus:ring-2 focus:ring-brand-blue cursor-pointer transition-colors ${statusColors[order.status]}`}
+                    >
+                      {Object.entries(statusLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2 text-xs mb-3">
+                    <div>
+                      <span className="text-text-secondary">客户：</span>
+                      <span className="text-text-primary">
+                        {order.user?.firstName} {order.user?.lastName}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-text-secondary">商品：</span>
+                      <span className="text-text-primary">
+                        {order.orderItems.length} 件
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-text-secondary">金额：</span>
+                      <span className="text-text-primary font-medium">
+                        ${Number(order.totalAmount).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-gray-200">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewDetail(order)}
+                      className="w-full flex items-center justify-center space-x-1"
+                    >
+                      <Eye size={16} />
+                      <span>查看详情</span>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 桌面端表格布局 */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -237,21 +303,22 @@ const AdminOrders: React.FC = () => {
 
             {/* 分页 */}
             {data && data.pagination.totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-text-secondary">
+              <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-xs md:text-sm text-text-secondary text-center md:text-left">
                   显示 {((page - 1) * 20) + 1} - {Math.min(page * 20, data.pagination.total)} 条，共{' '}
                   {data.pagination.total} 条
                 </div>
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-text-secondary">
+                <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto">
+                  <span className="text-xs md:text-sm text-text-secondary">
                     第 {page} / {data.pagination.totalPages} 页
                   </span>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 w-full md:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
+                      className="flex-1 md:flex-initial"
                     >
                       上一页
                     </Button>
@@ -260,6 +327,7 @@ const AdminOrders: React.FC = () => {
                       size="sm"
                       onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
                       disabled={page === data.pagination.totalPages}
+                      className="flex-1 md:flex-initial"
                     >
                       下一页
                     </Button>
@@ -281,7 +349,7 @@ const AdminOrders: React.FC = () => {
             }
           }}
         >
-          <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-scaleIn">
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col animate-scaleIn m-4">
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-text-primary">订单详情</h2>
               <button
@@ -296,7 +364,7 @@ const AdminOrders: React.FC = () => {
               {/* 订单信息 */}
               <div>
                 <h3 className="text-lg font-semibold text-text-primary mb-4">订单信息</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-text-secondary">订单号</p>
                     <p className="text-sm font-medium text-text-primary">#{selectedOrder.id.slice(-8).toUpperCase()}</p>

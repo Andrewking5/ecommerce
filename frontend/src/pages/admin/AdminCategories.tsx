@@ -170,17 +170,17 @@ const AdminCategories: React.FC = () => {
         ]}
       />
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">分类管理</h1>
-          <p className="text-text-secondary mt-2">管理所有商品分类</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary">分类管理</h1>
+          <p className="text-text-secondary mt-2 text-sm md:text-base">管理所有商品分类</p>
         </div>
         <Button
           onClick={() => {
             resetForm();
             setShowModal(true);
           }}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 w-full md:w-auto"
         >
           <Plus size={20} />
           <span>添加分类</span>

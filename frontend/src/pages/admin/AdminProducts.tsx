@@ -270,17 +270,17 @@ const AdminProducts: React.FC = () => {
         ]}
       />
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">{t('products.title')}</h1>
-          <p className="text-text-secondary mt-2">{t('products.subtitle')}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary">{t('products.title')}</h1>
+          <p className="text-text-secondary mt-2 text-sm md:text-base">{t('products.subtitle')}</p>
         </div>
         <Button
           onClick={() => {
             resetForm();
             setShowModal(true);
           }}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 w-full md:w-auto"
         >
           <Plus size={20} />
           <span>{t('products.addProduct')}</span>
@@ -341,7 +341,92 @@ const AdminProducts: React.FC = () => {
           />
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* 移动端卡片布局 */}
+            <div className="md:hidden space-y-4 p-4">
+              {data.products.map((product) => {
+                const isSelected = selectedIds.includes(product.id);
+                return (
+                  <div
+                    key={product.id}
+                    className={`bg-white rounded-lg border-2 p-4 ${
+                      isSelected ? 'border-brand-blue bg-blue-50' : 'border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <button
+                          onClick={() => handleSelectProduct(product.id, !isSelected)}
+                          className="flex-shrink-0"
+                        >
+                          {isSelected ? (
+                            <CheckSquare size={20} className="text-brand-blue" />
+                          ) : (
+                            <Square size={20} className="text-text-tertiary" />
+                          )}
+                        </button>
+                        {product.images?.[0] && (
+                          <img
+                            src={getImageUrl(product.images[0])}
+                            alt={product.name}
+                            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-text-primary truncate">{product.name}</div>
+                          <div className="text-xs text-text-secondary line-clamp-2">{product.description}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                      <div>
+                        <span className="text-text-secondary">分类：</span>
+                        <span className="text-text-primary">{product.category?.name || '-'}</span>
+                      </div>
+                      <div>
+                        <span className="text-text-secondary">价格：</span>
+                        <span className="text-text-primary font-medium">${Number(product.price).toFixed(2)}</span>
+                      </div>
+                      <div>
+                        <span className="text-text-secondary">库存：</span>
+                        <span className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {product.stock}
+                        </span>
+                      </div>
+                      <div>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            product.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {product.isActive ? t('products.status.active') : t('products.status.inactive')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-2 pt-2 border-t border-gray-200">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="text-brand-blue hover:text-brand-blue/80 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                        title={t('products.table.edit')}
+                      >
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm({ isOpen: true, productId: product.id })}
+                        className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        title={t('products.table.delete')}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 桌面端表格布局 */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
@@ -473,20 +558,21 @@ const AdminProducts: React.FC = () => {
 
             {/* 分页 */}
             {data && data.pagination.totalPages > 1 && (
-              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-text-secondary">
+              <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-xs md:text-sm text-text-secondary text-center md:text-left">
                   {t('products.pagination.showing', { 
                     start: ((page - 1) * 20) + 1, 
                     end: Math.min(page * 20, data.pagination.total), 
                     total: data.pagination.total 
                   })}
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 w-full md:w-auto justify-center">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
+                    className="flex-1 md:flex-initial"
                   >
                     {t('common.previous')}
                   </Button>
@@ -498,6 +584,7 @@ const AdminProducts: React.FC = () => {
                     size="sm"
                     onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
                     disabled={page === data.pagination.totalPages}
+                    className="flex-1 md:flex-initial"
                   >
                     {t('common.next')}
                   </Button>

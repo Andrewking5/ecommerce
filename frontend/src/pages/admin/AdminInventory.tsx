@@ -73,9 +73,9 @@ const AdminInventory: React.FC = () => {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary">{t('admin:inventory.title')}</h1>
-        <p className="text-text-secondary mt-2">{t('admin:inventory.description')}</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-text-primary">{t('admin:inventory.title')}</h1>
+        <p className="text-text-secondary mt-2 text-sm md:text-base">{t('admin:inventory.description')}</p>
       </div>
 
       {/* 库存统计卡片 */}

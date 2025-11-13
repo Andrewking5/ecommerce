@@ -127,14 +127,14 @@ const AdminUsers: React.FC = () => {
         ]}
       />
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary">用户管理</h1>
-        <p className="text-text-secondary mt-2">查看和管理所有用户账户</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-text-primary">用户管理</h1>
+        <p className="text-text-secondary mt-2 text-sm md:text-base">查看和管理所有用户账户</p>
       </div>
 
       {/* 搜索和筛选栏 */}
       <Card className="p-4 mb-6">
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-tertiary" size={20} />
             <Input
@@ -144,7 +144,7 @@ const AdminUsers: React.FC = () => {
               className="pl-10"
             />
           </div>
-          <div className="w-48">
+          <div className="w-full md:w-48">
             <select
               value={roleFilter}
               onChange={(e) => {
@@ -207,9 +207,27 @@ const AdminUsers: React.FC = () => {
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center mr-3">
+                          {user.avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt={`${user.firstName} ${user.lastName}`}
+                              className="w-10 h-10 rounded-full object-cover mr-3"
+                              onError={(e) => {
+                                // 如果头像加载失败，隐藏图片，显示首字母
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div
+                            className={`w-10 h-10 bg-brand-blue rounded-full flex items-center justify-center mr-3 ${
+                              user.avatar ? 'hidden' : ''
+                            }`}
+                          >
                             <span className="text-white font-semibold">
-                              {user.firstName[0]}{user.lastName[0]}
+                              {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
                             </span>
                           </div>
                           <div>
