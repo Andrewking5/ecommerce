@@ -55,8 +55,13 @@ npm run db:deploy
 4. 更新为：
 
 ```bash
-cd backend && npm install && npm run build && npm run db:deploy
+cd backend && npm install && npm run build
 ```
+
+**注意**：迁移应该在启动时运行（通过 `RUN_MIGRATIONS_ON_START=true`），而不是在构建时运行，因为：
+- 构建时数据库可能不可用
+- 构建环境可能没有正确的数据库连接
+- 迁移应该在应用启动时运行，确保数据库连接正常
 
 ### 步骤 2: 验证迁移
 

@@ -58,10 +58,11 @@ async function runMigration() {
     console.log(`🔄 Migration attempt ${retryCount}/${MAX_RETRIES}...`);
 
     try {
-      execSync('npx prisma migrate deploy --skip-generate', {
+      // Prisma 5.22.0+ 不再支持 --skip-generate，因为我们已经运行了 prisma generate
+      execSync('npx prisma migrate deploy', {
         stdio: 'inherit',
         env: process.env,
-        timeout: 60000, // 60秒超时
+        timeout: 120000, // 120秒超时（迁移可能需要更长时间）
       });
       console.log('✅ Migration deployed successfully');
       success = true;
@@ -72,6 +73,12 @@ async function runMigration() {
         await sleep(RETRY_DELAY);
       } else {
         console.error(`❌ Migration failed after ${MAX_RETRIES} attempts`);
+        console.warn('⚠️  Migration will be skipped. You can run it manually later.');
+        // 在构建阶段，不退出进程，让构建继续
+        if (process.env.SKIP_MIGRATION_ON_ERROR === 'true') {
+          console.log('ℹ️  SKIP_MIGRATION_ON_ERROR=true, continuing build...');
+          process.exit(0);
+        }
         process.exit(1);
       }
     }
