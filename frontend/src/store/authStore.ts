@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: true,
               isLoading: false,
             });
-            toast.success(i18n.t('auth:messages.loginSuccess'));
+            // 移除登入成功提示，避免影響操作
           } else {
             throw new Error(response.message);
           }
@@ -71,7 +71,7 @@ export const useAuthStore = create<AuthStore>()(
               isAuthenticated: true,
               isLoading: false,
             });
-            toast.success(i18n.t('auth:messages.registerSuccess'));
+            // 移除註冊成功提示，避免影響操作
           } else {
             throw new Error(response.message);
           }
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthStore>()(
           console.error('Logout error:', error);
         } finally {
           get().clearAuth();
-          toast.success(i18n.t('auth:messages.logoutSuccess'));
+          // 移除登出成功提示，避免影響操作
         }
       },
 

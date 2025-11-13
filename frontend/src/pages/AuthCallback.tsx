@@ -57,12 +57,8 @@ const AuthCallback: React.FC = () => {
       
       fetchUserProfile();
       
-      toast.success('登录成功！');
-      
-      // 延迟跳转以确保 toast 显示
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
+      // 移除成功提示，直接跳轉避免影響操作
+      navigate('/');
     } else if (error) {
       // 根据错误类型显示友好的错误消息
       let toastMessage = '登录失败';
