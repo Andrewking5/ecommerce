@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../app';
+import { EmailService } from '../services/emailService';
 
 export class AuthController {
   // 用戶註冊
@@ -45,6 +46,14 @@ export class AuthController {
           provider: 'EMAIL', // 明确标记为邮箱注册
         },
       });
+
+      // 发送欢迎邮件
+      try {
+        await EmailService.sendWelcomeEmail(user.email, user.firstName);
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+        // 不阻止注册，只记录错误
+      }
 
       // 生成 JWT tokens
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);

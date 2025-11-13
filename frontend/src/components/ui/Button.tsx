@@ -27,9 +27,16 @@ const Button: React.FC<ButtonProps> = ({
   };
   
   const sizeClasses = {
-    sm: 'px-3 py-2 text-sm rounded-lg',
-    md: 'px-4 py-2 text-base rounded-xl',
-    lg: 'px-6 py-3 text-lg rounded-xl',
+    sm: 'px-3 py-2 text-sm rounded-lg min-h-[36px]',
+    md: 'px-4 py-2 text-base rounded-xl min-h-[44px]', // 移动端推荐最小触摸目标
+    lg: 'px-6 py-3 text-lg rounded-xl min-h-[48px]',
+  };
+
+  // 自动生成aria-label（如果children是纯文本）
+  const getAriaLabel = (): string | undefined => {
+    if (props['aria-label']) return props['aria-label'];
+    if (typeof children === 'string') return children;
+    return undefined;
   };
 
   return (
@@ -41,6 +48,8 @@ const Button: React.FC<ButtonProps> = ({
         className
       )}
       disabled={disabled || loading}
+      aria-label={getAriaLabel()}
+      aria-busy={loading}
       {...props}
     >
       {loading && (

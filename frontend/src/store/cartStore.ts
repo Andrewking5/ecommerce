@@ -42,22 +42,26 @@ export const useCartStore = create<CartStore>()(
         }
         
         get().calculateTotals();
-        toast.success(`${product.name} added to cart`);
+        // 使用更轻量的通知，不显示图标，更快消失
+        toast.success(`${product.name} 已加入購物車`, {
+          duration: 1500,
+          icon: null, // 移除图标，减少视觉干扰
+          style: {
+            fontSize: '13px',
+            padding: '10px 14px',
+          },
+        });
       },
 
       removeItem: (itemId: string) => {
-        const { items } = get();
-        const item = items.find(item => item.id === itemId);
-        
         set(state => ({
           items: state.items.filter(item => item.id !== itemId),
         }));
         
         get().calculateTotals();
         
-        if (item?.product) {
-          toast.success(`${item.product.name} removed from cart`);
-        }
+        // 移除商品时不显示toast，避免干扰操作
+        // 用户可以通过购物车图标的变化来感知操作成功
       },
 
       updateQuantity: (itemId: string, quantity: number) => {
@@ -77,7 +81,9 @@ export const useCartStore = create<CartStore>()(
 
       clearCart: () => {
         set({ items: [], total: 0, itemCount: 0 });
-        toast.success('Cart cleared');
+        toast.success('購物車已清空', {
+          duration: 2000,
+        });
       },
 
       calculateTotals: () => {

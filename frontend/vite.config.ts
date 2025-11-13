@@ -33,6 +33,14 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
+        ws: false, // 禁用 WebSocket 代理
+      },
+      // 代理 API 请求
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        ws: false,
       },
     },
   },

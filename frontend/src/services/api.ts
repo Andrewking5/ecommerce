@@ -21,10 +21,29 @@ class ApiClient {
 
     // 請求攔截器
     this.client.interceptors.request.use(
-      (config) => {
+      async (config) => {
         // 添加 Accept-Language header（預設為英文）
         const language = localStorage.getItem('i18nextLng') || 'en';
         config.headers['Accept-Language'] = language;
+        
+        // 优先使用内存中的token，如果没有则从localStorage加载
+        if (!this.token) {
+          const storedToken = localStorage.getItem('token');
+          if (storedToken) {
+            this.token = storedToken;
+          } else {
+            // 尝试从authStore获取token（如果存在）
+            try {
+              const { useAuthStore } = await import('@/store/authStore');
+              const authStore = useAuthStore.getState();
+              if (authStore.token) {
+                this.token = authStore.token;
+              }
+            } catch (e) {
+              // 忽略导入错误
+            }
+          }
+        }
         
         if (this.token) {
           config.headers.Authorization = `Bearer ${this.token}`;
@@ -38,24 +57,11 @@ class ApiClient {
             });
           }
         } else {
-          // 嘗試從 localStorage 重新加載 token（防止 token 丟失）
-          // 這確保即使內存中的 token 丟失，也能從 localStorage 恢復
-          const storedToken = localStorage.getItem('token');
-          if (storedToken) {
-            // 生產環境也輸出警告，幫助診斷
-            console.warn('⚠️ API Request: Token not in memory, reloading from localStorage', {
-              url: config.url,
-              hasStoredToken: !!storedToken,
-            });
-            this.token = storedToken;
-            config.headers.Authorization = `Bearer ${this.token}`;
-          } else {
-            // 生產環境也輸出警告
-            console.warn('⚠️ API Request without token:', {
-              url: config.url,
-              method: config.method,
-            });
-          }
+          // 生產環境也輸出警告
+          console.warn('⚠️ API Request without token:', {
+            url: config.url,
+            method: config.method,
+          });
         }
         // 如果是 FormData，不设置 Content-Type，让浏览器自动设置
         if (config.data instanceof FormData) {
@@ -158,11 +164,13 @@ class ApiClient {
               success: response.data?.success,
               hasAccessToken: !!response.data?.accessToken,
               hasRefreshToken: !!response.data?.refreshToken,
+              responseData: response.data, // 完整响应数据用于调试
             });
 
-            if (response.data.success && response.data.accessToken) {
+            // 检查响应格式：后端返回 { success: true, accessToken, refreshToken }
+            if (response.data && response.data.success && response.data.accessToken) {
               const newToken = response.data.accessToken;
-              const newRefreshToken = response.data.refreshToken;
+              const newRefreshToken = response.data.refreshToken || refreshToken; // 如果没有新的refreshToken，使用旧的
 
               console.log('✅ Token refreshed successfully, retrying request...', {
                 newTokenLength: newToken.length,
@@ -176,8 +184,29 @@ class ApiClient {
                 localStorage.setItem('refreshToken', newRefreshToken);
               }
 
+              // 同步更新 authStore（如果存在）
+              try {
+                const { useAuthStore } = await import('@/store/authStore');
+                const authStore = useAuthStore.getState();
+                authStore.setToken(newToken);
+                if (newRefreshToken) {
+                  useAuthStore.setState({ refreshToken: newRefreshToken });
+                }
+              } catch (e) {
+                // 如果导入失败，忽略（避免循环依赖）
+                console.warn('Could not update authStore:', e);
+              }
+
+              // 确保原始请求的配置对象存在
+              if (!originalRequest.headers) {
+                originalRequest.headers = {};
+              }
+              
               // 更新原始请求的 token
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              
+              // 清除重试标记，允许重试
+              delete originalRequest._retry;
 
               // 处理队列中的请求
               this.processQueue(null, newToken);

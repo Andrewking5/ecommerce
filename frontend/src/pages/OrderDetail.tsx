@@ -6,6 +6,7 @@ import { orderApi } from '@/services/orders';
 import { getImageUrl } from '@/utils/imageUrl';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { ArrowLeft, MapPin, CreditCard, Calendar } from 'lucide-react';
 
 const OrderDetail: React.FC = () => {
@@ -21,10 +22,7 @@ const OrderDetail: React.FC = () => {
   if (isLoading) {
     return (
       <div className="container-apple py-12">
-        <div className="flex justify-center items-center h-64">
-          <div className="spinner w-8 h-8"></div>
-          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
-        </div>
+        <LoadingSpinner size="lg" text={t('common:loading')} className="py-20" />
       </div>
     );
   }

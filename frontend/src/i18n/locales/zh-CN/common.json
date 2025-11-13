@@ -38,6 +38,7 @@
     "contact": "联系我们",
     "cart": "购物车",
     "profile": "个人资料",
+    "addresses": "地址管理",
     "orders": "订单",
     "admin": "管理后台"
   },
@@ -97,6 +98,35 @@
     "email": "电子邮件",
     "phone": "电话",
     "memberSince": "会员自"
+  },
+  "address": {
+    "title": "地址管理",
+    "addNew": "添加新地址",
+    "edit": "编辑地址",
+    "delete": "删除地址",
+    "setDefault": "设为默认",
+    "default": "默认地址",
+    "recipientName": "收件人姓名",
+    "phone": "联系电话",
+    "province": "省份",
+    "city": "城市",
+    "district": "区县",
+    "street": "详细地址",
+    "zipCode": "邮编",
+    "label": "地址标签",
+    "isDefault": "设为默认地址",
+    "noAddresses": "还没有保存的地址",
+    "addFirst": "添加地址后，结账时可以直接选择",
+    "selectAddress": "选择收货地址",
+    "shippingAddress": "收货地址",
+    "billingAddress": "账单地址",
+    "useSameAddress": "使用相同地址作为账单地址",
+    "labels": {
+      "home": "家",
+      "company": "公司",
+      "school": "学校",
+      "other": "其他"
+    }
   }
 }
 

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
 import { ProductBasic } from '../types/prisma';
+import { Decimal } from '@prisma/client/runtime/library';
+import { EmailService } from '../services/emailService';
 
 export class OrderController {
   // 獲取用戶訂單
@@ -108,7 +110,43 @@ export class OrderController {
   static async createOrder(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
-      const { items, shippingAddress, billingAddress, paymentMethod } = req.body;
+      const {
+        items,
+        shippingAddress,
+        billingAddress,
+        paymentMethod,
+        couponCode,
+        shippingCost,
+        addressId, // 地址ID，如果提供则使用保存的地址
+      } = req.body;
+
+      // 如果提供了addressId，从地址簿获取地址
+      let finalShippingAddress = shippingAddress;
+      if (addressId) {
+        const savedAddress = await prisma.userAddress.findFirst({
+          where: {
+            id: addressId,
+            userId, // 确保地址属于当前用户
+          },
+        });
+
+        if (!savedAddress) {
+          res.status(404).json({
+            success: false,
+            message: 'Address not found',
+          });
+          return;
+        }
+
+        // 转换为订单地址格式
+        finalShippingAddress = {
+          street: `${savedAddress.province}${savedAddress.city}${savedAddress.district}${savedAddress.street}`,
+          city: savedAddress.city,
+          state: savedAddress.province,
+          zipCode: savedAddress.zipCode || '',
+          country: '中国',
+        };
+      }
 
       // 驗證商品庫存
       const productIds = items.map((item: any) => item.productId);
@@ -135,11 +173,88 @@ export class OrderController {
         }
       }
 
-      // 計算總金額
-      const totalAmount = items.reduce((sum: number, item: any) => {
+      // 計算商品總金額
+      const subtotal = items.reduce((sum: number, item: any) => {
         const product = products.find((p: ProductBasic) => p.id === item.productId);
-        return sum + (Number(product!.price) * item.quantity);
+        return sum + Number(product!.price) * item.quantity;
       }, 0);
+
+      // 驗證並計算優惠券折扣
+      let discountAmount = 0;
+      let validatedCouponCode = null;
+
+      if (couponCode) {
+        const coupon = await prisma.coupon.findUnique({
+          where: { code: couponCode },
+        });
+
+        if (!coupon) {
+          res.status(400).json({
+            success: false,
+            message: 'Invalid coupon code',
+          });
+          return;
+        }
+
+        // 驗證優惠券
+        const now = new Date();
+        if (!coupon.isActive) {
+          res.status(400).json({
+            success: false,
+            message: 'Coupon is not active',
+          });
+          return;
+        }
+
+        if (now < coupon.validFrom || now > coupon.validUntil) {
+          res.status(400).json({
+            success: false,
+            message: 'Coupon is not valid at this time',
+          });
+          return;
+        }
+
+        if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+          res.status(400).json({
+            success: false,
+            message: 'Coupon usage limit reached',
+          });
+          return;
+        }
+
+        if (coupon.minPurchase && subtotal < Number(coupon.minPurchase)) {
+          res.status(400).json({
+            success: false,
+            message: `Minimum purchase amount of $${coupon.minPurchase} required`,
+          });
+          return;
+        }
+
+        // 計算折扣
+        if (coupon.type === 'PERCENTAGE') {
+          discountAmount = (subtotal * Number(coupon.value)) / 100;
+          if (coupon.maxDiscount) {
+            discountAmount = Math.min(discountAmount, Number(coupon.maxDiscount));
+          }
+        } else {
+          discountAmount = Number(coupon.value);
+        }
+
+        discountAmount = Math.min(discountAmount, subtotal); // 折扣不能超过商品总额
+        validatedCouponCode = couponCode;
+      }
+
+      // 計算運費（如果未提供，使用默認值或免費）
+      const calculatedShippingCost = shippingCost !== undefined
+        ? Number(shippingCost)
+        : subtotal >= 100 ? 0 : 10; // 滿100免運費
+
+      // 計算稅費（假設稅率為8%）
+      const taxRate = 0.08;
+      const taxAmount = (subtotal - discountAmount + calculatedShippingCost) * taxRate;
+
+      // 計算總金額
+      const totalAmount = subtotal - discountAmount + calculatedShippingCost + taxAmount;
 
       // 創建訂單
       const order = await prisma.order.create({
@@ -152,9 +267,13 @@ export class OrderController {
               price: products.find((p: ProductBasic) => p.id === item.productId)!.price,
             })),
           },
-          shippingAddress,
-          billingAddress: billingAddress || shippingAddress,
-          totalAmount,
+          shippingAddress: finalShippingAddress,
+          billingAddress: billingAddress || finalShippingAddress,
+          totalAmount: new Decimal(totalAmount),
+          shippingCost: new Decimal(calculatedShippingCost),
+          taxAmount: new Decimal(taxAmount),
+          discountAmount: discountAmount > 0 ? new Decimal(discountAmount) : null,
+          couponCode: validatedCouponCode,
           status: 'PENDING',
           paymentMethod,
         },
@@ -174,6 +293,18 @@ export class OrderController {
         },
       });
 
+      // 更新優惠券使用次數
+      if (validatedCouponCode) {
+        await prisma.coupon.update({
+          where: { code: validatedCouponCode },
+          data: {
+            usedCount: {
+              increment: 1,
+            },
+          },
+        });
+      }
+
       // 更新商品庫存
       await Promise.all(
         items.map((item: any) =>
@@ -187,6 +318,26 @@ export class OrderController {
           })
         )
       );
+
+      // 发送订单确认邮件
+      try {
+        if (order.user && order.orderItems) {
+          await EmailService.sendOrderConfirmation(order.user.email, {
+            orderId: order.id,
+            orderNumber: order.id.substring(0, 8).toUpperCase(),
+            totalAmount: Number(order.totalAmount),
+            items: order.orderItems.map((item: any) => ({
+              name: item.product.name,
+              quantity: item.quantity,
+              price: Number(item.price),
+            })),
+            shippingAddress: order.shippingAddress,
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send order confirmation email:', emailError);
+        // 不阻止订单创建，只记录错误
+      }
 
       res.status(201).json({
         success: true,
@@ -343,6 +494,20 @@ export class OrderController {
           user: true,
         },
       });
+
+      // 发送订单状态更新邮件
+      try {
+        if (order.user) {
+          await EmailService.sendOrderStatusUpdate(order.user.email, {
+            orderId: order.id,
+            orderNumber: order.id.substring(0, 8).toUpperCase(),
+            status: order.status,
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send order status update email:', emailError);
+        // 不阻止状态更新，只记录错误
+      }
 
       res.json({
         success: true,

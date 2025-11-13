@@ -28,6 +28,10 @@ import healthRoutes from './routes/health';
 import adminRoutes from './routes/admin';
 import categoryRoutes from './routes/categories';
 import inventoryRoutes from './routes/inventory';
+import paymentRoutes from './routes/payment';
+import couponRoutes from './routes/coupons';
+import reviewRoutes from './routes/reviews';
+import addressRoutes from './routes/addresses';
 
 // 初始化 Prisma 客戶端
 // 注意：在 Render 上，数据库连接可能会因为空闲而关闭
@@ -108,7 +112,18 @@ app.use(cors({
 }));
 
 // 壓縮回應
-app.use(compression());
+// 响应压缩 - 优化API响应大小
+app.use(compression({
+  filter: (req, res) => {
+    // 只压缩文本类型的响应
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6, // 压缩级别 (1-9, 6是平衡点)
+  threshold: 1024, // 只压缩大于1KB的响应
+}));
 
 // 請求限制
 app.use(generalLimiter);
@@ -163,6 +178,10 @@ app.use('/api/health', healthRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/categories', categoryRoutes);
 app.use('/api/admin/inventory', inventoryRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/addresses', addressRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

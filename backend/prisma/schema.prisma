@@ -30,13 +30,21 @@ model User {
   // 国际化相关
   preferredLanguage String?  @default("en") // 用户语言偏好: en, zh-TW, zh-CN, ja
   
+  // AI推荐相关
+  viewedProducts Json?       // 浏览历史
+  preferences    Json?       // 用户偏好
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // 關聯
-  orders   Order[]
-  reviews  Review[]
-  cartItems CartItem[]
+  orders         Order[]
+  reviews        Review[]
+  cartItems      CartItem[]
+  userBehaviors  UserBehavior[]
+  chatMessages   ChatMessage[]
+  subscriptions Subscription[]
+  addresses      UserAddress[]
 
   @@map("users")
   @@index([provider, providerId]) // 为社交登录查询优化
@@ -57,6 +65,8 @@ model Category {
   products Product[]
 
   @@map("categories")
+  @@index([isActive])
+  @@index([slug])
 }
 
 // 商品模型
@@ -69,17 +79,26 @@ model Product {
   images       String[]
   stock        Int      @default(0)
   specifications Json?
+  model3dUrl   String?  // 3D模型URL
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // 關聯
-  category   Category    @relation(fields: [categoryId], references: [id])
-  orderItems OrderItem[]
-  reviews    Review[]
-  cartItems  CartItem[]
+  category      Category       @relation(fields: [categoryId], references: [id])
+  orderItems    OrderItem[]
+  reviews       Review[]
+  cartItems     CartItem[]
+  userBehaviors UserBehavior[]
+  subscriptions Subscription[]
 
   @@map("products")
+  @@index([categoryId])
+  @@index([isActive])
+  @@index([price])
+  @@index([stock])
+  @@index([createdAt])
+  @@index([categoryId, isActive]) // 复合索引：按分类和状态查询
 }
 
 // 訂單模型
@@ -88,6 +107,10 @@ model Order {
   userId        String
   status        OrderStatus @default(PENDING)
   totalAmount   Decimal     @db.Decimal(10, 2)
+  shippingCost  Decimal?    @db.Decimal(10, 2)
+  taxAmount     Decimal?    @db.Decimal(10, 2)
+  discountAmount Decimal?   @db.Decimal(10, 2)
+  couponCode    String?
   shippingAddress Json
   billingAddress  Json?
   paymentMethod String
@@ -98,8 +121,12 @@ model Order {
   // 關聯
   user      User        @relation(fields: [userId], references: [id])
   orderItems OrderItem[]
+  payments   Payment[]
 
   @@map("orders")
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // 訂單項目模型
@@ -115,17 +142,23 @@ model OrderItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@map("order_items")
+  @@index([orderId])
+  @@index([productId])
 }
 
 // 商品評論模型
 model Review {
-  id        String   @id @default(cuid())
-  productId String
-  userId    String
-  rating    Int      @db.SmallInt
-  comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  productId   String
+  userId      String
+  rating      Int       @db.SmallInt
+  comment     String?
+  images      String[]  // 评论图片
+  isVerified  Boolean   @default(false) // 是否已验证购买
+  helpfulCount Int      @default(0)     // 有用数
+  isApproved  Boolean   @default(false) // 管理员审核状态
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // 關聯
   product Product @relation(fields: [productId], references: [id])
@@ -133,6 +166,10 @@ model Review {
 
   @@unique([productId, userId])
   @@map("reviews")
+  @@index([productId])
+  @@index([userId])
+  @@index([isApproved])
+  @@index([rating])
 }
 
 // 購物車項目模型
@@ -148,6 +185,8 @@ model CartItem {
 
   @@unique([userId, productId])
   @@map("cart_items")
+  @@index([userId])
+  @@index([productId])
 }
 
 // 枚舉定義
@@ -171,6 +210,179 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
   REFUNDED
+}
+
+// 优惠券模型
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  type        CouponType
+  value       Decimal   @db.Decimal(10, 2)
+  minPurchase Decimal?  @db.Decimal(10, 2)
+  maxDiscount Decimal?  @db.Decimal(10, 2)
+  usageLimit  Int?      // 使用次数限制
+  usedCount   Int       @default(0)
+  validFrom   DateTime
+  validUntil  DateTime
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("coupons")
+  @@index([code])
+  @@index([isActive])
+}
+
+// 支付记录模型
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("usd")
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String
+  stripePaymentIntentId String? @unique
+  stripeChargeId       String?
+  refundAmount  Decimal?      @db.Decimal(10, 2)
+  refundReason  String?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // 關聯
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+  @@index([orderId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
+  @@index([createdAt])
+}
+
+// 用户行为模型
+model UserBehavior {
+  id        String          @id @default(cuid())
+  userId    String
+  productId String
+  action    BehaviorAction
+  metadata  Json?
+  timestamp DateTime        @default(now())
+
+  // 關聯
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("user_behaviors")
+  @@index([userId])
+  @@index([productId])
+  @@index([action])
+  @@index([timestamp])
+}
+
+// 聊天消息模型
+model ChatMessage {
+  id        String        @id @default(cuid())
+  userId    String
+  adminId   String?
+  message   String
+  type      MessageType   @default(USER)
+  isRead    Boolean       @default(false)
+  metadata  Json?
+  createdAt DateTime      @default(now())
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+  @@index([userId])
+  @@index([adminId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// 订阅模型
+model Subscription {
+  id              String            @id @default(cuid())
+  userId          String
+  productId       String
+  frequency       SubscriptionFrequency
+  nextDeliveryDate DateTime
+  isActive        Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // 關聯
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+  @@index([userId])
+  @@index([productId])
+  @@index([isActive])
+  @@index([nextDeliveryDate])
+}
+
+// 优惠券类型枚举
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+// 支付状态枚举
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+// 用户行为动作枚举
+enum BehaviorAction {
+  VIEW
+  ADD_TO_CART
+  PURCHASE
+  REMOVE_FROM_CART
+  SEARCH
+}
+
+// 消息类型枚举
+enum MessageType {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+// 订阅频率枚举
+enum SubscriptionFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+}
+
+// 用户地址模型
+model UserAddress {
+  id            String   @id @default(cuid())
+  userId        String
+  recipientName String   // 收件人姓名
+  phone         String   // 联系电话
+  province      String   // 省
+  city          String   // 市
+  district      String   // 区
+  street        String   // 详细地址
+  zipCode       String?  // 邮编
+  label         String? // 标签：家/公司/学校/自定义
+  isDefault     Boolean  @default(false) // 是否默认地址
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_addresses")
+  @@index([userId])
+  @@index([userId, isDefault])
 }
 
 

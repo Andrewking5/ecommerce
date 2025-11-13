@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { productApi } from '@/services/products';
 import Button from '@/components/ui/Button';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCardSkeleton from '@/components/common/ProductCardSkeleton';
+import EmptyState from '@/components/common/EmptyState';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import ProductFilterSidebar from '@/components/product/ProductFilterSidebar';
 import ProductSearchBar from '@/components/product/ProductSearchBar';
 import { Filter, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -111,9 +114,9 @@ const Products: React.FC = () => {
   }, [data]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50" aria-label={t('products:title', { defaultValue: 'Products' })}>
       {/* 顶部搜索栏 */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-30" role="banner">
         <div className="container-apple py-6">
           <ProductSearchBar
             value={searchQuery}
@@ -122,7 +125,7 @@ const Products: React.FC = () => {
             onClear={clearFilters}
           />
         </div>
-      </div>
+      </header>
 
       <div className="container-apple py-8">
         <div className="flex flex-col lg:flex-row gap-8">
@@ -202,32 +205,28 @@ const Products: React.FC = () => {
 
             {/* 商品列表 */}
             {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="spinner w-8 h-8"></div>
-                <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : error ? (
-              <div className="text-center py-12">
-                <h2 className="heading-2 mb-4">{t('common:error')}</h2>
-                <p className="text-text-secondary">{t('common:error', { defaultValue: 'Please try again later.' })}</p>
-              </div>
+              <ErrorMessage
+                title={t('common:error', { defaultValue: 'Error' })}
+                message={t('common:error', { defaultValue: 'Failed to load products. Please try again later.' })}
+                onRetry={() => window.location.reload()}
+              />
             ) : products.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="max-w-md mx-auto">
-                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Filter size={40} className="text-text-tertiary" />
-                  </div>
-                  <h2 className="heading-2 mb-4">{t('products:filter.noResults', { defaultValue: 'No products found' })}</h2>
-                  <p className="text-text-secondary mb-6">
-                    {t('products:filter.tryDifferentFilters', { defaultValue: 'Try adjusting your filters or search terms' })}
-                  </p>
-                  {hasActiveFilters && (
-                    <Button onClick={clearFilters} variant="outline">
-                      {t('common:buttons.clearAll', { defaultValue: 'Clear All Filters' })}
-                    </Button>
-                  )}
-                </div>
-              </div>
+              <EmptyState
+                icon="search"
+                title={t('products:filter.noResults', { defaultValue: 'No products found' })}
+                description={t('products:filter.tryDifferentFilters', { defaultValue: 'Try adjusting your filters or search terms' })}
+                action={hasActiveFilters ? (
+                  <Button onClick={clearFilters} variant="outline">
+                    {t('common:buttons.clearAll', { defaultValue: 'Clear All Filters' })}
+                  </Button>
+                ) : undefined}
+              />
             ) : (
               <>
                 <motion.div
@@ -315,7 +314,7 @@ const Products: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

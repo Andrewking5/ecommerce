@@ -2,10 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Star, Shield, Truck, Loader2 } from 'lucide-react';
+import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCardSkeleton from '@/components/common/ProductCardSkeleton';
 import { productApi } from '@/services/products';
 
 const Home: React.FC = () => {
@@ -23,12 +24,12 @@ const Home: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen" aria-label={t('common:home.title', { defaultValue: 'Home' })}>
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white py-20">
+      <section className="bg-gradient-to-b from-gray-50 to-white py-20" aria-labelledby="hero-title">
         <div className="container-apple">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="heading-1 mb-6">
+            <h1 id="hero-title" className="heading-1 mb-6">
               {t('common:hero.title')}
             </h1>
             <p className="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
@@ -107,9 +108,10 @@ const Home: React.FC = () => {
             </div>
 
             {productsLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
-                <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <ProductCardSkeleton key={index} />
+                ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -194,7 +196,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 

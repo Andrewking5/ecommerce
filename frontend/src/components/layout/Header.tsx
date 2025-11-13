@@ -62,7 +62,10 @@ const Header: React.FC = () => {
             </div>
 
             {/* Search */}
-            <button className="p-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
+            <button 
+              className="p-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
+              aria-label={t('buttons.search')}
+            >
               <Search size={20} />
             </button>
 
@@ -70,10 +73,11 @@ const Header: React.FC = () => {
             <Link
               to="/cart"
               className="relative p-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
+              aria-label={`${t('navigation.cart')}${itemCount > 0 ? ` (${itemCount} items)` : ''}`}
             >
               <ShoppingCart size={20} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-blue text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-brand-blue text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" aria-hidden="true">
                   {itemCount}
                 </span>
               )}
@@ -160,6 +164,8 @@ const Header: React.FC = () => {
             <button
               className="md:hidden p-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? t('buttons.close') : t('buttons.openMenu', { defaultValue: 'Open menu' })}
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>

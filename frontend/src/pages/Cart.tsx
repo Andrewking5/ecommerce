@@ -5,7 +5,8 @@ import { useCartStore } from '@/store/cartStore';
 import { getImageUrl } from '@/utils/imageUrl';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import EmptyState from '@/components/common/EmptyState';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 
 const Cart: React.FC = () => {
   const { t } = useTranslation(['cart', 'common']);
@@ -14,22 +15,22 @@ const Cart: React.FC = () => {
   if (items.length === 0) {
     return (
       <div className="container-apple py-12">
-        <div className="text-center max-w-md mx-auto">
-          <ShoppingBag size={64} className="mx-auto text-gray-400 mb-6" />
-          <h2 className="heading-2 mb-4">{t('cart:empty')}</h2>
-          <p className="text-text-secondary mb-8">
-            {t('cart:emptyDescription')}
-          </p>
-          <Link to="/products">
-            <Button size="lg">{t('common:buttons.shopNow')}</Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon="cart"
+          title={t('cart:empty', { defaultValue: 'Your cart is empty' })}
+          description={t('cart:emptyDescription', { defaultValue: 'Add some products to your cart to get started' })}
+          action={
+            <Link to="/products">
+              <Button size="lg">{t('common:buttons.shopNow', { defaultValue: 'Shop Now' })}</Button>
+            </Link>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="container-apple py-12">
+    <main className="container-apple py-12" aria-label={t('cart:title', { defaultValue: 'Shopping Cart' })}>
       <div className="flex justify-between items-center mb-8">
         <h1 className="heading-1">{t('cart:title')}</h1>
         <Button variant="outline" onClick={clearCart}>
@@ -61,23 +62,26 @@ const Cart: React.FC = () => {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                        aria-label={t('common:buttons.decreaseQuantity', { defaultValue: 'Decrease quantity' })}
                       >
-                        <Minus size={16} />
+                        <Minus size={16} aria-hidden="true" />
                       </button>
-                      <span className="w-8 text-center font-medium">
+                      <span className="w-8 text-center font-medium" aria-label={t('common:quantity', { defaultValue: 'Quantity' })}>
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                        aria-label={t('common:buttons.increaseQuantity', { defaultValue: 'Increase quantity' })}
                       >
-                        <Plus size={16} />
+                        <Plus size={16} aria-hidden="true" />
                       </button>
                     </div>
                     
                     {/* Remove Button */}
                     <button
                       onClick={() => removeItem(item.id)}
+                      aria-label={t('common:buttons.removeFromCart', { defaultValue: 'Remove from cart' })}
                       className="text-red-500 hover:text-red-700 transition-colors duration-200"
                     >
                       <Trash2 size={16} />
@@ -122,9 +126,11 @@ const Cart: React.FC = () => {
             </div>
             
             <div className="space-y-3">
-              <Button size="lg" className="w-full">
-                {t('cart:checkout')}
-              </Button>
+              <Link to="/checkout" className="block">
+                <Button size="lg" className="w-full">
+                  {t('cart:checkout')}
+                </Button>
+              </Link>
               <Link to="/products" className="block">
                 <Button variant="outline" size="lg" className="w-full">
                   {t('cart:continueShopping')}
@@ -140,7 +146,7 @@ const Cart: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

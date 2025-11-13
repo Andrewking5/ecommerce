@@ -631,15 +631,22 @@ const AdminProducts: React.FC = () => {
               />
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">{t('products.modal.descriptionLabel')}</label>
+                <label htmlFor="description" className="block text-sm font-medium text-text-primary mb-2">
+                  {t('products.modal.descriptionLabel')}
+                </label>
                 <textarea
+                  id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
                   rows={4}
                   required
                   placeholder={t('products.modal.descriptionPlaceholder')}
+                  aria-describedby="description-helper"
                 />
+                <p id="description-helper" className="mt-1 text-xs text-text-tertiary">
+                  {t('products.modal.descriptionHelper', { defaultValue: 'Provide a detailed description of the product' })}
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

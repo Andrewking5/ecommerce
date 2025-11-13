@@ -38,6 +38,7 @@
     "contact": "お問い合わせ",
     "cart": "カート",
     "profile": "プロフィール",
+    "addresses": "住所管理",
     "orders": "注文",
     "admin": "管理パネル"
   },
@@ -97,6 +98,35 @@
     "email": "メール",
     "phone": "電話",
     "memberSince": "メンバー登録日"
+  },
+  "address": {
+    "title": "住所管理",
+    "addNew": "新しい住所を追加",
+    "edit": "住所を編集",
+    "delete": "住所を削除",
+    "setDefault": "デフォルトに設定",
+    "default": "デフォルト住所",
+    "recipientName": "受取人名",
+    "phone": "電話番号",
+    "province": "都道府県",
+    "city": "市区町村",
+    "district": "区",
+    "street": "詳細住所",
+    "zipCode": "郵便番号",
+    "label": "住所ラベル",
+    "isDefault": "デフォルト住所に設定",
+    "noAddresses": "保存された住所がまだありません",
+    "addFirst": "住所を追加すると、チェックアウト時に直接選択できます",
+    "selectAddress": "配送先住所を選択",
+    "shippingAddress": "配送先住所",
+    "billingAddress": "請求先住所",
+    "useSameAddress": "請求先住所として同じ住所を使用",
+    "labels": {
+      "home": "自宅",
+      "company": "会社",
+      "school": "学校",
+      "other": "その他"
+    }
   }
 }
 

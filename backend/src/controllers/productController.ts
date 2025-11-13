@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
 import { ProductWithRelations, ReviewWithRating } from '../types/prisma';
+import { CacheService, CACHE_KEYS } from '../services/cacheService';
+import { asyncHandler, sendErrorResponse } from '../utils/errorHandler';
 
 export class ProductController {
   // 獲取商品列表
@@ -102,6 +104,33 @@ export class ProductController {
         : 'createdAt';
       const sortDirection = sortOrder === 'asc' ? 'asc' : 'desc';
 
+      // 生成缓存键（仅对公开查询使用缓存）
+      const isPublicQuery = !authReq.user || authReq.user.role !== 'ADMIN';
+      const cacheKey = isPublicQuery 
+        ? CacheService.generateKey(CACHE_KEYS.PRODUCTS, {
+            page: Number(page),
+            limit: Number(limit),
+            category: category || categoryId || '',
+            search: search || '',
+            sortBy: sortField,
+            sortOrder: sortDirection,
+            minPrice: minPrice || '',
+            maxPrice: maxPrice || '',
+          })
+        : null;
+
+      // 尝试从缓存获取（仅公开查询）
+      if (cacheKey && isPublicQuery) {
+        const cached = CacheService.get<any>(cacheKey);
+        if (cached) {
+          res.json({
+            success: true,
+            data: cached,
+          });
+          return;
+        }
+      }
+
       // 執行查詢
       const [products, total] = await Promise.all([
         prisma.product.findMany({
@@ -130,55 +159,28 @@ export class ProductController {
         reviewCount: product.reviews.length,
       }));
 
+      const responseData = {
+        products: productsWithRating,
+        pagination: {
+          page: Number(page),
+          limit: Number(limit),
+          total,
+          totalPages: Math.ceil(total / Number(limit)),
+        },
+      };
+
+      // 缓存结果（仅公开查询，缓存2分钟）
+      if (cacheKey && isPublicQuery) {
+        CacheService.set(cacheKey, responseData, 120);
+      }
+
       res.json({
         success: true,
-        data: {
-          products: productsWithRating,
-          pagination: {
-            page: Number(page),
-            limit: Number(limit),
-            total,
-            totalPages: Math.ceil(total / Number(limit)),
-          },
-        },
+        data: responseData,
       });
       return;
     } catch (error: any) {
-      console.error('❌ Get products error:', error);
-      console.error('Error details:', {
-        message: error?.message,
-        code: error?.code,
-        meta: error?.meta,
-        stack: error?.stack?.split('\n').slice(0, 5).join('\n'), // 只顯示前5行堆棧
-      });
-      
-      // 如果是 Prisma 錯誤，提供更詳細的信息
-      if (error?.code === 'P2002') {
-        res.status(400).json({
-          success: false,
-          message: req.t('products:errors.uniqueConstraintViolation'),
-          details: error?.meta,
-        });
-        return;
-      }
-      
-      if (error?.code === 'P2025') {
-        res.status(404).json({
-          success: false,
-          message: req.t('products:errors.recordNotFound'),
-        });
-        return;
-      }
-
-      res.status(500).json({
-        success: false,
-        message: error?.message || req.t('common:errors.internalServerError'),
-        ...(process.env.NODE_ENV !== 'production' && { 
-          error: error?.stack,
-          code: error?.code,
-          meta: error?.meta,
-        }),
-      });
+      sendErrorResponse(res, error, req);
       return;
     }
   }
@@ -187,6 +189,17 @@ export class ProductController {
   static async getProductById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+
+      // 尝试从缓存获取（缓存3分钟）
+      const cacheKey = `${CACHE_KEYS.PRODUCT}:${id}`;
+      const cached = CacheService.get<any>(cacheKey);
+      if (cached) {
+        res.json({
+          success: true,
+          data: cached,
+        });
+        return;
+      }
 
       const product = await prisma.product.findUnique({
         where: { id, isActive: true },
@@ -198,10 +211,12 @@ export class ProductController {
                 select: {
                   firstName: true,
                   lastName: true,
+                  avatar: true,
                 },
               },
             },
             orderBy: { createdAt: 'desc' },
+            take: 50, // 限制评论数量，避免数据过大
           },
         },
       });
@@ -213,6 +228,9 @@ export class ProductController {
         });
         return;
       }
+
+      // 缓存商品详情（3分钟）
+      CacheService.set(cacheKey, product, 180);
 
       res.json({
         success: true,
@@ -367,6 +385,10 @@ export class ProductController {
         },
       });
 
+      // 清除相关缓存
+      CacheService.delete(CACHE_KEYS.CATEGORIES);
+      CacheService.deleteByPrefix(CACHE_KEYS.PRODUCTS);
+
       res.status(201).json({
         success: true,
         message: req.t('products:success.created'),
@@ -451,6 +473,11 @@ export class ProductController {
         where: { id },
         data: { isActive: false },
       });
+
+      // 清除相关缓存
+      CacheService.delete(`${CACHE_KEYS.PRODUCT}:${id}`);
+      CacheService.delete(CACHE_KEYS.CATEGORIES);
+      CacheService.deleteByPrefix(CACHE_KEYS.PRODUCTS);
 
       res.json({
         success: true,

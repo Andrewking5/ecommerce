@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ProductImageGallery from '@/components/product/ProductImageGallery';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { ShoppingCart, Star, ArrowLeft, Minus, Plus, Heart, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
 
@@ -26,10 +27,7 @@ const ProductDetail: React.FC = () => {
   if (isLoading) {
     return (
       <div className="container-apple py-12">
-        <div className="flex justify-center items-center h-64">
-          <div className="spinner w-8 h-8"></div>
-          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
-        </div>
+        <LoadingSpinner size="lg" text={t('common:loading')} className="py-20" />
       </div>
     );
   }
@@ -49,7 +47,7 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <div className="container-apple py-12">
+    <main className="container-apple py-12" aria-label={t('products:detail.title', { defaultValue: 'Product Details' })}>
       <div className="mb-6">
         <Link
           to="/products"
@@ -236,7 +234,7 @@ const ProductDetail: React.FC = () => {
           excludeProductId={product.id} 
         />
       )}
-    </div>
+    </main>
   );
 };
 

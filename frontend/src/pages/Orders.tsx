@@ -6,6 +6,9 @@ import { orderApi } from '@/services/orders';
 import { getImageUrl } from '@/utils/imageUrl';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { Package, Calendar, DollarSign } from 'lucide-react';
 
 const Orders: React.FC = () => {
@@ -18,10 +21,7 @@ const Orders: React.FC = () => {
   if (isLoading) {
     return (
       <div className="container-apple py-12">
-        <div className="flex justify-center items-center h-64">
-          <div className="spinner w-8 h-8"></div>
-          <span className="ml-2 text-text-secondary">{t('common:loading')}</span>
-        </div>
+        <LoadingSpinner size="lg" text={t('common:loading')} className="py-20" />
       </div>
     );
   }
@@ -29,10 +29,11 @@ const Orders: React.FC = () => {
   if (error) {
     return (
       <div className="container-apple py-12">
-        <div className="text-center">
-          <h2 className="heading-2 mb-4">{t('common:error')}</h2>
-          <p className="text-text-secondary">{t('common:error', { defaultValue: 'Please try again later.' })}</p>
-        </div>
+        <ErrorMessage
+          title={t('common:error', { defaultValue: 'Error' })}
+          message={t('common:error', { defaultValue: 'Failed to load orders. Please try again later.' })}
+          onRetry={() => window.location.reload()}
+        />
       </div>
     );
   }
@@ -40,20 +41,20 @@ const Orders: React.FC = () => {
   const orders = data?.orders || [];
 
   return (
-    <div className="container-apple py-12">
+    <main className="container-apple py-12" aria-label={t('orders:title', { defaultValue: 'Orders' })}>
       <h1 className="heading-1 mb-8">{t('orders:title')}</h1>
 
       {orders.length === 0 ? (
-        <Card className="p-12 text-center">
-          <Package size={64} className="mx-auto text-gray-400 mb-6" />
-          <h2 className="heading-2 mb-4">{t('orders:noOrders')}</h2>
-          <p className="text-text-secondary mb-8">
-            {t('orders:noOrders', { defaultValue: 'You haven\'t placed any orders yet. Start shopping to see your orders here.' })}
-          </p>
-          <Link to="/products">
-            <Button size="lg">{t('common:buttons.shopNow')}</Button>
-          </Link>
-        </Card>
+        <EmptyState
+          icon="package"
+          title={t('orders:noOrders', { defaultValue: 'No orders yet' })}
+          description={t('orders:noOrders', { defaultValue: 'You haven\'t placed any orders yet. Start shopping to see your orders here.' })}
+          action={
+            <Link to="/products">
+              <Button size="lg">{t('common:buttons.shopNow', { defaultValue: 'Shop Now' })}</Button>
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-6">
           {orders.map((order) => (
@@ -122,7 +123,7 @@ const Orders: React.FC = () => {
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

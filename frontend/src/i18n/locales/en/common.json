@@ -45,6 +45,7 @@
     "contact": "Contact",
     "cart": "Cart",
     "profile": "Profile",
+    "addresses": "Addresses",
     "orders": "Orders",
     "admin": "Admin Panel"
   },
@@ -105,5 +106,34 @@
     "email": "Email",
     "phone": "Phone",
     "memberSince": "Member since"
+  },
+  "address": {
+    "title": "Address Management",
+    "addNew": "Add New Address",
+    "edit": "Edit Address",
+    "delete": "Delete Address",
+    "setDefault": "Set as Default",
+    "default": "Default Address",
+    "recipientName": "Recipient Name",
+    "phone": "Phone Number",
+    "province": "Province",
+    "city": "City",
+    "district": "District",
+    "street": "Street Address",
+    "zipCode": "Zip Code",
+    "label": "Address Label",
+    "isDefault": "Set as Default Address",
+    "noAddresses": "No saved addresses yet",
+    "addFirst": "Add an address to select it directly during checkout",
+    "selectAddress": "Select Shipping Address",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "useSameAddress": "Use same address for billing",
+    "labels": {
+      "home": "Home",
+      "company": "Company",
+      "school": "School",
+      "other": "Other"
+    }
   }
 }

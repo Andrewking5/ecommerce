@@ -43,6 +43,7 @@
     "contact": "聯絡我們",
     "cart": "購物車",
     "profile": "個人資料",
+    "addresses": "地址管理",
     "orders": "訂單",
     "admin": "管理後台"
   },
@@ -102,5 +103,34 @@
     "email": "電子郵件",
     "phone": "電話",
     "memberSince": "會員自"
+  },
+  "address": {
+    "title": "地址管理",
+    "addNew": "添加新地址",
+    "edit": "編輯地址",
+    "delete": "刪除地址",
+    "setDefault": "設為默認",
+    "default": "默認地址",
+    "recipientName": "收件人姓名",
+    "phone": "聯繫電話",
+    "province": "省份",
+    "city": "城市",
+    "district": "區縣",
+    "street": "詳細地址",
+    "zipCode": "郵編",
+    "label": "地址標籤",
+    "isDefault": "設為默認地址",
+    "noAddresses": "還沒有保存的地址",
+    "addFirst": "添加地址後，結賬時可以直接選擇",
+    "selectAddress": "選擇收貨地址",
+    "shippingAddress": "收貨地址",
+    "billingAddress": "賬單地址",
+    "useSameAddress": "使用相同地址作為賬單地址",
+    "labels": {
+      "home": "家",
+      "company": "公司",
+      "school": "學校",
+      "other": "其他"
+    }
   }
 }

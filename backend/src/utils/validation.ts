@@ -72,6 +72,51 @@ export const schemas = {
       country: Joi.string().required(),
     }).optional(),
     paymentMethod: Joi.string().valid('stripe', 'paypal').required(),
+    couponCode: Joi.string().optional(),
+    shippingCost: Joi.number().min(0).optional(),
+    addressId: Joi.string().optional(), // 地址ID，如果提供则使用保存的地址
+  }),
+
+  // 地址创建/更新
+  address: Joi.object({
+    recipientName: Joi.string().min(2).max(50).required()
+      .messages({
+        'string.min': 'Recipient name must be at least 2 characters',
+        'string.max': 'Recipient name must not exceed 50 characters',
+        'any.required': 'Recipient name is required',
+      }),
+    phone: Joi.string().pattern(/^[0-9+\-\s()]+$/).required()
+      .messages({
+        'string.pattern.base': 'Phone number format is invalid',
+        'any.required': 'Phone number is required',
+      }),
+    province: Joi.string().min(1).required()
+      .messages({
+        'any.required': 'Province is required',
+      }),
+    city: Joi.string().min(1).required()
+      .messages({
+        'any.required': 'City is required',
+      }),
+    district: Joi.string().min(1).required()
+      .messages({
+        'any.required': 'District is required',
+      }),
+    street: Joi.string().min(5).max(200).required()
+      .messages({
+        'string.min': 'Street address must be at least 5 characters',
+        'string.max': 'Street address must not exceed 200 characters',
+        'any.required': 'Street address is required',
+      }),
+    zipCode: Joi.string().pattern(/^[0-9]{5,10}$/).allow('', null).optional()
+      .messages({
+        'string.pattern.base': 'Zip code must be 5-10 digits',
+      }),
+    label: Joi.string().max(20).allow('', null).optional()
+      .messages({
+        'string.max': 'Label must not exceed 20 characters',
+      }),
+    isDefault: Joi.boolean().optional(),
   }),
 };
 
@@ -80,5 +125,6 @@ export const registerSchema = schemas.register;
 export const loginSchema = schemas.login;
 export const productSchema = schemas.product;
 export const orderSchema = schemas.order;
+export const addressSchema = schemas.address;
 
 

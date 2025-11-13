@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { User, Mail, Phone, Calendar } from 'lucide-react';
+import { User, Mail, Phone, Calendar, MapPin, Package } from 'lucide-react';
 
 const Profile: React.FC = () => {
   const { t } = useTranslation('common');
@@ -75,12 +76,43 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-8 pt-6 border-t border-gray-200 space-y-3">
             <Button variant="outline" className="w-full">
               {t('common:buttons.edit')} {t('profile:myProfile', { defaultValue: 'Profile' })}
             </Button>
           </div>
         </Card>
+
+        {/* 快捷功能 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <Link to="/user/addresses">
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <MapPin size={24} className="text-gray-700" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">地址管理</h3>
+                  <p className="text-sm text-gray-600">管理收货地址</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          <Link to="/user/orders">
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Package size={24} className="text-gray-700" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">我的订单</h3>
+                  <p className="text-sm text-gray-600">查看订单历史</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </div>
       </div>
     </div>
   );

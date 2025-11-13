@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Star, Eye, Package } from 'lucide-react';
+import { ShoppingCart, Star, Package } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import OptimizedImage from '@/components/common/OptimizedImage';
 import { Product } from '@/types/product';
 import { useCartStore } from '@/store/cartStore';
 import { getImageUrl } from '@/utils/imageUrl';
@@ -12,10 +13,9 @@ interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
   const { t } = useTranslation(['products', 'common']);
   const { addItem } = useCartStore();
-  const [imageError, setImageError] = useState(false);
   const [hoveredImage, setHoveredImage] = useState(0);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -32,29 +32,35 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <Link to={`/products/${product.id}`}>
       <Card hover className="overflow-hidden group h-full flex flex-col">
         {/* 图片区域 */}
-        <div className="relative aspect-square overflow-hidden bg-gray-100 group">
-          {mainImage && !imageError ? (
+        <div 
+          className="relative aspect-square overflow-hidden bg-gray-100 group"
+          onMouseEnter={() => {
+            // 如果有第二张图片，悬停时切换到第二张
+            if (product.images && product.images.length > 1) {
+              setHoveredImage(1);
+            }
+          }}
+          onMouseLeave={() => {
+            // 鼠标离开时切换回第一张
+            setHoveredImage(0);
+          }}
+        >
+          {mainImage ? (
             <>
-              <img
+              <OptimizedImage
                 src={getImageUrl(mainImage)}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                onError={() => setImageError(true)}
-                onMouseEnter={() => {
-                  if (product.images && product.images.length > 1) {
-                    setHoveredImage(1);
-                  }
-                }}
-                onMouseLeave={() => setHoveredImage(0)}
+                showSkeleton={true}
               />
-              
+
               {/* 多图指示器 */}
               {product.images && product.images.length > 1 && (
                 <div className="absolute top-4 left-4 flex space-x-1">
                   {product.images.slice(0, 3).map((_, index) => (
                     <div
                       key={index}
-                      className={`w-1.5 h-1.5 rounded-full ${
+                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
                         index === hoveredImage ? 'bg-white' : 'bg-white/50'
                       }`}
                     />
@@ -69,7 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
               {/* 评分标签 */}
               {product.averageRating && product.averageRating > 0 && (
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm">
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center space-x-1 shadow-sm z-10">
                   <Star size={14} className="text-yellow-500 fill-current" />
                   <span className="text-sm font-medium">
                     {product.averageRating.toFixed(1)}
@@ -79,28 +85,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
               {/* 库存状态 */}
               {product.stock === 0 && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
                   <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
                     {t('products:detail.outOfStock')}
                   </span>
                 </div>
               )}
-
-              {/* 快速查看按钮 */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/90 backdrop-blur-sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                >
-                  <Eye size={16} className="mr-1" />
-                  {t('common:buttons.viewAll', { defaultValue: 'Quick View' })}
-                </Button>
-              </div>
             </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
@@ -153,7 +143,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </Card>
     </Link>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;
 

@@ -3,6 +3,10 @@ export interface Order {
   userId: string;
   status: OrderStatus;
   totalAmount: number;
+  shippingCost?: number;
+  taxAmount?: number;
+  discountAmount?: number;
+  couponCode?: string;
   shippingAddress: Address;
   billingAddress?: Address;
   paymentMethod: string;
@@ -55,6 +59,9 @@ export interface CreateOrderRequest {
   shippingAddress: Address;
   billingAddress?: Address;
   paymentMethod: string;
+  couponCode?: string;
+  shippingCost?: number;
+  addressId?: string; // 地址ID，如果提供则使用保存的地址
 }
 
 export interface OrderListResponse {

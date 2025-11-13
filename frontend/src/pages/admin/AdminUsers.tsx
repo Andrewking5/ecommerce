@@ -399,15 +399,22 @@ const AdminUsers: React.FC = () => {
               />
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">角色</label>
+                <label htmlFor="role" className="block text-sm font-medium text-text-primary mb-2">
+                  角色
+                </label>
                 <select
+                  id="role"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'USER' | 'ADMIN' })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                  aria-describedby="role-helper"
                 >
                   <option value="USER">用户</option>
                   <option value="ADMIN">管理员</option>
                 </select>
+                <p id="role-helper" className="mt-1 text-xs text-text-tertiary">
+                  选择用户的权限级别
+                </p>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -417,8 +424,9 @@ const AdminUsers: React.FC = () => {
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="w-4 h-4 text-brand-blue rounded focus:ring-brand-blue"
+                  aria-describedby="isActive-helper"
                 />
-                <label htmlFor="isActive" className="text-sm text-text-secondary">
+                <label htmlFor="isActive" className="text-sm text-text-secondary" id="isActive-helper">
                   账户激活
                 </label>
               </div>

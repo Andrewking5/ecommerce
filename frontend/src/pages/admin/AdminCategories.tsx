@@ -353,14 +353,21 @@ const AdminCategories: React.FC = () => {
               />
 
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">分类描述</label>
+                <label htmlFor="category-description" className="block text-sm font-medium text-text-primary mb-2">
+                  分类描述
+                </label>
                 <textarea
+                  id="category-description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
                   rows={3}
                   placeholder="描述这个分类的特点..."
+                  aria-describedby="category-description-helper"
                 />
+                <p id="category-description-helper" className="mt-1 text-xs text-text-tertiary">
+                  可选：提供分类的详细描述
+                </p>
               </div>
 
               <SingleImageUpload
