@@ -76,8 +76,24 @@ class ApiClient {
       async (error) => {
         const originalRequest = error.config;
 
+        // 检查是否有原始请求配置（某些网络错误可能没有）
+        if (!originalRequest) {
+          // 如果没有原始请求，直接显示错误
+          const errorData = error.response?.data;
+          const message = errorData?.message || error.message || 'An error occurred';
+          toast.error(message);
+          return Promise.reject(error);
+        }
+
         // 401 错误：尝试刷新 token
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401) {
+          console.log('🔍 401 Unauthorized detected:', {
+            url: originalRequest?.url,
+            method: originalRequest?.method,
+            hasRetry: originalRequest?._retry,
+            isRefreshing: this.isRefreshing,
+          });
+
           // 如果已经在刷新 token，将请求加入队列
           if (this.isRefreshing) {
             console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
@@ -91,6 +107,15 @@ class ApiClient {
               .catch((err) => {
                 return Promise.reject(err);
               });
+          }
+
+          // 如果已经重试过，不再重试
+          if (originalRequest._retry) {
+            console.warn('⚠️ Request already retried, skipping token refresh');
+            const errorData = error.response?.data;
+            const message = errorData?.message || 'Unauthorized';
+            toast.error(message);
+            return Promise.reject(error);
           }
 
           originalRequest._retry = true;
