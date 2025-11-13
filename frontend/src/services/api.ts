@@ -4,6 +4,11 @@ import toast from 'react-hot-toast';
 class ApiClient {
   private client: AxiosInstance;
   private token: string | null = null;
+  private isRefreshing = false;
+  private failedQueue: Array<{
+    resolve: (value?: any) => void;
+    reject: (error?: any) => void;
+  }> = [];
 
   constructor(baseURL: string) {
     this.client = axios.create({
@@ -68,12 +73,76 @@ class ApiClient {
       (response: AxiosResponse) => {
         return response;
       },
-      (error) => {
-        if (error.response?.status === 401) {
-          // Token 過期，清除本地儲存
-          this.clearToken();
-          window.location.href = '/auth/login';
-          return Promise.reject(error);
+      async (error) => {
+        const originalRequest = error.config;
+
+        // 401 错误：尝试刷新 token
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          // 如果已经在刷新 token，将请求加入队列
+          if (this.isRefreshing) {
+            return new Promise((resolve, reject) => {
+              this.failedQueue.push({ resolve, reject });
+            })
+              .then((token) => {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+                return this.client(originalRequest);
+              })
+              .catch((err) => {
+                return Promise.reject(err);
+              });
+          }
+
+          originalRequest._retry = true;
+          this.isRefreshing = true;
+
+          try {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+              throw new Error('No refresh token available');
+            }
+
+            // 调用刷新 token API（不使用 apiClient，避免循环）
+            const response = await axios.post(
+              `${this.client.defaults.baseURL}/auth/refresh`,
+              { refreshToken },
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
+
+            if (response.data.success && response.data.accessToken) {
+              const newToken = response.data.accessToken;
+              const newRefreshToken = response.data.refreshToken;
+
+              // 更新 token
+              this.setToken(newToken);
+              localStorage.setItem('token', newToken);
+              if (newRefreshToken) {
+                localStorage.setItem('refreshToken', newRefreshToken);
+              }
+
+              // 更新原始请求的 token
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+              // 处理队列中的请求
+              this.processQueue(null, newToken);
+
+              // 重新发送原始请求
+              return this.client(originalRequest);
+            } else {
+              throw new Error('Token refresh failed');
+            }
+          } catch (refreshError) {
+            // 刷新失败，处理队列并清除 token
+            this.processQueue(refreshError, null);
+            this.clearToken();
+            window.location.href = '/auth/login';
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+          }
         }
         
         // 403 错误特殊处理（权限不足）
@@ -107,6 +176,17 @@ class ApiClient {
         return Promise.reject(error);
       }
     );
+  }
+
+  private processQueue(error: any, token: string | null) {
+    this.failedQueue.forEach((prom) => {
+      if (error) {
+        prom.reject(error);
+      } else {
+        prom.resolve(token);
+      }
+    });
+    this.failedQueue = [];
   }
 
   setToken(token: string) {

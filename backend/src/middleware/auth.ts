@@ -79,9 +79,16 @@ export const authenticateToken = async (
       error: error?.message || error,
       errorName: error?.name,
     });
-    res.status(403).json({ 
+    
+    // Token 过期或无效应该返回 401，让前端可以尝试刷新 token
+    // 403 应该用于权限不足的情况
+    const isTokenExpired = error?.name === 'TokenExpiredError' || error?.name === 'JsonWebTokenError';
+    const statusCode = isTokenExpired ? 401 : 403;
+    
+    res.status(statusCode).json({ 
       success: false,
-      message: 'Invalid or expired token' 
+      message: isTokenExpired ? 'Token expired or invalid' : 'Invalid token',
+      code: isTokenExpired ? 'TOKEN_EXPIRED' : 'TOKEN_INVALID'
     });
     return;
   }
