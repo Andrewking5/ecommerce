@@ -80,6 +80,7 @@ class ApiClient {
         if (error.response?.status === 401 && !originalRequest._retry) {
           // 如果已经在刷新 token，将请求加入队列
           if (this.isRefreshing) {
+            console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject });
             })
@@ -95,13 +96,17 @@ class ApiClient {
           originalRequest._retry = true;
           this.isRefreshing = true;
 
+          console.log('🔄 Attempting to refresh token...');
+
           try {
             const refreshToken = localStorage.getItem('refreshToken');
             if (!refreshToken) {
+              console.error('❌ No refresh token available');
               throw new Error('No refresh token available');
             }
 
             // 调用刷新 token API（不使用 apiClient，避免循环）
+            console.log('🔄 Calling refresh token API...');
             const response = await axios.post(
               `${this.client.defaults.baseURL}/auth/refresh`,
               { refreshToken },
@@ -115,6 +120,8 @@ class ApiClient {
             if (response.data.success && response.data.accessToken) {
               const newToken = response.data.accessToken;
               const newRefreshToken = response.data.refreshToken;
+
+              console.log('✅ Token refreshed successfully');
 
               // 更新 token
               this.setToken(newToken);
@@ -130,15 +137,28 @@ class ApiClient {
               this.processQueue(null, newToken);
 
               // 重新发送原始请求
+              console.log('🔄 Retrying original request:', originalRequest.url);
               return this.client(originalRequest);
             } else {
-              throw new Error('Token refresh failed');
+              console.error('❌ Token refresh failed: Invalid response format');
+              throw new Error('Token refresh failed: Invalid response format');
             }
-          } catch (refreshError) {
+          } catch (refreshError: any) {
+            console.error('❌ Token refresh error:', {
+              message: refreshError?.message,
+              response: refreshError?.response?.data,
+              status: refreshError?.response?.status,
+            });
+            
             // 刷新失败，处理队列并清除 token
             this.processQueue(refreshError, null);
             this.clearToken();
-            window.location.href = '/auth/login';
+            
+            // 延迟跳转，让用户看到错误信息
+            setTimeout(() => {
+              window.location.href = '/auth/login';
+            }, 1000);
+            
             return Promise.reject(refreshError);
           } finally {
             this.isRefreshing = false;

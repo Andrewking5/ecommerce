@@ -149,6 +149,7 @@ export class AuthController {
       const { refreshToken } = req.body;
 
       if (!refreshToken) {
+        console.warn('⚠️  Refresh token request without token');
         res.status(401).json({
           success: false,
           message: req.t('auth:errors.refreshTokenInvalid'),
@@ -156,14 +157,39 @@ export class AuthController {
         return;
       }
 
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as any;
+      let decoded: any;
+      try {
+        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as any;
+      } catch (jwtError: any) {
+        console.error('❌ Refresh token verification failed:', {
+          error: jwtError?.name,
+          message: jwtError?.message,
+        });
+        // Token 过期或无效应该返回 401
+        res.status(401).json({
+          success: false,
+          message: req.t('auth:errors.refreshTokenInvalid'),
+          code: jwtError?.name === 'TokenExpiredError' ? 'REFRESH_TOKEN_EXPIRED' : 'REFRESH_TOKEN_INVALID',
+        });
+        return;
+      }
       
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
       });
 
       if (!user) {
-        res.status(403).json({
+        console.error('❌ User not found for refresh token:', decoded.userId);
+        res.status(401).json({
+          success: false,
+          message: req.t('auth:errors.refreshTokenInvalid'),
+        });
+        return;
+      }
+
+      if (!user.isActive) {
+        console.error('❌ User is inactive:', decoded.userId);
+        res.status(401).json({
           success: false,
           message: req.t('auth:errors.refreshTokenInvalid'),
         });
@@ -172,15 +198,20 @@ export class AuthController {
 
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);
 
+      console.log('✅ Token refreshed successfully for user:', user.email);
+
       res.json({
         success: true,
         message: req.t('auth:success.tokenRefreshed'),
         ...tokens,
       });
       return;
-    } catch (error) {
-      console.error('Refresh token error:', error);
-      res.status(403).json({
+    } catch (error: any) {
+      console.error('❌ Refresh token error:', {
+        message: error?.message,
+        stack: error?.stack,
+      });
+      res.status(500).json({
         success: false,
         message: req.t('auth:errors.refreshTokenInvalid'),
       });
