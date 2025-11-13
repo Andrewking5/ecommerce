@@ -87,21 +87,18 @@ class ApiClient {
 
         // 401 错误：尝试刷新 token
         if (error.response?.status === 401) {
-          // 只在开发环境显示详细日志，避免控制台混乱
-          if (import.meta.env.DEV) {
-            console.log('🔍 401 Unauthorized detected (will auto-retry):', {
-              url: originalRequest?.url,
-              method: originalRequest?.method,
-              hasRetry: originalRequest?._retry,
-              isRefreshing: this.isRefreshing,
-            });
-          }
+          // 生产环境也显示关键日志，帮助诊断问题
+          console.log('🔍 401 Unauthorized detected (will auto-retry):', {
+            url: originalRequest?.url,
+            method: originalRequest?.method,
+            hasRetry: originalRequest?._retry,
+            isRefreshing: this.isRefreshing,
+            hasRefreshToken: !!localStorage.getItem('refreshToken'),
+          });
 
           // 如果已经在刷新 token，将请求加入队列
           if (this.isRefreshing) {
-            if (import.meta.env.DEV) {
-              console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
-            }
+            console.log('🔄 Token refresh in progress, queuing request:', originalRequest.url);
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject });
             })
@@ -126,22 +123,26 @@ class ApiClient {
           originalRequest._retry = true;
           this.isRefreshing = true;
 
-          // 只在开发环境显示详细日志
-          if (import.meta.env.DEV) {
-            console.log('🔄 Token expired, automatically refreshing...');
-          }
+          // 生产环境也显示关键日志
+          console.log('🔄 Token expired, automatically refreshing...', {
+            baseURL: this.client.defaults.baseURL,
+            refreshEndpoint: `${this.client.defaults.baseURL}/auth/refresh`,
+          });
 
           try {
             const refreshToken = localStorage.getItem('refreshToken');
             if (!refreshToken) {
               console.error('❌ No refresh token available');
+              console.error('💡 User needs to login again');
               throw new Error('No refresh token available');
             }
 
             // 调用刷新 token API（不使用 apiClient，避免循环）
-            if (import.meta.env.DEV) {
-              console.log('🔄 Calling refresh token API...');
-            }
+            console.log('🔄 Calling refresh token API...', {
+              endpoint: `${this.client.defaults.baseURL}/auth/refresh`,
+              hasRefreshToken: !!refreshToken,
+            });
+            
             const response = await axios.post(
               `${this.client.defaults.baseURL}/auth/refresh`,
               { refreshToken },
@@ -149,16 +150,24 @@ class ApiClient {
                 headers: {
                   'Content-Type': 'application/json',
                 },
+                timeout: 10000, // 10秒超时
               }
             );
+
+            console.log('📥 Refresh token response:', {
+              success: response.data?.success,
+              hasAccessToken: !!response.data?.accessToken,
+              hasRefreshToken: !!response.data?.refreshToken,
+            });
 
             if (response.data.success && response.data.accessToken) {
               const newToken = response.data.accessToken;
               const newRefreshToken = response.data.refreshToken;
 
-              if (import.meta.env.DEV) {
-                console.log('✅ Token refreshed successfully, retrying request...');
-              }
+              console.log('✅ Token refreshed successfully, retrying request...', {
+                newTokenLength: newToken.length,
+                hasNewRefreshToken: !!newRefreshToken,
+              });
 
               // 更新 token
               this.setToken(newToken);
@@ -180,11 +189,36 @@ class ApiClient {
               throw new Error('Token refresh failed: Invalid response format');
             }
           } catch (refreshError: any) {
+            // 生产环境详细错误日志
+            const errorCode = refreshError?.response?.data?.code;
+            const isRefreshTokenExpired = errorCode === 'REFRESH_TOKEN_EXPIRED';
+            const isRefreshTokenInvalid = errorCode === 'REFRESH_TOKEN_INVALID';
+            
             console.error('❌ Token refresh error:', {
               message: refreshError?.message,
               response: refreshError?.response?.data,
               status: refreshError?.response?.status,
+              code: errorCode,
+              baseURL: this.client.defaults.baseURL,
+              endpoint: `${this.client.defaults.baseURL}/auth/refresh`,
+              isNetworkError: !refreshError?.response,
+              isRefreshTokenExpired,
+              isRefreshTokenInvalid,
             });
+            
+            // 如果是网络错误，可能是 CORS 或连接问题
+            if (!refreshError?.response) {
+              console.error('🌐 Network error during token refresh - possible CORS or connection issue');
+              console.error('💡 Check if backend is accessible and CORS is configured correctly');
+              toast.error('无法连接到服务器，请检查网络连接');
+            } else if (isRefreshTokenExpired || isRefreshTokenInvalid) {
+              // Refresh token 过期或无效，需要重新登录
+              console.warn('⚠️ Refresh token expired or invalid - user needs to login again');
+              toast.error('登录已过期，请重新登录');
+            } else {
+              // 其他错误
+              toast.error('Token 刷新失败，请重新登录');
+            }
             
             // 刷新失败，处理队列并清除 token
             this.processQueue(refreshError, null);
@@ -193,7 +227,7 @@ class ApiClient {
             // 延迟跳转，让用户看到错误信息
             setTimeout(() => {
               window.location.href = '/auth/login';
-            }, 1000);
+            }, isRefreshTokenExpired || isRefreshTokenInvalid ? 1500 : 2000);
             
             return Promise.reject(refreshError);
           } finally {
