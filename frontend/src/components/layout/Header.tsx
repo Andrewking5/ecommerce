@@ -54,9 +54,11 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Language Switcher */}
-            <LanguageSwitcher />
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Language Switcher - Desktop only */}
+            <div className="hidden md:block">
+              <LanguageSwitcher variant="desktop" />
+            </div>
 
             {/* Search */}
             <button className="p-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
@@ -132,25 +134,30 @@ const Header: React.FC = () => {
             <nav className="flex flex-col space-y-4">
               <Link
                 to="/products"
-                className="text-text-secondary hover:text-text-primary transition-colors duration-200"
+                className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors duration-200 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('navigation.products')}
               </Link>
               <Link
                 to="/about"
-                className="text-text-secondary hover:text-text-primary transition-colors duration-200"
+                className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors duration-200 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('navigation.about')}
               </Link>
               <Link
                 to="/contact"
-                className="text-text-secondary hover:text-text-primary transition-colors duration-200"
+                className="px-4 py-2 text-text-secondary hover:text-text-primary hover:bg-gray-50 transition-colors duration-200 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('navigation.contact')}
               </Link>
+              
+              {/* Language Switcher - Mobile */}
+              <div className="px-4 pt-2 border-t border-gray-200 mt-2">
+                <LanguageSwitcher variant="mobile" />
+              </div>
             </nav>
           </div>
         )}
