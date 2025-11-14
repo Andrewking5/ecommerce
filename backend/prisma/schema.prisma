@@ -77,7 +77,7 @@ model Category {
 // 商品模型
 model Product {
   id             String   @id @default(cuid())
-  name           String
+  name           String   @unique
   description    String
   price          Decimal  @db.Decimal(10, 2) // 保留用于向后兼容，如果 hasVariants=true 则作为 basePrice
   categoryId     String

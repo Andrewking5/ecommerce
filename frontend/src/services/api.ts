@@ -57,11 +57,16 @@ class ApiClient {
             });
           }
         } else {
-          // 生產環境也輸出警告
-          console.warn('⚠️ API Request without token:', {
-            url: config.url,
-            method: config.method,
-          });
+          // 对于需要认证的请求，输出警告（排除公开端点）
+          const publicEndpoints = ['/auth/login', '/auth/register', '/auth/refresh', '/products', '/categories'];
+          const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
+          
+          if (!isPublicEndpoint && import.meta.env.DEV) {
+            console.warn('⚠️ API Request without token:', {
+              url: config.url,
+              method: config.method,
+            });
+          }
         }
         // 如果是 FormData，不设置 Content-Type，让浏览器自动设置
         if (config.data instanceof FormData) {
@@ -88,6 +93,66 @@ class ApiClient {
           const errorData = error.response?.data;
           const message = errorData?.message || error.message || 'An error occurred';
           toast.error(message);
+          return Promise.reject(error);
+        }
+
+        // 处理网络连接错误（在 401 处理之前）
+        if (!error.response) {
+          const isConnectionRefused = 
+            error.code === 'ERR_CONNECTION_REFUSED' || 
+            error.code === 'ECONNREFUSED' ||
+            error.code === 'ERR_NETWORK' ||
+            error.message?.includes('Network Error') ||
+            error.message?.includes('ERR_CONNECTION_REFUSED');
+          
+          if (isConnectionRefused) {
+            const apiUrl = this.client.defaults.baseURL;
+            const isLocalhost = apiUrl?.includes('localhost') || apiUrl?.includes('127.0.0.1');
+            
+            console.error('❌ 无法连接到后端服务器:', {
+              apiUrl,
+              errorCode: error.code,
+              errorMessage: error.message,
+              isLocalhost,
+              isProduction: import.meta.env.PROD,
+            });
+            
+            // 根据环境提供不同的错误提示
+            if (isLocalhost && import.meta.env.DEV) {
+              toast.error('无法连接到后端服务器。请确保后端服务器正在运行（端口 3001）', {
+                duration: 5000,
+              });
+            } else if (import.meta.env.PROD) {
+              toast.error('无法连接到服务器。请检查网络连接或联系管理员', {
+                duration: 5000,
+              });
+              console.error('💡 生产环境连接失败，请检查：');
+              console.error('   1. VITE_API_URL 环境变量是否正确设置');
+              console.error('   2. 后端服务器是否正常运行');
+              console.error('   3. 网络连接是否正常');
+            } else {
+              toast.error('网络连接失败，请检查后端服务器状态', {
+                duration: 5000,
+              });
+            }
+            
+            return Promise.reject(error);
+          }
+          
+          // 其他网络错误（超时、DNS 错误等）
+          console.error('❌ 网络错误:', {
+            code: error.code,
+            message: error.message,
+            apiUrl: this.client.defaults.baseURL,
+          });
+          
+          const networkErrorMessage = error.code === 'ECONNABORTED' || error.message?.includes('timeout')
+            ? '请求超时，请稍后重试'
+            : '网络连接失败，请检查网络连接';
+          
+          toast.error(networkErrorMessage, {
+            duration: 5000,
+          });
           return Promise.reject(error);
         }
 
@@ -235,18 +300,56 @@ class ApiClient {
               isRefreshTokenInvalid,
             });
             
-            // 如果是网络错误，可能是 CORS 或连接问题
+            // 处理不同类型的刷新错误
             if (!refreshError?.response) {
-              console.error('🌐 Network error during token refresh - possible CORS or connection issue');
-              console.error('💡 Check if backend is accessible and CORS is configured correctly');
-              toast.error('无法连接到服务器，请检查网络连接');
+              // 网络错误：无法连接到服务器
+              const apiUrl = this.client.defaults.baseURL;
+              const isLocalhost = apiUrl?.includes('localhost') || apiUrl?.includes('127.0.0.1');
+              
+              console.error('🌐 Token 刷新时网络错误:', {
+                apiUrl,
+                errorCode: refreshError?.code,
+                errorMessage: refreshError?.message,
+                isLocalhost,
+                isProduction: import.meta.env.PROD,
+              });
+              
+              if (isLocalhost && import.meta.env.DEV) {
+                console.error('💡 开发环境：请确保后端服务器正在运行（端口 3001）');
+                toast.error('无法连接到后端服务器，请检查后端是否运行', {
+                  duration: 5000,
+                });
+              } else if (import.meta.env.PROD) {
+                console.error('💡 生产环境：请检查：');
+                console.error('   1. VITE_API_URL 环境变量是否正确');
+                console.error('   2. 后端服务器是否正常运行');
+                console.error('   3. 网络连接是否正常');
+                toast.error('无法连接到服务器，请检查网络连接', {
+                  duration: 5000,
+                });
+              } else {
+                toast.error('Token 刷新失败：无法连接到服务器', {
+                  duration: 5000,
+                });
+              }
             } else if (isRefreshTokenExpired || isRefreshTokenInvalid) {
               // Refresh token 过期或无效，需要重新登录
               console.warn('⚠️ Refresh token expired or invalid - user needs to login again');
               toast.error('登录已过期，请重新登录');
             } else {
-              // 其他错误
-              toast.error('Token 刷新失败，请重新登录');
+              // 其他错误（如 500 服务器错误）
+              const status = refreshError?.response?.status;
+              const errorMessage = refreshError?.response?.data?.message || 'Token 刷新失败';
+              
+              console.error('❌ Token 刷新失败:', {
+                status,
+                message: errorMessage,
+              });
+              
+              toast.error(status === 500 
+                ? '服务器错误，请稍后重试' 
+                : 'Token 刷新失败，请重新登录'
+              );
             }
             
             // 刷新失败，处理队列并清除 token
@@ -277,9 +380,27 @@ class ApiClient {
           return Promise.reject(error);
         }
         
-        // 顯示錯誤訊息
+        // 500 服务器错误
+        if (error.response?.status === 500) {
+          console.error('❌ 服务器内部错误:', {
+            url: originalRequest?.url,
+            message: error.response?.data?.message,
+          });
+          toast.error('服务器错误，请稍后重试');
+          return Promise.reject(error);
+        }
+        
+        // 404 未找到
+        if (error.response?.status === 404) {
+          const errorData = error.response?.data;
+          const message = errorData?.message || '请求的资源不存在';
+          toast.error(message);
+          return Promise.reject(error);
+        }
+        
+        // 其他 HTTP 错误（400, 422 等）
         const errorData = error.response?.data;
-        let message = 'An error occurred';
+        let message = '操作失败';
         
         if (errorData) {
           // 如果有验证错误详情，显示详情
@@ -290,7 +411,10 @@ class ApiClient {
           }
         }
         
-        toast.error(message);
+        // 只在非静默请求时显示错误（某些请求可能设置了 silent 标志）
+        if (!originalRequest?.silent) {
+          toast.error(message);
+        }
         
         return Promise.reject(error);
       }
@@ -354,7 +478,14 @@ const apiBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 // 調試：在控制台顯示當前使用的 API URL
 if (import.meta.env.PROD) {
   console.log('🌐 Production API URL:', apiBaseURL);
-  console.log('🌐 VITE_API_URL from env:', import.meta.env.VITE_API_URL || 'NOT SET');
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  console.log('🌐 VITE_API_URL from env:', envApiUrl || 'NOT SET');
+  
+  // 生产环境警告：如果使用 localhost，说明配置错误
+  if (!envApiUrl || apiBaseURL.includes('localhost')) {
+    console.warn('⚠️ 警告：生产环境使用了 localhost API URL！');
+    console.warn('💡 请在 Vercel 环境变量中设置 VITE_API_URL');
+  }
 } else {
   console.log('🔧 Development API URL:', apiBaseURL);
 }

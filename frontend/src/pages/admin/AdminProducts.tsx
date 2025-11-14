@@ -12,10 +12,11 @@ import ProductFilters from '@/components/admin/ProductFilters';
 import BulkActions from '@/components/admin/BulkActions';
 import ConfirmDialog from '@/components/admin/ConfirmDialog';
 import EmptyState from '@/components/admin/EmptyState';
-import { Plus, Search, Edit, Trash2, Loader2, X, Package, ArrowUpDown, CheckSquare, Square } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Loader2, X, Package, ArrowUpDown, CheckSquare, Square, FileSpreadsheet } from 'lucide-react';
 import { productApi } from '@/services/products';
 import { Product, Category, ProductQueryParams } from '@/types/product';
 import { getImageUrl } from '@/utils/imageUrl';
+import ProductExcelImport from '@/components/admin/ProductExcelImport';
 import toast from 'react-hot-toast';
 
 const AdminProducts: React.FC = () => {
@@ -42,6 +43,7 @@ const AdminProducts: React.FC = () => {
     isOpen: false,
     action: '',
   });
+  const [showExcelImport, setShowExcelImport] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -276,13 +278,23 @@ const AdminProducts: React.FC = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-text-primary">{t('products.title')}</h1>
           <p className="text-text-secondary mt-2 text-sm md:text-base">{t('products.subtitle')}</p>
         </div>
-        <Button
-          onClick={() => navigate('/admin/products/new')}
-          className="flex items-center space-x-2 w-full md:w-auto"
-        >
-          <Plus size={20} />
-          <span>{t('products.addProduct')}</span>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <Button
+            onClick={() => setShowExcelImport(true)}
+            variant="outline"
+            className="flex items-center space-x-2 w-full md:w-auto"
+          >
+            <FileSpreadsheet size={20} />
+            <span>{t('products.import.title', { defaultValue: '批量导入' })}</span>
+          </Button>
+          <Button
+            onClick={() => navigate('/admin/products/new')}
+            className="flex items-center space-x-2 w-full md:w-auto"
+          >
+            <Plus size={20} />
+            <span>{t('products.addProduct')}</span>
+          </Button>
+        </div>
       </div>
 
       {/* 搜索栏 */}
@@ -754,6 +766,27 @@ const AdminProducts: React.FC = () => {
         }}
         onCancel={() => setBulkActionModal({ isOpen: false, action: '' })}
       />
+
+      {/* Excel 批量导入模态框 */}
+      {showExcelImport && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowExcelImport(false);
+            }
+          }}
+        >
+          <Card className="w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col animate-scaleIn my-8">
+            <div className="flex-1 overflow-y-auto p-6">
+              <ProductExcelImport
+                categories={categories || []}
+                onClose={() => setShowExcelImport(false)}
+              />
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

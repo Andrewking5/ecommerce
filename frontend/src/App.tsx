@@ -33,6 +33,7 @@ const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories'))
 const AdminInventory = lazy(() => import('@/pages/admin/AdminInventory'))
 const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'))
 const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'))
+const AdminTrash = lazy(() => import('@/pages/admin/AdminTrash'))
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
           <Route path="inventory" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminInventory /></Suspense>} />
           <Route path="orders" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminOrders /></Suspense>} />
           <Route path="users" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminUsers /></Suspense>} />
+          <Route path="trash" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminTrash /></Suspense>} />
         </Route>
 
         {/* 404 頁面 */}

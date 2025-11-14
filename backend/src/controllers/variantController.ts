@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
 import { asyncHandler, sendErrorResponse, AppError } from '../utils/errorHandler';
+import { normalizeImages, normalizeStock } from '../utils/productHelpers';
+import { CacheService, CACHE_KEYS } from '../services/cacheService';
 import {
   CreateVariantRequest,
   UpdateVariantRequest,
   CreateVariantsBulkRequest,
+  CreateVariantsDirectBulkRequest,
   GenerateSKURequest,
 } from '../types/variant';
 
@@ -151,6 +154,23 @@ export class VariantController {
       });
     }
 
+    // 确保图片数组格式正确
+    const images = Array.isArray(data.images)
+      ? data.images.filter((img: any) => img && String(img).trim())
+      : (data.images && String(data.images).trim())
+        ? [String(data.images).trim()]
+        : [];
+    
+    // 使用统一的库存处理函数
+    const stock = normalizeStock(data.stock);
+    
+    console.log(`📦 [后端] 创建变体 SKU "${data.sku}":`, {
+      images: images,
+      stock: stock,
+      imagesCount: images.length,
+      stockType: typeof data.stock,
+    });
+
     // 創建變體
     const variant = await prisma.productVariant.create({
       data: {
@@ -159,12 +179,12 @@ export class VariantController {
         price: data.price,
         comparePrice: data.comparePrice,
         costPrice: data.costPrice,
-        stock: data.stock,
+        stock: stock,
         reservedStock: data.reservedStock ?? 0,
         weight: data.weight,
         dimensions: data.dimensions,
         barcode: data.barcode,
-        images: data.images || [],
+        images: images,
         isDefault: data.isDefault ?? false,
         isActive: data.isActive ?? true,
         attributes: {
@@ -182,6 +202,12 @@ export class VariantController {
           },
         },
       },
+    });
+    
+    console.log(`✅ [后端] 变体创建成功 SKU "${variant.sku}":`, {
+      id: variant.id,
+      images: variant.images,
+      stock: variant.stock,
     });
 
     // 更新商品變體價格範圍
@@ -324,6 +350,238 @@ export class VariantController {
       success: true,
       data: createdVariants,
       count: createdVariants.length,
+    });
+  });
+
+  // 批量直接創建變體（管理員）- 用於 Excel 導入等場景
+  static createVariantsDirectBulk = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const data: CreateVariantsDirectBulkRequest = req.body;
+
+    // 驗證必填字段
+    if (!data.productId || !data.variants || !Array.isArray(data.variants) || data.variants.length === 0) {
+      throw new AppError('Product ID and variants array are required', 400, 'VALIDATION_ERROR');
+    }
+
+    // 驗證商品是否存在
+    const product = await prisma.product.findUnique({
+      where: { id: data.productId },
+    });
+
+    if (!product) {
+      throw new AppError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+    }
+
+    // 限制批量创建数量
+    if (data.variants.length > 100) {
+      throw new AppError('Cannot create more than 100 variants at once', 400, 'VALIDATION_ERROR');
+    }
+
+    const results = {
+      success: [] as any[],
+      failed: [] as Array<{ index: number; sku: string; error: string }>,
+    };
+
+    // 收集所有 SKU 用于重复检查
+    const skuSet = new Set<string>();
+    const duplicateSkus = new Set<string>();
+
+    // 第一遍：检查 SKU 重复
+    data.variants.forEach((variant, index) => {
+      const sku = String(variant.sku).trim();
+      if (!sku) {
+        results.failed.push({
+          index: index + 1,
+          sku: '',
+          error: 'SKU is required',
+        });
+      } else if (skuSet.has(sku)) {
+        duplicateSkus.add(sku);
+        results.failed.push({
+          index: index + 1,
+          sku,
+          error: `SKU "${sku}" is duplicated in the request`,
+        });
+      } else {
+        skuSet.add(sku);
+      }
+    });
+
+    // 检查数据库中已存在的 SKU
+    if (skuSet.size > 0) {
+      const existingVariants = await prisma.productVariant.findMany({
+        where: {
+          sku: { in: Array.from(skuSet) },
+        },
+        select: { sku: true },
+      });
+
+      existingVariants.forEach((existing) => {
+        if (skuSet.has(existing.sku)) {
+          duplicateSkus.add(existing.sku);
+          // 找到对应的索引
+          const index = data.variants.findIndex((v) => String(v.sku).trim() === existing.sku);
+          if (index >= 0) {
+            results.failed.push({
+              index: index + 1,
+              sku: existing.sku,
+              error: `SKU "${existing.sku}" already exists in database`,
+            });
+          }
+        }
+      });
+    }
+
+    // 过滤出有效的变体（不在失败列表中的）
+    const validVariants = data.variants
+      .map((variant, index) => ({ variant, originalIndex: index + 1 }))
+      .filter(({ variant, originalIndex }) => {
+        const sku = String(variant.sku).trim();
+        return sku && !duplicateSkus.has(sku) && !results.failed.some((f) => f.index === originalIndex);
+      });
+
+    // 验证属性是否存在
+    const attributeIds = new Set<string>();
+    validVariants.forEach(({ variant }) => {
+      variant.attributes?.forEach((attr) => {
+        attributeIds.add(attr.attributeId);
+      });
+    });
+
+    if (attributeIds.size > 0) {
+      const attributes = await prisma.productAttribute.findMany({
+        where: {
+          id: { in: Array.from(attributeIds) },
+        },
+        select: { id: true },
+      });
+
+      const validAttributeIds = new Set(attributes.map((a) => a.id));
+      const invalidAttributeIds = Array.from(attributeIds).filter((id) => !validAttributeIds.has(id));
+
+      if (invalidAttributeIds.length > 0) {
+        // 标记使用无效属性的变体为失败
+        validVariants.forEach(({ variant, originalIndex }) => {
+          const hasInvalidAttr = variant.attributes?.some((attr) => invalidAttributeIds.includes(attr.attributeId));
+          if (hasInvalidAttr) {
+            results.failed.push({
+              index: originalIndex,
+              sku: String(variant.sku).trim(),
+              error: `One or more attributes not found: ${invalidAttributeIds.join(', ')}`,
+            });
+          }
+        });
+      }
+    }
+
+    // 再次过滤有效的变体
+    const finalValidVariants = validVariants.filter(({ originalIndex }) => {
+      return !results.failed.some((f) => f.index === originalIndex);
+    });
+
+    // 如果設置了默認變體，確保只有一個
+    const defaultVariants = finalValidVariants.filter(({ variant }) => variant.isDefault);
+    if (defaultVariants.length > 1) {
+      // 只保留第一個作為默認
+      defaultVariants.slice(1).forEach(({ originalIndex }) => {
+        const variant = finalValidVariants.find((v) => v.originalIndex === originalIndex);
+        if (variant) {
+          variant.variant.isDefault = false;
+        }
+      });
+    }
+
+    // 如果有默認變體，取消現有的默認變體
+    if (defaultVariants.length > 0) {
+      await prisma.productVariant.updateMany({
+        where: {
+          productId: data.productId,
+          isDefault: true,
+        },
+        data: {
+          isDefault: false,
+        },
+      });
+    }
+
+    // 使用事務批量創建變體
+    if (finalValidVariants.length > 0) {
+      try {
+        const variantsToCreate = finalValidVariants.map(({ variant }) => ({
+          productId: data.productId,
+          sku: String(variant.sku).trim(),
+          price: Number(variant.price),
+          comparePrice: variant.comparePrice ? Number(variant.comparePrice) : null,
+          costPrice: variant.costPrice ? Number(variant.costPrice) : null,
+          stock: normalizeStock(variant.stock),
+          reservedStock: variant.reservedStock ? normalizeStock(variant.reservedStock) : 0,
+          weight: variant.weight ? Number(variant.weight) : null,
+          dimensions: variant.dimensions || null,
+          barcode: variant.barcode ? String(variant.barcode).trim() : null,
+          images: normalizeImages(variant.images),
+          isDefault: variant.isDefault ?? false,
+          isActive: variant.isActive !== undefined ? variant.isActive : true,
+          attributes: {
+            create: (variant.attributes || []).map((attr) => ({
+              attributeId: attr.attributeId,
+              value: String(attr.value),
+              displayValue: attr.displayValue ? String(attr.displayValue) : null,
+            })),
+          },
+        }));
+
+        const createdVariants = await prisma.$transaction(
+          variantsToCreate.map((variantData) =>
+            prisma.productVariant.create({
+              data: variantData,
+              include: {
+                attributes: {
+                  include: {
+                    attribute: true,
+                  },
+                },
+              },
+            })
+          )
+        );
+
+        results.success.push(...createdVariants);
+
+        // 更新商品變體價格範圍和 hasVariants 標記
+        await prisma.product.update({
+          where: { id: data.productId },
+          data: {
+            hasVariants: true,
+          },
+        });
+        await VariantController.updateProductPriceRange(data.productId);
+
+        // 清除相关缓存（变体创建完成后统一清除）
+        CacheService.delete(`${CACHE_KEYS.PRODUCT}:${data.productId}`);
+        CacheService.deleteByPrefix(CACHE_KEYS.PRODUCTS);
+      } catch (error: any) {
+        // 如果事務失敗，將所有變體標記為失敗
+        finalValidVariants.forEach(({ originalIndex, variant }) => {
+          results.failed.push({
+            index: originalIndex,
+            sku: String(variant.sku).trim(),
+            error: error?.message || 'Failed to create variant',
+          });
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Created ${results.success.length} variant(s), ${results.failed.length} failed`,
+      data: {
+        success: results.success,
+        failed: results.failed,
+        summary: {
+          total: data.variants.length,
+          success: results.success.length,
+          failed: results.failed.length,
+        },
+      },
     });
   });
 

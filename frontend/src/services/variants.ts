@@ -4,6 +4,7 @@ import {
   CreateVariantRequest,
   UpdateVariantRequest,
   CreateVariantsBulkRequest,
+  CreateVariantsDirectBulkRequest,
   GenerateSKURequest,
 } from '@/types/variant';
 
@@ -45,6 +46,16 @@ export const variantApi = {
   // 批量創建變體（管理員）
   createVariantsBulk: async (data: CreateVariantsBulkRequest): Promise<{ data: ProductVariant[]; count: number }> => {
     const response = await apiClient.post<any>('/variants/bulk', data);
+    return response.data || response;
+  },
+
+  // 批量直接創建變體（管理員）- 用於 Excel 導入等場景
+  createVariantsDirectBulk: async (data: CreateVariantsDirectBulkRequest): Promise<{
+    success: ProductVariant[];
+    failed: Array<{ index: number; sku: string; error: string }>;
+    summary: { total: number; success: number; failed: number };
+  }> => {
+    const response = await apiClient.post<any>('/variants/bulk-direct', data);
     return response.data || response;
   },
 

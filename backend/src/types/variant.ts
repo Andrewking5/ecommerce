@@ -155,6 +155,29 @@ export interface CreateVariantsBulkRequest {
   }>; // 或者直接指定每个组合的价格
 }
 
+export interface CreateVariantsDirectBulkRequest {
+  productId: string;
+  variants: Array<{
+    sku: string;
+    price: number;
+    comparePrice?: number;
+    costPrice?: number;
+    stock: number;
+    reservedStock?: number;
+    weight?: number;
+    dimensions?: any;
+    barcode?: string;
+    images?: string[];
+    isDefault?: boolean;
+    isActive?: boolean;
+    attributes: Array<{
+      attributeId: string;
+      value: string;
+      displayValue?: string;
+    }>;
+  }>;
+}
+
 export interface CreateAttributeTemplateRequest {
   name: string;
   categoryId?: string;

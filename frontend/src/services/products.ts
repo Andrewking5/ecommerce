@@ -83,6 +83,42 @@ export const productApi = {
   deleteProduct: async (id: string): Promise<void> => {
     await apiClient.delete(`/products/${id}`);
   },
+
+  // 批量創建商品（管理員）
+  createProductsBulk: async (products: Partial<Product>[]): Promise<{
+    success: Product[];
+    failed: Array<{ index: number; data: any; error: string }>;
+    summary: { total: number; success: number; failed: number };
+  }> => {
+    const response = await apiClient.post<any>('/products/bulk', { products });
+    return response.data || response;
+  },
+
+  // 獲取已刪除的商品列表（垃圾桶）
+  getDeletedProducts: async (params?: { page?: number; limit?: number; search?: string }): Promise<ProductListResponse> => {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    const queryString = queryParams.toString();
+    const response = await apiClient.get<any>(`/products/admin/trash${queryString ? `?${queryString}` : ''}`);
+    return response.data || response;
+  },
+
+  // 恢復商品（從垃圾桶恢復）
+  restoreProduct: async (id: string): Promise<Product> => {
+    const response = await apiClient.post<any>(`/products/${id}/restore`);
+    return response.data || response;
+  },
+
+  // 永久刪除商品（從數據庫中真正刪除）
+  permanentlyDeleteProduct: async (id: string): Promise<void> => {
+    await apiClient.delete(`/products/${id}/permanent`);
+  },
 };
 
 

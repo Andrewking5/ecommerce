@@ -167,8 +167,8 @@ const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
           或输入图片 URL
         </label>
         <input
-          type="url"
-          placeholder="https://example.com/image.jpg"
+          type="text"
+          placeholder="https://example.com/image.jpg 或 /uploads/products/image.jpg"
           value={image || ''}
           onChange={(e) => {
             const url = e.target.value.trim();
@@ -176,6 +176,9 @@ const SingleImageUpload: React.FC<SingleImageUploadProps> = ({
           }}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
         />
+        <p className="mt-1 text-xs text-text-tertiary">
+          支持完整 URL 或相对路径
+        </p>
       </div>
     </div>
   );

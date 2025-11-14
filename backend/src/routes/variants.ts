@@ -65,6 +65,33 @@ const createVariantsBulkSchema = Joi.object({
   skuPattern: Joi.string().max(200),
 });
 
+const createVariantsDirectBulkSchema = Joi.object({
+  productId: Joi.string().required(),
+  variants: Joi.array().items(
+    Joi.object({
+      sku: Joi.string().required().min(1).max(100),
+      price: Joi.number().positive().precision(2).required(),
+      comparePrice: Joi.number().positive().precision(2).allow(null),
+      costPrice: Joi.number().positive().precision(2).allow(null),
+      stock: Joi.number().integer().min(0).required(),
+      reservedStock: Joi.number().integer().min(0).default(0),
+      weight: Joi.number().positive().precision(2).allow(null),
+      dimensions: Joi.object().allow(null),
+      barcode: Joi.string().allow('', null),
+      images: Joi.array().items(Joi.string()).default([]),
+      isDefault: Joi.boolean().default(false),
+      isActive: Joi.boolean().default(true),
+      attributes: Joi.array().items(
+        Joi.object({
+          attributeId: Joi.string().required(),
+          value: Joi.string().required(),
+          displayValue: Joi.string().allow('', null),
+        })
+      ).default([]),
+    })
+  ).min(1).max(100).required(),
+});
+
 const updateVariantsBulkSchema = Joi.object({
   variantIds: Joi.array().items(Joi.string()).min(1).required(),
   data: Joi.object({
@@ -96,6 +123,7 @@ router.use(requireAdmin);
 // 變體管理路由
 router.post('/', validateRequest(createVariantSchema), VariantController.createVariant);
 router.post('/bulk', validateRequest(createVariantsBulkSchema), VariantController.createVariantsBulk);
+router.post('/bulk-direct', validateRequest(createVariantsDirectBulkSchema), VariantController.createVariantsDirectBulk);
 router.put('/:id', validateRequest(updateVariantSchema), VariantController.updateVariant);
 router.put('/bulk/update', validateRequest(updateVariantsBulkSchema), VariantController.updateVariantsBulk);
 router.delete('/:id', VariantController.deleteVariant);

@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Home,
   FolderTree,
-  AlertTriangle
+  AlertTriangle,
+  Trash2
 } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
@@ -56,6 +57,7 @@ const AdminLayout: React.FC = () => {
     { path: '/admin/inventory', icon: AlertTriangle, label: t('menu.inventory') },
     { path: '/admin/orders', icon: ShoppingBag, label: t('menu.orders') },
     { path: '/admin/users', icon: Users, label: t('menu.users') },
+    { path: '/admin/trash', icon: Trash2, label: '垃圾桶' },
   ];
 
   const isActive = (path: string) => {

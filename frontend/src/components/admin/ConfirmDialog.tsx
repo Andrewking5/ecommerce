@@ -9,8 +9,10 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
-  onCancel: () => void;
-  variant?: 'danger' | 'warning' | 'info';
+  onCancel?: () => void;
+  onClose?: () => void;
+  variant?: 'danger' | 'warning' | 'info' | 'default';
+  isLoading?: boolean;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -21,18 +23,36 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelText = '取消',
   onConfirm,
   onCancel,
+  onClose,
   variant = 'danger',
+  isLoading = false,
 }) => {
   if (!isOpen) return null;
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else if (onClose) {
+      onClose();
+    }
+  };
 
   const variantStyles = {
     danger: 'bg-red-100 text-red-600',
     warning: 'bg-yellow-100 text-yellow-600',
     info: 'bg-blue-100 text-blue-600',
+    default: 'bg-blue-100 text-blue-600',
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !isLoading) {
+          handleCancel();
+        }
+      }}
+    >
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-scaleIn">
         <div className="flex items-start space-x-4">
           <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${variantStyles[variant]}`}>
@@ -44,13 +64,19 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </div>
         </div>
         <div className="flex justify-end space-x-3 mt-6">
-          <Button variant="outline" onClick={onCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isLoading}
+          >
             {cancelText}
           </Button>
           <Button
-            variant={variant === 'danger' ? 'primary' : 'primary'}
+            variant="primary"
             onClick={onConfirm}
-            className={variant === 'danger' ? 'bg-red-600 hover:bg-red-700' : ''}
+            loading={isLoading}
+            disabled={isLoading}
+            className={variant === 'danger' ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : ''}
           >
             {confirmText}
           </Button>
