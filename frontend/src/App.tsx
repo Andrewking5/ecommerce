@@ -14,6 +14,8 @@ import Cart from '@/pages/Cart'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import AuthCallback from '@/pages/AuthCallback'
+import Privacy from '@/pages/Privacy'
+import DataDeletion from '@/pages/DataDeletion'
 import NotFound from '@/pages/NotFound'
 
 // 受保护路由 - 懒加载
@@ -60,6 +62,14 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="callback" element={<AuthCallback />} />
+        </Route>
+
+        {/* 法律頁面 */}
+        <Route path="/privacy" element={<Layout />}>
+          <Route index element={<Privacy />} />
+        </Route>
+        <Route path="/data-deletion" element={<Layout />}>
+          <Route index element={<DataDeletion />} />
         </Route>
 
         {/* 受保護路由 */}

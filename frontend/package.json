@@ -12,7 +12,8 @@
     "test:coverage": "vitest --coverage",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "convert-icon": "node scripts/convert-icon.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
