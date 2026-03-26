@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1296">
+  <defs>
+    <style>
+      .cls-1 {
+        mask: url(#mask);
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        fill: #fff1e1;
+      }
+
+      .cls-4 {
+        fill: #ebdbc6;
+      }
+
+      .cls-5 {
+        stroke: url(#gradient-1);
+      }
+
+      .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-13 {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 4px;
+      }
+
+      .cls-6 {
+        stroke: url(#gradient-4);
+      }
+
+      .cls-7 {
+        stroke: url(#gradient-2);
+      }
+
+      .cls-8 {
+        stroke: url(#gradient-3);
+      }
+
+      .cls-9 {
+        stroke: url(#gradient-5);
+      }
+
+      .cls-10 {
+        stroke: url(#gradient-7);
+      }
+
+      .cls-11 {
+        stroke: url(#gradient-8);
+      }
+
+      .cls-12 {
+        stroke: url(#gradient-9);
+      }
+
+      .cls-13 {
+        stroke: url(#gradient-6);
+      }
+    </style>
+    <mask id="mask" x="-62" y="-1080" width="2130" height="3076" maskUnits="userSpaceOnUse">
+      <g data-name="mask0 455 6706">
+        <rect class="cls-2" width="1920" height="1296"/>
+      </g>
+    </mask>
+    <linearGradient id="gradient-1" x1="994.83" y1="1113.38" x2="930.83" y2="177.38" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="360 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.3; 1"  
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset=".2" stop-color="#ebdbc6"/>
+      <stop offset=".42" stop-color="#fff"/>
+      <stop offset=".78" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-2" x1="988.96" y1="1365.78" x2="748.3" y2="259.11" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="360 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.3; 1"  
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset=".06" stop-color="#ebdbc6"/>
+      <stop offset=".39" stop-color="#fff"/>
+      <stop offset=".8" stop-color="#decfbb"/>
+    </linearGradient>
+    <linearGradient id="gradient-3" x1="1256.26" y1="146.59" x2="1215.16" y2="347.71" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset=".42" stop-color="#e6dad1"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="gradient-4" x1="475.82" y1="1212.82" x2="1210.04" y2="148.67" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".2" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-5" x1="508.51" y1="1221.17" x2="1235.83" y2="164.91" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".17" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-6" x1="552.84" y1="1222.82" x2="1263.24" y2="184.61" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".14" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-7" x1="593.99" y1="1222.5" x2="1294.34" y2="189.3" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".13" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-8" x1="628.83" y1="1223.56" x2="1317.63" y2="204.29" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".11" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+    <linearGradient id="gradient-9" x1="657.83" y1="1225.87" x2="1333.68" y2="222.13" gradientTransform="translate(0 1296) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <animateTransform
+        attributeName="gradientTransform"
+        type="rotate"
+        values="0 0.5 0.5; -90 0.5 0.5; 90 0.5 0.5; 0 0.5 0.5; 0 0.5 0.5"
+        keyTimes="0; 0.1; 0.1; 0.3; 1"
+        dur="10s"
+        repeatCount="indefinite"
+        additive="sum"
+      />
+      <stop offset="0" stop-color="#ebdbc6"/>
+      <stop offset=".05" stop-color="#fff"/>
+      <stop offset=".96" stop-color="#ebdbc6"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-1">
+    <g>
+      <path class="cls-3" d="m699.14,89.31c4.79-3.16,9.39-6.8,14.37-9.48,110.17-59.78,226.09-89.2,351.59-64.48,90.63,17.92,156.64,69.46,201.18,150.32,28.36,51.54,40.24,108.93,61.32,163.06,38.99,100.5,98.29,183.37,186.72,246.89,62.27,44.74,133.64,71.18,199.27,108.84,93.31,53.65,180.1,114.59,248.51,198.99,56.9,70.13,93.4,149.85,101.74,239.33,5.65,60.74.29,121.58-16.96,182.03-18.49,64.77-42.53,126.95-80.95,180.98-35.35,49.82-113.53,144.19-157.4,186.64-104.62,101.26-232.71,174.56-360.8,244.49-73.19,39.96-152.32,61.8-234.52,68.31-48.95,3.84-98.87,4.51-148.3-3.35-61.41-9.77-120.62-25.87-169.38-65.43-59.11-47.91-112.57-101.46-153.86-166.71-38.99-61.6-64.86-127.33-79.04-198.7-9.39-47.62-14.27-95.43-19.06-143.62-6.04-59.97-16-119.56-23.28-179.44-6.51-52.89-17.72-104.62-33.53-155.5-31.42-100.88-85.74-185.1-169.19-252.07-39.28-31.52-78.17-65.05-108.54-106.63-35.64-48.77-51.45-105-46.27-162.68,7.76-85.65,45.03-160.67,106.24-222.56,44.36-44.84,95.13-82.01,143.51-121.96,0,0,141.88-94.46,184.23-117.17-124.35-185-248.7-370.01-373.15-555.01C207.19-638.63,93.66-813.57-25.23-984.97c-18.97-27.31-43.88-54.32-31.42-93.03"/>
+      <path class="cls-5" d="m699.14,89.31c4.79-3.16,9.39-6.8,14.37-9.48,110.17-59.78,226.09-89.2,351.59-64.48,90.63,17.92,156.64,69.46,201.18,150.32,28.36,51.54,40.24,108.93,61.32,163.06,38.99,100.5,98.29,183.37,186.72,246.89,62.27,44.74,133.64,71.18,199.27,108.84,93.31,53.65,180.1,114.59,248.51,198.99,56.9,70.13,93.4,149.85,101.74,239.33,5.65,60.74.29,121.58-16.96,182.03-18.49,64.77-42.53,126.95-80.95,180.98-35.35,49.82-113.53,144.19-157.4,186.64-104.62,101.26-232.71,174.56-360.8,244.49-73.19,39.96-152.32,61.8-234.52,68.31-48.95,3.84-98.87,4.51-148.3-3.35-61.41-9.77-120.62-25.87-169.38-65.44-59.11-47.9-112.57-101.45-153.86-166.7-38.99-61.6-64.86-127.33-79.04-198.7-9.39-47.62-14.27-95.43-19.06-143.62-6.04-59.97-16-119.56-23.28-179.44-6.51-52.89-17.72-104.62-33.53-155.5-31.42-100.88-85.74-185.1-169.19-252.07-39.28-31.52-78.17-65.05-108.54-106.63-35.64-48.77-51.45-105-46.27-162.68,7.76-85.65,45.03-160.67,106.24-222.56,44.36-44.84,95.13-82.01,143.51-121.96,0,0,141.88-94.46,184.23-117.17-124.35-185-248.7-370.01-373.15-555.01C207.19-638.63,93.66-813.57-25.23-984.97c-18.97-27.31-43.88-54.32-31.42-93.03"/>
+      <path class="cls-7" d="m905.5,12.01c-78.04-4.31-204.9,40.68-388.5,157.82-96.87,61.8-181.17,136.26-206,164.67-31.8,36.39-84.5,104.24-105,148-28.26,60.32-38.21,135.71-23.46,200.24,14.18,61.76,45.4,113.66,90.61,157.89,62.74,61.38,120.79,126.68,165.13,203.08,35.06,60.42,58.72,125.05,71.74,193.61,10.73,56.11,10.73,113.08,15.23,169.67,10.44,131.08,37.93,258.43,101.82,375.44,4.89,8.9,11.01,17.52,9.67,28.63,0,0,127.78,231.9,576.25,173.5"/>
+      <path class="cls-8" d="m1334.51,1163.44c104.63-69.08,108.49-213.34,108.49-213.34-29.61-22-42.06-29.39-74.67-53.1-75.8,145.55-112.02,187.13-337.33,263.26l49.27,63.67s120.94,27.49,254.15-60.4l.09-.09Z"/>
+      <path class="cls-6" d="m443,0l745,1151"/>
+      <path class="cls-9" d="m475-7l740,1141"/>
+      <path class="cls-13" d="m517-5l729,1117"/>
+      <path class="cls-10" d="m554-1l728,1105"/>
+      <path class="cls-11" d="m588,0l719,1088"/>
+      <path class="cls-12" d="m616,0l709,1069"/>
+      <circle class="cls-4" cx="1328" cy="1072" r="7"/>
+      <circle class="cls-4" cx="1307" cy="1088" r="7"/>
+      <circle class="cls-4" cx="1282" cy="1104" r="7"/>
+      <circle class="cls-4" cx="1249" cy="1118" r="7"/>
+      <circle class="cls-4" cx="1220" cy="1135" r="7"/>
+      <circle class="cls-4" cx="1191" cy="1152" r="7"/>
+    </g>
+  </g>
+</svg>
