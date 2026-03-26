@@ -14,9 +14,8 @@
 
 import { useState, useRef, useEffect, type ImgHTMLAttributes, type CSSProperties } from 'react';
 
-// Import the generated manifest (static import — Vite handles JSON)
-import manifestData from '../image-manifest.json';
-
+// Import the generated manifest if it exists (built by images:optimize script)
+// Uses Vite's glob import with eager:false pattern so missing file won't break build
 interface ManifestEntry {
   original: string;
   width: number;
@@ -25,7 +24,16 @@ interface ManifestEntry {
   variants: { width: number; webp: string; avif: string }[];
 }
 
-const manifest: Record<string, ManifestEntry> = manifestData as Record<string, ManifestEntry>;
+let manifest: Record<string, ManifestEntry> = {};
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modules = import.meta.glob('../image-manifest.json', { eager: true });
+  const mod = Object.values(modules)[0] as { default?: Record<string, ManifestEntry> } | undefined;
+  if (mod?.default) manifest = mod.default;
+  else if (mod) manifest = mod as unknown as Record<string, ManifestEntry>;
+} catch {
+  // No manifest — all images render as plain <img>
+}
 
 /* ── Types ─────────────────────────────────────── */
 
@@ -108,44 +116,34 @@ export default function OptimizedImage({
     .map(v => `${v.avif} ${v.width}w`)
     .join(', ');
 
-  // Fallback to smallest WebP variant
+  // Fallback to largest WebP variant
   const fallbackSrc = entry.variants[entry.variants.length - 1]?.webp || src;
 
-  // LQIP blur styles
-  const wrapperStyle: CSSProperties = {
-    position: 'relative',
-    overflow: 'hidden',
-    ...(!isLoaded && entry.lqip
-      ? {
-          backgroundImage: `url(${entry.lqip})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }
-      : {}),
-  };
-
-  const imgStyle: CSSProperties = {
-    transition: 'opacity 0.4s ease, filter 0.4s ease',
-    opacity: isLoaded ? 1 : 0,
-    filter: isLoaded ? 'none' : 'blur(20px)',
-    ...style,
-  };
-
-  // Aspect ratio for CLS prevention
-  const aspectRatio = entry.width && entry.height
-    ? `${entry.width} / ${entry.height}`
-    : undefined;
+  // Extract object-fit classes from className to apply on inner img
+  const objectFitMatch = className.match(/object-(cover|contain|fill|none|scale-down)/);
+  const innerObjectClass = objectFitMatch ? objectFitMatch[0] : '';
 
   return (
     <div
       ref={containerRef}
       className={className}
       style={{
-        ...wrapperStyle,
-        aspectRatio: !isLoaded ? aspectRatio : undefined,
+        position: 'relative',
+        overflow: 'hidden',
+        ...style,
       }}
     >
+      {/* LQIP blur background — visible until real image loads */}
+      {!isLoaded && entry.lqip && (
+        <img
+          src={entry.lqip}
+          alt=""
+          aria-hidden
+          className={`absolute inset-0 w-full h-full ${innerObjectClass}`}
+          style={{ filter: 'blur(20px)', transform: 'scale(1.1)' }}
+        />
+      )}
+
       {isInView && (
         <picture>
           <source type="image/avif" srcSet={avifSrcset} sizes={sizes} />
@@ -155,8 +153,11 @@ export default function OptimizedImage({
             alt={alt}
             width={entry.width}
             height={entry.height}
-            className="w-full h-full"
-            style={imgStyle}
+            className={`w-full h-full ${innerObjectClass}`}
+            style={{
+              transition: 'opacity 0.3s ease',
+              opacity: isLoaded ? 1 : 0,
+            }}
             loading={priority ? 'eager' : 'lazy'}
             decoding={priority ? 'sync' : 'async'}
             onLoad={() => setIsLoaded(true)}
