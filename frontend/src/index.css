@@ -1,0 +1,670 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   THEME — Brand tokens
+   ============================================================ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-ayers-cream: #f5f2ed;
+  --color-ayers-ink: #1a1a1a;
+  --color-ayers-gold: #c5a059;
+  --color-ayers-gold-light: #e8d5a3;
+  --color-ayers-dark: #151619;
+  --color-ayers-espresso: #402512;
+  --color-ayers-brown: #A97F59;
+  --color-ayers-warm-cream: #F4E7D7;
+
+  --animate-glow-rotate: glow-rotate 6s linear infinite;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --animate-fade-up: fadeUp 0.7s var(--ease-out-expo) both;
+  --animate-fade-in: fadeIn 0.6s ease both;
+  --animate-slide-in-left: slideInLeft 0.7s var(--ease-out-expo) both;
+  --animate-slide-in-right: slideInRight 0.7s var(--ease-out-expo) both;
+  --animate-scale-in: scaleIn 0.5s var(--ease-out-expo) both;
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-count-up: countUp 0.4s var(--ease-out-expo) both;
+  --animate-pulse-gold: pulse-gold 2s ease-in-out infinite;
+  --animate-page-enter: pageEnter 0.5s var(--ease-out-expo) both;
+  --animate-page-exit: pageExit 0.35s ease-in both;
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px 8px rgba(197, 160, 89, 0.15);
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes lineReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10%      { transform: translate(-5%, -10%); }
+  30%      { transform: translate(3%, -15%); }
+  50%      { transform: translate(-15%, 5%); }
+  70%      { transform: translate(8%, 12%); }
+  90%      { transform: translate(-10%, 1%); }
+}
+
+/* Glowing card rotating border — Ayers signature effect */
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes glow-rotate {
+  to { --glow-angle: 360deg; }
+}
+
+@keyframes ambientPulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes priceFlash {
+  0% { filter: brightness(1); }
+  30% { filter: brightness(1.8) drop-shadow(0 0 8px rgba(197, 160, 89, 0.6)); }
+  100% { filter: brightness(1); }
+}
+
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
+@layer base {
+
+  /* --- Smooth scrolling ----------------------------------- */
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Disable smooth scroll when user prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* --- Body ----------------------------------------------- */
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-ayers-cream);
+    color: var(--color-ayers-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* --- Text selection ------------------------------------- */
+  ::selection {
+    background: #c5a059;
+    color: white;
+  }
+
+  ::-moz-selection {
+    background: #c5a059;
+    color: white;
+  }
+
+  /* --- Images --------------------------------------------- */
+  img,
+  video {
+    max-width: 100%;
+    display: block;
+  }
+
+  img {
+    height: auto;
+  }
+
+  /* --- Links ---------------------------------------------- */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* --- Focus accessibility -------------------------------- */
+  :focus-visible {
+    outline: 2px solid var(--color-ayers-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* --- Headings ------------------------------------------- */
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+    line-height: 1.15;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* --- Serif helper --------------------------------------- */
+  .serif {
+    font-family: var(--font-serif);
+  }
+
+  /* --- Custom scrollbar (Webkit) -------------------------- */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-ayers-dark);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ayers-gold);
+    border-radius: 100px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ayers-gold-light);
+  }
+
+  /* --- Custom scrollbar (Firefox) ------------------------- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ayers-gold) var(--color-ayers-dark);
+  }
+}
+
+/* ============================================================
+   COMPONENT LAYER
+   ============================================================ */
+@layer components {
+
+  /* --- Text gradient gold --------------------------------- */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #c5a059 0%, #e8d5a3 50%, #c5a059 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* --- Noise texture overlay ------------------------------ */
+  .bg-noise {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .bg-noise::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: -1;
+    animation: grain 8s steps(10) infinite;
+  }
+
+  /* --- Glassmorphism -------------------------------------- */
+  .glass {
+    background: rgba(245, 242, 237, 0.6);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(197, 160, 89, 0.12);
+  }
+
+  .glass-dark {
+    background: rgba(21, 22, 25, 0.7);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(197, 160, 89, 0.15);
+  }
+
+  /* --- Line reveal animation ------------------------------ */
+  .line-reveal {
+    clip-path: inset(0 100% 0 0);
+    animation: lineReveal 0.8s var(--ease-out-expo) forwards;
+  }
+
+  /* --- Hover lift ----------------------------------------- */
+  .hover-lift {
+    transition: transform 0.4s var(--ease-out-expo),
+                box-shadow 0.4s var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 20px 40px -12px rgba(26, 26, 26, 0.12),
+      0 8px 20px -8px rgba(197, 160, 89, 0.08);
+  }
+
+  /* --- Page transitions ----------------------------------- */
+  .page-enter {
+    animation: pageEnter 0.5s var(--ease-out-expo) both;
+  }
+
+  .page-exit {
+    animation: pageExit 0.35s ease-in both;
+  }
+
+  /* --- Loading skeleton shimmer --------------------------- */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(197, 160, 89, 0.08) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* --- Skeleton block (for placeholder UI) ---------------- */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(26, 26, 26, 0.05);
+    border-radius: 6px;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(197, 160, 89, 0.1) 40%,
+      rgba(197, 160, 89, 0.1) 60%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* --- Marquee container ---------------------------------- */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  /* --- Gold divider --------------------------------------- */
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-ayers-gold) 50%,
+      transparent 100%
+    );
+    border: none;
+  }
+
+  /* --- Magnetic hover effect for buttons ------------------ */
+  .btn-magnetic {
+    position: relative;
+    transition: transform 0.3s var(--ease-out-expo);
+  }
+
+  /* --- Underline draw animation --------------------------- */
+  .underline-draw {
+    position: relative;
+    display: inline-block;
+  }
+
+  .underline-draw::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-ayers-gold);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out-expo);
+  }
+
+  .underline-draw:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* --- Image reveal overlay ------------------------------- */
+  .image-reveal {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-reveal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-ayers-cream);
+    transform: scaleX(1);
+    transform-origin: left;
+    transition: transform 0.9s var(--ease-in-out-smooth);
+  }
+
+  .image-reveal.revealed::after {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+
+  /* --- Split text line container -------------------------- */
+  .split-line {
+    overflow: hidden;
+    display: inline-block;
+  }
+
+  .split-line > span {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 0.7s var(--ease-out-expo);
+  }
+
+  .split-line.in-view > span {
+    transform: translateY(0);
+  }
+
+  /* --- Stagger children animation delays ------------------ */
+  .stagger-children > *:nth-child(1)  { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2)  { animation-delay: 80ms; }
+  .stagger-children > *:nth-child(3)  { animation-delay: 160ms; }
+  .stagger-children > *:nth-child(4)  { animation-delay: 240ms; }
+  .stagger-children > *:nth-child(5)  { animation-delay: 320ms; }
+  .stagger-children > *:nth-child(6)  { animation-delay: 400ms; }
+  .stagger-children > *:nth-child(7)  { animation-delay: 480ms; }
+  .stagger-children > *:nth-child(8)  { animation-delay: 560ms; }
+  .stagger-children > *:nth-child(9)  { animation-delay: 640ms; }
+  .stagger-children > *:nth-child(10) { animation-delay: 720ms; }
+
+  /* --- Parallax wrapper ----------------------------------- */
+  .parallax-wrapper {
+    overflow: hidden;
+    will-change: transform;
+  }
+
+  /* --- Cursor dot (for custom cursor implementations) ----- */
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-ayers-gold);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.15s ease;
+  }
+
+  .cursor-dot.active {
+    transform: scale(4);
+  }
+
+  /* --- Horizontal scroll section -------------------------- */
+  .horizontal-scroll-section {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .horizontal-scroll-section > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  /* --- Text mask gradient (edge fade for text) ------------ */
+  .text-mask-edges {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+  }
+}
+
+/* ============================================================
+   UTILITY LAYER
+   ============================================================ */
+@layer utilities {
+
+  /* --- Delay utilities ------------------------------------ */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+  .delay-700 { animation-delay: 700ms; }
+  .delay-800 { animation-delay: 800ms; }
+
+  /* --- Fill mode forward (keep final state of animation) -- */
+  .fill-forwards { animation-fill-mode: forwards; }
+  .fill-both     { animation-fill-mode: both; }
+
+  /* --- GPU acceleration hint ------------------------------ */
+  .gpu {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* --- No scrollbar (hide but keep scrollable) ------------ */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* --- Text balance --------------------------------------- */
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+
+  /* --- Clip-path utilities -------------------------------- */
+  .clip-inset-full { clip-path: inset(0 100% 0 0); }
+  .clip-inset-none { clip-path: inset(0 0 0 0); }
+
+  /* --- Blend mode for overlays ---------------------------- */
+  .blend-overlay    { mix-blend-mode: overlay; }
+  .blend-multiply   { mix-blend-mode: multiply; }
+  .blend-difference { mix-blend-mode: difference; }
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  nav,
+  footer,
+  .no-print,
+  .cursor-dot,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  .glass,
+  .glass-dark {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .skeleton,
+  .skeleton-shimmer {
+    animation: none !important;
+    background: #eee !important;
+  }
+}

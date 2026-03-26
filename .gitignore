@@ -211,4 +211,7 @@ public/uploads/
 # Prisma
 prisma/migrations/
 
+# Large asset folders (store in cloud storage instead)
+frontend/產品型號規格照片｜總整理/
+
 

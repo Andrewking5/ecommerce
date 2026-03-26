@@ -19,17 +19,7 @@ export const authenticateToken = async (
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  // 調試日誌：記錄認證請求
-  console.log('🔑 Authentication check:', {
-    path: req.path,
-    method: req.method,
-    hasAuthHeader: !!authHeader,
-    hasToken: !!token,
-    tokenPrefix: token ? token.substring(0, 20) + '...' : 'none',
-  });
-
   if (!token) {
-    console.warn('⚠️  No token provided for:', req.path);
     res.status(401).json({ 
       success: false,
       message: 'Access token required' 
@@ -62,14 +52,6 @@ export const authenticateToken = async (
       email: user.email,
       role: userRole,
     };
-    
-    // 調試信息
-    console.log('✅ Authentication successful:', {
-      userId: user.id,
-      email: user.email,
-      role: userRole,
-      roleType: typeof userRole,
-    });
     
     next();
     return;
@@ -111,20 +93,6 @@ export const requireAdmin = (
   
   // 檢查角色（支持字符串和枚舉類型）
   const userRole = String(authReq.user.role).toUpperCase();
-  
-  // 調試信息（生產環境也輸出，幫助診斷）
-  const debugInfo = {
-    hasUser: !!authReq.user,
-    userId: authReq.user?.id,
-    userEmail: authReq.user?.email,
-    userRole: authReq.user?.role,
-    roleType: typeof authReq.user?.role,
-    roleValue: userRole,
-    isAdmin: userRole === 'ADMIN',
-    requestPath: req.path,
-    requestMethod: req.method,
-  };
-  console.log('🔐 Admin check:', debugInfo);
   
   if (userRole !== 'ADMIN') {
     res.status(403).json({ 

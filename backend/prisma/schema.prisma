@@ -46,8 +46,9 @@ model User {
   cartItems     CartItem[]
   userBehaviors UserBehavior[]
   chatMessages  ChatMessage[]
-  subscriptions Subscription[]
-  addresses     UserAddress[]
+  subscriptions  Subscription[]
+  addresses      UserAddress[]
+  customConfigs  CustomConfig[]
 
   @@index([provider, providerId]) // 为社交登录查询优化
   @@map("users")
@@ -127,9 +128,15 @@ model Order {
   shippingAddress Json
   billingAddress  Json?
   paymentMethod   String
-  paymentIntentId String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  paymentIntentId   String?
+  trackingNumber    String?
+  carrier           String?
+  trackingUrl       String?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  estimatedDelivery DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // 關聯
   user       User        @relation(fields: [userId], references: [id])
@@ -139,7 +146,33 @@ model Order {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([trackingNumber])
   @@map("orders")
+}
+
+// Newsletter 訂閱
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  isActive     Boolean  @default(true)
+  subscribedAt DateTime @default(now())
+  unsubscribedAt DateTime?
+
+  @@map("newsletter_subscribers")
+}
+
+// 聯絡表單
+model ContactInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  isResolved Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("contact_inquiries")
 }
 
 // 訂單項目模型
@@ -502,4 +535,59 @@ model ProductAttributeTemplate {
   @@index([categoryId])
   @@index([isDefault])
   @@map("product_attribute_templates")
+}
+
+model HomeBanner {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  subtitle     String
+  titleWord1   String
+  titleWord2   String
+  titleColor1  String   @default("text-ayers-warm-cream")
+  titleColor2  String   @default("text-ayers-gold")
+  body         String
+  ctaLabel     String
+  ctaLink      String
+  image        String
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, displayOrder])
+  @@map("home_banners")
+}
+
+// 客製化吉他配置分享（社群靈感作品集）
+model CustomConfig {
+  id          String   @id @default(cuid())
+  title       String                          // 作品名稱
+  selections  Json                            // 全部 10 步驟選項 (key-value)
+  uploads     Json?                           // 客製化圖片 URL map, e.g. {"inlayTop": "/uploads/custom/xxx.jpg"}
+  thumbnail   String?                         // 3D 截圖 URL
+  totalPrice  Decimal  @db.Decimal(10, 2)     // 配置總價
+  isPublic    Boolean  @default(false)        // 是否公開到社群
+  likes       Int      @default(0)
+
+  // 作者
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublic, likes])
+  @@index([userId])
+  @@map("custom_configs")
+}
+
+// 客製化配置按讚紀錄
+model CustomConfigLike {
+  id        String   @id @default(cuid())
+  configId  String
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([configId, userId])
+  @@map("custom_config_likes")
 }

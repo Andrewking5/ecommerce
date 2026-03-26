@@ -250,5 +250,40 @@ export class EmailService {
       throw new Error('Failed to send email');
     }
   }
+
+  /**
+   * Send contact form notification to admin
+   */
+  static async sendContactNotification(
+    to: string,
+    data: { name: string; email: string; subject: string; message: string }
+  ): Promise<void> {
+    const html = `
+      <h2>New Contact Form Submission</h2>
+      <p><strong>From:</strong> ${data.name} (${data.email})</p>
+      <p><strong>Subject:</strong> ${data.subject}</p>
+      <hr />
+      <p>${data.message.replace(/\n/g, '<br />')}</p>
+    `;
+    await this.sendEmail({ to, subject: `[Ayers Guitars] Contact: ${data.subject}`, html, text: data.message });
+  }
+
+  /**
+   * Send auto-reply to contact form submitter
+   */
+  static async sendContactAutoReply(
+    to: string,
+    data: { name: string }
+  ): Promise<void> {
+    const html = `
+      <h2>Thank you for contacting Ayers Guitars</h2>
+      <p>Dear ${data.name},</p>
+      <p>We have received your message and will get back to you within 1-2 business days.</p>
+      <p>If your inquiry is urgent, please call us at +886 5 123 4567.</p>
+      <br />
+      <p>Best regards,<br />Ayers Guitars Customer Support</p>
+    `;
+    await this.sendEmail({ to, subject: 'We received your message — Ayers Guitars', html });
+  }
 }
 

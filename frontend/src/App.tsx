@@ -1,141 +1,151 @@
-import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
-import ErrorBoundary from '@/components/common/ErrorBoundary'
-import LoadingSpinner from '@/components/common/LoadingSpinner'
-import Layout from '@/components/layout/Layout'
-import AdminLayout from '@/components/layout/AdminLayout'
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-// 公开路由 - 立即加载
-import Home from '@/pages/Home'
-import Products from '@/pages/Products'
-import ProductDetail from '@/pages/ProductDetail'
-import Cart from '@/pages/Cart'
-import Login from '@/pages/Login'
-import Register from '@/pages/Register'
-import AuthCallback from '@/pages/AuthCallback'
-import Privacy from '@/pages/Privacy'
-import DataDeletion from '@/pages/DataDeletion'
-import NotFound from '@/pages/NotFound'
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CartProvider } from './contexts/CartContext';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
-// 受保护路由 - 懒加载
-const Checkout = lazy(() => import('@/pages/Checkout'))
-const CheckoutSuccess = lazy(() => import('@/pages/CheckoutSuccess'))
-const CheckoutCancel = lazy(() => import('@/pages/CheckoutCancel'))
-const Profile = lazy(() => import('@/pages/Profile'))
-const Addresses = lazy(() => import('@/pages/Addresses'))
-const Orders = lazy(() => import('@/pages/Orders'))
-const OrderDetail = lazy(() => import('@/pages/OrderDetail'))
+import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
+import { GuitarSunLoader } from './components/guitar';
 
-// 管理后台路由 - 懒加载
-const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
-const AdminProducts = lazy(() => import('@/pages/admin/AdminProducts'))
-const AdminProductForm = lazy(() => import('@/pages/admin/AdminProductForm'))
-const AdminCategories = lazy(() => import('@/pages/admin/AdminCategories'))
-const AdminInventory = lazy(() => import('@/pages/admin/AdminInventory'))
-const AdminOrders = lazy(() => import('@/pages/admin/AdminOrders'))
-const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'))
-const AdminTrash = lazy(() => import('@/pages/admin/AdminTrash'))
+// Eagerly load the home page for fast initial render
+import Home from './pages/Home';
 
-function App() {
+// Lazy-load all other pages for code splitting
+const Collections = lazy(() => import('./pages/Collections'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Customizer = lazy(() => import('./pages/Customizer'));
+const Community = lazy(() => import('./pages/Community'));
+const StoreLocator = lazy(() => import('./pages/StoreLocator'));
+const Support = lazy(() => import('./pages/Support'));
+const Account = lazy(() => import('./pages/Account'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Technology = lazy(() => import('./pages/Technology'));
+const Login = lazy(() => import('./pages/Login'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Warranty = lazy(() => import('./pages/Warranty'));
+const Shipping = lazy(() => import('./pages/Shipping'));
+const Contact = lazy(() => import('./pages/Contact'));
+const About = lazy(() => import('./pages/About'));
+const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+function PageLoader() {
   return (
-    <ErrorBoundary>
-    <div className="min-h-screen bg-background-primary">
-      <Routes>
-        {/* 公開路由 */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="products" element={<Products />} />
-          <Route path="products/:id" element={<ProductDetail />} />
-          <Route path="cart" element={<Cart />} />
-        </Route>
-
-        {/* 結帳路由（需要認證） */}
-        <Route path="/checkout" element={<Layout />}>
-          <Route index element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><Checkout /></Suspense>} />
-          <Route path="success" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><CheckoutSuccess /></Suspense>} />
-          <Route path="cancel" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><CheckoutCancel /></Suspense>} />
-        </Route>
-
-        {/* 認證路由 */}
-        <Route path="/auth">
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="callback" element={<AuthCallback />} />
-        </Route>
-
-        {/* 法律頁面 */}
-        <Route path="/privacy" element={<Layout />}>
-          <Route index element={<Privacy />} />
-        </Route>
-        <Route path="/data-deletion" element={<Layout />}>
-          <Route index element={<DataDeletion />} />
-        </Route>
-
-        {/* 受保護路由 */}
-        <Route path="/user" element={<Layout />}>
-          <Route path="profile" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><Profile /></Suspense>} />
-          <Route path="addresses" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><Addresses /></Suspense>} />
-          <Route path="orders" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><Orders /></Suspense>} />
-          <Route path="orders/:id" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><OrderDetail /></Suspense>} />
-        </Route>
-
-        {/* 管理員路由 */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminDashboard /></Suspense>} />
-          <Route path="products" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProducts /></Suspense>} />
-          <Route path="products/new" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProductForm /></Suspense>} />
-          <Route path="products/:id/edit" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminProductForm /></Suspense>} />
-          <Route path="categories" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminCategories /></Suspense>} />
-          <Route path="inventory" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminInventory /></Suspense>} />
-          <Route path="orders" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminOrders /></Suspense>} />
-          <Route path="users" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminUsers /></Suspense>} />
-          <Route path="trash" element={<Suspense fallback={<LoadingSpinner size="lg" className="py-20" />}><AdminTrash /></Suspense>} />
-        </Route>
-
-        {/* 404 頁面 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      
-      {/* Toast 通知 - 优化为不干扰用户操作 */}
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          duration: 2000, // 缩短显示时间到2秒
-          style: {
-            background: '#363636',
-            color: '#fff',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            fontSize: '14px',
-            maxWidth: '300px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          },
-          success: {
-            iconTheme: {
-              primary: '#34C759',
-              secondary: '#fff',
-            },
-            duration: 2000,
-          },
-          error: {
-            iconTheme: {
-              primary: '#FF3B30',
-              secondary: '#fff',
-            },
-            duration: 3000, // 错误信息稍长一点
-          },
-        }}
-        containerStyle={{
-          bottom: '20px',
-          right: '20px',
-        }}
-      />
+    <div className="min-h-screen flex items-center justify-center bg-ayers-cream">
+      <GuitarSunLoader size={72} />
     </div>
-    </ErrorBoundary>
-  )
+  );
 }
 
-export default App
+function ProtectedRoute({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {
+  const { isAuthenticated, isLoading, isAdmin } = useAuth();
 
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
+  if (!isAuthenticated) {
+    return <Navigate to="../login" replace />;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="../login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+/**
+ * Sync i18n language with the :lang URL parameter.
+ */
+function LanguageSync() {
+  const { lang } = useParams<{ lang: string }>();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    if (lang && isSupportedLang(lang) && i18n.language !== lang) {
+      i18n.changeLanguage(lang);
+    }
+  }, [lang, i18n]);
+
+  return null;
+}
+
+/**
+ * Redirect root `/` to `/:detectedLang/`
+ */
+function RootRedirect() {
+  const { i18n } = useTranslation();
+  const lang = isSupportedLang(i18n.language) ? i18n.language : 'zh-TW';
+  return <Navigate to={`/${lang}`} replace />;
+}
+
+function AppLayout() {
+  const location = useStrippedLocation();
+  const isFullscreen = location.pathname === '/customizer';
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <LanguageSync />
+      <Navbar />
+      <main className={isFullscreen ? 'flex-grow' : 'flex-grow pt-20'}>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="product/:id" element={<ProductDetail />} />
+            <Route path="customizer" element={<Customizer />} />
+            <Route path="community" element={<Community />} />
+            <Route path="store-locator" element={<StoreLocator />} />
+            <Route path="support" element={<Support />} />
+            <Route path="account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path="admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="checkout/success" element={<CheckoutSuccess />} />
+            <Route path="orders/:id/tracking" element={<OrderTracking />} />
+            <Route path="technology" element={<Technology />} />
+            <Route path="login" element={<Login />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
+            <Route path="warranty" element={<Warranty />} />
+            <Route path="shipping" element={<Shipping />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="about" element={<About />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {!isFullscreen && <Footer />}
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <HelmetProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Router>
+            <Routes>
+              {/* Root → redirect to detected language */}
+              <Route path="/" element={<RootRedirect />} />
+              {/* All pages under /:lang/ */}
+              <Route path="/:lang/*" element={<AppLayout />} />
+            </Routes>
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
+  );
+}

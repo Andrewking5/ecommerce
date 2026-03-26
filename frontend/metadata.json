@@ -1,0 +1,7 @@
+{
+  "name": "Ayers Guitars - Premium Acoustic Experience",
+  "description": "A high-end guitar showcase and 3D customization platform for Ayers Guitars.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

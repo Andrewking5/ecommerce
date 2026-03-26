@@ -526,10 +526,11 @@ export class ProductController {
       const categories = await prisma.category.findMany({
         select: { id: true, slug: true, name: true },
       });
+      type CategoryEntry = { id: string; slug: string; name: string };
       const categoryMaps = {
-        byId: new Map(categories.map(c => [c.id, c])),
-        bySlug: new Map(categories.map(c => [c.slug, c])),
-        byName: new Map(categories.map(c => [c.name.toLowerCase(), c])),
+        byId: new Map<string, CategoryEntry>(categories.map((c: CategoryEntry) => [c.id, c])),
+        bySlug: new Map<string, CategoryEntry>(categories.map((c: CategoryEntry) => [c.slug, c])),
+        byName: new Map<string, CategoryEntry>(categories.map((c: CategoryEntry) => [c.name.toLowerCase(), c])),
       };
 
       // 批量创建商品
@@ -549,8 +550,6 @@ export class ProductController {
           }
         }
       }
-      
-      console.log(`📋 [批量创建] 总共 ${productsData.length} 个商品，同一批请求中有 ${duplicateNamesInBatch.size} 个重复名称:`, Array.from(duplicateNamesInBatch));
       
       // 批量创建商品
       for (let i = 0; i < productsData.length; i++) {
@@ -576,24 +575,13 @@ export class ProductController {
               data: productData,
               error: errorMessage,
             });
-            console.log(`⚠️ [批量创建] 商品索引 ${i + 1} "${productData.name}" 在同一批请求中重复`);
             continue;
           }
 
           // 檢查商品名稱唯一性（检查数据库中是否已存在）
-          // 添加调试日志
-          console.log(`🔍 [商品名称检查] 检查商品 "${productData.name}" 是否已在数据库中存在...`);
           const nameExists = await checkProductNameExists(productData.name);
-          console.log(`🔍 [商品名称检查] 商品 "${productData.name}" 检查结果: ${nameExists ? '已存在' : '不存在'}`);
-          
+
           if (nameExists) {
-            // 如果检查到已存在，再次查询确认（用于调试）
-            const existingProduct = await prisma.product.findFirst({
-              where: { name: productData.name.trim() },
-              select: { id: true, name: true, createdAt: true },
-            });
-            console.log(`⚠️ [商品名称检查] 找到已存在的商品:`, existingProduct);
-            
             // 确保错误信息是中文，不使用国际化key
             const errorMessage = `商品名称 "${productData.name}" 已存在，请修改商品名称`;
             results.failed.push({
@@ -626,24 +614,6 @@ export class ProductController {
           const images = normalizeImages(productData.images);
           const stock = normalizeStock(productData.stock);
           
-          console.log(`📦 [后端] 创建商品 "${productData.name}":`, {
-            images: images,
-            imagesInput: productData.images,
-            imagesInputType: typeof productData.images,
-            imagesInputJSON: JSON.stringify(productData.images),
-            imagesCount: images.length,
-            stock: stock,
-            stockInput: productData.stock,
-            stockInputType: typeof productData.stock,
-            hasVariants: productData.hasVariants,
-            fullProductData: JSON.stringify(productData, null, 2), // 完整商品数据用于调试
-          });
-          
-          // 如果图片数组为空，发出警告
-          if (images.length === 0 && productData.images) {
-            console.warn(`⚠️ [后端] 商品 "${productData.name}" 的图片URL处理结果为空，原始值:`, productData.images, '类型:', typeof productData.images);
-          }
-
           const product = await prisma.product.create({
             data: {
               name: productData.name,
@@ -664,24 +634,6 @@ export class ProductController {
             },
           });
           
-          // 验证创建后的商品数据
-          const createdProduct = await prisma.product.findUnique({
-            where: { id: product.id },
-            select: { id: true, name: true, stock: true, hasVariants: true },
-          });
-          
-          console.log(`✅ [后端] 商品创建成功 "${product.name}":`, {
-            id: product.id,
-            images: product.images,
-            stock: product.stock,
-            stockType: typeof product.stock,
-            hasVariants: product.hasVariants,
-            verifiedStock: createdProduct?.stock, // 从数据库重新查询验证
-            stockMatch: product.stock === createdProduct?.stock,
-            stockInput: productData.stock, // 原始输入值
-            normalizedStock: stock, // 处理后的库存值
-          });
-
           results.success.push(product);
         } catch (error: any) {
           console.error(`Failed to create product at index ${i + 1}:`, error);
@@ -925,8 +877,6 @@ export class ProductController {
       CacheService.delete(CACHE_KEYS.CATEGORIES);
       CacheService.deleteByPrefix(CACHE_KEYS.PRODUCTS);
 
-      console.log(`✅ [恢复商品] 商品 "${restoredProduct.name}" 已恢复`);
-
       res.json({
         success: true,
         message: '商品已恢复',
@@ -974,7 +924,7 @@ export class ProductController {
       }
 
       // 使用事务删除商品及其关联数据
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         // 删除变体（级联删除会自动删除变体属性关联）
         if (product.variants.length > 0) {
           await tx.productVariant.deleteMany({
@@ -1004,8 +954,6 @@ export class ProductController {
       CacheService.delete(`${CACHE_KEYS.PRODUCT}:${id}`);
       CacheService.delete(CACHE_KEYS.CATEGORIES);
       CacheService.deleteByPrefix(CACHE_KEYS.PRODUCTS);
-
-      console.log(`🗑️ [永久删除] 商品 "${product.name}" 已从数据库中永久删除`);
 
       res.json({
         success: true,

@@ -34,6 +34,10 @@ import reviewRoutes from './routes/reviews';
 import addressRoutes from './routes/addresses';
 import attributeRoutes from './routes/attributes';
 import variantRoutes from './routes/variants';
+import contactRoutes from './routes/contact';
+import newsletterRoutes from './routes/newsletter';
+import bannerRoutes from './routes/banners';
+import customConfigRoutes from './routes/customConfigs';
 
 // 初始化 Prisma 客戶端
 // 注意：在 Render 上，数据库连接可能会因为空闲而关闭
@@ -83,24 +87,17 @@ app.use(cors({
       process.env.FRONTEND_URL,
       'https://ecommerce-frontend-liard-omega.vercel.app',
     ].filter(Boolean);
-    
-    // 調試日誌
-    if (process.env.NODE_ENV === 'production') {
-      console.log('🌐 CORS check:', {
-        origin,
-        allowedOrigins,
-        frontendUrl: process.env.FRONTEND_URL,
-        isAllowed: !origin || allowedOrigins.includes(origin || ''),
-      });
-    }
-    
+
     if (!origin) {
       // 允許沒有 origin 的請求（例如 Postman、服務器端請求、健康檢查等）
-      // 這是正常的，因為某些請求（如 Render 的健康檢查、curl、Postman）沒有 origin 頭
       return callback(null, true);
     }
-    
-    if (allowedOrigins.includes(origin)) {
+
+    // 允許已列出的來源 + 開發環境的區域網路 IP（192.168.x.x / 172.x.x.x / 10.x.x.x）
+    const isAllowed = allowedOrigins.includes(origin);
+    const isLocalNetwork = process.env.NODE_ENV !== 'production' && /^https?:\/\/(192\.168\.|172\.(1[6-9]|2\d|3[01])\.|10\.|127\.)/.test(origin);
+
+    if (isAllowed || isLocalNetwork) {
       callback(null, true);
     } else {
       console.warn('⚠️ CORS blocked:', origin);
@@ -150,12 +147,14 @@ app.use('/uploads', (req, res, next): void => {
     process.env.FRONTEND_URL,
     'https://ecommerce-frontend-liard-omega.vercel.app',
   ].filter(Boolean);
-  
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+
+  const isAllowed = origin && allowedOrigins.includes(origin);
+  const isLocalNetwork = origin && process.env.NODE_ENV !== 'production' && /^https?:\/\/(192\.168\.|172\.(1[6-9]|2\d|3[01])\.|10\.|127\.)/.test(origin);
+
+  if (isAllowed || isLocalNetwork) {
+    res.setHeader('Access-Control-Allow-Origin', origin!);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   } else if (!origin) {
-    // 允许没有 origin 的请求（直接访问图片）
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
   
@@ -186,6 +185,10 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/attributes', attributeRoutes);
 app.use('/api/variants', variantRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/banners', bannerRoutes);
+app.use('/api/custom-configs', customConfigRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

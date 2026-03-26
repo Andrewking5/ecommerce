@@ -480,11 +480,28 @@ export class OrderController {
   static async updateOrderStatus(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { status } = req.body;
+      const { status, trackingNumber, carrier, trackingUrl, estimatedDelivery } = req.body;
+
+      // Build update data
+      const updateData: any = { status };
+
+      // When shipping, record tracking info
+      if (status === 'SHIPPED') {
+        updateData.shippedAt = new Date();
+        if (trackingNumber) updateData.trackingNumber = trackingNumber;
+        if (carrier) updateData.carrier = carrier;
+        if (trackingUrl) updateData.trackingUrl = trackingUrl;
+        if (estimatedDelivery) updateData.estimatedDelivery = new Date(estimatedDelivery);
+      }
+
+      // When delivered, record delivery time
+      if (status === 'DELIVERED') {
+        updateData.deliveredAt = new Date();
+      }
 
       const order = await prisma.order.update({
         where: { id },
-        data: { status },
+        data: updateData,
         include: {
           orderItems: {
             include: {
@@ -506,7 +523,6 @@ export class OrderController {
         }
       } catch (emailError) {
         console.error('Failed to send order status update email:', emailError);
-        // 不阻止状态更新，只记录错误
       }
 
       res.json({

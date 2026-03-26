@@ -21,9 +21,9 @@ router.get('/:orderId', PaymentController.getPaymentStatus);
 
 // 管理员路由
 router.get('/admin/payments', requireAdmin, PaymentController.getAllPayments);
+router.get('/admin/payments/stats', requireAdmin, PaymentController.getPaymentStats);
 router.get('/admin/payments/:id', requireAdmin, PaymentController.getPaymentById);
 router.post('/admin/payments/:id/refund', requireAdmin, PaymentController.processRefund);
-router.get('/admin/payments/stats', requireAdmin, PaymentController.getPaymentStats);
 
 export default router;
 

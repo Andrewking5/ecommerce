@@ -1,106 +1,192 @@
-import React from 'react';
-import Card from '@/components/ui/Card';
+import { motion } from 'motion/react';
+import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
+import { Shield, Eye, Lock, Cookie, Globe, UserCheck, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const Privacy: React.FC = () => {
+export default function Privacy() {
+  const { t } = useTranslation();
+
+  const sections = [
+    {
+      icon: Eye,
+      title: t('privacy.informationWeCollect.title', 'Information We Collect'),
+      content: [
+        t('privacy.informationWeCollect.intro', 'When you visit our website, place an order, or interact with our services, we may collect the following types of information:'),
+        t('privacy.informationWeCollect.personalInfo', 'Personal identification information: name, email address, phone number, shipping and billing addresses.'),
+        t('privacy.informationWeCollect.paymentInfo', 'Payment information: credit card details are processed securely through our third-party payment processors and are never stored on our servers.'),
+        t('privacy.informationWeCollect.technicalData', 'Technical data: IP address, browser type, device information, pages visited, and browsing patterns on our website.'),
+        t('privacy.informationWeCollect.communicationRecords', 'Communication records: any correspondence you have with our customer service team, including emails and support tickets.'),
+        t('privacy.informationWeCollect.accountInfo', 'Account information: if you create an account, we store your login credentials (password is encrypted), order history, and preferences.'),
+      ],
+    },
+    {
+      icon: Shield,
+      title: t('privacy.howWeUse.title', 'How We Use Your Information'),
+      content: [
+        t('privacy.howWeUse.intro', 'We use the information we collect for the following purposes:'),
+        t('privacy.howWeUse.orderFulfillment', 'Order fulfillment: processing and shipping your purchases, sending order confirmations and tracking information.'),
+        t('privacy.howWeUse.customerService', 'Customer service: responding to your inquiries, providing technical support, and handling warranty claims for your Ayers instruments.'),
+        t('privacy.howWeUse.productImprovement', 'Product improvement: analyzing usage patterns to improve our website, products, and services.'),
+        t('privacy.howWeUse.marketing', 'Marketing communications: with your consent, sending newsletters, product announcements, and promotional offers. You can opt out at any time.'),
+        t('privacy.howWeUse.legalCompliance', 'Legal compliance: meeting our legal obligations, resolving disputes, and enforcing our agreements.'),
+      ],
+    },
+    {
+      icon: Lock,
+      title: t('privacy.security.title', 'Data Protection & Security'),
+      content: [
+        t('privacy.security.intro', 'We implement industry-standard security measures to protect your personal information:'),
+        t('privacy.security.encryption', 'All data transmissions are encrypted using SSL/TLS technology (256-bit encryption).'),
+        t('privacy.security.pciCompliant', 'Payment processing is handled by PCI DSS compliant third-party providers.'),
+        t('privacy.security.accessRestricted', 'Access to personal data is restricted to authorized personnel only, on a need-to-know basis.'),
+        t('privacy.security.assessments', 'We conduct regular security assessments and vulnerability testing of our systems.'),
+        t('privacy.security.storage', 'Personal data is stored on secure servers with enterprise-grade firewall protection.'),
+        t('privacy.security.breachNotification', 'In the event of a data breach, we will notify affected users and relevant authorities in accordance with applicable laws.'),
+      ],
+    },
+    {
+      icon: Cookie,
+      title: t('privacy.cookies.title', 'Cookies & Tracking'),
+      content: [
+        t('privacy.cookies.intro', 'Our website uses cookies and similar technologies to enhance your browsing experience:'),
+        t('privacy.cookies.essential', 'Essential cookies: required for the website to function properly, including shopping cart functionality and secure checkout.'),
+        t('privacy.cookies.analytics', 'Analytics cookies: help us understand how visitors interact with our website, allowing us to improve site performance and user experience.'),
+        t('privacy.cookies.marketing', 'Marketing cookies: used to deliver relevant advertisements and track the effectiveness of our marketing campaigns.'),
+        t('privacy.cookies.manage', 'You can manage your cookie preferences through your browser settings. Disabling certain cookies may affect website functionality.'),
+        t('privacy.cookies.googleAnalytics', 'We use Google Analytics for website analytics. You can opt out by installing the Google Analytics Opt-out Browser Add-on.'),
+      ],
+    },
+    {
+      icon: Globe,
+      title: t('privacy.thirdParty.title', 'Third-Party Services'),
+      content: [
+        t('privacy.thirdParty.intro', 'We work with trusted third-party service providers to operate our business:'),
+        t('privacy.thirdParty.payment', 'Payment processors: for secure transaction processing (e.g., Stripe, PayPal).'),
+        t('privacy.thirdParty.shipping', 'Shipping carriers: to deliver your orders and provide tracking information.'),
+        t('privacy.thirdParty.email', 'Email service providers: for transactional and marketing email communications.'),
+        t('privacy.thirdParty.analyticsProviders', 'Analytics providers: for website analytics and performance monitoring.'),
+        t('privacy.thirdParty.cloudHosting', 'Cloud hosting: our website and data are hosted on secure cloud infrastructure.'),
+        t('privacy.thirdParty.obligation', 'These third parties are contractually obligated to protect your information and may only use it for the specific services they provide to us.'),
+      ],
+    },
+    {
+      icon: UserCheck,
+      title: t('privacy.yourRights.title', 'Your Rights'),
+      content: [
+        t('privacy.yourRights.intro', 'You have the following rights regarding your personal information:'),
+        t('privacy.yourRights.access', 'Right of access: request a copy of the personal data we hold about you.'),
+        t('privacy.yourRights.rectification', 'Right to rectification: request correction of inaccurate or incomplete personal data.'),
+        t('privacy.yourRights.erasure', 'Right to erasure: request deletion of your personal data, subject to legal retention requirements.'),
+        t('privacy.yourRights.restrict', 'Right to restrict processing: request that we limit how we use your data.'),
+        t('privacy.yourRights.portability', 'Right to data portability: receive your data in a structured, machine-readable format.'),
+        t('privacy.yourRights.object', 'Right to object: object to the processing of your personal data for marketing purposes.'),
+        t('privacy.yourRights.contact', 'To exercise any of these rights, please contact us at service@ayersguitars.com. We will respond to your request within 30 days.'),
+      ],
+    },
+    {
+      icon: Mail,
+      title: t('privacy.contactUs.title', 'Contact Us'),
+      content: [
+        t('privacy.contactUs.intro', 'If you have any questions or concerns about this Privacy Policy or our data practices, please contact us:'),
+        t('privacy.contactUs.company', 'Ayers Guitars Co., Ltd.'),
+        t('privacy.contactUs.email', 'Email: service@ayersguitars.com'),
+        t('privacy.contactUs.website', 'Website: www.ayersguitars.com'),
+        t('privacy.contactUs.commitment', 'We are committed to resolving any concerns you may have about our collection and use of your personal information.'),
+      ],
+    },
+  ];
 
   return (
-    <div className="container-apple py-12">
-        <Card className="max-w-4xl mx-auto">
-          <div className="prose prose-lg max-w-none">
-            <h1 className="text-3xl font-bold mb-6">隱私政策</h1>
-            <p className="text-text-secondary mb-4">最後更新日期：{new Date().toLocaleDateString('zh-TW')}</p>
+    <div className="bg-ayers-cream min-h-screen">
+      {/* Hero */}
+      <section className="bg-ayers-dark py-24 md:py-32">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-6">
+              {t('privacy.heroLabel', 'Legal')}
+            </p>
+            <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
+              {t('privacy.heroTitle', 'Privacy Policy')}
+            </h1>
+            <p className="text-lg text-white/50 max-w-2xl mx-auto">
+              {t('privacy.heroDescription', 'Your privacy matters to us. This policy outlines how Ayers Guitars collects, uses, and protects your personal information.')}
+            </p>
+            <p className="text-sm text-white/30 mt-6">
+              {t('privacy.lastUpdated', 'Last updated: March 1, 2026')}
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">1. 資料收集</h2>
-              <p className="text-text-secondary mb-4">
-                我們收集以下類型的個人資料：
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-text-secondary mb-4">
-                <li>姓名、電子郵件地址、電話號碼</li>
-                <li>送貨地址和帳單地址</li>
-                <li>付款資訊（透過安全的第三方支付處理器）</li>
-                <li>訂單歷史和購買記錄</li>
-                <li>透過 Facebook 登入時提供的個人資料</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">2. 資料使用</h2>
-              <p className="text-text-secondary mb-4">
-                我們使用收集的資料用於：
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-text-secondary mb-4">
-                <li>處理和完成您的訂單</li>
-                <li>提供客戶服務和支持</li>
-                <li>發送訂單確認和更新</li>
-                <li>改善我們的服務和用戶體驗</li>
-                <li>遵守法律義務</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">3. 資料分享</h2>
-              <p className="text-text-secondary mb-4">
-                我們不會出售您的個人資料。我們可能與以下第三方分享資料：
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-text-secondary mb-4">
-                <li>支付處理器（如 Stripe）以處理付款</li>
-                <li>物流服務提供商以完成訂單配送</li>
-                <li>社交媒體平台（如 Facebook）當您使用社交登入時</li>
-                <li>法律要求時向執法機構提供</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">4. 資料安全</h2>
-              <p className="text-text-secondary mb-4">
-                我們採用業界標準的安全措施來保護您的個人資料，包括加密、安全伺服器和存取控制。
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">5. 您的權利</h2>
-              <p className="text-text-secondary mb-4">
-                您有權：
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-text-secondary mb-4">
-                <li>存取您的個人資料</li>
-                <li>更正不準確的資料</li>
-                <li>要求刪除您的資料（請參閱<a href="/data-deletion" className="text-brand-blue hover:underline">資料刪除說明</a>）</li>
-                <li>反對某些資料處理活動</li>
-                <li>資料可攜權</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">6. Cookie 使用</h2>
-              <p className="text-text-secondary mb-4">
-                我們使用 Cookie 來改善您的瀏覽體驗、記住您的偏好並分析網站流量。您可以透過瀏覽器設定管理 Cookie。
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">7. 聯絡我們</h2>
-              <p className="text-text-secondary mb-4">
-                如果您對本隱私政策有任何疑問，請透過以下方式聯絡我們：
-              </p>
-              <ul className="list-none space-y-2 text-text-secondary mb-4">
-                <li>電子郵件：anpenghuang@gmail.com</li>
-                <li>地址：台北市北投區知行路115號</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">8. 政策變更</h2>
-              <p className="text-text-secondary mb-4">
-                我們可能會不時更新本隱私政策。重大變更將透過電子郵件或網站公告通知您。
-              </p>
-            </section>
+      {/* Content */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-16">
+            {sections.map((section, i) => (
+              <motion.div
+                key={section.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5"
+              >
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center">
+                    <section.icon className="text-ayers-gold" size={22} />
+                  </div>
+                  <h2 className="text-2xl font-serif italic font-bold">{section.title}</h2>
+                </div>
+                <div className="space-y-4">
+                  {section.content.map((paragraph, j) => (
+                    <p
+                      key={j}
+                      className={`text-sm leading-relaxed ${
+                        j === 0
+                          ? 'text-ayers-ink/80 font-medium'
+                          : 'text-ayers-ink/60 pl-4 border-l-2 border-ayers-gold/20'
+                      }`}
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
           </div>
-        </Card>
-      </div>
+
+          {/* Footer note */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mt-20"
+          >
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-ayers-gold/30 to-transparent mb-8" />
+            <p className="text-sm text-ayers-ink/40">
+              {t('privacy.footerNote', 'This privacy policy is effective as of March 1, 2026 and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.')}
+            </p>
+            <div className="mt-8 flex justify-center space-x-6">
+              <Link
+                to="/terms"
+                className="text-xs font-bold uppercase tracking-widest text-ayers-gold hover:opacity-70 transition-opacity"
+              >
+                {t('privacy.termsLink', 'Terms of Service')}
+              </Link>
+              <Link
+                to="/contact"
+                className="text-xs font-bold uppercase tracking-widest text-ayers-gold hover:opacity-70 transition-opacity"
+              >
+                {t('privacy.contactLink', 'Contact Us')}
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
   );
-};
-
-export default Privacy;
-
+}
