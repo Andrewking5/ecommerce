@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/anpen/AI/web_design/E-commerce/frontend/src -type f -name *data* -o -name *product* -o -name *constant*)",
+      "Bash(find /c/Users/anpen/AI/web_design/E-commerce/frontend/public -type f \\\\\\(-name *.json -o -name *product* -o -name *image* \\\\\\))",
+      "Bash(ls -la \"c:\\\\Users\\\\anpen\\\\AI\\\\web_design\\\\E-commerce\\\\backend\\\\src\\\\routes\"\" 2>/dev/null || echo \"Routes directory not found \")",
+      "Bash(grep -r \"SITE_URL\\\\|domain\\\\|DOMAIN\" /c/Users/anpen/AI/web_design/E-commerce/frontend/.env*)",
+      "Bash(ls prisma/*.db)",
+      "Bash(ls prisma/*.sqlite)",
+      "Bash(npx jest:*)",
+      "Bash(node -e \":*)",
+      "Bash(grep -rn from.*animations c:UsersanpenAIweb_designE-commercefrontendsrc --include=*.tsx --include=*.ts)",
+      "Bash(sort -t'|' -k1 -rn)",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}

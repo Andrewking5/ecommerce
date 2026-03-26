@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Search, Phone, Navigation, Globe, X, Map, ExternalLink } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import { useLocalizedNavigate } from '@/src/lib/i18nRouting';
+import OptimizedImage from '@/src/components/OptimizedImage';
 
 interface Dealer {
   name: string;
@@ -302,11 +303,11 @@ export default function StoreLocator() {
                 className={`block aspect-[16/10] overflow-hidden relative ${dealer.web ? 'cursor-pointer' : 'cursor-default'}`}
                 onClick={(e) => { if (!dealer.web) e.preventDefault(); }}
               >
-                <img
+                <OptimizedImage
                   src={dealer.img}
                   alt={dealer.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                 />
                 {dealer.distance !== null && (
                   <span className="absolute top-3 right-3 bg-ayers-dark/80 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full">

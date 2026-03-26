@@ -1,0 +1,20 @@
+{
+  "name": "Ayers Guitars",
+  "short_name": "Ayers",
+  "description": "Premium handcrafted acoustic guitars from Taiwan since 1996",
+  "start_url": "/zh-TW",
+  "display": "standalone",
+  "background_color": "#f5f2ed",
+  "theme_color": "#1a1714",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "music"],
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

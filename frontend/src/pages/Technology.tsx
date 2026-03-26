@@ -2,18 +2,30 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, Zap, Wind, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import OptimizedImage from '../components/OptimizedImage';
+import SEO from '../components/SEO';
 
 export default function Technology() {
   const { t } = useTranslation();
   return (
     <div className="bg-ayers-cream min-h-screen">
+      <SEO
+        title={t('tech.heroTitle', 'AYERS 2.0 — 重新定義聲學卓越')}
+        description={t('tech.feature1Desc', 'SUNWAVE 系統、T-Line 無縫延音技術、Awesome 弦釘系統 — Ayers 三大核心聲學技術。')}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: t('tech.heroTitle', 'Technology'), url: '/technology' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden bg-ayers-dark text-white">
         <div className="absolute inset-0 z-0 opacity-30">
-          <img
+          <OptimizedImage
             src="/images/products/ayers-tech-1.png"
             alt="Ayers Sunwave Technology"
             className="w-full h-full object-contain"
+            priority
+            sizes="100vw"
           />
         </div>
         <div className="relative z-10 text-center max-w-4xl px-4">
@@ -42,10 +54,11 @@ export default function Technology() {
               >
                 <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_20s_linear_infinite]" />
                 <div className="absolute inset-8 border border-white/20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-                <img
+                <OptimizedImage
                   src="/images/products/ayers-tech-2.png"
                   alt={t('tech.bracingAlt', 'Ayers 力木結構')}
                   className="w-full h-full object-contain relative z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                 />
                 {/* Hotspots */}
                 <Hotspot x="30%" y="40%" label={t('tech.hotspot1Label', 'SUNWAVE 力木結構')} desc={t('tech.hotspot1Desc', '重塑聲波傳遞路徑，打造更明亮、延展、立體的音色')} />
@@ -93,10 +106,11 @@ export default function Technology() {
           </div>
 
           <div className="mt-16 aspect-[21/9] rounded-[3rem] overflow-hidden">
-            <img
+            <OptimizedImage
               src="/images/products/wave/a05c-wave-detail.jpg"
               alt={t('tech.workshopAlt', 'Ayers 工坊')}
               className="w-full h-full object-cover"
+              sizes="100vw"
             />
           </div>
         </div>

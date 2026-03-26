@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Heart, Music, Award, Globe } from 'lucide-react';
+import OptimizedImage from '../components/OptimizedImage';
+import SEO from '../components/SEO';
 
 const MILESTONES = [
   { year: '1989', title: 'milestones.founded', fallback: '創辦人黃振發於越南胡志明市設立工廠，最初以「Emotion」品牌從事 OEM 代工與古典吉他製作。' },
@@ -24,13 +26,23 @@ export default function About() {
 
   return (
     <div className="bg-ayers-cream min-h-screen">
+      <SEO
+        title={t('about.heroTitle', '關於 Ayers Guitars')}
+        description={t('about.storyP1', 'Ayers 是世界知名的高端手工吉他品牌，由擁有數十年經驗的匠人打造。')}
+        breadcrumbs={[
+          { name: 'Home', url: `/${t('lang', 'zh-TW')}` },
+          { name: t('about.heroTitle', 'About'), url: `/${t('lang', 'zh-TW')}/about` },
+        ]}
+      />
       {/* Hero */}
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden bg-ayers-dark text-white">
         <div className="absolute inset-0 z-0 opacity-30">
-          <img
+          <OptimizedImage
             src="/images/products/wave/a05c-wave-detail.jpg"
             alt="Ayers Workshop"
             className="w-full h-full object-cover"
+            priority
+            sizes="100vw"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-ayers-dark via-ayers-dark/50 to-transparent" />
@@ -91,10 +103,11 @@ export default function About() {
               viewport={{ once: true }}
               className="aspect-[4/5] rounded-3xl overflow-hidden"
             >
-              <img
+              <OptimizedImage
                 src="/images/products/sun/sj07c-passion-front.png"
                 alt={t('about.craftAlt', 'Ayers Guitar Craftsmanship')}
                 className="w-full h-full object-cover"
+                sizes="(min-width: 1024px) 50vw, 100vw"
               />
             </motion.div>
           </div>
@@ -183,7 +196,7 @@ export default function About() {
             className="bg-ayers-dark text-white rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 mb-10"
           >
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-ayers-gold/30 flex-shrink-0">
-              <img src="/images/luthiers/kuan-yu-lu.png" alt="盧冠宇" className="w-full h-full object-cover" />
+              <OptimizedImage src="/images/luthiers/kuan-yu-lu.png" alt="盧冠宇" className="w-full h-full object-cover" sizes="160px" />
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-ayers-gold mb-2">{t('about.luthier1Role', '技術總監（2019-至今，台灣）')}</p>
@@ -209,7 +222,7 @@ export default function About() {
                 className="bg-ayers-cream rounded-2xl p-6 flex items-start gap-5 border border-ayers-ink/5 hover:border-ayers-gold/30 transition-colors"
               >
                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-ayers-gold/20 flex-shrink-0">
-                  <img src={luthier.img} alt={luthier.name} className="w-full h-full object-cover" />
+                  <OptimizedImage src={luthier.img} alt={luthier.name} className="w-full h-full object-cover" sizes="80px" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">

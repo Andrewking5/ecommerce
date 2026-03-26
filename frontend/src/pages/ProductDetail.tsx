@@ -18,6 +18,9 @@ import {
   User,
 } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
+import OptimizedImage from '@/src/components/OptimizedImage';
+import SEO, { type BreadcrumbItem } from '@/src/components/SEO';
+import { useLanguagePrefix } from '@/src/lib/i18nRouting';
 import { cn } from '@/src/lib/utils';
 import productService, { type Product } from '@/src/services/productService';
 import reviewService, { type Review } from '@/src/services/reviewService';
@@ -183,14 +186,15 @@ function ZoomableImage({
       <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent z-10 pointer-events-none" />
 
       {/* Normal image */}
-      <img
+      <OptimizedImage
         src={src}
         alt={alt}
         className={cn(
           'w-full h-full object-contain scale-[1.25] transition-opacity duration-300 relative z-[5]',
           isZooming ? 'opacity-0' : 'opacity-100'
         )}
-        referrerPolicy="no-referrer"
+        priority
+        sizes="(min-width: 1024px) 50vw, 100vw"
       />
 
       {/* Zoomed image */}
@@ -553,6 +557,7 @@ function ReviewsSection({ productId }: { productId: string }) {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCartContext();
+  const lang = useLanguagePrefix();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -659,10 +664,56 @@ export default function ProductDetail() {
     );
   }
 
+  // ── SEO — Product Schema + Breadcrumbs ─────────────────────────────────
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    { name: 'Home', url: `/${lang}` },
+    { name: 'Collections', url: `/${lang}/collections` },
+    ...(product.category
+      ? [{ name: product.category.name, url: `/${lang}/collections?category=${product.category.slug}` }]
+      : []),
+    { name: product.name, url: `/${lang}/product/${product.id}` },
+  ];
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || `${product.name} — Ayers Guitars handcrafted acoustic guitar`,
+    image: images.map((img: string) => img.startsWith('http') ? img : `https://www.ayersguitars.com${img}`),
+    brand: {
+      '@type': 'Brand',
+      name: 'Ayers Guitars',
+    },
+    ...(product.sku ? { sku: product.sku } : {}),
+    offers: {
+      '@type': 'Offer',
+      url: `https://www.ayersguitars.com/${lang}/product/${product.id}`,
+      priceCurrency: 'TWD',
+      price: product.price,
+      availability: inStock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Ayers Guitars',
+      },
+    },
+  };
+
   // ── Main Render ──────────────────────────────────────────────────────────
 
   return (
     <>
+      <SEO
+        title={product.name}
+        description={product.description || `${product.name} — Ayers Guitars 手工吉他`}
+        ogImage={images[0]}
+        ogType="product"
+        breadcrumbs={breadcrumbs}
+        jsonLd={productJsonLd}
+      />
+
       {/* Lightbox */}
       <AnimatePresence>
         {lightboxOpen && mainImage && (
@@ -770,11 +821,11 @@ export default function ProductDetail() {
                           : 'ring-1 ring-ayers-ink/8 opacity-50 hover:opacity-90'
                       )}
                     >
-                      <img
+                      <OptimizedImage
                         src={img}
                         alt={`${product.name} ${i + 1}`}
                         className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
+                        sizes="80px"
                       />
                       {selectedImageIndex === i && (
                         <motion.div

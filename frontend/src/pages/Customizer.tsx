@@ -10,17 +10,72 @@ import * as THREE from 'three';
 import customConfigService, { type CommunityConfig } from '@/src/services/customConfigService';
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Web Audio — disabled for now (procedural sounds need better tuning)
-// TODO: Replace with real audio samples (.mp3) for better quality
+// Web Audio — Lightweight procedural sounds for haptic feedback
+// Uses AudioContext lazy init (created on first user gesture)
 // ═════════════════════════════════════════════════════════════════════════════
-// let audioCtx: AudioContext | null = null;
-// function getAudioCtx() {
-//   if (!audioCtx) audioCtx = new AudioContext();
-//   return audioCtx;
-// }
-function playKnock() { /* disabled */ }
-function playStepSound() { /* disabled */ }
-function playChord() { /* disabled */ }
+
+let audioCtx: AudioContext | null = null;
+function getAudioCtx(): AudioContext | null {
+  try {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch {
+    return null;
+  }
+}
+
+/** Short percussive knock — played on option select */
+function playKnock() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
+  gain.gain.setValueAtTime(0.15, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.1);
+}
+
+/** Soft step sound — played on stage navigation */
+function playStepSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(500 + Math.random() * 200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.06);
+  gain.gain.setValueAtTime(0.08, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.08);
+}
+
+/** Guitar chord strum — played on completion/summary */
+function playChord() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const notes = [82.4, 110, 146.8, 196, 246.9, 329.6]; // E2 A2 D3 G3 B3 E4
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + i * 0.04;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.08, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 1.5);
+  });
+}
 
 // ═════════════════════════════════════════════════════════════════════════════
 // STAGES — 10 steps matching Ayers official customizer (USD pricing)
@@ -504,18 +559,57 @@ function CameraRig({
   return null;
 }
 
-// Map selection → model file
-// Model mapping: {shape}-{cutaway} → glb file
-// Add new .glb files to public/models/ as they become available
-// Map shape + bodyFeature → model file
-// All shapes currently use 2 available models; add specific .glb files as they become available
+// ═════════════════════════════════════════════════════════════════════════════
+// Model mapping with LOD (Level of Detail) support
+//
+// GLB file naming convention:
+//   /models/guitar-{shape}.glb       — standard
+//   /models/guitar-{shape}c.glb      — cutaway variant
+//   /models/guitar-{shape}-low.glb   — low-poly LOD (mobile)
+//
+// Currently available: guitar-a.glb, guitar-ac.glb
+// Add new .glb files to /public/models/ as they become ready.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Maps body shape IDs to their model file basename */
+const SHAPE_MODEL_MAP: Record<string, string> = {
+  dreadnought: 'guitar-a',    // Fallback until guitar-d.glb is ready
+  auditorium:  'guitar-a',
+  orchestra:   'guitar-a',    // Fallback until guitar-o.glb
+  sj:          'guitar-a',    // Fallback until guitar-sj.glb
+  'l-00':      'guitar-a',    // Fallback until guitar-l00.glb
+  jumbo:       'guitar-a',    // Fallback until guitar-j.glb
+};
+
+/** Available models on disk — prevents 404 fetch attempts */
+const AVAILABLE_MODELS = new Set([
+  '/models/guitar-a.glb',
+  '/models/guitar-ac.glb',
+]);
+
 function getModelUrl(shape: string, bodyFeature: string): string {
   const features = bodyFeature ? bodyFeature.split(',') : [];
   const hasCutaway = features.includes('cutaway');
-  // TODO: add per-shape models (guitar-d.glb, guitar-sj.glb, etc.)
-  return hasCutaway ? '/models/guitar-ac.glb' : '/models/guitar-a.glb';
+  const basename = SHAPE_MODEL_MAP[shape] || 'guitar-a';
+  const idealUrl = hasCutaway ? `/models/${basename}c.glb` : `/models/${basename}.glb`;
+  // Use shape-specific model if available, otherwise fall back
+  return AVAILABLE_MODELS.has(idealUrl) ? idealUrl : (hasCutaway ? '/models/guitar-ac.glb' : '/models/guitar-a.glb');
 }
-// Preload both
+
+/** LOD: detect if device should use simplified model */
+function useShouldUseLowLOD(): boolean {
+  const [isLow, setIsLow] = useState(false);
+  useEffect(() => {
+    // Use low LOD on mobile or devices with < 4GB RAM
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    const lowMemory = 'deviceMemory' in navigator && (navigator as any).deviceMemory < 4;
+    const lowCores = navigator.hardwareConcurrency < 4;
+    setIsLow(isMobile || lowMemory || lowCores);
+  }, []);
+  return isLow;
+}
+
+// Preload both available models
 useGLTF.preload('/models/guitar-a.glb');
 useGLTF.preload('/models/guitar-ac.glb');
 
@@ -525,19 +619,31 @@ useGLTF.preload('/models/guitar-ac.glb');
 // We map each part to a material config based on the user's selections
 // ═════════════════════════════════════════════════════════════════════════════
 
-interface PartMaterials {
-  [meshName: string]: {
-    color: string;
-    roughness: number;
-    metalness: number;
-    // TODO: when textures are ready, add:
-    // map?: string;        // diffuse texture path
-    // normalMap?: string;   // normal map path
-    // roughnessMap?: string;
-  };
+interface PartMaterialConfig {
+  color: string;
+  roughness: number;
+  metalness: number;
+  /** Diffuse texture path (e.g., "/textures/sitka-diffuse.jpg") */
+  map?: string;
+  /** Normal map path */
+  normalMap?: string;
+  /** Roughness map path */
+  roughnessMap?: string;
 }
 
-// Wood color references (until real textures are provided by 3D modeler)
+interface PartMaterials {
+  [meshName: string]: PartMaterialConfig;
+}
+
+// Wood texture paths — add files to /public/textures/ as they become available
+// If a texture file doesn't exist, the material falls back to flat color
+const WOOD_TEXTURES: Record<string, { map?: string; normalMap?: string; roughnessMap?: string }> = {
+  // Example: when texture files are added, uncomment:
+  // 'sitka':    { map: '/textures/sitka-diffuse.jpg', normalMap: '/textures/wood-normal.jpg' },
+  // 'rosewood': { map: '/textures/rosewood-diffuse.jpg', normalMap: '/textures/wood-normal.jpg' },
+};
+
+// Wood color references (used as base color, blended with textures when available)
 const WOOD_COLORS: Record<string, string> = {
   // Top woods (面板)
   'sitka':       '#e8d5b0',  // Sitka Spruce — 淺黃白
@@ -571,35 +677,58 @@ const HARDWARE_COLORS: Record<string, { color: string; metalness: number; roughn
 };
 
 function buildPartMaterials(selections: Record<string, string>): PartMaterials {
-  const top = WOOD_COLORS[selections.top] || '#e8d5b0';
-  const back = WOOD_COLORS[selections.back] || '#3d2216';
-  const neck = WOOD_COLORS[selections.neck] || '#7a4430';
-  const fb = WOOD_COLORS[selections.fingerboard] || '#2a1208';
+  const topKey = selections.top || 'sitka';
+  const backKey = selections.back || 'rosewood';
+  const neckKey = selections.neck || 'mahogany-n';
+  const fbKey = selections.fingerboard || 'rosewood-f';
+
+  const top = WOOD_COLORS[topKey] || '#e8d5b0';
+  const back = WOOD_COLORS[backKey] || '#3d2216';
+  const neck = WOOD_COLORS[neckKey] || '#7a4430';
+  const fb = WOOD_COLORS[fbKey] || '#2a1208';
   const hw = HARDWARE_COLORS[selections.tuner] || HARDWARE_COLORS.chrome;
 
+  const topTex = WOOD_TEXTURES[topKey] || {};
+  const backTex = WOOD_TEXTURES[backKey] || {};
+  const neckTex = WOOD_TEXTURES[neckKey] || {};
+  const fbTex = WOOD_TEXTURES[fbKey] || {};
+
   return {
-    Top:         { color: top, roughness: 0.35, metalness: 0 },
-    Back:        { color: back, roughness: 0.4, metalness: 0 },
-    Sides:       { color: back, roughness: 0.4, metalness: 0 },      // Same as back
-    Neck:        { color: neck, roughness: 0.45, metalness: 0 },
-    Fingerboard: { color: fb, roughness: 0.3, metalness: 0 },
-    Headstock:   { color: neck, roughness: 0.4, metalness: 0 },      // Same as neck
-    Bridge:      { color: fb, roughness: 0.35, metalness: 0 },       // Same as fingerboard
+    Top:         { color: top, roughness: 0.35, metalness: 0, ...topTex },
+    Back:        { color: back, roughness: 0.4, metalness: 0, ...backTex },
+    Sides:       { color: back, roughness: 0.4, metalness: 0, ...backTex },
+    Neck:        { color: neck, roughness: 0.45, metalness: 0, ...neckTex },
+    Fingerboard: { color: fb, roughness: 0.3, metalness: 0, ...fbTex },
+    Headstock:   { color: neck, roughness: 0.4, metalness: 0, ...neckTex },
+    Bridge:      { color: fb, roughness: 0.35, metalness: 0, ...fbTex },
     BridgePins:  { color: fb, roughness: 0.3, metalness: 0 },
-    Nut:         { color: '#f5f0e0', roughness: 0.4, metalness: 0 }, // Bone white
+    Nut:         { color: '#f5f0e0', roughness: 0.4, metalness: 0 },
     Saddle:      { color: '#f5f0e0', roughness: 0.4, metalness: 0 },
     Tuners:      { color: hw.color, roughness: hw.roughness, metalness: hw.metalness },
     Strings:     { color: '#c0b090', roughness: 0.3, metalness: 0.6 },
-    Rosette:     { color: '#2a6a5a', roughness: 0.25, metalness: 0.3 }, // Abalone green
+    Rosette:     { color: '#2a6a5a', roughness: 0.25, metalness: 0.3 },
     Binding:     { color: '#f5f0e0', roughness: 0.3, metalness: 0 },
     Inlays:      { color: '#e8e0d0', roughness: 0.2, metalness: 0.2 },
     Pickguard:   { color: '#1a1208', roughness: 0.5, metalness: 0 },
   };
 }
 
-function Guitar({ selections, glow, modelUrl }: { selections: Record<string, string>; glow: boolean; modelUrl: string }) {
+function Guitar({ selections, glow, modelUrl, lowLOD }: { selections: Record<string, string>; glow: boolean; modelUrl: string; lowLOD: boolean }) {
   const { scene } = useGLTF(modelUrl);
   const matsRef = useRef<Map<string, THREE.MeshStandardMaterial>>(new Map());
+  const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
+  const textureCache = useRef<Map<string, THREE.Texture>>(new Map());
+
+  // Helper: load texture with caching (returns null if path undefined)
+  const loadTexture = useCallback((path?: string): THREE.Texture | null => {
+    if (!path) return null;
+    if (textureCache.current.has(path)) return textureCache.current.get(path)!;
+    const tex = textureLoader.load(path);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.flipY = false;
+    textureCache.current.set(path, tex);
+    return tex;
+  }, [textureLoader]);
 
   // Animate glow
   useFrame((_, dt) => {
@@ -617,11 +746,15 @@ function Guitar({ selections, glow, modelUrl }: { selections: Record<string, str
     scene.traverse((ch) => {
       if (ch instanceof THREE.Mesh) {
         const name = ch.name;
-        // Find matching part config (case-insensitive partial match)
         const partKey = Object.keys(parts).find(k =>
           name.toLowerCase().includes(k.toLowerCase())
         );
-        const cfg = partKey ? parts[partKey] : parts.Top; // fallback to top wood
+        const cfg = partKey ? parts[partKey] : parts.Top;
+
+        // LOD: skip normal maps and roughness maps on low-end devices
+        const diffuseMap = loadTexture(cfg.map);
+        const normalMap = lowLOD ? null : loadTexture(cfg.normalMap);
+        const roughnessMap = lowLOD ? null : loadTexture(cfg.roughnessMap);
 
         const mat = new THREE.MeshStandardMaterial({
           color: new THREE.Color(cfg.color),
@@ -630,22 +763,25 @@ function Guitar({ selections, glow, modelUrl }: { selections: Record<string, str
           emissive: new THREE.Color('#c5a059'),
           emissiveIntensity: 0,
           side: THREE.DoubleSide,
-          // TODO: Add texture maps here when available:
-          // map: textureLoader.load(cfg.map),
-          // normalMap: textureLoader.load(cfg.normalMap),
-          // roughnessMap: textureLoader.load(cfg.roughnessMap),
+          ...(diffuseMap ? { map: diffuseMap } : {}),
+          ...(normalMap ? { normalMap } : {}),
+          ...(roughnessMap ? { roughnessMap } : {}),
         });
 
         ch.material = mat;
-        ch.castShadow = true;
+        ch.castShadow = !lowLOD; // Skip shadow casting on low-end
         map.set(name, mat);
       }
     });
 
     matsRef.current = map;
-  }, [scene, selections]);
 
-  // Left-handed: mirror on X axis
+    return () => {
+      // Dispose materials on cleanup
+      map.forEach(m => m.dispose());
+    };
+  }, [scene, selections, lowLOD, loadTexture]);
+
   const isLefty = (selections.bodyFeature || '').split(',').includes('lefty');
 
   return <primitive object={scene} scale={[isLefty ? -1 : 1, 1, 1]} />;
@@ -811,6 +947,7 @@ export default function Customizer() {
   const [freeOrbit, setFreeOrbit] = useState(false);
   const [mobileFullscreen3D, setMobileFullscreen3D] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const lowLOD = useShouldUseLowLOD();
   const [linkCopied, setLinkCopied] = useState(false);
   const [screenshotting, setScreenshotting] = useState(false);
   const [stageBlur, setStageBlur] = useState(false);
@@ -1052,12 +1189,12 @@ export default function Customizer() {
             <spotLight position={[0, 7, 1]} intensity={0.5} angle={0.5} penumbra={1} color="#ffe4b5" />
             <Bounds fit clip observe margin={1.1}>
               <Center>
-                <Guitar selections={selections} glow={glow} modelUrl={getModelUrl(selections.shape, selections.bodyFeature)} />
+                <Guitar selections={selections} glow={glow} modelUrl={getModelUrl(selections.shape, selections.bodyFeature)} lowLOD={lowLOD} />
               </Center>
             </Bounds>
-            {!isMobile && <ContactShadows position={[0, -2.5, 0]} opacity={0.25} scale={14} blur={2.5} far={8} />}
+            {!lowLOD && <ContactShadows position={[0, -2.5, 0]} opacity={0.25} scale={14} blur={2.5} far={8} />}
             <Environment preset="studio" />
-            {!isMobile && <DustParticles count={60} ambientColor="#c5a059" />}
+            {!lowLOD && <DustParticles count={isMobile ? 30 : 60} ambientColor="#c5a059" />}
             <CameraRig stageCamera={stage.camera} showSummary={showSummary} selectionPulse={selectionPulse} freeOrbit={freeOrbit || mobileFullscreen3D} />
           </Canvas>
         </Suspense>

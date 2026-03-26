@@ -1,4 +1,20 @@
+# Ayers Guitars — robots.txt
+
 User-agent: *
 Allow: /
 
+# Block private/authenticated pages from crawling
+Disallow: /*/account
+Disallow: /*/admin
+Disallow: /*/checkout
+Disallow: /*/login
+Disallow: /*/orders/
+
+# Block API routes (served from different origin but just in case)
+Disallow: /api/
+
+# Optimized images (Googlebot should find these via <picture> srcset)
+Disallow: /images-opt/
+
+# Sitemap
 Sitemap: https://www.ayersguitars.com/sitemap.xml

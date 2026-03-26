@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import { Play, Instagram, Youtube, Music, Heart, Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import OptimizedImage from '../components/OptimizedImage';
+import SEO from '../components/SEO';
 
 const ARTISTS_DATA = [
   {
@@ -64,13 +66,23 @@ export default function Community() {
   const { t } = useTranslation();
   return (
     <div className="bg-ayers-dark min-h-screen text-white">
+      <SEO
+        title={t('community.title', 'Ayers Artist Gallery & Community')}
+        description={t('community.subtitle', 'Hear the stories. Feel the sound. Join the family.')}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: t('community.title', 'Community'), url: '/community' },
+        ]}
+      />
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <OptimizedImage
             src="/images/products/sun/a06-autumn-sun-detail.jpg"
             alt={t('community.title', 'Ayers Artist Gallery & Community')}
             className="w-full h-full object-cover opacity-40"
+            priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ayers-dark via-transparent to-transparent" />
         </div>
@@ -101,11 +113,11 @@ export default function Community() {
                 className="group cursor-pointer"
               >
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden mb-6">
-                  <img
+                  <OptimizedImage
                     src={artist.img}
                     alt={t(artist.nameKey, artist.nameFallback)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40">
@@ -161,11 +173,11 @@ export default function Community() {
                 transition={{ delay: i * 0.1 }}
                 className="group relative aspect-square rounded-2xl overflow-hidden"
               >
-                <img
+                <OptimizedImage
                   src={item.img}
                   alt={item.user}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  referrerPolicy="no-referrer"
+                  sizes="(min-width: 768px) 25vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
                   <p className="text-xs font-bold mb-2">{item.user}</p>

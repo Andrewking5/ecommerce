@@ -5,6 +5,8 @@ import { cn } from '@/src/lib/utils';
 import { useSearchParams } from 'react-router-dom';
 import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
 import productService, { type Product } from '@/src/services/productService';
+import OptimizedImage from '@/src/components/OptimizedImage';
+import SEO from '@/src/components/SEO';
 import { useCartContext } from '@/src/contexts/CartContext';
 import { Rosette, FretDot, PickIcon, BridgePinIcon, TuningPegIcon, StringDivider, GuitarSunLoader } from '@/src/components/guitar';
 import { useTranslation } from 'react-i18next';
@@ -207,6 +209,21 @@ export default function Collections() {
 
   return (
     <div className="bg-ayers-cream min-h-screen">
+      <SEO
+        title={t('collections.seoTitle', '吉他系列 — 探索所有 Ayers 手工吉他')}
+        description={t('collections.seoDesc', '瀏覽 Ayers 全系列手工吉他：Wave 濤系列、Sun 日系列、Light 光系列、Uluru 烏克麗麗系列。')}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: t('collections.pageTitle', 'Collections'), url: '/collections' },
+        ]}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Ayers Guitars Collections',
+          description: 'Browse all Ayers handcrafted acoustic guitar series.',
+          url: 'https://www.ayersguitars.com/zh-TW/collections',
+        }}
+      />
       {/* ── Page Intro — Sound hole rosette reveal ── */}
       <AnimatePresence>
         {showIntro && <PageIntro onComplete={() => setShowIntro(false)} />}
@@ -339,13 +356,14 @@ export default function Collections() {
                         'w-14 h-20 sm:w-16 sm:h-24 rounded-xl overflow-hidden transition-all duration-300',
                         isActive ? 'bg-[#2a2621]' : 'bg-ayers-ink/[0.04] group-hover:bg-[#2a2621]/70'
                       )}>
-                        <img
+                        <OptimizedImage
                           src={series.img}
                           alt={series.name}
                           className={cn(
                             'w-full h-full object-contain p-1 transition-all duration-500',
                             isActive ? 'scale-105' : 'opacity-50 group-hover:opacity-90 group-hover:scale-105'
                           )}
+                          sizes="64px"
                         />
                       </div>
                       {/* Sound hole ring overlay */}
@@ -601,8 +619,19 @@ export default function Collections() {
 
             {/* ── Product Grid ── */}
             <main className="flex-grow min-w-0">
-              {/* Sound hole loading */}
-              {loading && <div className="flex items-center justify-center py-28"><GuitarSunLoader size={40} text="Loading" /></div>}
+              {/* Skeleton loading — shows placeholder cards during fetch */}
+              {loading && (
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="aspect-[3/4] rounded-2xl bg-ayers-ink/[0.04] mb-3" />
+                      <div className="h-3 bg-ayers-ink/[0.06] rounded-full w-1/3 mb-2" />
+                      <div className="h-4 bg-ayers-ink/[0.08] rounded-full w-3/4 mb-2" />
+                      <div className="h-3 bg-ayers-ink/[0.06] rounded-full w-1/4" />
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Error state */}
               {!loading && error && (
@@ -623,19 +652,17 @@ export default function Collections() {
               {!loading && !error && (
                 <>
                   <div className="grid grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
-                    <AnimatePresence mode="popLayout">
-                      {filteredProducts.map((product, i) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          index={i}
-                          getImage={getProductImage}
-                          getSecondImage={getProductSecondImage}
-                          getSeries={getProductSeries}
-                          onAddToCart={handleAddToCart}
-                        />
-                      ))}
-                    </AnimatePresence>
+                    {filteredProducts.map((product, i) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        index={i}
+                        getImage={getProductImage}
+                        getSecondImage={getProductSecondImage}
+                        getSeries={getProductSeries}
+                        onAddToCart={handleAddToCart}
+                      />
+                    ))}
                   </div>
 
                   {filteredProducts.length === 0 && (
@@ -707,11 +734,9 @@ function ProductCard({
   return (
     <motion.div
       ref={cardRef}
-      layout
       initial={{ opacity: 0, y: 24 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.45, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay: Math.min(index * 0.04, 0.3), ease: [0.22, 1, 0.36, 1] }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); mx.set(0); my.set(0); }}
       onMouseMove={handleMouseMove}

@@ -4,6 +4,8 @@ import { ChevronRight } from 'lucide-react';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import bannerService from '../services/bannerService';
+import OptimizedImage from '../components/OptimizedImage';
+import SEO from '../components/SEO';
 import GuitarStrings from '../components/animations/GuitarStrings';
 import SunwaveRipple from '../components/animations/SunwaveRipple';
 import FretboardProgress from '../components/animations/FretboardProgress';
@@ -252,6 +254,25 @@ export default function Home() {
       animate={{ opacity: entered ? 1 : 0 }}
       transition={{ duration: 0.6 }}
     >
+      <SEO
+        title={t('home.seoTitle', '手工吉他品牌 — 台灣製造頂級原聲吉他')}
+        description={t('home.seoDesc', 'Ayers Guitars — 自1996年起，以匠心手工打造頂級原聲吉他。SUNWAVE 聲學技術，為您帶來卓越音色與共鳴。')}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'Ayers Guitars',
+          url: 'https://www.ayersguitars.com',
+          logo: 'https://www.ayersguitars.com/favicon.svg',
+          foundingDate: '1996',
+          foundingLocation: { '@type': 'Place', name: 'Taiwan' },
+          description: 'Premium handcrafted acoustic guitars from Taiwan since 1996.',
+          sameAs: [
+            'https://www.facebook.com/AyersgtUluruuke',
+            'https://www.instagram.com/ayersguitar/',
+            'https://www.youtube.com/user/AyersGuitar',
+          ],
+        }}
+      />
       <FretboardProgress sections={FRETBOARD_SECTIONS} />
 
       {/* ── Social sidebar (fixed right, desktop only) ──────────────── */}
@@ -427,11 +448,13 @@ export default function Home() {
               className="relative"
             >
               <div className="absolute inset-0 -m-16 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 70% at 50% 50%, rgba(197,160,89,0.12) 0%, transparent 70%)' }} />
-              <img
+              <OptimizedImage
                 src={heroSlides[currentSlide].img}
                 alt=""
                 className="h-[60vh] xl:h-[68vh] object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.4)] relative z-10"
                 draggable={false}
+                priority
+                sizes="(min-width: 1280px) 40vw, 30vw"
               />
             </motion.div>
           </AnimatePresence>
@@ -583,12 +606,12 @@ export default function Home() {
                       w-28 h-28 rounded-full overflow-hidden
                       ${isEven ? 'left-[12%]' : 'right-[12%]'}`}
                   >
-                    <img
+                    <OptimizedImage
                       src={series.detail}
                       alt=""
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      loading="lazy"
                       draggable={false}
+                      sizes="112px"
                     />
                   </motion.div>
 
@@ -609,14 +632,14 @@ export default function Home() {
                       <div className="relative w-full max-w-sm md:max-w-md mx-auto">
                         {/* Subtle ground shadow */}
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/[0.06] rounded-[100%] blur-xl" />
-                        <img
+                        <OptimizedImage
                           src={series.img}
                           alt={series.fullName}
                           className="w-full h-auto object-contain drop-shadow-2xl
                             group-hover:scale-[1.04] group-hover:-translate-y-2
                             transition-all duration-700 ease-out"
-                          loading="lazy"
                           draggable={false}
+                          sizes="(min-width: 768px) 40vw, 90vw"
                         />
                       </div>
                     </motion.div>
@@ -720,7 +743,7 @@ export default function Home() {
                   <div className="aspect-video bg-[#1a1714] rounded-[calc(1.5rem-2px)] overflow-hidden flex items-center justify-center p-3 relative">
                     <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(244,231,215,0.08) 0%, transparent 70%)' }} />
                     <div className="absolute bottom-0 inset-x-0 h-1/4 bg-gradient-to-t from-black/20 to-transparent z-10 pointer-events-none" />
-                    <img src="/images/products/ayers-tech-1.png" alt="Ayers Sunwave Technology" className="w-full h-auto object-contain relative z-0" loading="lazy" />
+                    <OptimizedImage src="/images/products/ayers-tech-1.png" alt="Ayers Sunwave Technology" className="w-full h-auto object-contain relative z-0" sizes="(min-width: 1024px) 50vw, 90vw" />
                   </div>
                 </GlowingCard>
               </motion.div>
@@ -769,7 +792,7 @@ export default function Home() {
                       <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 15%, rgba(244,231,215,0.10) 0%, transparent 70%)' }} />
                       <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'radial-gradient(ellipse 50% 55% at 50% 55%, rgba(197,160,89,0.08) 0%, transparent 70%)' }} />
                       <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent z-10 pointer-events-none" />
-                      <img src={img.src} alt={img.alt} className="w-full h-full object-contain scale-[1.35] relative z-0" loading="lazy" />
+                      <OptimizedImage src={img.src} alt={img.alt} className="w-full h-full object-contain scale-[1.35] relative z-0" sizes="(min-width: 768px) 35vw, 45vw" />
                     </div>
                   </GlowingCard>
                 </motion.div>

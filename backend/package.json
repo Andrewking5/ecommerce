@@ -96,12 +96,21 @@
       "<rootDir>/src",
       "<rootDir>/tests"
     ],
+    "setupFilesAfterSetup": [
+      "<rootDir>/tests/setup.ts"
+    ],
     "testMatch": [
       "**/__tests__/**/*.ts",
       "**/?(*.)+(spec|test).ts"
     ],
     "transform": {
       "^.+\\.ts$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid|nanoid)/)"
+    ],
+    "moduleNameMapper": {
+      "^uuid$": "<rootDir>/tests/__mocks__/uuid.ts"
     },
     "collectCoverageFrom": [
       "src/**/*.ts",
