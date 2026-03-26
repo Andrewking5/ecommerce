@@ -3,6 +3,7 @@ import api from './api';
 export interface HomeBanner {
   id: string;
   slug: string;
+  placement: string;
   subtitle: string;
   titleWord1: string;
   titleWord2: string;
@@ -12,13 +13,17 @@ export interface HomeBanner {
   ctaLabel: string;
   ctaLink: string;
   image: string;
+  productImage: string | null;
+  gradientColor: string;
   displayOrder: number;
   isActive: boolean;
 }
 
 const bannerService = {
-  async getActiveBanners(): Promise<HomeBanner[]> {
-    const { data } = await api.get('/banners');
+  /** Get active banners, optionally filtered by placement ("home" | "collections") */
+  async getActiveBanners(placement?: string): Promise<HomeBanner[]> {
+    const params = placement ? `?placement=${placement}` : '';
+    const { data } = await api.get(`/banners${params}`);
     return data.success ? data.data : [];
   },
   async getAllBanners(): Promise<HomeBanner[]> {

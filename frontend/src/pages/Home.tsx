@@ -197,7 +197,7 @@ export default function Home() {
   const [heroSlides, setHeroSlides] = useState(FALLBACK_SLIDES);
 
   useEffect(() => {
-    bannerService.getActiveBanners()
+    bannerService.getActiveBanners('home')
       .then(banners => {
         if (banners.length > 0) {
           setHeroSlides(banners.map(b => ({

@@ -19,6 +19,7 @@ import productService, { type Product, type Category } from '@/src/services/prod
 import userService from '@/src/services/userService';
 import type { User as UserType } from '@/src/services/authService';
 import bannerService, { type HomeBanner } from '@/src/services/bannerService';
+import api from '@/src/services/api';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import couponService, { type Coupon } from '@/src/services/couponService';
 
@@ -1265,10 +1266,113 @@ function CustomersTab() {
    BANNERS TAB
    ═══════════════════════════════════════════════════════ */
 
+/* ─── Reusable Image Upload Field ─── */
+function ImageUploadField({ label, hint, required, value, onChange }: {
+  label: string;
+  hint?: string;
+  required?: boolean;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const { data } = await api.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (data.success && data.data?.url) {
+        onChange(data.data.url);
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-[11px] text-white/40 mb-1.5">
+        {label} {required && <span className="text-red-400">*必填</span>}
+        {hint && <span className="text-white/20 ml-1">({hint})</span>}
+      </label>
+
+      {/* Preview + upload area */}
+      <div
+        className={cn(
+          'relative rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden',
+          value ? 'border-white/10 bg-white/5' : 'border-white/15 bg-white/[0.02] hover:border-ayers-gold/40',
+        )}
+        onClick={() => !uploading && fileRef.current?.click()}
+      >
+        {value ? (
+          <div className="relative group">
+            <img src={value} alt="" className="w-full h-32 object-cover" />
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
+                className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-[10px] font-bold text-white hover:bg-white/30 transition-colors"
+              >
+                <Upload size={12} className="inline mr-1" />重新上傳
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onChange(''); }}
+                className="px-3 py-1.5 bg-red-500/30 backdrop-blur-sm rounded-lg text-[10px] font-bold text-white hover:bg-red-500/50 transition-colors"
+              >
+                <X size={12} className="inline mr-1" />移除
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="py-8 flex flex-col items-center gap-2 text-white/30">
+            {uploading ? (
+              <><GuitarSunLoader size={20} /><span className="text-[10px]">上傳中...</span></>
+            ) : (
+              <>
+                <Upload size={24} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">點擊上傳圖片</span>
+                <span className="text-[9px] text-white/15">支援 JPG、PNG、WebP（最大 10MB）</span>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleUpload} />
+
+      {/* Toggle URL input for manual entry */}
+      <button
+        onClick={() => setShowUrlInput(!showUrlInput)}
+        className="mt-1.5 text-[9px] text-white/20 hover:text-white/40 transition-colors"
+      >
+        {showUrlInput ? '隱藏網址輸入' : '或手動輸入網址'}
+      </button>
+      {showUrlInput && (
+        <input
+          type="text"
+          placeholder="https://... 或 /images/..."
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-[11px] focus:outline-none focus:border-ayers-gold transition-all"
+        />
+      )}
+    </div>
+  );
+}
+
 const EMPTY_BANNER: Partial<HomeBanner> = {
-  slug: '', subtitle: '', titleWord1: '', titleWord2: '',
+  slug: '', placement: 'collections', subtitle: '', titleWord1: '', titleWord2: '',
   titleColor1: '#c5a059', titleColor2: '#ffffff',
-  body: '', ctaLabel: '', ctaLink: '', image: '', isActive: true,
+  body: '', ctaLabel: '', ctaLink: '', image: '', productImage: '', gradientColor: '#1a1a1a', isActive: true,
 };
 
 function BannersTab() {
@@ -1387,59 +1491,207 @@ function BannersTab() {
         </div>
       </div>
 
-      {/* ── Edit / Create Form ── */}
+      {/* ── Edit / Create Form — Simplified No-Code UI ── */}
       {editingBanner && (
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <Card title={editingBanner.id ? t('admin.banners.editBanner') : t('admin.banners.newBanner')} action={
+          <Card title={editingBanner.id ? '編輯橫幅' : '新增橫幅'} action={
             <button onClick={() => setEditingBanner(null)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
           }>
-            <div className="p-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {formField(t('admin.banners.slugLabel'), 'slug')}
-                {formField(t('admin.banners.subtitle'), 'subtitle')}
-                {formField(t('admin.banners.titleWord1'), 'titleWord1')}
-                {formField(t('admin.banners.titleWord2'), 'titleWord2')}
-                {formField(t('admin.banners.titleColor1'), 'titleColor1', 'color')}
-                {formField(t('admin.banners.titleColor2'), 'titleColor2', 'color')}
-                {formField(t('admin.banners.ctaLabel'), 'ctaLabel')}
-                {formField(t('admin.banners.ctaLink'), 'ctaLink')}
-                {formField(t('admin.banners.imageUrl'), 'image')}
-                {formField(t('admin.banners.body'), 'body', 'textarea')}
+            <div className="p-5 space-y-6">
+
+              {/* ── Section 1: Basic Info ── */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">基本設定</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">顯示位置</label>
+                    <select
+                      value={(editingBanner as any).placement || 'collections'}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, placement: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    >
+                      <option value="home">🏠 首頁</option>
+                      <option value="collections">🎸 系列頁 (Collections)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">識別碼 (Slug)</label>
+                    <input
+                      type="text"
+                      placeholder="例：wave-promo"
+                      value={editingBanner.slug || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, slug: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Image Preview */}
-              {editingBanner.image && (
-                <div className="mt-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1.5">{t('admin.banners.preview')}</p>
-                  <img src={editingBanner.image} alt="Preview" className="h-24 rounded-xl object-contain bg-white/5 border border-white/5" />
+              {/* ── Section 2: Content ── */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">文字內容</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">標籤文字 <span className="text-white/20">(小字)</span></label>
+                    <input
+                      type="text"
+                      placeholder="例：NEW ARRIVAL、限時優惠"
+                      value={editingBanner.subtitle || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, subtitle: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">標題第一行 <span className="text-white/20">(大字)</span></label>
+                    <input
+                      type="text"
+                      placeholder="例：Wave"
+                      value={editingBanner.titleWord1 || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, titleWord1: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">標題第二行</label>
+                    <input
+                      type="text"
+                      placeholder="例：濤系列"
+                      value={editingBanner.titleWord2 || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, titleWord2: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-[11px] text-white/40 mb-1.5">說明文字</label>
+                  <textarea
+                    placeholder="例：聲波如潮水般層疊推進，音色飽滿厚實"
+                    value={editingBanner.body || ''}
+                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, body: e.target.value } : prev)}
+                    rows={2}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* ── Section 3: Button ── */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">按鈕</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">按鈕文字</label>
+                    <input
+                      type="text"
+                      placeholder="例：探索 Wave 系列"
+                      value={editingBanner.ctaLabel || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, ctaLabel: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">按鈕連結</label>
+                    <input
+                      type="text"
+                      placeholder="例：/collections?series=wave"
+                      value={editingBanner.ctaLink || ''}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, ctaLink: e.target.value } : prev)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Section 4: Images ── */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">圖片</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <ImageUploadField
+                    label="背景圖片"
+                    required
+                    hint="建議尺寸 1920×1080，橫式大圖"
+                    value={editingBanner.image || ''}
+                    onChange={(url) => setEditingBanner(prev => prev ? { ...prev, image: url } : prev)}
+                  />
+                  <ImageUploadField
+                    label="產品圖片"
+                    hint="可選，右側浮動吉他（建議去背 PNG）"
+                    value={(editingBanner as any).productImage || ''}
+                    onChange={(url) => setEditingBanner(prev => prev ? { ...prev, productImage: url } : prev)}
+                  />
+                </div>
+                <div className="mt-4 max-w-xs">
+                  <label className="block text-[11px] text-white/40 mb-1.5">遮罩底色 <span className="text-white/20">(文字背後的漸層色)</span></label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={(editingBanner as any).gradientColor || '#1a1a1a'}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradientColor: e.target.value } : prev)}
+                      className="w-10 h-10 rounded-lg border border-white/10 cursor-pointer bg-transparent"
+                    />
+                    <div className="flex gap-2">
+                      {['#1a2a3a', '#2a1a0e', '#1a1a2a', '#0e1a2a', '#1a1a1a'].map(c => (
+                        <button
+                          key={c}
+                          onClick={() => setEditingBanner(prev => prev ? { ...prev, gradientColor: c } : prev)}
+                          className="w-8 h-8 rounded-lg border border-white/10 hover:border-ayers-gold transition-colors"
+                          style={{ backgroundColor: c }}
+                          title={c}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Live Preview ── */}
+              {(editingBanner.titleWord1 || editingBanner.image) && (
+                <div>
+                  <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">即時預覽</h3>
+                  <div
+                    className="relative rounded-2xl overflow-hidden h-48 flex items-center"
+                    style={{ background: (editingBanner as any).gradientColor || '#1a1a1a' }}
+                  >
+                    {editingBanner.image && (
+                      <img src={editingBanner.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                    )}
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${(editingBanner as any).gradientColor || '#1a1a1a'}, transparent)` }} />
+                    <div className="relative z-10 p-6 max-w-sm">
+                      {editingBanner.subtitle && (
+                        <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ayers-gold border border-ayers-gold/30 px-2 py-0.5 rounded-full">
+                          {editingBanner.subtitle}
+                        </span>
+                      )}
+                      <h3 className="text-2xl font-serif italic font-bold text-white mt-2">
+                        {editingBanner.titleWord1} {editingBanner.titleWord2}
+                      </h3>
+                      {editingBanner.body && <p className="text-xs text-white/50 mt-1">{editingBanner.body}</p>}
+                      {editingBanner.ctaLabel && (
+                        <span className="inline-block mt-3 bg-ayers-gold text-black text-[9px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                          {editingBanner.ctaLabel}
+                        </span>
+                      )}
+                    </div>
+                    {(editingBanner as any).productImage && (
+                      <img src={(editingBanner as any).productImage} alt="" className="absolute right-4 top-2 h-44 object-contain drop-shadow-2xl" />
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Title Preview */}
-              {(editingBanner.titleWord1 || editingBanner.titleWord2) && (
-                <div className="mt-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1.5">{t('admin.banners.titlePreview')}</p>
-                  <p className="text-lg font-bold">
-                    <span style={{ color: editingBanner.titleColor1 || '#c5a059' }}>{editingBanner.titleWord1}</span>
-                    {' '}
-                    <span style={{ color: editingBanner.titleColor2 || '#ffffff' }}>{editingBanner.titleWord2}</span>
-                  </p>
-                </div>
-              )}
-
+              {/* ── Actions ── */}
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   onClick={() => setEditingBanner(null)}
-                  className="px-4 py-2 rounded-xl bg-white/5 text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-white/5 text-white/40 text-xs font-bold hover:text-white transition-colors"
                 >
-                  {t('admin.banners.cancel')}
+                  取消
                 </button>
                 <button
                   onClick={handleSave}
-                  disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 transition-all disabled:opacity-50"
+                  disabled={saving || !editingBanner.slug || !editingBanner.titleWord1 || !editingBanner.image}
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-ayers-gold text-black text-xs font-bold hover:bg-ayers-gold/90 transition-all disabled:opacity-30"
                 >
-                  {saving ? <><GuitarSunLoader size={12} /> {t('admin.banners.saving')}</> : <><Save size={12} /> {editingBanner.id ? t('admin.banners.update') : t('admin.banners.create')}</>}
+                  {saving ? <><GuitarSunLoader size={12} /> 儲存中...</> : <><Save size={12} /> {editingBanner.id ? '更新' : '建立'}</>}
                 </button>
               </div>
             </div>

@@ -540,21 +540,24 @@ model ProductAttributeTemplate {
 model HomeBanner {
   id           String   @id @default(cuid())
   slug         String   @unique
-  subtitle     String
-  titleWord1   String
-  titleWord2   String
+  placement    String   @default("home")       // "home" | "collections" | "custom"
+  subtitle     String                           // 標籤文字 (e.g. "NEW ARRIVAL", "BEST SELLER")
+  titleWord1   String                           // 標題第一行
+  titleWord2   String                           // 標題第二行
   titleColor1  String   @default("text-ayers-warm-cream")
   titleColor2  String   @default("text-ayers-gold")
-  body         String
-  ctaLabel     String
-  ctaLink      String
-  image        String
+  body         String                           // 說明文字
+  ctaLabel     String                           // 按鈕文字
+  ctaLink      String                           // 按鈕連結
+  image        String                           // 背景圖片 URL
+  productImage String?                          // 產品圖片 URL（右側浮動吉他，可選）
+  gradientColor String  @default("#1a1a1a")     // 漸層底色（左側文字遮罩）
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@index([isActive, displayOrder])
+  @@index([isActive, placement, displayOrder])
   @@map("home_banners")
 }
 

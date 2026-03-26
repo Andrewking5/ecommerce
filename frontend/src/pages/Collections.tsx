@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { ChevronDown, X, ArrowUpRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, ArrowUpRight } from 'lucide-react';
+import bannerService from '@/src/services/bannerService';
 import { cn } from '@/src/lib/utils';
 import { useSearchParams } from 'react-router-dom';
 import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
@@ -10,6 +11,220 @@ import SEO from '@/src/components/SEO';
 import { useCartContext } from '@/src/contexts/CartContext';
 import { Rosette, FretDot, PickIcon, BridgePinIcon, TuningPegIcon, StringDivider, GuitarSunLoader } from '@/src/components/guitar';
 import { useTranslation } from 'react-i18next';
+
+/* ─────────────────────────── HERO BANNER CAROUSEL ─────────────────────────── */
+
+const HERO_BANNERS = [
+  {
+    id: 'wave',
+    bg: '/images/products/wave/a05c-wave-detail.jpg',
+    guitar: '/images/products/wave/d09-wave-front.png',
+    label: 'NEW ARRIVAL',
+    title: 'Wave 濤系列',
+    subtitle: '聲波如潮水般層疊推進，音色飽滿厚實',
+    cta: { text: '探索 Wave 系列', link: '/collections?series=wave' },
+    gradient: 'from-[#1a2a3a] via-[#1a2a3a]/80 to-transparent',
+  },
+  {
+    id: 'sun',
+    bg: '/images/products/sun/a06-autumn-sun-detail.jpg',
+    guitar: '/images/products/sun/sj07c-passion-front.png',
+    label: 'BEST SELLER',
+    title: 'Sun 日系列',
+    subtitle: '聲如日光般溫暖綻放，溫潤而明亮的經典音色',
+    cta: { text: '探索 Sun 系列', link: '/collections?series=sun' },
+    gradient: 'from-[#2a1a0e] via-[#2a1a0e]/80 to-transparent',
+  },
+  {
+    id: 'light',
+    bg: '/images/products/light/st2-ocean-bridge.png',
+    guitar: '/images/products/light/om05-light-front.png',
+    label: 'SIGNATURE',
+    title: 'Light 光系列',
+    subtitle: '輕若羽毛，純如本初，最純粹的原聲之美',
+    cta: { text: '探索 Light 系列', link: '/collections?series=light' },
+    gradient: 'from-[#1a1a2a] via-[#1a1a2a]/80 to-transparent',
+  },
+  {
+    id: 'customizer',
+    bg: '/images/products/wave/as03-wave-back-detail.jpg',
+    guitar: '/images/products/light/st2-ocean-1.png',
+    label: '3D CUSTOMIZER',
+    title: '打造你的專屬吉他',
+    subtitle: '從桶身到漆面，10 個步驟完成你的夢想之琴',
+    cta: { text: '開始客製', link: '/customizer' },
+    gradient: 'from-[#0e1a2a] via-[#0e1a2a]/80 to-transparent',
+  },
+];
+
+const BANNER_INTERVAL = 5000;
+
+function HeroBannerCarousel() {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [banners, setBanners] = useState(HERO_BANNERS);
+  const { t } = useTranslation();
+
+  // Fetch collections banners from admin API; fallback to HERO_BANNERS
+  useEffect(() => {
+    bannerService.getActiveBanners('collections')
+      .then(apiBanners => {
+        if (apiBanners.length > 0) {
+          setBanners(apiBanners.map(b => ({
+            id: b.slug || b.id,
+            bg: b.image,
+            guitar: b.productImage || b.image,
+            label: b.subtitle || '',
+            title: [b.titleWord1, b.titleWord2].filter(Boolean).join(' '),
+            subtitle: b.body || '',
+            cta: { text: b.ctaLabel || '了解更多', link: b.ctaLink || '/collections' },
+            gradient: `from-[${b.gradientColor || '#1a1a1a'}] via-[${b.gradientColor || '#1a1a1a'}]/80 to-transparent`,
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Auto-rotate
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => {
+      setCurrent(prev => (prev + 1) % banners.length);
+    }, BANNER_INTERVAL);
+    return () => clearInterval(timer);
+  }, [paused, current, banners.length]);
+
+  const banner = banners[current];
+
+  return (
+    <section
+      className="relative w-full h-[50vh] sm:h-[55vh] lg:h-[60vh] overflow-hidden bg-ayers-dark"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* Background image — crossfade */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={banner.id + '-bg'}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0"
+        >
+          <OptimizedImage
+            src={banner.bg}
+            alt=""
+            className="w-full h-full object-cover"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Gradient overlay — left side for text readability */}
+      <div className={`absolute inset-0 bg-gradient-to-r ${banner.gradient} z-[1]`} />
+
+      {/* Content */}
+      <div className="relative z-10 h-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 flex items-center">
+        <div className="flex items-center justify-between w-full gap-8">
+          {/* Text side */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={banner.id + '-text'}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-lg"
+            >
+              <span className="inline-block text-[10px] font-bold uppercase tracking-[0.4em] text-ayers-gold mb-4 border border-ayers-gold/30 px-3 py-1 rounded-full">
+                {banner.label}
+              </span>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif italic font-bold text-white mb-4 leading-tight">
+                {t(`collections.banner_${banner.id}_title`, banner.title)}
+              </h2>
+              <p className="text-sm sm:text-base text-white/60 font-light leading-relaxed mb-8 max-w-md">
+                {t(`collections.banner_${banner.id}_subtitle`, banner.subtitle)}
+              </p>
+              <Link
+                to={banner.cta.link}
+                className="inline-flex items-center gap-2 bg-ayers-gold text-white px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-ayers-dark transition-all duration-300"
+              >
+                {t(`collections.banner_${banner.id}_cta`, banner.cta.text)}
+                <ChevronRight size={14} />
+              </Link>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Guitar image — right side, desktop only */}
+          <div className="hidden lg:flex items-center justify-center flex-shrink-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={banner.id + '-guitar'}
+                initial={{ opacity: 0, y: 30, rotate: 2 }}
+                animate={{ opacity: 1, y: 0, rotate: 0 }}
+                exit={{ opacity: 0, y: -20, rotate: -2 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <OptimizedImage
+                  src={banner.guitar}
+                  alt=""
+                  className="h-[40vh] lg:h-[48vh] object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+                  priority
+                  sizes="30vw"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation arrows */}
+      <button
+        onClick={() => setCurrent(prev => (prev - 1 + banners.length) % banners.length)}
+        className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/20 hover:text-white transition-all cursor-pointer"
+        aria-label="Previous"
+      >
+        <ChevronLeft size={18} />
+      </button>
+      <button
+        onClick={() => setCurrent(prev => (prev + 1) % HERO_BANNERS.length)}
+        className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/20 hover:text-white transition-all cursor-pointer"
+        aria-label="Next"
+      >
+        <ChevronRight size={18} />
+      </button>
+
+      {/* Progress indicators */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        {HERO_BANNERS.map((b, i) => (
+          <button
+            key={b.id}
+            onClick={() => setCurrent(i)}
+            className="relative p-1 cursor-pointer"
+            aria-label={`Go to slide ${i + 1}`}
+          >
+            <div className="w-8 sm:w-12 h-[2px] bg-white/20 rounded-full overflow-hidden">
+              {current === i ? (
+                <motion.div
+                  className="h-full bg-ayers-gold rounded-full origin-left"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: BANNER_INTERVAL / 1000, ease: 'linear' }}
+                  key={current}
+                />
+              ) : (
+                <div className={`h-full rounded-full transition-all ${i < current ? 'bg-white/40 w-full' : 'bg-transparent'}`} />
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /** Page intro — sound hole circle expanding to reveal page */
 function PageIntro({ onComplete }: { onComplete: () => void }) {
@@ -230,188 +445,12 @@ export default function Collections() {
       </AnimatePresence>
 
       {/* ══════════════════════════════════════════════════════════
-          1. PAGE HEADER — Warm with rosette decoration
+          0. HERO BANNER CAROUSEL — Full-width ad/promo rotator
           ══════════════════════════════════════════════════════════ */}
-      <section className="relative pt-32 sm:pt-36 pb-10 sm:pb-14 bg-ayers-cream overflow-hidden">
-        {/* Decorative rosette — top right */}
-        <div className="absolute top-20 right-8 lg:right-20 text-ayers-gold pointer-events-none">
-          <Rosette size={180} className="opacity-40" />
-        </div>
-        {/* Second rosette — smaller, left side */}
-        <div className="absolute bottom-0 left-4 text-ayers-gold pointer-events-none hidden lg:block">
-          <Rosette size={80} className="opacity-20" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-          {/* Breadcrumb with pick separator */}
-          <motion.nav
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: showIntro ? 1.8 : 0 }}
-            className="flex items-center gap-2 text-[10px] uppercase tracking-[0.35em] text-ayers-ink/25 mb-10"
-          >
-            <Link to="/" className="hover:text-ayers-gold transition-colors">{t('collections.home', 'Home')}</Link>
-            <PickIcon size={8} className="text-ayers-gold/30" />
-            <span className="text-ayers-ink/50">{t('collections.guitarSeries', 'Guitar Series')}</span>
-          </motion.nav>
-
-          {/* Title with string underline */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: showIntro ? 1.9 : 0.1, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif italic font-bold text-ayers-ink leading-[0.95] mb-3">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={activeSeries || 'all'}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -16 }}
-                  transition={{ duration: 0.35 }}
-                  className="block"
-                >
-                  {currentSeriesData ? currentSeriesData.nameZh : t('collections.allSeriesGuitars', 'All Series Guitars')}
-                </motion.span>
-              </AnimatePresence>
-            </h1>
-
-            {/* String-style underline accent */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: showIntro ? 2.1 : 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="origin-left w-20 mb-5"
-            >
-              <StringDivider />
-            </motion.div>
-
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={activeSeries || 'all'}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                className="text-sm sm:text-base text-ayers-ink/40 font-light max-w-lg"
-              >
-                {currentSeriesData
-                  ? currentSeriesData.desc
-                  : t('collections.allSeriesDesc', '探索 Ayers 全系列手工吉他，找到屬於你的完美音色。')}
-              </motion.p>
-            </AnimatePresence>
-          </motion.div>
-
-          {/* ── Series Cards with sound hole accent ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: showIntro ? 2.2 : 0.3 }}
-            className="mt-10 sm:mt-12 flex gap-3 sm:gap-4 overflow-x-auto pb-2 -mx-6 px-6 sm:mx-0 sm:px-0 scrollbar-hide"
-          >
-            {/* All button */}
-            <button
-              onClick={() => setActiveSeries('')}
-              className={cn(
-                'flex-shrink-0 group relative rounded-2xl border-2 transition-all duration-300 cursor-pointer px-6 sm:px-8 py-5 sm:py-6 min-w-[120px]',
-                !activeSeries
-                  ? 'border-ayers-gold bg-ayers-gold/[0.06]'
-                  : 'border-ayers-ink/8 hover:border-ayers-ink/15 bg-white/50'
-              )}
-            >
-              {/* Mini rosette accent */}
-              <div className={cn(
-                'absolute top-3 right-3 transition-opacity',
-                !activeSeries ? 'opacity-40' : 'opacity-10 group-hover:opacity-20'
-              )}>
-                <Rosette size={24} className="text-ayers-gold" />
-              </div>
-              <p className={cn(
-                'text-[9px] font-bold uppercase tracking-[0.3em] mb-1 transition-colors',
-                !activeSeries ? 'text-ayers-gold' : 'text-ayers-ink/25 group-hover:text-ayers-ink/40'
-              )}>{t('collections.all', 'ALL')}</p>
-              <p className={cn(
-                'text-sm font-serif italic font-bold transition-colors',
-                !activeSeries ? 'text-ayers-ink' : 'text-ayers-ink/50 group-hover:text-ayers-ink'
-              )}>{t('collections.allSeries', '全系列')}</p>
-            </button>
-
-            {SERIES_DATA.map(series => {
-              const isActive = activeSeries === series.name;
-              return (
-                <button
-                  key={series.name}
-                  onClick={() => setActiveSeries(isActive ? '' : series.name)}
-                  className={cn(
-                    'flex-shrink-0 group relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden min-w-[200px] sm:min-w-[240px]',
-                    isActive
-                      ? 'border-ayers-gold bg-ayers-gold/[0.06]'
-                      : 'border-ayers-ink/8 hover:border-ayers-ink/15 bg-white/50'
-                  )}
-                >
-                  <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4">
-                    {/* Guitar thumbnail with sound hole frame */}
-                    <div className="relative flex-shrink-0">
-                      <div className={cn(
-                        'w-14 h-20 sm:w-16 sm:h-24 rounded-xl overflow-hidden transition-all duration-300',
-                        isActive ? 'bg-[#2a2621]' : 'bg-ayers-ink/[0.04] group-hover:bg-[#2a2621]/70'
-                      )}>
-                        <OptimizedImage
-                          src={series.img}
-                          alt={series.name}
-                          className={cn(
-                            'w-full h-full object-contain p-1 transition-all duration-500',
-                            isActive ? 'scale-105' : 'opacity-50 group-hover:opacity-90 group-hover:scale-105'
-                          )}
-                          sizes="64px"
-                        />
-                      </div>
-                      {/* Sound hole ring overlay */}
-                      {isActive && (
-                        <motion.div
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          className="absolute -bottom-1 -right-1"
-                        >
-                          <Rosette size={20} className="text-ayers-gold opacity-60" />
-                        </motion.div>
-                      )}
-                    </div>
-
-                    {/* Text */}
-                    <div className="text-left min-w-0">
-                      <p className={cn(
-                        'text-[9px] font-bold uppercase tracking-[0.25em] mb-0.5 transition-colors',
-                        isActive ? 'text-ayers-gold' : 'text-ayers-ink/20 group-hover:text-ayers-ink/35'
-                      )}>{series.name} {t('collections.seriesLabel', 'Series')}</p>
-                      <p className={cn(
-                        'text-sm font-serif italic font-bold transition-colors truncate',
-                        isActive ? 'text-ayers-ink' : 'text-ayers-ink/45 group-hover:text-ayers-ink'
-                      )}>{series.nameZh.replace(/^[A-Z]+ /, '')}</p>
-                      <p className={cn(
-                        'text-[9px] mt-0.5 transition-colors truncate',
-                        isActive ? 'text-ayers-ink/35' : 'text-ayers-ink/15'
-                      )}>{series.tagline}</p>
-                    </div>
-                  </div>
-
-                  {/* Active indicator — gold string line */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="seriesActiveBar"
-                      className="absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-ayers-gold to-transparent"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </motion.div>
-        </div>
-      </section>
+      <HeroBannerCarousel />
 
       {/* ══════════════════════════════════════════════════════════
-          2. PRODUCTS — Sidebar + Grid
+          1. PRODUCTS — Sidebar + Grid
           ══════════════════════════════════════════════════════════ */}
       <section ref={gridRef} className="pb-20 sm:pb-28 bg-ayers-cream">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
@@ -422,7 +461,6 @@ export default function Collections() {
             animate={gridInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.4 }}
           >
-            <StringDivider className="mb-4" />
             <div className="flex items-center justify-between py-3 mb-6">
               {/* Left: count + tags */}
               <div className="flex items-center gap-2.5 flex-wrap min-w-0">

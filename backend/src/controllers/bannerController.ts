@@ -2,11 +2,15 @@ import { Request, Response } from 'express';
 import { prisma } from '../app';
 
 export class BannerController {
-  // Public: get active banners
+  // Public: get active banners (optional ?placement=home|collections)
   static async getActiveBanners(req: Request, res: Response): Promise<void> {
     try {
+      const placement = req.query.placement as string | undefined;
       const banners = await prisma.homeBanner.findMany({
-        where: { isActive: true },
+        where: {
+          isActive: true,
+          ...(placement ? { placement } : {}),
+        },
         orderBy: { displayOrder: 'asc' },
       });
       res.json({ success: true, data: banners });
@@ -54,6 +58,7 @@ export class BannerController {
     try {
       const {
         slug,
+        placement,
         subtitle,
         titleWord1,
         titleWord2,
@@ -63,6 +68,8 @@ export class BannerController {
         ctaLabel,
         ctaLink,
         image,
+        productImage,
+        gradientColor,
         displayOrder,
         isActive,
       } = req.body;
@@ -79,6 +86,7 @@ export class BannerController {
       const banner = await prisma.homeBanner.create({
         data: {
           slug,
+          placement: placement ?? 'home',
           subtitle,
           titleWord1,
           titleWord2,
@@ -88,6 +96,8 @@ export class BannerController {
           ctaLabel,
           ctaLink,
           image,
+          productImage: productImage ?? null,
+          gradientColor: gradientColor ?? '#1a1a1a',
           displayOrder: displayOrder ?? 0,
           isActive: isActive ?? true,
         },
@@ -106,6 +116,7 @@ export class BannerController {
       const { id } = req.params;
       const {
         slug,
+        placement,
         subtitle,
         titleWord1,
         titleWord2,
@@ -115,6 +126,8 @@ export class BannerController {
         ctaLabel,
         ctaLink,
         image,
+        productImage,
+        gradientColor,
         displayOrder,
         isActive,
       } = req.body;
@@ -139,6 +152,7 @@ export class BannerController {
         where: { id },
         data: {
           ...(slug !== undefined && { slug }),
+          ...(placement !== undefined && { placement }),
           ...(subtitle !== undefined && { subtitle }),
           ...(titleWord1 !== undefined && { titleWord1 }),
           ...(titleWord2 !== undefined && { titleWord2 }),
@@ -148,6 +162,8 @@ export class BannerController {
           ...(ctaLabel !== undefined && { ctaLabel }),
           ...(ctaLink !== undefined && { ctaLink }),
           ...(image !== undefined && { image }),
+          ...(productImage !== undefined && { productImage }),
+          ...(gradientColor !== undefined && { gradientColor }),
           ...(displayOrder !== undefined && { displayOrder }),
           ...(isActive !== undefined && { isActive }),
         },
