@@ -31,6 +31,8 @@ import { securityMiddleware } from './middleware/security';
 import { generalLimiter } from './middleware/rateLimiter';
 import { csrfProtection } from './middleware/csrf';
 import { i18nMiddleware } from './i18n/config';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger';
 
 // 導入路由
 import authRoutes from './routes/auth';
@@ -156,6 +158,20 @@ app.use(cookieParser());
 // CSRF 保護（在 API 路由之前）
 app.use('/api', csrfProtection);
 
+// HTTP Cache Headers for public GET endpoints
+app.use('/api/products', (req, res, next) => {
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+  }
+  next();
+});
+app.use('/api/banners', (req, res, next) => {
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=120, s-maxage=600');
+  }
+  next();
+});
+
 // 靜態檔案服務（添加 CORS 支持）
 app.use('/uploads', (req, res, next): void => {
   // 設置 CORS 頭
@@ -188,6 +204,12 @@ app.use('/uploads', (req, res, next): void => {
   next();
 }, express.static('uploads'));
 
+// Swagger API 文件
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Ayers Guitars API Docs',
+}));
+
 // API 路由
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -209,11 +231,6 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/custom-configs', customConfigRoutes);
 app.use('/api/wishlist', wishlistRoutes);
-
-// Sentry 測試路由（確認後可刪除）
-app.get('/api/sentry-test', (_req, _res) => {
-  throw new Error('Sentry test error from backend!');
-});
 
 // 根路由
 app.get('/', (req, res) => {

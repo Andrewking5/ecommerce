@@ -13,6 +13,7 @@ import { WishlistProvider } from './contexts/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
+import ChatWidget from './components/ChatWidget';
 import ErrorBoundary from './components/ErrorBoundary';
 
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
@@ -110,10 +111,17 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Skip to content — accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-ayers-ink focus:text-white focus:px-6 focus:py-3 focus:rounded-xl focus:text-sm focus:font-bold"
+      >
+        Skip to content
+      </a>
       <LanguageSync />
       <PageViewTracker />
       <Navbar />
-      <main className={isFullscreen ? 'flex-grow' : 'flex-grow pt-20'}>
+      <main id="main-content" role="main" className={isFullscreen ? 'flex-grow' : 'flex-grow pt-20'}>
         <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -147,6 +155,7 @@ function AppLayout() {
       </main>
       {!isFullscreen && <Footer />}
       <CookieConsent />
+      <ChatWidget />
     </div>
   );
 }

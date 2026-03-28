@@ -17,6 +17,8 @@ import {
   ThumbsUp,
   User,
   Heart,
+  Share2,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import OptimizedImage from '@/src/components/OptimizedImage';
@@ -24,6 +26,7 @@ import SEO, { type BreadcrumbItem } from '@/src/components/SEO';
 import { useLanguagePrefix } from '@/src/lib/i18nRouting';
 import { cn } from '@/src/lib/utils';
 import productService, { type Product } from '@/src/services/productService';
+import { LocalizedLink } from '@/src/lib/i18nRouting';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import { useCartContext } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
@@ -1082,6 +1085,28 @@ export default function ProductDetail() {
                   >
                     <Heart size={20} fill={product && isInWishlist(product.id) ? 'currentColor' : 'none'} />
                   </motion.button>
+
+                  {/* Share Button */}
+                  <motion.button
+                    onClick={() => {
+                      if (navigator.share && product) {
+                        navigator.share({
+                          title: product.name,
+                          text: `${product.name} - Ayers Guitars`,
+                          url: window.location.href,
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert(t('share.copied', 'Link copied!'));
+                      }
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-4 rounded-2xl border border-ayers-ink/8 bg-white text-ayers-ink/40 hover:text-ayers-gold hover:border-ayers-gold/30 transition-all duration-300 cursor-pointer"
+                    title={t('share.title', 'Share')}
+                  >
+                    <Share2 size={20} />
+                  </motion.button>
                 </motion.div>
               </div>
             </div>
@@ -1089,8 +1114,55 @@ export default function ProductDetail() {
 
           {/* ── Reviews Section ─────────────────────────────────── */}
           {id && <ReviewsSection productId={id} />}
+
+          {/* ── Recommendations ──────────────────────────────── */}
+          {id && <RecommendationsSection productId={id} />}
         </div>
       </div>
     </>
+  );
+}
+
+function RecommendationsSection({ productId }: { productId: string }) {
+  const [recs, setRecs] = useState<Product[]>([]);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    productService.getRecommendations(productId, 4).then((res) => {
+      if (res.success) setRecs(res.data);
+    }).catch(() => {});
+  }, [productId]);
+
+  if (recs.length === 0) return null;
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="mt-16 mb-8"
+    >
+      <h2 className="text-2xl font-serif italic font-bold text-ayers-ink mb-8">
+        {t('product.youMayAlsoLike', 'You May Also Like')}
+      </h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {recs.map((rec) => (
+          <LocalizedLink key={rec.id} to={`/product/${rec.id}`} className="group block">
+            <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1714] mb-3">
+              <img
+                src={rec.images?.[0] || '/images/placeholder.png'}
+                alt={rec.name}
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>
+            <h3 className="text-sm font-serif italic font-bold text-ayers-ink group-hover:text-ayers-gold transition-colors truncate">
+              {rec.name}
+            </h3>
+            <p className="text-sm font-bold text-ayers-ink/60">NT${Number(rec.price).toLocaleString()}</p>
+          </LocalizedLink>
+        ))}
+      </div>
+    </motion.section>
   );
 }

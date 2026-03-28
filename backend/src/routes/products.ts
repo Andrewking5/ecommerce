@@ -12,6 +12,9 @@ router.get('/categories', ProductController.getCategories);
 // 需要認證的管理員路由（必須在 /:id 之前，否則會被 /:id 匹配）
 router.get('/admin/trash', authenticateToken, requireAdmin, ProductController.getDeletedProducts);
 
+// 推薦商品（必須在 /:id 之前）
+router.get('/:id/recommendations', ProductController.getRecommendations);
+
 // 公開路由 — 商品詳情（不需要登入）
 router.get('/:id', ProductController.getProductById);
 

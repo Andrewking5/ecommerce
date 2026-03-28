@@ -358,6 +358,22 @@
     "resend": "Resend",
     "resent": "Verification email sent!"
   },
+  "share": {
+    "title": "Share",
+    "copied": "Link copied to clipboard!"
+  },
+  "product": {
+    "youMayAlsoLike": "You May Also Like"
+  },
+  "chat": {
+    "toggle": "Open chat",
+    "title": "Ayers Guitars Support",
+    "subtitle": "We usually reply within a few hours",
+    "welcome": "Hi! How can we help you today?",
+    "placeholder": "Type a message...",
+    "received": "Message received! We'll get back to you via email shortly.",
+    "error": "Failed to send. Please email service@ayersguitars.com"
+  },
   "invoice": {
     "download": "Download Invoice",
     "downloading": "Generating PDF..."

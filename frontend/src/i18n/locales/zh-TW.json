@@ -358,6 +358,22 @@
     "resend": "重新發送",
     "resent": "驗證郵件已發送！"
   },
+  "share": {
+    "title": "分享",
+    "copied": "連結已複製！"
+  },
+  "product": {
+    "youMayAlsoLike": "你可能也喜歡"
+  },
+  "chat": {
+    "toggle": "開啟客服",
+    "title": "Ayers Guitars 客服",
+    "subtitle": "我們通常在幾小時內回覆",
+    "welcome": "您好！有什麼可以幫助您的嗎？",
+    "placeholder": "輸入訊息...",
+    "received": "訊息已收到！我們會盡快透過郵件回覆您。",
+    "error": "發送失敗，請寄信至 service@ayersguitars.com"
+  },
   "invoice": {
     "download": "下載發票",
     "downloading": "正在生成 PDF..."

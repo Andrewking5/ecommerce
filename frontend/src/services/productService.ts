@@ -161,6 +161,11 @@ const productService = {
     const { data } = await api.post('/admin/inventory/bulk-update', { updates });
     return data;
   },
+
+  async getRecommendations(productId: string, limit = 6): Promise<{ success: boolean; data: Product[] }> {
+    const { data } = await api.get(`/products/${productId}/recommendations`, { params: { limit } });
+    return data;
+  },
 };
 
 export default productService;

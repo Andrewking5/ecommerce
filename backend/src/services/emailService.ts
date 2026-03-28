@@ -271,6 +271,56 @@ export class EmailService {
   }
 
   /**
+   * 發送電子報確認信（Double Opt-in）
+   */
+  static async sendNewsletterConfirmation(
+    to: string,
+    confirmUrl: string
+  ): Promise<void> {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1d1d1f; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #1a1714; color: #C8A96E; padding: 30px; text-align: center; }
+          .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; }
+          .content { padding: 30px; background: #faf8f5; }
+          .button { display: inline-block; padding: 14px 32px; background: #1a1714; color: #fff; text-decoration: none; border-radius: 12px; margin: 20px 0; font-weight: bold; }
+          .footer { padding: 20px; text-align: center; color: #999; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>AYERS GUITARS</h1>
+          </div>
+          <div class="content">
+            <p>Thank you for subscribing to the Ayers Guitars newsletter!</p>
+            <p>Please confirm your subscription by clicking the button below:</p>
+            <p style="text-align: center;">
+              <a href="${confirmUrl}" class="button">Confirm Subscription</a>
+            </p>
+            <p style="font-size: 13px; color: #666;">If you didn't subscribe, please ignore this email.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; Ayers Guitars. Handcrafted since 1996.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await this.sendEmail({
+      to,
+      subject: 'Confirm Your Newsletter Subscription - Ayers Guitars',
+      html,
+    });
+  }
+
+  /**
    * 发送邮件的基础方法
    */
   private static async sendEmail({

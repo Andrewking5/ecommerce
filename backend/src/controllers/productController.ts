@@ -338,19 +338,45 @@ export class ProductController {
         return;
       }
 
-      const products = await prisma.product.findMany({
-        where: {
-          isActive: true,
-          OR: [
-            { name: { contains: q as string, mode: 'insensitive' } },
-            { description: { contains: q as string, mode: 'insensitive' } },
-          ],
-        },
-        include: {
-          category: true,
-        },
-        take: 20,
-      });
+      const query = (q as string).trim();
+
+      // Use PostgreSQL full-text search with ranking for better relevance
+      // Falls back to LIKE if full-text returns no results
+      let products: any[];
+
+      try {
+        // Full-text search with ts_rank for relevance scoring
+        products = await prisma.$queryRaw`
+          SELECT p.*,
+            ts_rank(
+              to_tsvector('english', coalesce(p.name, '') || ' ' || coalesce(p.description, '')),
+              plainto_tsquery('english', ${query})
+            ) AS rank
+          FROM products p
+          WHERE p."isActive" = true
+            AND (
+              to_tsvector('english', coalesce(p.name, '') || ' ' || coalesce(p.description, ''))
+              @@ plainto_tsquery('english', ${query})
+              OR p.name ILIKE ${'%' + query + '%'}
+              OR p.description ILIKE ${'%' + query + '%'}
+            )
+          ORDER BY rank DESC, p."createdAt" DESC
+          LIMIT 20
+        `;
+      } catch {
+        // Fallback to basic LIKE search if raw query fails
+        products = await prisma.product.findMany({
+          where: {
+            isActive: true,
+            OR: [
+              { name: { contains: query, mode: 'insensitive' } },
+              { description: { contains: query, mode: 'insensitive' } },
+            ],
+          },
+          include: { category: true },
+          take: 20,
+        });
+      }
 
       res.json({
         success: true,
@@ -364,6 +390,60 @@ export class ProductController {
         message: req.t('common:errors.internalServerError'),
       });
       return;
+    }
+  }
+
+  // 取得推薦商品（同類別 + 熱門商品）
+  static async getRecommendations(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const limit = Math.min(Number(req.query.limit) || 6, 12);
+
+      const product = await prisma.product.findUnique({
+        where: { id },
+        select: { categoryId: true, price: true },
+      });
+
+      if (!product) {
+        res.json({ success: true, data: [] });
+        return;
+      }
+
+      // 1. Same category products (excluding current)
+      const sameCategory = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          categoryId: product.categoryId,
+          id: { not: id },
+        },
+        include: { category: { select: { name: true, slug: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      });
+
+      // 2. If not enough, fill with popular products (most ordered)
+      if (sameCategory.length < limit) {
+        const remaining = limit - sameCategory.length;
+        const excludeIds = [id, ...sameCategory.map((p) => p.id)];
+
+        const popular = await prisma.product.findMany({
+          where: {
+            isActive: true,
+            id: { notIn: excludeIds },
+            stock: { gt: 0 },
+          },
+          include: { category: { select: { name: true, slug: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: remaining,
+        });
+
+        sameCategory.push(...popular);
+      }
+
+      res.json({ success: true, data: sameCategory });
+    } catch (error) {
+      console.error('Get recommendations error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get recommendations' });
     }
   }
 
