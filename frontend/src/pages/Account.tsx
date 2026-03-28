@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { User, Package, Heart, MapPin, LogOut, ChevronRight, Save, Palette, Plus, Edit2, Trash2, Star, X } from 'lucide-react';
+import { User, Package, Heart, Bookmark, MapPin, LogOut, ChevronRight, Save, Palette, Plus, Edit2, Trash2, Star, X, ShoppingCart, FileDown } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,9 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import orderService, { type Order } from '@/src/services/orderService';
 import userService from '@/src/services/userService';
 import addressService, { type Address, type AddressInput } from '@/src/services/addressService';
+import { useWishlist } from '@/src/contexts/WishlistContext';
+import { useCartContext } from '@/src/contexts/CartContext';
+import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
 
 const STATUS_LABEL_KEYS: Record<string, string> = {
   PENDING: 'account.statusPending',
@@ -215,6 +218,7 @@ export default function Account() {
   const menuItems = [
     { id: 'profile', icon: <User size={20} />, label: t('account.myProfile') },
     { id: 'orders', icon: <Package size={20} />, label: t('account.orderHistory') },
+    { id: 'wishlist', icon: <Bookmark size={20} />, label: t('account.wishlist', '願望清單') },
     { id: 'saved', icon: <Heart size={20} />, label: t('account.savedDesigns') },
     { id: 'addresses', icon: <MapPin size={20} />, label: t('account.addresses') },
     { id: 'logout', icon: <LogOut size={20} />, label: t('account.logOut') },
@@ -392,15 +396,29 @@ export default function Account() {
                               </p>
                             )}
                           </div>
-                          <button className="bg-ayers-dark text-white px-10 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center shrink-0">
-                            {t('account.viewDetails')} <ChevronRight size={14} className="ml-2" />
-                          </button>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <button
+                              onClick={() => orderService.downloadInvoice(order.id)}
+                              className="p-3.5 rounded-full border border-ayers-ink/10 text-ayers-ink/40 hover:text-ayers-gold hover:border-ayers-gold/30 transition-all"
+                              title={t('invoice.download', 'Download Invoice')}
+                            >
+                              <FileDown size={16} />
+                            </button>
+                            <button className="bg-ayers-dark text-white px-10 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center">
+                              {t('account.viewDetails')} <ChevronRight size={14} className="ml-2" />
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 )}
               </motion.section>
+            )}
+
+            {/* Wishlist Tab */}
+            {activeTab === 'wishlist' && (
+              <WishlistTab />
             )}
 
             {/* Saved Designs Tab */}
@@ -687,5 +705,116 @@ export default function Account() {
         </div>
       </div>
     </div>
+  );
+}
+
+function WishlistTab() {
+  const { t } = useTranslation();
+  const { wishlistItems, isLoading, toggle } = useWishlist();
+  const { addToCart } = useCartContext();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center py-20">
+        <GuitarSunLoader size={32} />
+      </motion.section>
+    );
+  }
+
+  return (
+    <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <h2 className="text-4xl font-serif italic font-bold mb-8">{t('account.wishlist', '願望清單')}</h2>
+
+      {wishlistItems.length === 0 ? (
+        <div className="bg-white p-12 rounded-[2rem] shadow-sm border border-ayers-ink/5 text-center">
+          <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
+            <Bookmark size={32} className="text-red-400" />
+          </div>
+          <p className="text-lg font-bold text-ayers-ink/70 mb-2">
+            {t('account.noWishlistItems', '願望清單是空的')}
+          </p>
+          <p className="text-sm text-ayers-ink/40 max-w-sm mx-auto leading-relaxed">
+            {t('account.noWishlistItemsDesc', '收藏喜愛的吉他，方便日後查看。')}
+          </p>
+          <button
+            onClick={() => navigate('/collections')}
+            className="mt-8 bg-ayers-dark text-white px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all inline-flex items-center"
+          >
+            {t('account.browseGuitars', '瀏覽吉他')} <ChevronRight size={14} className="ml-2" />
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {wishlistItems.map((item) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-sm border border-ayers-ink/5 overflow-hidden group"
+            >
+              <Link to={`/product/${item.product.id}`}>
+                <div className="aspect-[3/4] bg-[#1a1714] relative overflow-hidden">
+                  <img
+                    src={item.product.images?.[0] || '/images/placeholder.png'}
+                    alt={item.product.name}
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {!item.product.isActive && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white text-xs font-bold uppercase tracking-widest">
+                        {t('collections.soldOut', 'Sold Out')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+
+              <div className="p-5">
+                <Link to={`/product/${item.product.id}`}>
+                  <h3 className="text-sm font-serif italic font-bold text-ayers-ink group-hover:text-ayers-gold transition-colors mb-1">
+                    {item.product.name}
+                  </h3>
+                </Link>
+                {item.product.category && (
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ayers-gold/50 mb-2">
+                    {item.product.category.name}
+                  </p>
+                )}
+                <p className="text-sm font-bold text-ayers-ink/70 mb-4">
+                  NT${Number(item.product.price).toLocaleString()}
+                </p>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      addToCart({
+                        productId: item.product.id,
+                        name: item.product.name,
+                        price: Number(item.product.price),
+                        image: item.product.images?.[0] || '',
+                      });
+                    }}
+                    disabled={item.product.stock <= 0}
+                    className="flex-1 bg-ayers-ink text-white py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    <ShoppingCart size={13} />
+                    {t('collections.addToCart', '加入購物車')}
+                  </button>
+                  <button
+                    onClick={() => toggle(item.product.id)}
+                    className="p-2.5 rounded-xl border border-ayers-ink/10 text-ayers-ink/40 hover:text-red-500 hover:border-red-200 transition-all"
+                    title={t('wishlist.remove', '從願望清單移除')}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.section>
   );
 }

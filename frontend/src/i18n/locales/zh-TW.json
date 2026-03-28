@@ -314,7 +314,59 @@
     "statusProcessing": "處理中",
     "statusShipped": "已出貨",
     "statusDelivered": "已送達",
-    "statusCancelled": "已取消"
+    "statusCancelled": "已取消",
+    "wishlist": "願望清單",
+    "noWishlistItems": "願望清單是空的",
+    "noWishlistItemsDesc": "收藏喜愛的吉他，方便日後查看。",
+    "browseGuitars": "瀏覽吉他"
+  },
+  "wishlist": {
+    "add": "加入願望清單",
+    "remove": "從願望清單移除",
+    "added": "已加入願望清單",
+    "removed": "已從願望清單移除",
+    "loginRequired": "請先登入以收藏商品"
+  },
+  "forgotPassword": {
+    "title": "重設密碼",
+    "description": "輸入您的電子郵件地址，我們會發送重設連結給您。",
+    "submit": "發送重設連結",
+    "success": "如果該電子郵件帳戶存在，重設連結已發送。請檢查您的收件匣。",
+    "backToLogin": "返回登入",
+    "error": "發生錯誤，請重試。"
+  },
+  "resetPassword": {
+    "title": "設定新密碼",
+    "newPassword": "新密碼",
+    "confirmPassword": "確認新密碼",
+    "submit": "重設密碼",
+    "success": "密碼重設成功，正在跳轉到登入頁面...",
+    "invalidToken": "此重設連結無效或已過期。",
+    "invalidTokenDesc": "此重設連結無效或已過期，請重新申請。",
+    "requestNew": "重新申請",
+    "minLength": "密碼至少需要 8 個字元。"
+  },
+  "verifyEmail": {
+    "verifying": "正在驗證您的電子郵件...",
+    "success": "郵件驗證成功！",
+    "successDesc": "您的電子郵件已成功驗證，正在跳轉到帳戶頁面...",
+    "error": "驗證失敗，連結可能無效。",
+    "errorTitle": "驗證失敗",
+    "goToAccount": "前往我的帳戶",
+    "goToLogin": "前往登入",
+    "banner": "請驗證您的電子郵件地址。",
+    "resend": "重新發送",
+    "resent": "驗證郵件已發送！"
+  },
+  "invoice": {
+    "download": "下載發票",
+    "downloading": "正在生成 PDF..."
+  },
+  "cookies": {
+    "title": "我們使用 Cookie",
+    "description": "我們使用 Cookie 和分析工具來改善您的瀏覽體驗。您可以選擇接受或拒絕。",
+    "accept": "接受",
+    "decline": "拒絕"
   },
   "customizer": {
     "title": "吉他",

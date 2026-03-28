@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import cartService, { type CartItem } from '../services/cartService';
+import { trackAddToCart, trackRemoveFromCart } from '../lib/analytics';
 
 interface CartContextType {
   items: CartItem[];
@@ -27,13 +28,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = useCallback(
     (product: { productId: string; name: string; price: number; image: string }, quantity = 1) => {
       cartService.addToCart(product, quantity);
+      trackAddToCart({ id: product.productId, name: product.name, price: product.price }, quantity);
     },
     []
   );
 
   const removeFromCart = useCallback((productId: string) => {
+    const item = items.find((i) => i.productId === productId);
+    if (item) {
+      trackRemoveFromCart({ id: item.productId, name: item.name, price: item.price }, item.quantity);
+    }
     cartService.removeFromCart(productId);
-  }, []);
+  }, [items]);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     cartService.updateCartItem(productId, quantity);

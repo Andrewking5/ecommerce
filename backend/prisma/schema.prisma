@@ -33,6 +33,12 @@ model User {
   // 国际化相关
   preferredLanguage String? @default("en") // 用户语言偏好: en, zh-TW, zh-CN, ja
 
+  // 郵箱驗證與密碼重設
+  emailVerified     Boolean   @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+
   // AI推荐相关
   viewedProducts Json? // 浏览历史
   preferences    Json? // 用户偏好
@@ -49,6 +55,7 @@ model User {
   subscriptions  Subscription[]
   addresses      UserAddress[]
   customConfigs  CustomConfig[]
+  wishlistItems  WishlistItem[]
 
   @@index([provider, providerId]) // 为社交登录查询优化
   @@map("users")
@@ -104,6 +111,7 @@ model Product {
   userBehaviors UserBehavior[]
   subscriptions Subscription[]
   variants      ProductVariant[] // 商品变体
+  wishlistItems WishlistItem[]
 
   @@index([categoryId])
   @@index([isActive])
@@ -582,6 +590,23 @@ model CustomConfig {
   @@index([isPublic, likes])
   @@index([userId])
   @@map("custom_configs")
+}
+
+// 願望清單模型
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  // 關聯
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@map("wishlist_items")
 }
 
 // 客製化配置按讚紀錄

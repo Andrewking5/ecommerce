@@ -16,6 +16,7 @@ import {
   Send,
   ThumbsUp,
   User,
+  Heart,
 } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import OptimizedImage from '@/src/components/OptimizedImage';
@@ -26,6 +27,10 @@ import productService, { type Product } from '@/src/services/productService';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import { useCartContext } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { useWishlist } from '@/src/contexts/WishlistContext';
+import { useLocalizedNavigate } from '@/src/lib/i18nRouting';
+import { useTranslation } from 'react-i18next';
+import { trackViewItem } from '@/src/lib/analytics';
 
 // ─── Collapsible Section ─────────────────────────────────────────────────────
 
@@ -557,6 +562,10 @@ function ReviewsSection({ productId }: { productId: string }) {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCartContext();
+  const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggle } = useWishlist();
+  const navigateLocal = useLocalizedNavigate();
   const lang = useLanguagePrefix();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -578,6 +587,11 @@ export default function ProductDetail() {
       .then((res) => {
         if (res.success && res.data) {
           setProduct(res.data);
+          trackViewItem({
+            id: res.data.id,
+            name: res.data.name,
+            price: Number(res.data.price),
+          });
         } else {
           setError('Product not found');
         }
@@ -1048,6 +1062,25 @@ export default function ProductDetail() {
                         className="absolute inset-0 m-auto w-4 h-4 rounded-full bg-white"
                       />
                     )}
+                  </motion.button>
+
+                  {/* Wishlist Button */}
+                  <motion.button
+                    onClick={() => {
+                      if (!isAuthenticated) { navigateLocal('/login'); return; }
+                      if (product) toggle(product.id);
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={cn(
+                      'p-4 rounded-2xl border transition-all duration-300 cursor-pointer',
+                      product && isInWishlist(product.id)
+                        ? 'bg-red-50 border-red-200 text-red-500'
+                        : 'bg-white border-ayers-ink/8 text-ayers-ink/40 hover:text-red-500 hover:border-red-200'
+                    )}
+                    title={product && isInWishlist(product.id) ? t('wishlist.remove', '從願望清單移除') : t('wishlist.add', '加入願望清單')}
+                  >
+                    <Heart size={20} fill={product && isInWishlist(product.id) ? 'currentColor' : 'none'} />
                   </motion.button>
                 </motion.div>
               </div>

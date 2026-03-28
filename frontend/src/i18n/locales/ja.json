@@ -314,7 +314,59 @@
     "statusProcessing": "処理中",
     "statusShipped": "発送済み",
     "statusDelivered": "配達完了",
-    "statusCancelled": "キャンセル済み"
+    "statusCancelled": "キャンセル済み",
+    "wishlist": "ウィッシュリスト",
+    "noWishlistItems": "ウィッシュリストは空です",
+    "noWishlistItemsDesc": "お気に入りのギターを保存して、後で見返しましょう。",
+    "browseGuitars": "ギターを見る"
+  },
+  "wishlist": {
+    "add": "ウィッシュリストに追加",
+    "remove": "ウィッシュリストから削除",
+    "added": "ウィッシュリストに追加しました",
+    "removed": "ウィッシュリストから削除しました",
+    "loginRequired": "ウィッシュリストに保存するにはログインしてください"
+  },
+  "forgotPassword": {
+    "title": "パスワードリセット",
+    "description": "メールアドレスを入力してください。リセットリンクをお送りします。",
+    "submit": "リセットリンクを送信",
+    "success": "アカウントが存在する場合、リセットリンクが送信されました。受信トレイをご確認ください。",
+    "backToLogin": "ログインに戻る",
+    "error": "エラーが発生しました。もう一度お試しください。"
+  },
+  "resetPassword": {
+    "title": "新しいパスワードを設定",
+    "newPassword": "新しいパスワード",
+    "confirmPassword": "新しいパスワード（確認）",
+    "submit": "パスワードをリセット",
+    "success": "パスワードがリセットされました。ログインページに移動します...",
+    "invalidToken": "このリセットリンクは無効または期限切れです。",
+    "invalidTokenDesc": "このリセットリンクは無効または期限切れです。新しいリンクをリクエストしてください。",
+    "requestNew": "新しいリンクをリクエスト",
+    "minLength": "パスワードは8文字以上である必要があります。"
+  },
+  "verifyEmail": {
+    "verifying": "メールアドレスを確認中...",
+    "success": "メール認証完了！",
+    "successDesc": "メールアドレスが正常に確認されました。アカウントページに移動します...",
+    "error": "認証に失敗しました。リンクが無効な可能性があります。",
+    "errorTitle": "認証失敗",
+    "goToAccount": "マイアカウントへ",
+    "goToLogin": "ログインへ",
+    "banner": "メールアドレスを確認してください。",
+    "resend": "再送信",
+    "resent": "確認メールを送信しました！"
+  },
+  "invoice": {
+    "download": "請求書をダウンロード",
+    "downloading": "PDFを生成中..."
+  },
+  "cookies": {
+    "title": "Cookieの使用について",
+    "description": "当サイトではCookieと分析ツールを使用して閲覧体験を向上させています。承認または拒否を選択できます。",
+    "accept": "承認",
+    "decline": "拒否"
   },
   "customizer": {
     "title": "ギター",

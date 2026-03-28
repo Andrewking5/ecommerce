@@ -9,10 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { WishlistProvider } from './contexts/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
+import { usePageViewTracking } from './hooks/useAnalytics';
 import { GuitarSunLoader } from './components/guitar';
 
 // Eagerly load the home page for fast initial render
@@ -39,6 +42,9 @@ const About = lazy(() => import('./pages/About'));
 const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
 const OrderTracking = lazy(() => import('./pages/OrderTracking'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 
 function PageLoader() {
   return (
@@ -82,6 +88,12 @@ function LanguageSync() {
   return null;
 }
 
+/** Track GA4 page views on route changes */
+function PageViewTracker() {
+  usePageViewTracking();
+  return null;
+}
+
 /**
  * Redirect root `/` to `/:detectedLang/`
  */
@@ -98,6 +110,7 @@ function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <LanguageSync />
+      <PageViewTracker />
       <Navbar />
       <main className={isFullscreen ? 'flex-grow' : 'flex-grow pt-20'}>
         <Suspense fallback={<PageLoader />}>
@@ -116,6 +129,9 @@ function AppLayout() {
             <Route path="orders/:id/tracking" element={<OrderTracking />} />
             <Route path="technology" element={<Technology />} />
             <Route path="login" element={<Login />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
             <Route path="warranty" element={<Warranty />} />
@@ -127,6 +143,7 @@ function AppLayout() {
         </Suspense>
       </main>
       {!isFullscreen && <Footer />}
+      <CookieConsent />
     </div>
   );
 }
@@ -136,6 +153,7 @@ export default function App() {
     <HelmetProvider>
       <AuthProvider>
         <CartProvider>
+          <WishlistProvider>
           <Router>
             <Routes>
               {/* Root → redirect to detected language */}
@@ -144,6 +162,7 @@ export default function App() {
               <Route path="/:lang/*" element={<AppLayout />} />
             </Routes>
           </Router>
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </HelmetProvider>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { OrderController } from '../controllers/orderController';
+import { InvoiceController } from '../controllers/invoiceController';
 
 const router = Router();
 
@@ -9,6 +10,7 @@ router.use(authenticateToken);
 
 // 用戶訂單路由
 router.get('/', OrderController.getUserOrders);
+router.get('/:id/invoice', InvoiceController.getInvoice);
 router.get('/:id', OrderController.getOrderById);
 router.post('/', OrderController.createOrder);
 

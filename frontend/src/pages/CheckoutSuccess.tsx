@@ -6,6 +6,7 @@ import { GuitarSunLoader } from '@/src/components/guitar';
 import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
 import paymentService from '@/src/services/paymentService';
 import { useTranslation } from 'react-i18next';
+import { trackPurchase } from '@/src/lib/analytics';
 
 export default function CheckoutSuccess() {
   const [searchParams] = useSearchParams();
@@ -15,20 +16,30 @@ export default function CheckoutSuccess() {
 
   const paymentIntent = searchParams.get('payment_intent');
   const stateOrderId = (location.state as any)?.orderId;
+  const purchaseData = (location.state as any)?.purchaseData;
 
   useEffect(() => {
     // If we arrived via redirect from Stripe, verify payment
     if (paymentIntent) {
-      // Payment was redirected back — it's confirmed
       setStatus('success');
     } else if (stateOrderId) {
-      // We navigated here after inline payment confirmation
       setStatus('success');
     } else {
-      // Direct access without payment context
       setStatus('success');
     }
-  }, [paymentIntent, stateOrderId]);
+
+    // Track purchase event (deduplication handled inside trackPurchase)
+    if (stateOrderId && purchaseData) {
+      trackPurchase(
+        stateOrderId,
+        purchaseData.value,
+        purchaseData.tax,
+        purchaseData.shipping,
+        purchaseData.items,
+        purchaseData.coupon,
+      );
+    }
+  }, [paymentIntent, stateOrderId, purchaseData]);
 
   if (status === 'loading') {
     return (

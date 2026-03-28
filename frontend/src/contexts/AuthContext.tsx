@@ -9,6 +9,7 @@ export interface User {
   phone?: string;
   avatar?: string;
   role: 'USER' | 'ADMIN';
+  emailVerified?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { ChevronDown, ChevronLeft, ChevronRight, X, ArrowUpRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, ArrowUpRight, Heart } from 'lucide-react';
 import bannerService from '@/src/services/bannerService';
 import { cn } from '@/src/lib/utils';
 import { useSearchParams } from 'react-router-dom';
@@ -9,6 +9,9 @@ import productService, { type Product } from '@/src/services/productService';
 import OptimizedImage from '@/src/components/OptimizedImage';
 import SEO from '@/src/components/SEO';
 import { useCartContext } from '@/src/contexts/CartContext';
+import { useWishlist } from '@/src/contexts/WishlistContext';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { useLocalizedNavigate } from '@/src/lib/i18nRouting';
 import { Rosette, FretDot, PickIcon, BridgePinIcon, TuningPegIcon, StringDivider, GuitarSunLoader } from '@/src/components/guitar';
 import { useTranslation } from 'react-i18next';
 
@@ -741,12 +744,16 @@ function ProductCard({
   onAddToCart: (p: Product) => void;
 }) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const { isInWishlist, toggle } = useWishlist();
+  const navigate = useLocalizedNavigate();
   const series = getSeries(product);
   const secondImg = getSecondImage(product);
   const [isHovered, setIsHovered] = useState(false);
   const [added, setAdded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: true, margin: '-40px' });
+  const wishlisted = isInWishlist(product.id);
 
   const handleAdd = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -755,6 +762,16 @@ function ProductCard({
     setAdded(true);
     setTimeout(() => setAdded(false), 1400);
   }, [onAddToCart, product]);
+
+  const handleWishlist = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    toggle(product.id);
+  }, [isAuthenticated, navigate, toggle, product.id]);
 
   // Mouse-tracking parallax
   const mx = useMotionValue(0);
@@ -846,6 +863,23 @@ function ProductCard({
               </span>
             </div>
           )}
+
+          {/* Wishlist heart button */}
+          <motion.button
+            initial={false}
+            animate={{ opacity: isHovered || wishlisted ? 1 : 0, y: isHovered || wishlisted ? 0 : 6 }}
+            transition={{ duration: 0.2 }}
+            onClick={handleWishlist}
+            className={cn(
+              'absolute bottom-3 left-3 z-10 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-200 cursor-pointer',
+              wishlisted
+                ? 'bg-red-500 text-white scale-110'
+                : 'bg-white text-ayers-ink hover:bg-red-50 hover:text-red-500 hover:scale-105'
+            )}
+            title={wishlisted ? t('wishlist.remove', '從願望清單移除') : t('wishlist.add', '加入願望清單')}
+          >
+            <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
+          </motion.button>
 
           {/* Quick add — bridge pin button */}
           {product.stock > 0 && (

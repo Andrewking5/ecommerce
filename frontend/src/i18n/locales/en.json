@@ -314,7 +314,59 @@
     "statusProcessing": "Processing",
     "statusShipped": "Shipped",
     "statusDelivered": "Delivered",
-    "statusCancelled": "Cancelled"
+    "statusCancelled": "Cancelled",
+    "wishlist": "Wishlist",
+    "noWishlistItems": "Your Wishlist is Empty",
+    "noWishlistItemsDesc": "Save your favourite guitars to revisit them later.",
+    "browseGuitars": "Browse Guitars"
+  },
+  "wishlist": {
+    "add": "Add to Wishlist",
+    "remove": "Remove from Wishlist",
+    "added": "Added to Wishlist",
+    "removed": "Removed from Wishlist",
+    "loginRequired": "Please log in to save items to your wishlist"
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "description": "Enter your email address and we'll send you a reset link.",
+    "submit": "Send Reset Link",
+    "success": "If an account exists with that email, a reset link has been sent. Please check your inbox.",
+    "backToLogin": "Back to Sign In",
+    "error": "Something went wrong. Please try again."
+  },
+  "resetPassword": {
+    "title": "Set New Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "submit": "Reset Password",
+    "success": "Password reset successfully. Redirecting to login...",
+    "invalidToken": "This reset link is invalid or has expired.",
+    "invalidTokenDesc": "This reset link is invalid or has expired. Please request a new one.",
+    "requestNew": "Request New Link",
+    "minLength": "Password must be at least 8 characters."
+  },
+  "verifyEmail": {
+    "verifying": "Verifying your email...",
+    "success": "Email Verified!",
+    "successDesc": "Your email has been verified successfully. Redirecting to your account...",
+    "error": "Verification failed. The link may be invalid.",
+    "errorTitle": "Verification Failed",
+    "goToAccount": "Go to My Account",
+    "goToLogin": "Go to Login",
+    "banner": "Please verify your email address.",
+    "resend": "Resend",
+    "resent": "Verification email sent!"
+  },
+  "invoice": {
+    "download": "Download Invoice",
+    "downloading": "Generating PDF..."
+  },
+  "cookies": {
+    "title": "We Use Cookies",
+    "description": "We use cookies and analytics tools to improve your browsing experience. You can choose to accept or decline.",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "customizer": {
     "title": "Guitar",

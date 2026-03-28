@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { prisma } from '../app';
 import { EmailService } from '../services/emailService';
 
@@ -34,6 +35,10 @@ export class AuthController {
       // 密碼雜湊
       const hashedPassword = await bcrypt.hash(password, 12);
 
+      // 生成驗證 token
+      const verificationRaw = crypto.randomBytes(32).toString('hex');
+      const verificationToken = crypto.createHash('sha256').update(verificationRaw).digest('hex');
+
       // 創建用戶
       const user = await prisma.user.create({
         data: {
@@ -43,16 +48,19 @@ export class AuthController {
           lastName,
           phone,
           role: 'USER',
-          provider: 'EMAIL', // 明确标记为邮箱注册
+          provider: 'EMAIL',
+          emailVerified: false,
+          verificationToken,
         },
       });
 
-      // 发送欢迎邮件
+      // 发送欢迎邮件 + 驗證郵件
       try {
         await EmailService.sendWelcomeEmail(user.email, user.firstName);
+        const verifyUrl = `${process.env.FRONTEND_URL}/${user.preferredLanguage || 'zh-TW'}/verify-email?token=${verificationRaw}`;
+        await EmailService.sendVerificationEmail(user.email, user.firstName, verifyUrl);
       } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError);
-        // 不阻止注册，只记录错误
+        console.error('Failed to send email:', emailError);
       }
 
       // 生成 JWT tokens
@@ -252,22 +260,32 @@ export class AuthController {
     try {
       const { email } = req.body;
 
-      const user = await prisma.user.findUnique({
-        where: { email },
-      });
+      // Always return generic success to prevent email enumeration
+      const user = await prisma.user.findUnique({ where: { email } });
 
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          message: req.t('auth:errors.userNotFound'),
+      if (user && user.provider === 'EMAIL') {
+        const resetRaw = crypto.randomBytes(32).toString('hex');
+        const resetTokenHash = crypto.createHash('sha256').update(resetRaw).digest('hex');
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            resetToken: resetTokenHash,
+            resetTokenExpiry: new Date(Date.now() + 3600000), // 1 hour
+          },
         });
-        return;
+
+        const resetUrl = `${process.env.FRONTEND_URL}/${user.preferredLanguage || 'zh-TW'}/reset-password?token=${resetRaw}`;
+        try {
+          await EmailService.sendPasswordResetEmail(user.email, user.firstName, resetUrl);
+        } catch (emailError) {
+          console.error('Failed to send reset email:', emailError);
+        }
       }
 
-      // 在實際應用中，這裡應該發送重置密碼的郵件
       res.json({
         success: true,
-        message: 'Password reset email sent',
+        message: 'If an account exists with that email, a password reset link has been sent.',
       });
       return;
     } catch (error) {
@@ -285,14 +303,120 @@ export class AuthController {
     try {
       const { token, newPassword } = req.body;
 
-      // 在實際應用中，這裡應該驗證重置 token
-      res.json({
-        success: true,
-        message: 'Password reset successfully',
+      if (!token || !newPassword) {
+        res.status(400).json({ success: false, message: 'Token and new password are required.' });
+        return;
+      }
+
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+      const user = await prisma.user.findFirst({
+        where: {
+          resetToken: tokenHash,
+          resetTokenExpiry: { gt: new Date() },
+        },
       });
+
+      if (!user) {
+        res.status(400).json({ success: false, message: 'Reset token is invalid or has expired.' });
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          resetToken: null,
+          resetTokenExpiry: null,
+        },
+      });
+
+      res.json({ success: true, message: 'Password reset successfully.' });
       return;
     } catch (error) {
       console.error('Reset password error:', error);
+      res.status(500).json({
+        success: false,
+        message: req.t('common:errors.internalServerError'),
+      });
+      return;
+    }
+  }
+
+  // 驗證郵箱
+  static async verifyEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { token } = req.body;
+
+      if (!token) {
+        res.status(400).json({ success: false, message: 'Verification token is required.' });
+        return;
+      }
+
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+      const user = await prisma.user.findFirst({
+        where: { verificationToken: tokenHash },
+      });
+
+      if (!user) {
+        res.status(400).json({ success: false, message: 'Verification token is invalid.' });
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: true,
+          verificationToken: null,
+        },
+      });
+
+      res.json({ success: true, message: 'Email verified successfully.' });
+      return;
+    } catch (error) {
+      console.error('Verify email error:', error);
+      res.status(500).json({
+        success: false,
+        message: req.t('common:errors.internalServerError'),
+      });
+      return;
+    }
+  }
+
+  // 重新發送驗證郵件
+  static async resendVerification(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+
+      if (!user) {
+        res.status(404).json({ success: false, message: 'User not found.' });
+        return;
+      }
+
+      if (user.emailVerified) {
+        res.status(400).json({ success: false, message: 'Email is already verified.' });
+        return;
+      }
+
+      const verificationRaw = crypto.randomBytes(32).toString('hex');
+      const verificationToken = crypto.createHash('sha256').update(verificationRaw).digest('hex');
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { verificationToken },
+      });
+
+      const verifyUrl = `${process.env.FRONTEND_URL}/${user.preferredLanguage || 'zh-TW'}/verify-email?token=${verificationRaw}`;
+      await EmailService.sendVerificationEmail(user.email, user.firstName, verifyUrl);
+
+      res.json({ success: true, message: 'Verification email sent.' });
+      return;
+    } catch (error) {
+      console.error('Resend verification error:', error);
       res.status(500).json({
         success: false,
         message: req.t('common:errors.internalServerError'),

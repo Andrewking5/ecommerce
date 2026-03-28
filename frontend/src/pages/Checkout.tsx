@@ -13,6 +13,7 @@ import { useLocalizedNavigate as useNavigate, LocalizedLink as Link } from '@/sr
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { stripePromise } from '@/src/lib/stripe';
 import { useTranslation } from 'react-i18next';
+import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from '@/src/lib/analytics';
 
 const COUNTRIES = [
   { value: 'Taiwan', label: '台灣 Taiwan' },
@@ -129,6 +130,16 @@ export default function Checkout() {
     }
   }, [authLoading, isAuthenticated, navigate]);
 
+  // Track begin_checkout event
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      trackBeginCheckout(
+        cartItems.map((i) => ({ id: i.productId, name: i.name, price: i.price, quantity: i.quantity })),
+        totalPrice,
+      );
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Fetch saved addresses when authenticated
   useEffect(() => {
     if (isAuthenticated) {
@@ -233,6 +244,8 @@ export default function Checkout() {
 
       setClientSecret(paymentRes.data.clientSecret);
       setActiveStep('payment');
+      trackAddShippingInfo(total, shippingInfo.country);
+      trackAddPaymentInfo(total, 'stripe');
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'Failed to create order. Please try again.');
     } finally {
@@ -784,7 +797,18 @@ function ReviewStepInner({
 
       // Payment succeeded (no redirect needed)
       clearCart();
-      navigate('/checkout/success', { state: { orderId } });
+      navigate('/checkout/success', {
+        state: {
+          orderId,
+          purchaseData: {
+            value: total,
+            tax,
+            shipping: 0,
+            coupon: appliedCoupon?.code,
+            items: cartItems.map((i) => ({ id: i.productId, name: i.name, price: i.price, quantity: i.quantity })),
+          },
+        },
+      });
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred.');
       setIsSubmitting(false);

@@ -227,6 +227,7 @@ export default function Login() {
                     {mode === 'login' && (
                       <button
                         type="button"
+                        onClick={() => navigate('/forgot-password')}
                         className="text-[10px] font-bold uppercase tracking-widest text-ayers-gold hover:text-ayers-gold/80 transition-colors"
                       >
                         {t('login.forgotPassword')}

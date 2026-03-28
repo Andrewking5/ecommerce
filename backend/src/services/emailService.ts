@@ -218,6 +218,59 @@ export class EmailService {
   }
 
   /**
+   * 發送郵箱驗證信
+   */
+  static async sendVerificationEmail(
+    to: string,
+    firstName: string,
+    verificationUrl: string
+  ): Promise<void> {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1d1d1f; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #1a1714; color: #C8A96E; padding: 30px; text-align: center; }
+          .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; }
+          .content { padding: 30px; background: #faf8f5; }
+          .button { display: inline-block; padding: 14px 32px; background: #1a1714; color: #fff; text-decoration: none; border-radius: 12px; margin: 20px 0; font-weight: bold; letter-spacing: 1px; }
+          .footer { padding: 20px; text-align: center; color: #999; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>AYERS GUITARS</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${firstName},</p>
+            <p>Welcome to Ayers Guitars! Please verify your email address to complete your registration.</p>
+            <p style="text-align: center;">
+              <a href="${verificationUrl}" class="button">Verify Email</a>
+            </p>
+            <p style="font-size: 13px; color: #666;">Or copy and paste this link into your browser:</p>
+            <p style="font-size: 12px; word-break: break-all; color: #999;">${verificationUrl}</p>
+            <p style="font-size: 13px; color: #666;">If you didn't create an account, please ignore this email.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; Ayers Guitars. Handcrafted since 1996.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await this.sendEmail({
+      to,
+      subject: 'Verify Your Email - Ayers Guitars',
+      html,
+    });
+  }
+
+  /**
    * 发送邮件的基础方法
    */
   private static async sendEmail({

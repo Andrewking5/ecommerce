@@ -38,6 +38,7 @@ import contactRoutes from './routes/contact';
 import newsletterRoutes from './routes/newsletter';
 import bannerRoutes from './routes/banners';
 import customConfigRoutes from './routes/customConfigs';
+import wishlistRoutes from './routes/wishlist';
 
 // 初始化 Prisma 客戶端
 // 注意：在 Render 上，数据库连接可能会因为空闲而关闭
@@ -60,8 +61,8 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "http://localhost:3001", "http://localhost:5173", "http://localhost:3000"],
-      scriptSrc: ["'self'"],
-      connectSrc: ["'self'", "http://localhost:3001", "http://localhost:5173", "http://localhost:3000"],
+      scriptSrc: ["'self'", "https://www.googletagmanager.com"],
+      connectSrc: ["'self'", "http://localhost:3001", "http://localhost:5173", "http://localhost:3000", "https://www.google-analytics.com", "https://www.googletagmanager.com"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null, // 开发环境不强制 HTTPS
@@ -189,6 +190,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/custom-configs', customConfigRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

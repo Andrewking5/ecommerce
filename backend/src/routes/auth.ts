@@ -5,6 +5,7 @@ import { validateRequest } from '../middleware/validation';
 import { registerSchema, loginSchema } from '../utils/validation';
 import { AuthController } from '../controllers/authController';
 import { SocialAuthController } from '../controllers/socialAuthController';
+import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -40,6 +41,12 @@ router.post('/forgot-password', AuthController.forgotPassword);
 
 // 重置密碼
 router.post('/reset-password', AuthController.resetPassword);
+
+// 驗證郵箱
+router.post('/verify-email', AuthController.verifyEmail);
+
+// 重新發送驗證郵件（需要登入）
+router.post('/resend-verification', authenticateToken, AuthController.resendVerification);
 
 // 社交登录路由
 // Google

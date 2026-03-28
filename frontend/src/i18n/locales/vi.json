@@ -314,7 +314,59 @@
     "statusProcessing": "Đang xử lý",
     "statusShipped": "Đã giao",
     "statusDelivered": "Đã nhận",
-    "statusCancelled": "Đã hủy"
+    "statusCancelled": "Đã hủy",
+    "wishlist": "Danh sách yêu thích",
+    "noWishlistItems": "Danh sách yêu thích trống",
+    "noWishlistItemsDesc": "Lưu những cây guitar yêu thích để xem lại sau.",
+    "browseGuitars": "Xem guitar"
+  },
+  "wishlist": {
+    "add": "Thêm vào yêu thích",
+    "remove": "Xóa khỏi yêu thích",
+    "added": "Đã thêm vào yêu thích",
+    "removed": "Đã xóa khỏi yêu thích",
+    "loginRequired": "Vui lòng đăng nhập để lưu sản phẩm yêu thích"
+  },
+  "forgotPassword": {
+    "title": "Đặt lại mật khẩu",
+    "description": "Nhập địa chỉ email của bạn, chúng tôi sẽ gửi liên kết đặt lại cho bạn.",
+    "submit": "Gửi liên kết đặt lại",
+    "success": "Nếu tài khoản tồn tại, liên kết đặt lại đã được gửi. Vui lòng kiểm tra hộp thư.",
+    "backToLogin": "Quay lại đăng nhập",
+    "error": "Đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "resetPassword": {
+    "title": "Đặt mật khẩu mới",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "submit": "Đặt lại mật khẩu",
+    "success": "Mật khẩu đã được đặt lại. Đang chuyển đến trang đăng nhập...",
+    "invalidToken": "Liên kết đặt lại không hợp lệ hoặc đã hết hạn.",
+    "invalidTokenDesc": "Liên kết đặt lại không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.",
+    "requestNew": "Yêu cầu liên kết mới",
+    "minLength": "Mật khẩu phải có ít nhất 8 ký tự."
+  },
+  "verifyEmail": {
+    "verifying": "Đang xác minh email của bạn...",
+    "success": "Xác minh email thành công!",
+    "successDesc": "Email của bạn đã được xác minh thành công. Đang chuyển đến trang tài khoản...",
+    "error": "Xác minh thất bại. Liên kết có thể không hợp lệ.",
+    "errorTitle": "Xác minh thất bại",
+    "goToAccount": "Đến tài khoản",
+    "goToLogin": "Đến đăng nhập",
+    "banner": "Vui lòng xác minh địa chỉ email của bạn.",
+    "resend": "Gửi lại",
+    "resent": "Email xác minh đã được gửi!"
+  },
+  "invoice": {
+    "download": "Tải hóa đơn",
+    "downloading": "Đang tạo PDF..."
+  },
+  "cookies": {
+    "title": "Chúng tôi sử dụng Cookie",
+    "description": "Chúng tôi sử dụng cookie và công cụ phân tích để cải thiện trải nghiệm duyệt web của bạn. Bạn có thể chọn chấp nhận hoặc từ chối.",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối"
   },
   "customizer": {
     "title": "Guitar",

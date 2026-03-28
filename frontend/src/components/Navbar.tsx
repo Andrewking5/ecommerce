@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { Search, User, ShoppingCart, Shield } from 'lucide-react';
+import { Search, User, ShoppingCart, Shield, Mail, X as XIcon } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { useCartContext } from '@/src/contexts/CartContext';
 import { LocalizedLink, useLocalizedNavigate, useStrippedLocation } from '@/src/lib/i18nRouting';
 import LanguageSwitcher from './LanguageSwitcher';
 import { AyersLogo } from './AyersLogo';
+import api from '@/src/services/api';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +24,9 @@ export default function Navbar() {
 
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
+  const [verifyBannerDismissed, setVerifyBannerDismissed] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const showVerifyBanner = isAuthenticated && user && user.emailVerified === false && !verifyBannerDismissed;
   const { itemCount: totalItems } = useCartContext();
 
   const navLinks = [
@@ -457,6 +461,38 @@ export default function Navbar() {
           </div>
         )}
       </nav>
+
+      {/* Email verification banner */}
+      {showVerifyBanner && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-amber-50 border-b border-amber-200">
+          <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-amber-800 text-xs">
+              <Mail size={14} />
+              <span>{t('verifyEmail.banner', 'Please verify your email address.')}</span>
+              <button
+                onClick={async () => {
+                  setResendLoading(true);
+                  try {
+                    await api.post('/auth/resend-verification');
+                    alert(t('verifyEmail.resent', 'Verification email sent!'));
+                  } catch {
+                    // Silently fail
+                  } finally {
+                    setResendLoading(false);
+                  }
+                }}
+                disabled={resendLoading}
+                className="font-bold underline hover:text-amber-900 disabled:opacity-50"
+              >
+                {resendLoading ? '...' : t('verifyEmail.resend', 'Resend')}
+              </button>
+            </div>
+            <button onClick={() => setVerifyBannerDismissed(true)} className="text-amber-600 hover:text-amber-800">
+              <XIcon size={14} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile menu overlay — portalled to body */}
       {mobileOverlay}
