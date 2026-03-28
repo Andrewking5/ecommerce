@@ -13,9 +13,7 @@ if (SENTRY_DSN) {
     dsn: SENTRY_DSN,
     environment: import.meta.env.MODE,
     tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: import.meta.env.PROD ? 1.0 : 0,
-    enabled: import.meta.env.PROD,
+    sendDefaultPii: true,
   });
 }
 

@@ -16,7 +16,7 @@ if (process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV || 'development',
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0,
-    enabled: process.env.NODE_ENV === 'production',
+    sendDefaultPii: true,
   });
   console.log('✅ Sentry initialized');
 }
@@ -210,6 +210,11 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/custom-configs', customConfigRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 
+// Sentry 測試路由（確認後可刪除）
+app.get('/api/sentry-test', (_req, _res) => {
+  throw new Error('Sentry test error from backend!');
+});
+
 // 根路由
 app.get('/', (req, res) => {
   res.json({
@@ -225,7 +230,7 @@ app.use(notFound);
 
 // Sentry 錯誤處理（必須在自訂 errorHandler 之前）
 if (process.env.SENTRY_DSN) {
-  Sentry.setupExpressErrorHandler(app);
+  app.use(Sentry.Handlers.errorHandler());
 }
 
 // 錯誤處理中介軟體（必须在最后）
