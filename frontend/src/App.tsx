@@ -13,6 +13,7 @@ import { WishlistProvider } from './contexts/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
 import { usePageViewTracking } from './hooks/useAnalytics';
@@ -113,6 +114,7 @@ function AppLayout() {
       <PageViewTracker />
       <Navbar />
       <main className={isFullscreen ? 'flex-grow' : 'flex-grow pt-20'}>
+        <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route index element={<Home />} />
@@ -141,6 +143,7 @@ function AppLayout() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
       {!isFullscreen && <Footer />}
       <CookieConsent />
@@ -150,6 +153,7 @@ function AppLayout() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <HelmetProvider>
       <AuthProvider>
         <CartProvider>
@@ -166,5 +170,6 @@ export default function App() {
         </CartProvider>
       </AuthProvider>
     </HelmetProvider>
+    </ErrorBoundary>
   );
 }

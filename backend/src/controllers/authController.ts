@@ -65,12 +65,13 @@ export class AuthController {
 
       // 生成 JWT tokens
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);
+      AuthController.setRefreshCookie(res, tokens.refreshToken);
 
       res.status(201).json({
         success: true,
         message: req.t('auth:success.registered'),
         user: AuthController.sanitizeUser(user),
-        ...tokens,
+        accessToken: tokens.accessToken,
       });
       return;
     } catch (error: any) {
@@ -132,12 +133,13 @@ export class AuthController {
 
       // 生成 JWT tokens
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);
+      AuthController.setRefreshCookie(res, tokens.refreshToken);
 
       res.json({
         success: true,
         message: req.t('auth:success.loggedIn'),
         user: AuthController.sanitizeUser(user),
-        ...tokens,
+        accessToken: tokens.accessToken,
       });
       return;
     } catch (error: any) {
@@ -163,7 +165,8 @@ export class AuthController {
   // 刷新 Token
   static async refreshToken(req: Request, res: Response): Promise<void> {
     try {
-      const { refreshToken } = req.body;
+      // Read from HttpOnly cookie first, fallback to body for backward compatibility
+      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
       if (!refreshToken) {
         console.warn('⚠️  Refresh token request without token');
@@ -214,13 +217,14 @@ export class AuthController {
       }
 
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);
+      AuthController.setRefreshCookie(res, tokens.refreshToken);
 
       console.log('✅ Token refreshed successfully for user:', user.email);
 
       res.json({
         success: true,
         message: req.t('auth:success.tokenRefreshed'),
-        ...tokens,
+        accessToken: tokens.accessToken,
       });
       return;
     } catch (error: any) {
@@ -239,7 +243,7 @@ export class AuthController {
   // 登出
   static async logout(req: Request, res: Response): Promise<void> {
     try {
-      // 在實際應用中，這裡應該將 token 加入黑名單
+      AuthController.clearRefreshCookie(res);
       res.json({
         success: true,
         message: req.t('auth:success.loggedOut'),
@@ -440,6 +444,27 @@ export class AuthController {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  // 設置 refreshToken 為 HttpOnly cookie
+  static setRefreshCookie(res: any, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/api/auth', // Only sent to auth endpoints
+    });
+  }
+
+  // 清除 refreshToken cookie
+  static clearRefreshCookie(res: any) {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      path: '/api/auth',
+    });
   }
 
   // 清理用戶資料（移除敏感資訊）

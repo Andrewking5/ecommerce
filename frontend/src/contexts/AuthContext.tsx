@@ -40,7 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token && user) {
-      // Verify token is still valid by fetching profile
       api.get('/users/profile')
         .then(({ data }) => {
           if (data.success) {
@@ -50,8 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           // Token invalid, clear auth state
+          // (refreshToken cookie is HttpOnly, cleared by backend on logout)
           localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
           setUser(null);
         })
@@ -64,8 +63,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
     if (data.success) {
+      // accessToken in localStorage (short-lived, 15m)
+      // refreshToken set as HttpOnly cookie by backend automatically
       localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
     } else {
@@ -77,7 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data } = await api.post('/auth/register', registerData);
     if (data.success) {
       localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
     } else {
@@ -87,12 +86,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
+      // Backend clears the HttpOnly refreshToken cookie
       await api.post('/auth/logout');
     } catch {
       // Ignore logout API errors
     } finally {
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       setUser(null);
     }

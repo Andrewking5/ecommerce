@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
 
 interface AppError extends Error {
   statusCode?: number;
@@ -13,26 +14,27 @@ export const errorHandler = (
 ): void => {
   let { statusCode = 500, message } = error;
 
-  // 記錄錯誤
-  console.error(`Error ${statusCode}: ${message}`);
-  console.error(error.stack);
+  // Structured error logging
+  logger.error(message, {
+    statusCode,
+    method: req.method,
+    path: req.originalUrl,
+    stack: error.stack,
+    isOperational: error.isOperational,
+  });
 
-  // 使用 i18n 翻譯錯誤訊息
+  // i18n translation for error messages
   if (req.t) {
-    // 生產環境不暴露詳細錯誤
     if (process.env.NODE_ENV === 'production' && statusCode === 500) {
       message = req.t('common:errors.internalServerError');
     } else {
-      // 嘗試翻譯錯誤訊息（如果翻譯鍵存在）
       const translationKey = `common:errors.${message.toLowerCase().replace(/\s+/g, '')}`;
       const translated = req.t(translationKey);
-      // 如果翻譯存在且不是鍵名本身，使用翻譯
       if (translated !== translationKey) {
         message = translated;
       }
     }
   } else {
-    // 如果沒有 i18n，使用預設訊息
     if (process.env.NODE_ENV === 'production' && statusCode === 500) {
       message = 'Internal server error';
     }
@@ -54,5 +56,3 @@ export const notFound = (req: Request, res: Response, next: NextFunction): void 
   next(error);
   return;
 };
-
-

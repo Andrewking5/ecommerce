@@ -2,11 +2,24 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import * as Sentry from '@sentry/node';
 
 // 載入環境變數
 dotenv.config();
+
+// 初始化 Sentry（在所有中間件之前）
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.2 : 1.0,
+    enabled: process.env.NODE_ENV === 'production',
+  });
+  console.log('✅ Sentry initialized');
+}
 
 // 導入 Passport 配置
 import './config/passport';
@@ -16,6 +29,7 @@ import { errorHandler, notFound } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { securityMiddleware } from './middleware/security';
 import { generalLimiter } from './middleware/rateLimiter';
+import { csrfProtection } from './middleware/csrf';
 import { i18nMiddleware } from './i18n/config';
 
 // 導入路由
@@ -137,6 +151,10 @@ app.use(requestLogger);
 // 解析 JSON 和 URL 編碼的請求主體
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
+
+// CSRF 保護（在 API 路由之前）
+app.use('/api', csrfProtection);
 
 // 靜態檔案服務（添加 CORS 支持）
 app.use('/uploads', (req, res, next): void => {
@@ -204,6 +222,11 @@ app.get('/', (req, res) => {
 
 // 404 處理（必须在所有路由之后，错误处理之前）
 app.use(notFound);
+
+// Sentry 錯誤處理（必須在自訂 errorHandler 之前）
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 // 錯誤處理中介軟體（必须在最后）
 app.use(errorHandler);

@@ -108,11 +108,11 @@ export class SocialAuthController {
 
       // 生成 JWT tokens
       const tokens = AuthController.generateTokens(user.id, user.email, user.role);
+      AuthController.setRefreshCookie(res, tokens.refreshToken);
 
-      // 重定向到前端并携带 token
+      // 重定向到前端并携带 accessToken only (refreshToken is HttpOnly cookie)
       const redirectUrl = new URL(`${process.env.FRONTEND_URL}/auth/callback`);
       redirectUrl.searchParams.set('token', tokens.accessToken);
-      redirectUrl.searchParams.set('refreshToken', tokens.refreshToken);
       redirectUrl.searchParams.set('success', 'true');
 
       res.redirect(redirectUrl.toString());

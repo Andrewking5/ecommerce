@@ -10,20 +10,35 @@ function getLoginPath(): string {
   return `/${lang}/login`;
 }
 
+/** Read CSRF token from cookie */
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Send cookies (refreshToken + csrf_token)
 });
 
-// Request interceptor - attach token
+// Request interceptor - attach access token + CSRF token
 api.interceptors.request.use(
   (config) => {
+    // Access token (still in localStorage — short-lived, 15m)
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // CSRF token (from cookie, sent as header for double-submit validation)
+    const csrf = getCsrfToken();
+    if (csrf) {
+      config.headers['X-CSRF-Token'] = csrf;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -53,16 +68,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      const refreshToken = localStorage.getItem('refreshToken');
-
-      // No refresh token — clear stale auth data and let the request fail naturally.
-      // Do NOT redirect to login; the page itself decides if auth is required.
-      if (!refreshToken) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        return Promise.reject(error);
-      }
-
+      // Refresh token is now in HttpOnly cookie — no need to check localStorage
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -78,15 +84,15 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
-        });
+        // Refresh token sent automatically via HttpOnly cookie (withCredentials: true)
+        const response = await axios.post(
+          `${API_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        const { accessToken } = response.data;
         localStorage.setItem('accessToken', accessToken);
-        if (newRefreshToken) {
-          localStorage.setItem('refreshToken', newRefreshToken);
-        }
 
         processQueue(null, accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -94,10 +100,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
-        // Only redirect if the original request was to a protected endpoint
-        // (i.e., user was logged in but token expired and refresh failed)
         window.location.href = getLoginPath();
         return Promise.reject(refreshError);
       } finally {

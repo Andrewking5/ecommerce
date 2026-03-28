@@ -1,37 +1,31 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
 
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const start = Date.now();
-  
-  // 記錄請求開始（使用 originalUrl 獲取完整路徑）
-  const requestPath = req.originalUrl || req.url;
-  console.log(`${req.method} ${requestPath}`);
-  
-  // 攔截回應結束事件
-  const originalSend = res.send;
-  res.send = function(data) {
+
+  // Intercept response finish to log with duration + status
+  res.on('finish', () => {
     const duration = Date.now() - start;
-    const responsePath = req.originalUrl || req.url;
-    
-    console.log(`${req.method} ${responsePath} - ${res.statusCode} - ${duration}ms`);
-    
-    // 如果是 404，記錄更多信息
-    if (res.statusCode === 404) {
-      console.error(`❌ 404 Not Found:`, {
-        method: req.method,
-        path: requestPath,
-        originalUrl: req.originalUrl,
-        url: req.url,
-        baseUrl: req.baseUrl,
-        route: req.route?.path,
-      });
+    const path = req.originalUrl || req.url;
+    const meta = {
+      method: req.method,
+      path,
+      status: res.statusCode,
+      duration: `${duration}ms`,
+      ip: req.ip,
+      userAgent: req.get('user-agent')?.substring(0, 80),
+    };
+
+    if (res.statusCode >= 500) {
+      logger.error(`${req.method} ${path} ${res.statusCode} ${duration}ms`, meta);
+    } else if (res.statusCode >= 400) {
+      logger.warn(`${req.method} ${path} ${res.statusCode} ${duration}ms`, meta);
+    } else {
+      logger.http(`${req.method} ${path} ${res.statusCode} ${duration}ms`, meta);
     }
-    
-    return originalSend.call(this, data);
-  };
+  });
 
   next();
   return;
 };
-
-

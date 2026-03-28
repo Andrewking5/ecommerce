@@ -167,6 +167,10 @@ process.on('uncaughtException', (error: Error) => {
   console.error('❌ Uncaught Exception:');
   console.error('  Error message:', error.message);
   console.error('  Error stack:', error.stack);
+  try {
+    const Sentry = require('@sentry/node');
+    Sentry.captureException(error);
+  } catch {}
   process.exit(1);
 });
 
