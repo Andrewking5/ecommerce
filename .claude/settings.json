@@ -11,7 +11,14 @@
       "Bash(node -e \":*)",
       "Bash(grep -rn from.*animations c:UsersanpenAIweb_designE-commercefrontendsrc --include=*.tsx --include=*.ts)",
       "Bash(sort -t'|' -k1 -rn)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(grep -r \"import.*redis\\\\|from.*redis\\\\|require.*redis\" /c/Users/anpen/Desktop/ai/ecommerce-main/backend/src --include=*.ts --include=*.js)",
+      "Bash(grep -n \"useCallback.*\\\\[\\\\]\" /c/Users/anpen/Desktop/ai/ecommerce-main/frontend/src/contexts/*.tsx)",
+      "Bash(ls -la c:/Users/anpen/Desktop/ai/ecommerce-main/backend/*.md)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(git remote:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

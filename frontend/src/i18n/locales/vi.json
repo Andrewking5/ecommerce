@@ -114,6 +114,12 @@
     "ctaCollections": "Xem bộ sưu tập",
     "ctaCustomizer": "Xưởng tùy chỉnh 3D"
   },
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Đã xảy ra lỗi không mong muốn. Vui lòng thử tải lại trang.",
+    "tryAgain": "Thử lại",
+    "home": "Trang chủ"
+  },
   "notFound": {
     "errorCode": "Error 404",
     "title": "Lệch tông",
@@ -123,7 +129,9 @@
     "browseCollections": "Xem bộ sưu tập",
     "tagline": "Ayers Guitars — Handcrafted Since 1996",
     "brokenString": "Dây đàn đã đứt… nhưng chúng tôi sẽ giúp bạn tìm đường về.",
-    "pluckHint": "Thử lướt qua các dây trên màn hình — vẫn còn vài dây nguyên vẹn"
+    "pluckHint": "Thử lướt qua các dây trên màn hình — vẫn còn vài dây nguyên vẹn",
+    "slideToPluck": "vuốt để gảy",
+    "secretSun": "☀️ Bạn đã tìm thấy mặt trời bí mật!"
   },
   "milestones": {
     "founded": "Người sáng lập Huang Zhen-Fa thành lập nhà máy tại TP. Hồ Chí Minh, Việt Nam, ban đầu với thương hiệu \"Emotion\" sản xuất OEM và guitar cổ điển.",

@@ -546,7 +546,7 @@ function ProductsTab() {
                 <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-2">{t('admin.products.imagePreview', '圖片預覽')}</p>
                 <div className="flex gap-2 flex-wrap">
                   {editingProduct.images.map((img, i) => (
-                    <img key={i} src={img} alt="" className="w-16 h-16 rounded-lg object-contain bg-white/5 border border-white/5" />
+                    <img key={i} src={img} alt={`${editingProduct.name || 'Product'} image ${i + 1}`} className="w-16 h-16 rounded-lg object-contain bg-white/5 border border-white/5" />
                   ))}
                 </div>
               </div>
@@ -667,7 +667,7 @@ function ProductsTab() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         {p.images?.[0] && (
-                          <img src={p.images[0]} alt="" className="w-10 h-10 rounded-lg object-contain bg-white/5" />
+                          <img src={p.images[0]} alt={p.name} className="w-10 h-10 rounded-lg object-contain bg-white/5" />
                         )}
                         <span className="font-medium truncate max-w-[180px]">{p.name}</span>
                       </div>
@@ -810,7 +810,7 @@ function CategoriesTab() {
             </div>
             {editingCat.image && (
               <div className="mt-3">
-                <img src={editingCat.image} alt="" className="h-16 rounded-xl object-contain bg-white/5 border border-white/5" />
+                <img src={editingCat.image} alt={editingCat.name || 'Category'} className="h-16 rounded-xl object-contain bg-white/5 border border-white/5" />
               </div>
             )}
             <div className="flex justify-end gap-3 mt-6">
@@ -848,7 +848,7 @@ function CategoriesTab() {
                 {categories.map((c) => (
                   <tr key={c.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer" onClick={() => setEditingCat({ ...c })}>
                     <td className="px-5 py-4">
-                      {c.image ? <img src={c.image} alt="" className="w-10 h-10 rounded-lg object-contain bg-white/5" /> : <div className="w-10 h-10 rounded-lg bg-white/5" />}
+                      {c.image ? <img src={c.image} alt={c.name} className="w-10 h-10 rounded-lg object-contain bg-white/5" /> : <div className="w-10 h-10 rounded-lg bg-white/5" />}
                     </td>
                     <td className="px-5 py-4 font-medium">{c.name}</td>
                     <td className="px-5 py-4 text-white/40 text-xs font-mono">{c.slug}</td>
@@ -920,7 +920,7 @@ function InventoryTab() {
                   <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        {p.images?.[0] && <img src={p.images[0]} alt="" className="w-8 h-8 rounded-lg object-contain bg-white/5" />}
+                        {p.images?.[0] && <img src={p.images[0]} alt={p.name} className="w-8 h-8 rounded-lg object-contain bg-white/5" />}
                         <span className="truncate max-w-[200px]">{p.name}</span>
                       </div>
                     </td>
@@ -1291,8 +1291,8 @@ function ImageUploadField({ label, hint, required, value, onChange }: {
       if (data.success && data.data?.url) {
         onChange(data.data.url);
       }
-    } catch (err) {
-      console.error('Upload failed:', err);
+    } catch {
+      // upload failed — UI resets silently
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -1316,7 +1316,7 @@ function ImageUploadField({ label, hint, required, value, onChange }: {
       >
         {value ? (
           <div className="relative group">
-            <img src={value} alt="" className="w-full h-32 object-cover" />
+            <img src={value} alt={label} className="w-full h-32 object-cover" />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
               <button
                 onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
@@ -1652,7 +1652,7 @@ function BannersTab() {
                     style={{ background: (editingBanner as any).gradientColor || '#1a1a1a' }}
                   >
                     {editingBanner.image && (
-                      <img src={editingBanner.image} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                      <img src={editingBanner.image} alt={`${editingBanner.titleWord1 || ''} ${editingBanner.titleWord2 || ''}`.trim() || 'Banner'} className="absolute inset-0 w-full h-full object-cover opacity-40" />
                     )}
                     <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${(editingBanner as any).gradientColor || '#1a1a1a'}, transparent)` }} />
                     <div className="relative z-10 p-6 max-w-sm">
@@ -1672,7 +1672,7 @@ function BannersTab() {
                       )}
                     </div>
                     {(editingBanner as any).productImage && (
-                      <img src={(editingBanner as any).productImage} alt="" className="absolute right-4 top-2 h-44 object-contain drop-shadow-2xl" />
+                      <img src={(editingBanner as any).productImage} alt="Banner product" className="absolute right-4 top-2 h-44 object-contain drop-shadow-2xl" />
                     )}
                   </div>
                 </div>
@@ -1741,7 +1741,7 @@ function BannersTab() {
                     </td>
                     <td className="px-5 py-4">
                       {b.image ? (
-                        <img src={b.image} alt="" className="w-16 h-10 rounded-lg object-cover bg-white/5" />
+                        <img src={b.image} alt={`${b.titleWord1 || ''} ${b.titleWord2 || ''}`.trim() || 'Banner'} className="w-16 h-10 rounded-lg object-cover bg-white/5" />
                       ) : (
                         <div className="w-16 h-10 rounded-lg bg-white/5 flex items-center justify-center"><Image size={14} className="text-white/15" /></div>
                       )}

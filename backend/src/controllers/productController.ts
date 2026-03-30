@@ -133,8 +133,8 @@ export class ProductController {
         }
       }
 
-      // 執行查詢
-      const [products, total] = await Promise.all([
+      // 執行查詢 — 使用資料庫層面的 _avg/_sum 取代 JS 運算
+      const [products, total, reviewAggregates, variantStocks] = await Promise.all([
         prisma.product.findMany({
           where,
           skip,
@@ -142,39 +142,39 @@ export class ProductController {
           orderBy: { [sortField]: sortDirection },
           include: {
             category: true,
-            reviews: {
-              select: {
-                rating: true,
-              },
-            },
-            variants: {
-              where: { isActive: true },
-              select: {
-                id: true,
-                stock: true,
-              },
-            },
+            _count: { select: { reviews: true } },
           },
         }),
         prisma.product.count({ where }),
+        // 批量取得所有商品的平均評分
+        prisma.review.groupBy({
+          by: ['productId'],
+          where: { product: where },
+          _avg: { rating: true },
+          _count: { rating: true },
+        }),
+        // 批量取得有變體商品的庫存總和
+        prisma.productVariant.groupBy({
+          by: ['productId'],
+          where: { isActive: true, product: where },
+          _sum: { stock: true },
+        }),
       ]);
 
-      // 計算平均評分和库存（对于有变体的商品，使用变体的总库存）
+      // 建立查詢結果的快速索引
+      const ratingMap = new Map(reviewAggregates.map((r: any) => [r.productId, { avg: r._avg.rating || 0, count: r._count.rating }]));
+      const variantStockMap = new Map(variantStocks.map((v: any) => [v.productId, v._sum.stock || 0]));
+
       const productsWithRating = products.map((product: any) => {
-        // 计算变体总库存
-        let displayStock = product.stock;
-        if (product.hasVariants && product.variants && product.variants.length > 0) {
-          // 对于有变体的商品，使用变体的总库存
-          displayStock = product.variants.reduce((sum: number, variant: any) => sum + (variant.stock || 0), 0);
-        }
-        
+        const rating = ratingMap.get(product.id);
+        const variantStock = variantStockMap.get(product.id);
+        const displayStock = product.hasVariants && variantStock !== undefined ? variantStock : product.stock;
+
         return {
           ...product,
-          stock: displayStock, // 覆盖主商品的库存，使用变体总库存（如果有变体）
-          averageRating: product.reviews.length > 0
-            ? product.reviews.reduce((sum: number, review: ReviewWithRating) => sum + review.rating, 0) / product.reviews.length
-            : 0,
-          reviewCount: product.reviews.length,
+          stock: displayStock,
+          averageRating: rating?.avg ?? 0,
+          reviewCount: rating?.count ?? 0,
         };
       });
 

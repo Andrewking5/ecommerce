@@ -114,6 +114,12 @@
     "ctaCollections": "コレクションを見る",
     "ctaCustomizer": "3D カスタムワークショップ"
   },
+  "errorBoundary": {
+    "title": "エラーが発生しました",
+    "description": "予期しないエラーが発生しました。ページを更新してみてください。",
+    "tryAgain": "再試行",
+    "home": "ホーム"
+  },
   "notFound": {
     "errorCode": "Error 404",
     "title": "音が外れました",
@@ -123,7 +129,9 @@
     "browseCollections": "コレクションを見る",
     "tagline": "Ayers Guitars — Handcrafted Since 1996",
     "brokenString": "弦が切れてしまいました…でもホームへの道をご案内します。",
-    "pluckHint": "画面の弦をなぞってみてください — まだ無事な弦もあります"
+    "pluckHint": "画面の弦をなぞってみてください — まだ無事な弦もあります",
+    "slideToPluck": "スライドして弾く",
+    "secretSun": "☀️ 隠された太陽を見つけました！"
   },
   "milestones": {
     "founded": "創業者の黄振発がベトナム・ホーチミン市に工場を設立。当初は「Emotion」ブランドでOEM生産とクラシックギター製作を行う。",

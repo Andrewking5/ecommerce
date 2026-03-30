@@ -114,6 +114,12 @@
     "ctaCollections": "瀏覽系列",
     "ctaCustomizer": "3D 客製工坊"
   },
+  "errorBoundary": {
+    "title": "發生錯誤",
+    "description": "發生了意外的錯誤，請嘗試重新整理頁面。",
+    "tryAgain": "重試",
+    "home": "首頁"
+  },
   "notFound": {
     "errorCode": "Error 404",
     "title": "走音了",
@@ -123,7 +129,9 @@
     "browseCollections": "瀏覽系列",
     "tagline": "Ayers Guitars — Handcrafted Since 1996",
     "brokenString": "這條弦斷了⋯⋯但我們幫你找到回家的路。",
-    "pluckHint": "試著滑過畫面上的弦 — 還有幾條是完好的"
+    "pluckHint": "試著滑過畫面上的弦 — 還有幾條是完好的",
+    "slideToPluck": "滑動撥弦",
+    "secretSun": "☀️ 你發現了隱藏的太陽！"
   },
   "milestones": {
     "founded": "創辦人黃振發於越南胡志明市設立工廠，最初以「Emotion」品牌從事 OEM 代工與古典吉他製作。",

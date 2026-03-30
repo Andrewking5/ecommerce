@@ -114,6 +114,12 @@
     "ctaCollections": "Browse Collections",
     "ctaCustomizer": "3D Custom Workshop"
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try refreshing the page.",
+    "tryAgain": "Try Again",
+    "home": "Home"
+  },
   "notFound": {
     "errorCode": "Error 404",
     "title": "Off Key",
@@ -123,7 +129,9 @@
     "browseCollections": "Browse Collections",
     "tagline": "Ayers Guitars — Handcrafted Since 1996",
     "brokenString": "A string has snapped... but we'll help you find your way home.",
-    "pluckHint": "Try sliding across the strings — a few are still intact"
+    "pluckHint": "Try sliding across the strings — a few are still intact",
+    "slideToPluck": "slide to pluck",
+    "secretSun": "☀️ You found the secret sun!"
   },
   "milestones": {
     "founded": "Founder Huang Zhen-Fa established a factory in Ho Chi Minh City, Vietnam, initially under the \"Emotion\" brand for OEM production and classical guitar making.",

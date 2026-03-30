@@ -47,6 +47,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 
 function PageLoader() {
   return (
@@ -171,6 +172,8 @@ export default function App() {
             <Routes>
               {/* Root → redirect to detected language */}
               <Route path="/" element={<RootRedirect />} />
+              {/* OAuth callback — outside /:lang/ because backend redirects to /auth/callback */}
+              <Route path="/auth/callback" element={<Suspense fallback={<PageLoader />}><AuthCallback /></Suspense>} />
               {/* All pages under /:lang/ */}
               <Route path="/:lang/*" element={<AppLayout />} />
             </Routes>

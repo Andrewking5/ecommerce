@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import i18n from 'i18next';
 
 interface Props {
   children: ReactNode;
@@ -23,7 +24,9 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+    }
     Sentry.captureException(error, {
       extra: { componentStack: errorInfo.componentStack },
     });
@@ -47,10 +50,10 @@ export default class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <h1 className="text-3xl font-serif italic font-bold text-ayers-ink mb-3">
-              Something went wrong
+              {i18n.t('errorBoundary.title', 'Something went wrong')}
             </h1>
             <p className="text-sm text-ayers-ink/50 mb-8 leading-relaxed">
-              An unexpected error occurred. Please try refreshing the page.
+              {i18n.t('errorBoundary.description', 'An unexpected error occurred. Please try refreshing the page.')}
             </p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -67,14 +70,14 @@ export default class ErrorBoundary extends Component<Props, State> {
                 className="inline-flex items-center gap-2 bg-ayers-ink text-white px-8 py-3.5 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all"
               >
                 <RefreshCw size={14} />
-                Try Again
+                {i18n.t('errorBoundary.tryAgain', 'Try Again')}
               </button>
               <a
                 href="/"
                 className="inline-flex items-center gap-2 border border-ayers-ink/10 text-ayers-ink/60 px-8 py-3.5 rounded-2xl text-xs font-bold uppercase tracking-widest hover:border-ayers-gold hover:text-ayers-gold transition-all"
               >
                 <Home size={14} />
-                Home
+                {i18n.t('errorBoundary.home', 'Home')}
               </a>
             </div>
           </div>

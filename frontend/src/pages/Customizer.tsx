@@ -1494,7 +1494,6 @@ export default function Customizer() {
                                   const file = e.target.files?.[0];
                                   if (file && file.size <= 1024 * 1024) {
                                     // TODO: handle file upload to server
-                                    console.log('Upload:', field.key, file.name);
                                   }
                                 }} />
                               </motion.label>

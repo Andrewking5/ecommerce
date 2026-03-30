@@ -57,12 +57,24 @@ import customConfigRoutes from './routes/customConfigs';
 import wishlistRoutes from './routes/wishlist';
 
 // 初始化 Prisma 客戶端
-// 注意：在 Render 上，数据库连接可能会因为空闲而关闭
-// 确保 DATABASE_URL 包含连接池参数，例如：
-// postgresql://user:pass@host:5432/db?connection_limit=10&pool_timeout=20
+// 自動為 DATABASE_URL 附加連線池參數（若尚未設定）
+function getDatabaseUrl(): string {
+  const url = process.env.DATABASE_URL || '';
+  if (!url) return url;
+  const hasPoolParams = /connection_limit|pool_timeout|connect_timeout/.test(url);
+  if (hasPoolParams) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}connection_limit=5&pool_timeout=20&connect_timeout=10`;
+}
+
+const databaseUrl = getDatabaseUrl();
+if (databaseUrl && databaseUrl !== process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = databaseUrl;
+}
+
 export const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' 
-    ? ['query', 'info', 'warn', 'error'] 
+  log: process.env.NODE_ENV === 'development'
+    ? ['query', 'info', 'warn', 'error']
     : ['warn', 'error'],
 });
 

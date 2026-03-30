@@ -1150,7 +1150,7 @@ function RecommendationsSection({ productId }: { productId: string }) {
           <LocalizedLink key={rec.id} to={`/product/${rec.id}`} className="group block">
             <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-[#1a1714] mb-3">
               <img
-                src={rec.images?.[0] || '/images/placeholder.png'}
+                src={rec.images?.[0] || '/images/placeholder.svg'}
                 alt={rec.name}
                 className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"

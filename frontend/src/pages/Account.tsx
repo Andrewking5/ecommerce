@@ -96,9 +96,7 @@ export default function Account() {
             setOrders(res.data.orders);
           }
         })
-        .catch((err) => {
-          console.error('Failed to fetch orders:', err);
-        })
+        .catch(() => {})
         .finally(() => setOrdersLoading(false));
     }
   }, [activeTab, isAuthenticated]);
@@ -117,8 +115,8 @@ export default function Account() {
       if (res.success) {
         setAddresses(res.data);
       }
-    } catch (err) {
-      console.error('Failed to fetch addresses:', err);
+    } catch {
+      // address fetch failed silently — UI shows empty state
     } finally {
       setAddressesLoading(false);
     }
@@ -168,8 +166,8 @@ export default function Account() {
     try {
       await addressService.deleteAddress(id);
       fetchAddresses();
-    } catch (err) {
-      console.error('Failed to delete address:', err);
+    } catch {
+      // delete failed silently — address remains in list
     }
   };
 
@@ -177,8 +175,8 @@ export default function Account() {
     try {
       await addressService.setDefaultAddress(id);
       fetchAddresses();
-    } catch (err) {
-      console.error('Failed to set default address:', err);
+    } catch {
+      // set default failed silently
     }
   };
 
@@ -757,7 +755,7 @@ function WishlistTab() {
               <Link to={`/product/${item.product.id}`}>
                 <div className="aspect-[3/4] bg-[#1a1714] relative overflow-hidden">
                   <img
-                    src={item.product.images?.[0] || '/images/placeholder.png'}
+                    src={item.product.images?.[0] || '/images/placeholder.svg'}
                     alt={item.product.name}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                   />

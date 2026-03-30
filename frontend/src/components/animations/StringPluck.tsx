@@ -4,6 +4,7 @@
  * 用在 CTA 區塊增加互動趣味
  */
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface StringPluckProps {
   /** 弦數量 */
@@ -18,6 +19,7 @@ interface StringState {
 }
 
 export default function StringPluck({ count = 5, className = '' }: StringPluckProps) {
+  const { t } = useTranslation();
   const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number>(0);
   const stringsRef = useRef<StringState[]>(
@@ -156,7 +158,7 @@ export default function StringPluck({ count = 5, className = '' }: StringPluckPr
         className="fill-white/10 text-[10px] uppercase tracking-[0.3em]"
         style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 9 }}
       >
-        slide to pluck
+        {t('notFound.slideToPluck', 'slide to pluck')}
       </text>
     </svg>
   );

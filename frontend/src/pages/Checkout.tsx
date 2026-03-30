@@ -156,9 +156,7 @@ export default function Checkout() {
             }
           }
         })
-        .catch((err) => {
-          console.error('Failed to fetch saved addresses:', err);
-        })
+        .catch(() => {})
         .finally(() => setAddressesLoading(false));
     }
   }, [isAuthenticated]);

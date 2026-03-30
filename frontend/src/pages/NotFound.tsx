@@ -34,6 +34,7 @@ function initStrings(): BrokenStringState[] {
 }
 
 function BrokenGuitarStrings({ className = '' }: { className?: string }) {
+  const { t } = useTranslation();
   const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number>(0);
   const stringsRef = useRef<BrokenStringState[]>(initStrings());
@@ -168,7 +169,7 @@ function BrokenGuitarStrings({ className = '' }: { className?: string }) {
       <text x="50%" y="95%" textAnchor="middle"
         className="fill-ayers-gold/15 text-[10px] uppercase tracking-[0.3em]"
         style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 9 }}>
-        slide to pluck
+        {t('notFound.slideToPluck', 'slide to pluck')}
       </text>
     </svg>
   );
@@ -177,6 +178,7 @@ function BrokenGuitarStrings({ className = '' }: { className?: string }) {
 /* ── Interactive Sun — the 404 centrepiece ── */
 
 function NotFoundSun() {
+  const { t } = useTranslation();
   const [clicks, setClicks] = useState(0);
   const [hovered, setHovered] = useState(false);
 
@@ -224,7 +226,7 @@ function NotFoundSun() {
           animate={{ opacity: 1, y: 0 }}
           className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-ayers-gold/60 tracking-wider"
         >
-          ☀️ You found the secret sun!
+          {t('notFound.secretSun', '☀️ You found the secret sun!')}
         </motion.p>
       )}
     </motion.div>

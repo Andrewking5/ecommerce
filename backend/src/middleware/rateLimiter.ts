@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 // 一般 API 限制
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 分鐘
-  max: 100, // 最多 100 個請求
+  max: 300, // 最多 300 個請求（前端每頁約 6+ API 呼叫，100 太嚴格）
   message: {
     error: 'Too many requests from this IP, please try again later.',
   },
