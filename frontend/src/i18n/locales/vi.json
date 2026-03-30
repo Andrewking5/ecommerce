@@ -8,7 +8,8 @@
     "admin": "Quản trị",
     "search": "Tìm kiếm",
     "searchPlaceholder": "Tìm guitar, dòng sản phẩm, gỗ...",
-    "login": "Đăng nhập"
+    "login": "Đăng nhập",
+    "account": "Tài khoản"
   },
   "footer": {
     "description": "Chế tác guitar acoustic cao cấp với đam mê và sự chính xác từ năm 1996. Trải nghiệm sức mạnh cộng hưởng từ kỹ thuật âm thanh của chúng tôi.",
@@ -326,7 +327,23 @@
     "wishlist": "Danh sách yêu thích",
     "noWishlistItems": "Danh sách yêu thích trống",
     "noWishlistItemsDesc": "Lưu những cây guitar yêu thích để xem lại sau.",
-    "browseGuitars": "Xem guitar"
+    "browseGuitars": "Xem guitar",
+    "addAddress": "Thêm địa chỉ",
+    "editAddress": "Sửa địa chỉ",
+    "recipientName": "Tên người nhận",
+    "addressLine1": "Địa chỉ dòng 1",
+    "addressLine2": "Địa chỉ dòng 2",
+    "addressLine2Placeholder": "Căn hộ, tầng, số phòng, v.v. (tùy chọn)",
+    "city": "Thành phố",
+    "state": "Tỉnh / Bang",
+    "postalCode": "Mã bưu chính",
+    "country": "Quốc gia",
+    "defaultAddress": "Mặc định",
+    "setAsDefault": "Đặt làm địa chỉ mặc định",
+    "cancel": "Hủy",
+    "saveAddress": "Lưu địa chỉ",
+    "deleteAddress": "Xóa địa chỉ",
+    "addressSaveFailed": "Lưu địa chỉ thất bại."
   },
   "wishlist": {
     "add": "Thêm vào yêu thích",
@@ -365,6 +382,22 @@
     "banner": "Vui lòng xác minh địa chỉ email của bạn.",
     "resend": "Gửi lại",
     "resent": "Email xác minh đã được gửi!"
+  },
+  "share": {
+    "title": "Chia sẻ",
+    "copied": "Đã sao chép liên kết!"
+  },
+  "product": {
+    "youMayAlsoLike": "Bạn cũng có thể thích"
+  },
+  "chat": {
+    "toggle": "Mở chat",
+    "title": "Hỗ trợ Ayers Guitars",
+    "subtitle": "Chúng tôi thường phản hồi trong vài giờ",
+    "welcome": "Xin chào! Chúng tôi có thể giúp gì cho bạn?",
+    "placeholder": "Nhập tin nhắn...",
+    "received": "Đã nhận tin nhắn! Chúng tôi sẽ phản hồi qua email sớm.",
+    "error": "Gửi thất bại. Vui lòng gửi email đến service@ayersguitars.com"
   },
   "invoice": {
     "download": "Tải hóa đơn",

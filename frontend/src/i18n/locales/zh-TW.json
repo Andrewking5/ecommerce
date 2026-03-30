@@ -8,7 +8,8 @@
     "admin": "管理後台",
     "search": "搜尋",
     "searchPlaceholder": "搜尋吉他、系列、木材⋯",
-    "login": "登入"
+    "login": "登入",
+    "account": "帳戶"
   },
   "footer": {
     "description": "自 1996 年以來，以熱情與精湛工藝打造頂級原聲吉他。感受我們聲學工程的共鳴力量。",
@@ -326,7 +327,23 @@
     "wishlist": "願望清單",
     "noWishlistItems": "願望清單是空的",
     "noWishlistItemsDesc": "收藏喜愛的吉他，方便日後查看。",
-    "browseGuitars": "瀏覽吉他"
+    "browseGuitars": "瀏覽吉他",
+    "addAddress": "新增地址",
+    "editAddress": "編輯地址",
+    "recipientName": "收件人姓名",
+    "addressLine1": "地址第一行",
+    "addressLine2": "地址第二行",
+    "addressLine2Placeholder": "公寓、樓層、房號等（選填）",
+    "city": "城市",
+    "state": "州 / 省",
+    "postalCode": "郵遞區號",
+    "country": "國家",
+    "defaultAddress": "預設",
+    "setAsDefault": "設為預設地址",
+    "cancel": "取消",
+    "saveAddress": "儲存地址",
+    "deleteAddress": "刪除地址",
+    "addressSaveFailed": "儲存地址失敗。"
   },
   "wishlist": {
     "add": "加入願望清單",

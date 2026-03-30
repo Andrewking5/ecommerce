@@ -8,7 +8,8 @@
     "admin": "管理画面",
     "search": "検索",
     "searchPlaceholder": "ギター、シリーズ、木材を検索...",
-    "login": "ログイン"
+    "login": "ログイン",
+    "account": "アカウント"
   },
   "footer": {
     "description": "1996年以来、情熱と精密な技術でプレミアムアコースティックギターを製作。私たちの音響工学の響きをご体験ください。",
@@ -326,7 +327,23 @@
     "wishlist": "ウィッシュリスト",
     "noWishlistItems": "ウィッシュリストは空です",
     "noWishlistItemsDesc": "お気に入りのギターを保存して、後で見返しましょう。",
-    "browseGuitars": "ギターを見る"
+    "browseGuitars": "ギターを見る",
+    "addAddress": "住所を追加",
+    "editAddress": "住所を編集",
+    "recipientName": "受取人名",
+    "addressLine1": "住所1",
+    "addressLine2": "住所2",
+    "addressLine2Placeholder": "マンション名、部屋番号など（任意）",
+    "city": "市区町村",
+    "state": "都道府県",
+    "postalCode": "郵便番号",
+    "country": "国",
+    "defaultAddress": "デフォルト",
+    "setAsDefault": "デフォルトの住所に設定",
+    "cancel": "キャンセル",
+    "saveAddress": "住所を保存",
+    "deleteAddress": "住所を削除",
+    "addressSaveFailed": "住所の保存に失敗しました。"
   },
   "wishlist": {
     "add": "ウィッシュリストに追加",
@@ -365,6 +382,22 @@
     "banner": "メールアドレスを確認してください。",
     "resend": "再送信",
     "resent": "確認メールを送信しました！"
+  },
+  "share": {
+    "title": "共有",
+    "copied": "リンクをコピーしました！"
+  },
+  "product": {
+    "youMayAlsoLike": "おすすめ"
+  },
+  "chat": {
+    "toggle": "チャットを開く",
+    "title": "Ayers Guitars サポート",
+    "subtitle": "通常数時間以内にご返信いたします",
+    "welcome": "こんにちは！何かお手伝いできることはありますか？",
+    "placeholder": "メッセージを入力...",
+    "received": "メッセージを受け取りました！メールで折り返しご連絡いたします。",
+    "error": "送信に失敗しました。service@ayersguitars.com までメールしてください"
   },
   "invoice": {
     "download": "請求書をダウンロード",

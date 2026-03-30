@@ -8,7 +8,8 @@
     "admin": "管理后台",
     "search": "搜索",
     "searchPlaceholder": "搜索吉他、系列、木材……",
-    "login": "登录"
+    "login": "登录",
+    "account": "账户"
   },
   "footer": {
     "description": "自 1996 年以来，以热情与精湛工艺打造顶级原声吉他。感受我们声学工程的共鸣力量。",
@@ -326,7 +327,23 @@
     "wishlist": "心愿单",
     "noWishlistItems": "心愿单是空的",
     "noWishlistItemsDesc": "收藏喜爱的吉他，方便日后查看。",
-    "browseGuitars": "浏览吉他"
+    "browseGuitars": "浏览吉他",
+    "addAddress": "添加地址",
+    "editAddress": "编辑地址",
+    "recipientName": "收件人姓名",
+    "addressLine1": "地址第一行",
+    "addressLine2": "地址第二行",
+    "addressLine2Placeholder": "公寓、楼层、房号等（选填）",
+    "city": "城市",
+    "state": "州 / 省",
+    "postalCode": "邮政编码",
+    "country": "国家",
+    "defaultAddress": "默认",
+    "setAsDefault": "设为默认地址",
+    "cancel": "取消",
+    "saveAddress": "保存地址",
+    "deleteAddress": "删除地址",
+    "addressSaveFailed": "保存地址失败。"
   },
   "wishlist": {
     "add": "加入心愿单",
@@ -365,6 +382,22 @@
     "banner": "请验证您的电子邮件地址。",
     "resend": "重新发送",
     "resent": "验证邮件已发送！"
+  },
+  "share": {
+    "title": "分享",
+    "copied": "链接已复制！"
+  },
+  "product": {
+    "youMayAlsoLike": "你可能也喜欢"
+  },
+  "chat": {
+    "toggle": "打开客服",
+    "title": "Ayers Guitars 客服",
+    "subtitle": "我们通常在几小时内回复",
+    "welcome": "您好！有什么可以帮助您的吗？",
+    "placeholder": "输入消息...",
+    "received": "消息已收到！我们会尽快通过邮件回复您。",
+    "error": "发送失败，请发邮件至 service@ayersguitars.com"
   },
   "invoice": {
     "download": "下载发票",

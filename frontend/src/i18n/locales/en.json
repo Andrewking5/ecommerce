@@ -8,7 +8,8 @@
     "admin": "Admin",
     "search": "Search",
     "searchPlaceholder": "Search guitars, series, woods...",
-    "login": "Login"
+    "login": "Login",
+    "account": "Account"
   },
   "footer": {
     "description": "Crafting premium acoustic guitars with passion and precision since 1996. Experience the resonant power of our acoustic engineering.",
@@ -326,7 +327,23 @@
     "wishlist": "Wishlist",
     "noWishlistItems": "Your Wishlist is Empty",
     "noWishlistItemsDesc": "Save your favourite guitars to revisit them later.",
-    "browseGuitars": "Browse Guitars"
+    "browseGuitars": "Browse Guitars",
+    "addAddress": "Add Address",
+    "editAddress": "Edit Address",
+    "recipientName": "Recipient Name",
+    "addressLine1": "Address Line 1",
+    "addressLine2": "Address Line 2",
+    "addressLine2Placeholder": "Apt, suite, unit, etc. (optional)",
+    "city": "City",
+    "state": "State / Province",
+    "postalCode": "Postal Code",
+    "country": "Country",
+    "defaultAddress": "Default",
+    "setAsDefault": "Set as default address",
+    "cancel": "Cancel",
+    "saveAddress": "Save Address",
+    "deleteAddress": "Delete Address",
+    "addressSaveFailed": "Failed to save address."
   },
   "wishlist": {
     "add": "Add to Wishlist",
