@@ -2,7 +2,7 @@ import { useState, Suspense, useRef, useEffect, useMemo, useCallback } from 'rea
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, Center, Bounds, Points, PointMaterial } from '@react-three/drei';
-import { ChevronRight, ChevronLeft, Check, ShoppingCart, Eye, Compass, Maximize2, X, Upload, Link2, Camera, Heart, Users, ArrowRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ChevronDown, Check, ShoppingCart, Eye, Compass, Maximize2, X, Upload, Link2, Camera, Heart, Users, ArrowRight } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -956,6 +956,7 @@ export default function Customizer() {
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shared, setShared] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   // Detect mobile (< lg breakpoint)
   useEffect(() => {
@@ -1266,13 +1267,11 @@ export default function Customizer() {
             )}>📋</button>
           </div>
 
-          {/* Mobile: vertical progress on the right side of 3D area */}
+          {/* Mobile: vertical progress dots on the right side of 3D area */}
           <div className="absolute right-3 top-3 z-20 flex lg:hidden flex-col items-center gap-1 bg-black/40 backdrop-blur-md py-2.5 px-1.5 rounded-2xl border border-white/[0.06]">
-            {/* Step label */}
             <span className="text-[8px] font-bold text-ayers-gold/70 mb-0.5">
               {showSummary ? '📋' : `${step + 1}`}
             </span>
-            {/* Vertical dots */}
             {STAGES.map((s, i) => (
               <button
                 key={s.id}
@@ -1284,12 +1283,22 @@ export default function Customizer() {
                 )}
               />
             ))}
-            {/* Summary dot */}
             <button
               onClick={() => { playStepSound(); setShowSummary(true); }}
               className={cn('w-2 rounded-full transition-all duration-300', showSummary ? 'h-4 bg-ayers-gold' : 'h-2 bg-white/10')}
             />
           </div>
+
+          {/* Mobile: floating step label at bottom of 3D area */}
+          {!showSummary && (
+            <div className="absolute bottom-1 left-0 right-0 z-20 flex lg:hidden justify-center pointer-events-none">
+              <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/[0.06]">
+                <span className="text-[10px]">{stage.icon}</span>
+                <span className="text-[9px] font-bold text-ayers-gold/80">{step + 1}/{STAGES.length}</span>
+                <span className="text-[10px] font-semibold text-white/70">{t(stage.titleKey)}</span>
+              </div>
+            </div>
+          )}
         </>
       )}
 
@@ -1312,54 +1321,93 @@ export default function Customizer() {
                   <div className="w-5 h-0.5 bg-ayers-gold mt-2" />
                 </div>
 
-                {/* Sectioned options with thumbnails */}
-                <div className="overflow-y-auto flex-1 px-5 py-2 space-y-3">
+                {/* Sectioned options — accordion on mobile, always open on desktop */}
+                <div className="overflow-y-auto flex-1 px-5 py-2 space-y-1.5">
                   {SUMMARY_SECTIONS.map(section => {
                     const sectionStages = STAGES.filter(s => section.stageIds.includes(s.id));
                     const sectionFields = sectionStages.flatMap(s => getVisibleFields(s, guitarType));
                     if (sectionFields.length === 0) return null;
+                    // Count items in this section
+                    const itemCount = sectionFields.reduce((acc, f) => {
+                      if (f.multi) {
+                        return acc + (selections[f.key] || '').split(',').filter(Boolean).length;
+                      }
+                      return acc + (selections[f.key] ? 1 : 0);
+                    }, 0);
+                    const isExpanded = expandedSections[section.titleKey] ?? false;
+                    // Sum add-on price for this section
+                    const sectionAdd = sectionFields.reduce((acc, f) => {
+                      if (f.multi) {
+                        const ids = (selections[f.key] || '').split(',').filter(Boolean);
+                        return acc + f.options.filter(o => ids.includes(o.id)).reduce((s, o) => s + o.add, 0);
+                      }
+                      const opt = f.options.find(o => o.id === selections[f.key]);
+                      return acc + (opt?.add || 0);
+                    }, 0);
                     return (
-                      <div key={section.titleKey}>
-                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-ayers-gold/40">{t(section.titleKey)}</span>
-                        <div className="mt-1.5 space-y-1">
-                          {sectionFields.map(f => {
-                            if (f.multi) {
-                              const selectedIds = (selections[f.key] || '').split(',').filter(Boolean);
-                              const selectedOpts = f.options.filter(o => selectedIds.includes(o.id));
-                              if (selectedOpts.length === 0) return null;
-                              return selectedOpts.map(opt => (
-                                <div key={opt.id} className="flex items-center gap-2.5 py-1">
-                                  <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center flex-shrink-0 text-[10px]">✓</div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
-                                    <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
-                                  </div>
-                                  {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
-                                </div>
-                              ));
-                            }
-                            const opt = f.options.find(o => o.id === selections[f.key]);
-                            if (!opt) return null;
-                            return (
-                              <div key={f.key} className="flex items-center gap-2.5 py-1">
-                                {opt.img ? (
-                                  <div className="w-7 h-7 rounded-md overflow-hidden bg-white/5 flex-shrink-0">
-                                    <img src={opt.img} alt="" className="w-full h-full object-contain" />
-                                  </div>
-                                ) : opt.swatch ? (
-                                  <div className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-white/10" style={{ backgroundColor: opt.swatch }} />
-                                ) : (
-                                  <div className="w-7 h-7 rounded-md bg-white/5 flex-shrink-0" />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
-                                  <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
-                                </div>
-                                {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
+                      <div key={section.titleKey} className="rounded-xl border border-white/[0.04] overflow-hidden">
+                        {/* Section header — clickable on mobile */}
+                        <button
+                          onClick={() => setExpandedSections(prev => ({ ...prev, [section.titleKey]: !prev[section.titleKey] }))}
+                          className="w-full flex items-center gap-2 px-3 py-2.5 lg:py-2 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                        >
+                          <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-ayers-gold/50 flex-1 text-left">{t(section.titleKey)}</span>
+                          <span className="text-[9px] text-white/30 font-medium">{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
+                          {sectionAdd > 0 && <span className="text-[8px] text-ayers-gold/40 font-bold">+US${sectionAdd.toLocaleString()}</span>}
+                          <ChevronDown size={12} className={cn('text-white/30 transition-transform duration-200', isExpanded && 'rotate-180')} />
+                        </button>
+                        {/* Section content */}
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="px-3 pb-2.5 space-y-1">
+                                {sectionFields.map(f => {
+                                  if (f.multi) {
+                                    const selectedIds = (selections[f.key] || '').split(',').filter(Boolean);
+                                    const selectedOpts = f.options.filter(o => selectedIds.includes(o.id));
+                                    if (selectedOpts.length === 0) return null;
+                                    return selectedOpts.map(opt => (
+                                      <div key={opt.id} className="flex items-center gap-2.5 py-1">
+                                        <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center flex-shrink-0 text-[10px]">✓</div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
+                                          <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
+                                        </div>
+                                        {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
+                                      </div>
+                                    ));
+                                  }
+                                  const opt = f.options.find(o => o.id === selections[f.key]);
+                                  if (!opt) return null;
+                                  return (
+                                    <div key={f.key} className="flex items-center gap-2.5 py-1">
+                                      {opt.img ? (
+                                        <div className="w-7 h-7 rounded-md overflow-hidden bg-white/5 flex-shrink-0">
+                                          <img src={opt.img} alt="" className="w-full h-full object-contain" />
+                                        </div>
+                                      ) : opt.swatch ? (
+                                        <div className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-white/10" style={{ backgroundColor: opt.swatch }} />
+                                      ) : (
+                                        <div className="w-7 h-7 rounded-md bg-white/5 flex-shrink-0" />
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
+                                        <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
+                                      </div>
+                                      {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            );
-                          })}
-                        </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     );
                   })}
@@ -1427,8 +1475,8 @@ export default function Customizer() {
             ) : (
               /* ── Stage Options ──── */
               <motion.div key={stage.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col flex-1 overflow-hidden">
-                {/* Stage Header */}
-                <div className="px-5 py-3 border-b border-white/[0.04] flex-shrink-0 flex items-center justify-between">
+                {/* Stage Header — hidden on mobile (shown as floating label above panel), visible on desktop */}
+                <div className="hidden lg:flex px-5 py-3 border-b border-white/[0.04] flex-shrink-0 items-center justify-between">
                   <div>
                     <span className="text-[9px] font-bold uppercase tracking-wider text-ayers-gold/50">{t('customizer.step', { current: step + 1, total: STAGES.length })}</span>
                     <h2 className="text-sm font-bold">{stage.icon} {t(stage.titleKey)} <span className="text-white/30 font-normal text-xs">{t(stage.subtitleKey)}</span></h2>
