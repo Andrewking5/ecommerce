@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { User, Package, Heart, Bookmark, MapPin, LogOut, ChevronRight, Save, Palette, Plus, Edit2, Trash2, Star, X, ShoppingCart, FileDown } from 'lucide-react';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { GuitarSunLoader, FullPageLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
@@ -224,11 +224,7 @@ export default function Account() {
 
   // Show loading while checking auth
   if (authLoading) {
-    return (
-      <div className="bg-ayers-cream min-h-screen py-12 flex items-center justify-center">
-        <GuitarSunLoader size={32} />
-      </div>
-    );
+    return <FullPageLoader />;
   }
 
   if (!isAuthenticated || !user) {

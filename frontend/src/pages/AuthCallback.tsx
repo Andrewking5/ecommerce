@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { GuitarSunLoader } from '../components/guitar';
+import { FullPageLoader } from '../components/guitar';
 
 /**
  * Handles OAuth callback redirect from social login (Google, Facebook).
@@ -73,9 +73,6 @@ export default function AuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-ayers-cream">
-      <GuitarSunLoader size={72} />
-      <p className="mt-6 text-ayers-ink/60 text-sm">正在完成登入...</p>
-    </div>
+    <FullPageLoader text="正在完成登入..." />
   );
 }

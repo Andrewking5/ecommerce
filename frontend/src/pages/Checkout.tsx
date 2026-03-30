@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { ShieldCheck, ChevronDown, Lock, Truck, CreditCard, ShoppingBag, AlertCircle, Tag, X, MapPin, Check } from 'lucide-react';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { GuitarSunLoader, FullPageLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
@@ -293,9 +293,7 @@ export default function Checkout() {
 
   if (authLoading) {
     return (
-      <div className="bg-ayers-cream min-h-screen flex items-center justify-center">
-        <GuitarSunLoader size={40} />
-      </div>
+      <FullPageLoader />
     );
   }
 

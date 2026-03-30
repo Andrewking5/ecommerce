@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/src/lib/utils';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { GuitarSunLoader, FullPageLoader } from '@/src/components/guitar';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as XLSX from 'xlsx';
@@ -2369,5 +2369,5 @@ function EmptyChart({ icon, message }: { icon: React.ReactNode; message: string 
 }
 
 function AdminLoader() {
-  return <div className="min-h-screen flex items-center justify-center" style={{ background: ESPRESSO_DARK }}><GuitarSunLoader size={32} /></div>;
+  return <FullPageLoader bgStyle={ESPRESSO_DARK} />;
 }

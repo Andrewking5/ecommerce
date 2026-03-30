@@ -20,7 +20,7 @@ import {
   Share2,
   Link as LinkIcon,
 } from 'lucide-react';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { GuitarSunLoader, FullPageLoader } from '@/src/components/guitar';
 import OptimizedImage from '@/src/components/OptimizedImage';
 import SEO, { type BreadcrumbItem } from '@/src/components/SEO';
 import { useLanguagePrefix } from '@/src/lib/i18nRouting';
@@ -641,15 +641,7 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return (
-      <div className="bg-ayers-cream min-h-screen flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center gap-4"
-        >
-          <GuitarSunLoader size={40} text="Loading" />
-        </motion.div>
-      </div>
+      <FullPageLoader text="Loading" />
     );
   }
 

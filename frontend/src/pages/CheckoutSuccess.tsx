@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { FullPageLoader } from '@/src/components/guitar';
 import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
 import paymentService from '@/src/services/paymentService';
 import { useTranslation } from 'react-i18next';
@@ -43,9 +43,7 @@ export default function CheckoutSuccess() {
 
   if (status === 'loading') {
     return (
-      <div className="bg-ayers-cream min-h-screen flex items-center justify-center">
-        <GuitarSunLoader size={40} />
-      </div>
+      <FullPageLoader />
     );
   }
 

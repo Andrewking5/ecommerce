@@ -18,7 +18,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
 import { usePageViewTracking } from './hooks/useAnalytics';
-import { GuitarSunLoader } from './components/guitar';
+import { FullPageLoader } from './components/guitar';
 
 // Eagerly load the home page for fast initial render
 import Home from './pages/Home';
@@ -50,11 +50,7 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 
 function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-ayers-cream">
-      <GuitarSunLoader size={72} />
-    </div>
-  );
+  return <FullPageLoader size={48} />;
 }
 
 function ProtectedRoute({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) {

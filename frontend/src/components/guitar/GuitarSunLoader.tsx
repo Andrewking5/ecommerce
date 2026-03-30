@@ -25,3 +25,25 @@ export default function GuitarSunLoader({ size = 48, className = '', text, speed
     </div>
   );
 }
+
+/**
+ * FullPageLoader — 全頁置中 loading（統一樣式）
+ * bg: 預設 ayers-cream，Admin 可覆蓋
+ */
+interface FullPageLoaderProps {
+  size?: number;
+  text?: string;
+  bg?: string;        // Tailwind bg class 或 inline style 都可
+  bgStyle?: string;   // 用 inline style（Admin 深色背景用）
+}
+
+export function FullPageLoader({ size = 48, text, bg = 'bg-ayers-cream', bgStyle }: FullPageLoaderProps) {
+  return (
+    <div
+      className={`min-h-screen flex items-center justify-center ${bgStyle ? '' : bg}`}
+      style={bgStyle ? { background: bgStyle } : undefined}
+    >
+      <GuitarSunLoader size={size} text={text} />
+    </div>
+  );
+}

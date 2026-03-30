@@ -11,7 +11,7 @@ import {
   ShoppingBag,
   ArrowRight,
 } from 'lucide-react';
-import { GuitarSunLoader } from '@/src/components/guitar';
+import { FullPageLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { LocalizedLink as Link } from '@/src/lib/i18nRouting';
 import { useAuth } from '@/src/contexts/AuthContext';
@@ -65,9 +65,7 @@ export default function OrderTracking() {
 
   if (loading) {
     return (
-      <div className="bg-ayers-cream min-h-screen flex items-center justify-center">
-        <GuitarSunLoader size={40} />
-      </div>
+      <FullPageLoader />
     );
   }
 
