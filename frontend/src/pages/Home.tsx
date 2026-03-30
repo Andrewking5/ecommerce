@@ -531,14 +531,13 @@ export default function Home() {
         <div className="py-4">
           <div className="flex whitespace-nowrap">
             {[0, 1].map((i) => (
-              <motion.span
+              <span
                 key={i}
-                className="flex-shrink-0 text-[10px] sm:text-xs uppercase tracking-[0.35em] text-ayers-warm-cream/12 font-semibold"
-                animate={{ x: [0, '-50%'] }}
-                transition={{ x: { duration: 25, repeat: Infinity, ease: 'linear' } }}
+                className="flex-shrink-0 text-[10px] sm:text-xs uppercase tracking-[0.35em] text-ayers-warm-cream/12 font-semibold will-change-transform"
+                style={{ animation: 'marquee 25s linear infinite' }}
               >
                 {t('home.marquee')}{t('home.marquee')}
-              </motion.span>
+              </span>
             ))}
           </div>
         </div>
@@ -812,23 +811,21 @@ export default function Home() {
           >
             <StringPluck count={5} className="z-[1]" />
 
-            {/* Warm orb */}
-            <motion.div
-              animate={{ x: [0, 25, -15, 0], y: [0, -15, 8, 0] }}
-              transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(circle,_rgba(197,160,89,0.08)_0%,_transparent_70%)] pointer-events-none"
+            {/* Warm orb — CSS animation 取代 motion */}
+            <div
+              className="absolute top-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(circle,_rgba(197,160,89,0.08)_0%,_transparent_70%)] pointer-events-none will-change-transform"
+              style={{ animation: 'float-orb 14s ease-in-out infinite' }}
             />
 
-            {/* Koi fish */}
-            <motion.svg
-              className="absolute top-10 right-12 w-28 h-16 text-ayers-gold pointer-events-none opacity-[0.04] hidden lg:block"
+            {/* Koi fish — CSS animation 取代 motion */}
+            <svg
+              className="absolute top-10 right-12 w-28 h-16 text-ayers-gold pointer-events-none opacity-[0.04] hidden lg:block will-change-transform"
               viewBox="0 0 120 60" fill="currentColor"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ animation: 'float-y 7s ease-in-out infinite' }}
             >
               <path d="M100 30 Q90 10 70 15 Q55 18 45 30 Q35 18 20 20 Q5 22 0 30 Q5 38 20 40 Q35 42 45 30 Q55 42 70 45 Q90 50 100 30 Z" />
               <path d="M105 25 Q115 20 120 30 Q115 40 105 35 Z" />
-            </motion.svg>
+            </svg>
 
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16">
               <motion.div
@@ -860,13 +857,12 @@ export default function Home() {
                 className="flex-shrink-0"
               >
                 <div className="relative w-44 h-44 sm:w-56 sm:h-56">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-                    className="absolute inset-0"
+                  <div
+                    className="absolute inset-0 will-change-transform"
+                    style={{ animation: 'spin 30s linear infinite' }}
                   >
                     <Rosette size={256} className="w-full h-full text-ayers-gold/15" />
-                  </motion.div>
+                  </div>
                   <div className="absolute inset-12 sm:inset-16 bg-ayers-gold/90 rounded-full flex items-center justify-center">
                     <span className="text-white text-lg sm:text-xl font-serif italic font-bold">3D</span>
                   </div>
