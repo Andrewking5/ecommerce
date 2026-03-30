@@ -311,8 +311,8 @@ export default function Home() {
       >
         {/* ── Static ambient glow ── */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.06) 0%, transparent 70%)' }} />
-          <div className="absolute bottom-1/3 left-1/4 w-[350px] h-[350px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.04) 0%, transparent 70%)' }} />
+          <div className="absolute top-1/4 right-1/4 w-[60vw] sm:w-[500px] h-[60vw] sm:h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.06) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-1/3 left-1/4 w-[45vw] sm:w-[350px] h-[45vw] sm:h-[350px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.04) 0%, transparent 70%)' }} />
         </div>
 
         {/* Grain */}
@@ -608,18 +608,14 @@ export default function Home() {
                   </motion.div>
 
                   {/* ── Main content grid: guitar + text ── */}
-                  <div className={`relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center
-                    ${isEven ? 'md:direction-rtl' : ''}`}
-                    style={isEven ? { direction: 'rtl' } : undefined}
-                  >
+                  <div className={`relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center`}>
                     {/* Guitar image side */}
                     <motion.div
                       initial={{ opacity: 0, x: isEven ? 60 : -60 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: '-80px' }}
                       transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
-                      className="relative flex items-center justify-center"
-                      style={{ direction: 'ltr' }}
+                      className={`relative flex items-center justify-center ${isEven ? 'md:order-2' : ''}`}
                     >
                       <div className="relative w-full max-w-sm md:max-w-md mx-auto">
                         {/* Subtle ground shadow */}
@@ -642,7 +638,7 @@ export default function Home() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true, margin: '-80px' }}
                       transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT_EXPO }}
-                      style={{ direction: 'ltr' }}
+                      className={isEven ? 'md:order-1' : ''}
                     >
                       {/* Series label */}
                       <div className="flex items-center gap-3 mb-4">
@@ -766,7 +762,7 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            <div className="md:col-span-7 grid grid-cols-2 gap-5">
+            <div className="md:col-span-7 grid grid-cols-2 gap-3 sm:gap-5">
               {[
                 { src: '/images/products/uluru/manako-iii-front.png', alt: 'Manako III', delay: 0 },
                 { src: '/images/products/uluru/kohola-i-front.png', alt: 'Kohola I', delay: 0.12 },
@@ -807,7 +803,7 @@ export default function Home() {
 
             {/* Warm orb — CSS animation 取代 motion */}
             <div
-              className="absolute top-0 right-0 w-[400px] h-[400px] bg-[radial-gradient(circle,_rgba(197,160,89,0.08)_0%,_transparent_70%)] pointer-events-none will-change-transform"
+              className="absolute top-0 right-0 w-[250px] h-[250px] sm:w-[400px] sm:h-[400px] bg-[radial-gradient(circle,_rgba(197,160,89,0.08)_0%,_transparent_70%)] pointer-events-none will-change-transform"
               style={{ animation: 'float-orb 14s ease-in-out infinite' }}
             />
 
@@ -875,7 +871,7 @@ export default function Home() {
         style={{ background: `linear-gradient(135deg, ${ESPRESSO}, ${ESPRESSO_DARK})` }}
       >
         <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16">
-          <div className="grid grid-cols-3 gap-6 sm:gap-8 text-center">
+          <div className="grid grid-cols-3 gap-3 sm:gap-8 text-center">
             {STATS.map((stat, i) => (
               <motion.div
                 key={stat.labelKey}
@@ -884,10 +880,10 @@ export default function Home() {
                 transition={{ delay: i * 0.12, duration: 0.6 }}
                 className="relative"
               >
-                <p className="text-3xl sm:text-5xl md:text-6xl font-serif italic font-bold text-ayers-warm-cream mb-2">
+                <p className="text-2xl sm:text-5xl md:text-6xl font-serif italic font-bold text-ayers-warm-cream mb-2">
                   <OdometerCounter value={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.4em] text-ayers-gold">
+                <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.4em] text-ayers-gold">
                   {t(stat.labelKey)}
                 </p>
                 {i < STATS.length - 1 && (

@@ -418,9 +418,9 @@ function CameraRig({
       mouse.current.y = (e.clientY / window.innerHeight - 0.5) * 2;
       if (drag.current.active) {
         const dx = (e.clientX - drag.current.startX) * 0.005;
-        const dy = (e.clientY - drag.current.startY) * 0.003;
+        const dy = (e.clientY - drag.current.startY) * 0.005;
         dragOffset.current.theta = drag.current.offsetTheta + dx;
-        dragOffset.current.phi = THREE.MathUtils.clamp(drag.current.offsetPhi - dy, -0.4, 0.4);
+        dragOffset.current.phi = THREE.MathUtils.clamp(drag.current.offsetPhi - dy, -0.8, 0.8);
         idleTimer.current = 0;
       }
     };
@@ -454,9 +454,9 @@ function CameraRig({
     const onTouchMove = (e: TouchEvent) => {
       if (drag.current.active && e.touches.length === 1) {
         const dx = (e.touches[0].clientX - drag.current.startX) * 0.005;
-        const dy = (e.touches[0].clientY - drag.current.startY) * 0.003;
+        const dy = (e.touches[0].clientY - drag.current.startY) * 0.005;
         dragOffset.current.theta = drag.current.offsetTheta + dx;
-        dragOffset.current.phi = THREE.MathUtils.clamp(drag.current.offsetPhi - dy, -0.4, 0.4);
+        dragOffset.current.phi = THREE.MathUtils.clamp(drag.current.offsetPhi - dy, -0.8, 0.8);
         idleTimer.current = 0;
       }
     };

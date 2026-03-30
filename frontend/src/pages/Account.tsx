@@ -238,25 +238,27 @@ export default function Account() {
   return (
     <div className="bg-ayers-cream min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar Navigation */}
-          <aside className="w-full lg:w-64 space-y-4">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                className={cn(
-                  "w-full flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all group",
-                  activeTab === item.id ? "bg-white shadow-md text-ayers-ink" : "text-ayers-ink/40 hover:bg-white/50 hover:text-ayers-ink"
-                )}
-              >
-                <span className={cn(activeTab === item.id ? "text-ayers-gold" : "group-hover:text-ayers-gold transition-colors")}>
-                  {item.icon}
-                </span>
-                <span className="text-sm font-bold uppercase tracking-widest">{item.label}</span>
-                {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-ayers-gold rounded-full" />}
-              </button>
-            ))}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
+          {/* Sidebar Navigation — horizontal scroll on mobile, vertical on desktop */}
+          <aside className="w-full lg:w-64">
+            <div className="flex lg:flex-col gap-2 lg:gap-4 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabClick(item.id)}
+                  className={cn(
+                    "flex items-center gap-2 lg:gap-4 px-4 lg:px-6 py-3 lg:py-4 rounded-xl lg:rounded-2xl transition-all group whitespace-nowrap shrink-0 lg:shrink lg:w-full",
+                    activeTab === item.id ? "bg-white shadow-md text-ayers-ink" : "text-ayers-ink/40 hover:bg-white/50 hover:text-ayers-ink"
+                  )}
+                >
+                  <span className={cn(activeTab === item.id ? "text-ayers-gold" : "group-hover:text-ayers-gold transition-colors")}>
+                    {item.icon}
+                  </span>
+                  <span className="text-xs lg:text-sm font-bold uppercase tracking-widest">{item.label}</span>
+                  {activeTab === item.id && <div className="hidden lg:block ml-auto w-1.5 h-1.5 bg-ayers-gold rounded-full" />}
+                </button>
+              ))}
+            </div>
           </aside>
 
           {/* Main Content */}
@@ -267,8 +269,8 @@ export default function Account() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h2 className="text-4xl font-serif italic font-bold mb-8">{t('account.myProfile')}</h2>
-                <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-ayers-ink/5 space-y-6">
+                <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-6 sm:mb-8">{t('account.myProfile')}</h2>
+                <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-sm border border-ayers-ink/5 space-y-5 sm:space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-ayers-ink/60 mb-2">
@@ -348,7 +350,7 @@ export default function Account() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h2 className="text-4xl font-serif italic font-bold mb-8">{t('account.orderHistory')}</h2>
+                <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-6 sm:mb-8">{t('account.orderHistory')}</h2>
 
                 {ordersLoading ? (
                   <div className="flex items-center justify-center py-20">
@@ -371,10 +373,10 @@ export default function Account() {
                         className="bg-white rounded-[2rem] shadow-sm border border-ayers-ink/5 overflow-hidden"
                       >
                         <div className="h-2 bg-ayers-gold" />
-                        <div className="p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                          <div className="space-y-4 flex-grow">
-                            <div className="flex items-center space-x-4 flex-wrap gap-2">
-                              <h3 className="text-xl font-bold">
+                        <div className="p-5 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-8">
+                          <div className="space-y-3 sm:space-y-4 flex-grow min-w-0">
+                            <div className="flex items-center space-x-3 sm:space-x-4 flex-wrap gap-2">
+                              <h3 className="text-base sm:text-xl font-bold">
                                 Order #{order.id.substring(0, 8).toUpperCase()}
                               </h3>
                               <span className={cn(
@@ -394,15 +396,15 @@ export default function Account() {
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-3 shrink-0">
+                          <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
                             <button
                               onClick={() => orderService.downloadInvoice(order.id)}
-                              className="p-3.5 rounded-full border border-ayers-ink/10 text-ayers-ink/40 hover:text-ayers-gold hover:border-ayers-gold/30 transition-all"
+                              className="p-3 sm:p-3.5 rounded-full border border-ayers-ink/10 text-ayers-ink/40 hover:text-ayers-gold hover:border-ayers-gold/30 transition-all"
                               title={t('invoice.download', 'Download Invoice')}
                             >
                               <FileDown size={16} />
                             </button>
-                            <button className="bg-ayers-dark text-white px-10 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center">
+                            <button className="flex-1 md:flex-none bg-ayers-dark text-white px-6 sm:px-10 py-3 sm:py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center justify-center">
                               {t('account.viewDetails')} <ChevronRight size={14} className="ml-2" />
                             </button>
                           </div>
@@ -425,7 +427,7 @@ export default function Account() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h2 className="text-4xl font-serif italic font-bold mb-8">{t('account.savedDesigns')}</h2>
+                <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-6 sm:mb-8">{t('account.savedDesigns')}</h2>
                 <div className="bg-white p-12 rounded-[2rem] shadow-sm border border-ayers-ink/5 text-center">
                   <div className="w-20 h-20 rounded-full bg-ayers-gold/10 flex items-center justify-center mx-auto mb-6">
                     <Palette size={32} className="text-ayers-gold" />
@@ -450,13 +452,13 @@ export default function Account() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-4xl font-serif italic font-bold">{t('account.addresses')}</h2>
+                <div className="flex items-center justify-between mb-6 sm:mb-8 gap-4">
+                  <h2 className="text-2xl sm:text-4xl font-serif italic font-bold">{t('account.addresses')}</h2>
                   <button
                     onClick={() => openAddressModal()}
-                    className="bg-ayers-dark text-white px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center"
+                    className="bg-ayers-dark text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-ayers-gold transition-all flex items-center shrink-0"
                   >
-                    <Plus size={14} className="mr-2" />
+                    <Plus size={14} className="mr-1 sm:mr-2" />
                     {t('account.addAddress')}
                   </button>
                 </div>
@@ -486,7 +488,7 @@ export default function Account() {
                         className="bg-white rounded-[2rem] shadow-sm border border-ayers-ink/5 overflow-hidden"
                       >
                         {addr.isDefault && <div className="h-2 bg-ayers-gold" />}
-                        <div className="p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div className="p-5 sm:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 sm:gap-8">
                           <div className="space-y-3 flex-grow">
                             <div className="flex items-center space-x-3 flex-wrap gap-2">
                               <h3 className="text-xl font-bold">{addr.recipientName}</h3>
@@ -545,8 +547,8 @@ export default function Account() {
                       animate={{ opacity: 1, scale: 1 }}
                       className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                     >
-                      <div className="p-8 border-b border-ayers-ink/5 flex items-center justify-between">
-                        <h3 className="text-xl font-bold uppercase tracking-widest">
+                      <div className="p-5 sm:p-8 border-b border-ayers-ink/5 flex items-center justify-between">
+                        <h3 className="text-base sm:text-xl font-bold uppercase tracking-widest">
                           {editingAddress ? t('account.editAddress') : t('account.addAddress')}
                         </h3>
                         <button
@@ -556,7 +558,7 @@ export default function Account() {
                           <X size={20} />
                         </button>
                       </div>
-                      <div className="p-8 space-y-6">
+                      <div className="p-5 sm:p-8 space-y-5 sm:space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <label className="block text-[10px] font-bold uppercase tracking-widest text-ayers-ink/60 mb-2">
@@ -722,7 +724,7 @@ function WishlistTab() {
 
   return (
     <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <h2 className="text-4xl font-serif italic font-bold mb-8">{t('account.wishlist', '願望清單')}</h2>
+      <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-6 sm:mb-8">{t('account.wishlist', '願望清單')}</h2>
 
       {wishlistItems.length === 0 ? (
         <div className="bg-white p-12 rounded-[2rem] shadow-sm border border-ayers-ink/5 text-center">

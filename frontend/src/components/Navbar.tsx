@@ -356,14 +356,27 @@ export default function Navbar() {
             </div>
 
             {/* Mobile icons + hamburger */}
-            <div className="md:hidden flex items-center space-x-4">
-              <button
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 rounded-md hover:bg-black/5"
-                aria-label="Toggle search"
-              >
-                <Search size={20} />
-              </button>
+            <div className="md:hidden flex items-center space-x-3">
+              {isAuthenticated ? (
+                <LocalizedLink to="/account" className="p-2 hover:opacity-70 transition-opacity">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                  ) : (
+                    <div
+                      className={cn(
+                        "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold",
+                        isDark ? "bg-white/20 text-white" : "bg-ayers-ink/10 text-ayers-ink"
+                      )}
+                    >
+                      {user?.firstName?.charAt(0)?.toUpperCase() || <User size={14} />}
+                    </div>
+                  )}
+                </LocalizedLink>
+              ) : (
+                <LocalizedLink to="/login" className="p-2 hover:opacity-70 transition-opacity">
+                  <User size={20} />
+                </LocalizedLink>
+              )}
               <LocalizedLink to="/checkout" className="relative p-2">
                 <ShoppingCart size={20} />
                 {totalItems > 0 && (
