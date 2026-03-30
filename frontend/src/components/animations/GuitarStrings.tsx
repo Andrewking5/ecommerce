@@ -21,7 +21,8 @@ const STRINGS = [
 ];
 
 const DURATION = 3000; // 總振動時間 ms
-const POINTS = 80; // 每條弦的取樣點數
+// 行動裝置用較少取樣點以提升效能
+const POINTS = typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 80;
 
 export default function GuitarStrings({ play = true, className = '' }: GuitarStringsProps) {
   const svgRef = useRef<SVGSVGElement>(null);

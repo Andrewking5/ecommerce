@@ -221,14 +221,14 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [, setSlideDirection] = useState(1);
 
-  // Auto-rotate slides
+  // Auto-rotate slides（移除 currentSlide 依賴，避免每次換 slide 重建 timer）
   useEffect(() => {
     const timer = setInterval(() => {
       setSlideDirection(1);
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, SLIDE_INTERVAL);
     return () => clearInterval(timer);
-  }, [currentSlide]);
+  }, [heroSlides.length]);
 
   const goToSlide = useCallback((idx: number) => {
     setSlideDirection(idx > currentSlide ? 1 : -1);
@@ -321,14 +321,13 @@ export default function Home() {
         {/* Guitar strings — subtle background texture */}
         <GuitarStrings play className="z-[3] opacity-20" />
 
-        {/* Rosette */}
-        <motion.div
+        {/* Rosette — 使用 CSS animation 取代 motion 以降低 JS 開銷 */}
+        <div
           className="absolute bottom-20 right-12 lg:right-28 z-[4] text-ayers-gold/15 pointer-events-none hidden md:block"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+          style={{ animation: 'spin 40s linear infinite' }}
         >
           <Rosette size={160} />
-        </motion.div>
+        </div>
 
         {/* ── Time-sensitive greeting pill (top-left, fades in) ── */}
         <motion.div

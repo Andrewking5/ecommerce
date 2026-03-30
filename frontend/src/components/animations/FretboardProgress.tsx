@@ -19,20 +19,25 @@ export default function FretboardProgress({ sections }: FretboardProgressProps) 
   const { scrollYProgress } = useScroll();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // 追蹤當前可見的區塊
+  // 追蹤當前可見的區塊（使用 rAF 節流避免每次 scroll 都計算）
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const viewportMid = window.innerHeight / 2;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i].id);
-        if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= viewportMid) {
-          setActiveIndex(i);
-          break;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const viewportMid = window.innerHeight / 2;
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const el = document.getElementById(sections[i].id);
+          if (!el) continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= viewportMid) {
+            setActiveIndex(i);
+            break;
+          }
         }
-      }
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
