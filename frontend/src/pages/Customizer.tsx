@@ -1385,12 +1385,23 @@ export default function Customizer() {
                   })}
                 </div>
 
-                {/* Footer: price + actions */}
-                <div className="px-5 py-3 border-t border-white/[0.04] flex-shrink-0 bg-black/30 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-white/25">{t('customizer.total')}</span>
-                    <span className="text-xl font-serif italic font-bold text-ayers-gold"><AnimPrice value={price} size="large" /></span>
+                {/* Middle: share buttons (scrollable area on mobile) */}
+                <div className="overflow-y-auto flex-1 min-h-0 lg:hidden px-5 py-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <motion.button onClick={shareLink} whileTap={{ scale: 0.95 }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.06] text-[8px] font-bold uppercase tracking-wider text-white/40 active:text-white/60 transition-all">
+                      {linkCopied ? <><Check size={10} className="text-emerald-400" /> {t('customizer.linkCopied')}</> : <><Link2 size={10} /> {t('customizer.shareLink')}</>}
+                    </motion.button>
+                    <motion.button onClick={takeScreenshot} whileTap={{ scale: 0.95 }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.06] text-[8px] font-bold uppercase tracking-wider text-white/40 active:text-white/60 transition-all">
+                      {screenshotting ? <><Check size={10} className="text-emerald-400" /> {t('customizer.screenshotSaved')}</> : <><Camera size={10} /> {t('customizer.screenshot')}</>}
+                    </motion.button>
+                    <motion.button onClick={shareToGallery} disabled={sharing || shared} whileTap={{ scale: 0.95 }} className={cn('flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[8px] font-bold uppercase tracking-wider transition-all', shared ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10' : 'border-ayers-gold/20 text-ayers-gold/60 active:text-ayers-gold active:border-ayers-gold/40')}>
+                      {shared ? <><Check size={10} /> {t('customizer.sharedToGallery')}</> : sharing ? <><img src="/images/ayers/guitar-sun.png" alt="" className="w-3 h-3 animate-[spin_1s_linear_infinite]" /> {t('customizer.sharingToGallery')}</> : <><Users size={10} /> {t('customizer.shareToGallery')}</>}
+                    </motion.button>
                   </div>
+                </div>
+
+                {/* Desktop: share buttons inside footer */}
+                <div className="hidden lg:block px-5 py-2 border-t border-white/[0.04]">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <motion.button onClick={shareLink} whileTap={{ scale: 0.95 }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.06] text-[8px] font-bold uppercase tracking-wider text-white/40 hover:text-white/60 hover:border-white/10 transition-all">
                       {linkCopied ? <><Check size={10} className="text-emerald-400" /> {t('customizer.linkCopied')}</> : <><Link2 size={10} /> {t('customizer.shareLink')}</>}
@@ -1402,8 +1413,16 @@ export default function Customizer() {
                       {shared ? <><Check size={10} /> {t('customizer.sharedToGallery')}</> : sharing ? <><img src="/images/ayers/guitar-sun.png" alt="" className="w-3 h-3 animate-[spin_1s_linear_infinite]" /> {t('customizer.sharingToGallery')}</> : <><Users size={10} /> {t('customizer.shareToGallery')}</>}
                     </motion.button>
                   </div>
+                </div>
+
+                {/* Footer: price + back/cart — always visible */}
+                <div className="px-5 py-2.5 border-t border-white/[0.04] flex-shrink-0 bg-black/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[8px] font-bold uppercase tracking-wider text-white/25">{t('customizer.total')}</span>
+                    <span className="text-lg font-serif italic font-bold text-ayers-gold"><AnimPrice value={price} size="large" /></span>
+                  </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => { playStepSound(); setShowSummary(false); setStep(STAGES.length - 1); }} className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-wider text-white/50 hover:bg-white/5 transition-all">
+                    <button onClick={() => { playStepSound(); setShowSummary(false); setStep(STAGES.length - 1); }} className="flex items-center gap-1 px-3 py-2.5 rounded-xl text-[9px] font-bold uppercase tracking-wider text-white/50 active:bg-white/5 transition-all">
                       <ChevronLeft size={12} /> {t('customizer.back')}
                     </button>
                     <motion.button onClick={() => { playChord(); setSent(true); setTimeout(() => setSent(false), 3000); }} disabled={sent} whileTap={{ scale: 0.98 }} className={cn('flex-1 py-3 rounded-xl font-bold uppercase tracking-wider text-[10px] flex items-center justify-center gap-2 transition-all', sent ? 'bg-emerald-500 text-white' : 'bg-ayers-gold text-[#0c0c0e]')}>
