@@ -12,7 +12,7 @@ import FretboardProgress from '../components/animations/FretboardProgress';
 import StringPluck from '../components/animations/StringPluck';
 import {
   Rosette, PickIcon, StringDivider, GlowingCard,
-  WordMaskReveal, OdometerCounter,
+  WordMaskReveal, OdometerCounter, GuitarSunLoader,
 } from '../components/guitar';
 import { AyersLogo } from '../components/AyersLogo';
 
@@ -498,13 +498,7 @@ export default function Home() {
           className="absolute bottom-8 right-6 sm:right-10 z-10 flex items-center gap-3 pointer-events-none"
         >
           <span className="text-[9px] uppercase tracking-[0.4em] text-ayers-warm-cream/20 font-medium hidden sm:block">{t('home.scroll')}</span>
-          <img
-            src="/images/ayers/guitar-sun.png"
-            alt=""
-            className="w-12 h-12 sm:w-14 sm:h-14 select-none"
-            style={{ animation: 'spin 25s linear infinite', opacity: 0.35 }}
-            draggable={false}
-          />
+          <GuitarSunLoader size={56} speed="slow" opacity={0.35} />
         </motion.div>
 
         {/* Slide counter — top right */}
