@@ -16,9 +16,8 @@ export default defineConfig(() => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          },
+          // 不使用 manualChunks — 讓 Vite 自動將 Three.js 打包進 Customizer 的 lazy chunk
+          // 避免首頁預載 2-3MB 的 Three.js bundle
         },
       },
     },
