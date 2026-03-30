@@ -116,7 +116,7 @@ export default function Warranty() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-6">
               {t('warranty.ourPromise', 'Our Promise')}
             </p>
-            <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
               {t('warranty.title', 'Lifetime Warranty')}
             </h1>
             <p className="text-lg text-white/50 max-w-2xl mx-auto">
@@ -133,7 +133,7 @@ export default function Warranty() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5 flex flex-col md:flex-row items-center gap-8"
+            className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5 flex flex-col md:flex-row items-center gap-8"
           >
             <div className="w-24 h-24 rounded-full bg-ayers-gold/10 flex items-center justify-center flex-shrink-0">
               <Shield className="text-ayers-gold" size={48} strokeWidth={1.5} />
@@ -159,7 +159,7 @@ export default function Warranty() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-ayers-ink/5"
+              className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-10 shadow-sm border border-ayers-ink/5"
             >
               <div className="flex items-center space-x-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
@@ -185,7 +185,7 @@ export default function Warranty() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-ayers-ink/5"
+              className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-10 shadow-sm border border-ayers-ink/5"
             >
               <div className="flex items-center space-x-3 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
@@ -235,7 +235,7 @@ export default function Warranty() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-ayers-cream rounded-2xl p-8 relative"
+                className="bg-ayers-cream rounded-2xl p-5 sm:p-8 relative"
               >
                 <span className="text-6xl font-serif italic font-bold text-ayers-gold/10 absolute top-4 right-6">
                   {item.step}
@@ -265,7 +265,7 @@ export default function Warranty() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-4">
               {t('warranty.careLabel', 'Preserve Your Investment')}
             </p>
-            <h2 className="text-4xl font-serif italic font-bold mb-4">{t('warranty.careTitle', 'Care & Maintenance')}</h2>
+            <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-4">{t('warranty.careTitle', 'Care & Maintenance')}</h2>
             <p className="text-sm text-ayers-ink/50 max-w-lg mx-auto">
               {t('warranty.careDesc', 'Proper care will ensure your Ayers guitar sounds and looks beautiful for generations. Follow these guidelines to protect your instrument.')}
             </p>
@@ -279,7 +279,7 @@ export default function Warranty() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-[2rem] p-8 shadow-sm border border-ayers-ink/5"
+                className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-sm border border-ayers-ink/5"
               >
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="w-10 h-10 rounded-xl bg-ayers-gold/10 flex items-center justify-center">
@@ -310,7 +310,7 @@ export default function Warranty() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-ayers-dark rounded-[2rem] p-10 md:p-16 text-center"
+            className="bg-ayers-dark rounded-2xl sm:rounded-[2rem] p-6 sm:p-10 md:p-16 text-center"
           >
             <Shield className="text-ayers-gold mx-auto mb-6" size={40} strokeWidth={1.5} />
             <h2 className="text-3xl md:text-4xl font-serif italic font-bold text-white mb-4">
@@ -322,13 +322,13 @@ export default function Warranty() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 to="/contact"
-                className="inline-flex items-center bg-ayers-gold text-white px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-ayers-dark transition-all"
+                className="inline-flex items-center bg-ayers-gold text-white px-6 sm:px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-ayers-dark transition-all"
               >
                 {t('warranty.ctaContact', 'Contact Support')}
               </Link>
               <a
                 href="mailto:service@ayersguitars.com"
-                className="inline-flex items-center bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:border-ayers-gold hover:text-ayers-gold transition-all"
+                className="inline-flex items-center bg-transparent border-2 border-white/30 text-white px-6 sm:px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:border-ayers-gold hover:text-ayers-gold transition-all"
               >
                 service@ayersguitars.com
               </a>

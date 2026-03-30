@@ -90,7 +90,7 @@ export default function Login() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="text-5xl font-serif italic font-bold text-ayers-ink"
+            className="text-3xl sm:text-5xl font-serif italic font-bold text-ayers-ink"
           >
             Ayers
           </motion.h1>
@@ -135,7 +135,7 @@ export default function Login() {
           </div>
 
           {/* Form area */}
-          <div className="p-8 sm:p-10">
+          <div className="p-5 sm:p-10">
             {/* Error message */}
             <AnimatePresence mode="wait">
               {error && (
@@ -164,7 +164,7 @@ export default function Login() {
               >
                 {/* Register: name fields */}
                 {mode === 'register' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-ayers-ink/40 mb-2">
                         {t('login.firstName')}

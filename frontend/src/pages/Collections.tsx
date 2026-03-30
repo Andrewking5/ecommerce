@@ -153,7 +153,7 @@ function HeroBannerCarousel() {
               </p>
               <Link
                 to={banner.cta.link}
-                className="inline-flex items-center gap-2 bg-ayers-gold text-white px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-ayers-dark transition-all duration-300"
+                className="inline-flex items-center gap-2 bg-ayers-gold text-white px-6 sm:px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-ayers-dark transition-all duration-300"
               >
                 {t(`collections.banner_${banner.id}_cta`, banner.cta.text)}
                 <ChevronRight size={14} />

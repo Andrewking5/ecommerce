@@ -94,7 +94,7 @@ export default function OrderTracking() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
           <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-4">{t('tracking.title')}</p>
-          <h1 className="text-4xl md:text-5xl font-serif italic font-bold mb-4">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif italic font-bold mb-4">
             Order #{order.id.substring(0, 8).toUpperCase()}
           </h1>
           <p className="text-sm text-ayers-ink/50">{t('tracking.placedOn')} {formatDate(order.createdAt)}</p>
@@ -109,7 +109,7 @@ export default function OrderTracking() {
         )}
 
         {!isCancelled && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-8">
             <div className="relative">
               {ORDER_STEPS.map((step, i) => {
                 const isActive = i <= currentStep;
@@ -172,7 +172,7 @@ export default function OrderTracking() {
           </motion.div>
         )}
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-8">
           <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-ayers-gold mb-6">{t('tracking.orderItems')}</h2>
           <div className="space-y-4">
             {order.orderItems.map((item) => (

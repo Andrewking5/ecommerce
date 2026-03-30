@@ -39,7 +39,7 @@ export default function ForgotPassword() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-serif italic font-bold text-ayers-ink mb-3">
+          <h1 className="text-2xl sm:text-4xl font-serif italic font-bold text-ayers-ink mb-3">
             {t('forgotPassword.title', 'Reset Password')}
           </h1>
           <p className="text-sm text-ayers-ink/50">

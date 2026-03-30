@@ -124,7 +124,7 @@ export default function Shipping() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-6">
               {t('shipping.label', 'Delivery & Returns')}
             </p>
-            <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
               {t('shipping.title', 'Shipping & Returns')}
             </h1>
             <p className="text-lg text-white/50 max-w-2xl mx-auto">
@@ -164,7 +164,7 @@ export default function Shipping() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5"
+            className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5"
           >
             <div className="flex items-center space-x-4 mb-8">
               <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center">
@@ -221,7 +221,7 @@ export default function Shipping() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5"
+            className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5"
           >
             <div className="flex items-center space-x-4 mb-8">
               <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center">
@@ -291,7 +291,7 @@ export default function Shipping() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-4">
               {t('shipping.returnLabel', 'Satisfaction Guaranteed')}
             </p>
-            <h2 className="text-4xl font-serif italic font-bold mb-4">{t('shipping.returnTitle', 'Return Policy')}</h2>
+            <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-4">{t('shipping.returnTitle', 'Return Policy')}</h2>
             <p className="text-sm text-ayers-ink/50 max-w-lg mx-auto">
               {t('shipping.returnDesc', 'We want you to be completely happy with your Ayers instrument. If you are not satisfied, we offer a straightforward 30-day return policy.')}
             </p>
@@ -303,7 +303,7 @@ export default function Shipping() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-ayers-cream rounded-2xl p-8"
+              className="bg-ayers-cream rounded-2xl p-5 sm:p-8"
             >
               <h3 className="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                 <CheckCircle className="text-green-500" size={16} />
@@ -329,7 +329,7 @@ export default function Shipping() {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-ayers-cream rounded-2xl p-8"
+              className="bg-ayers-cream rounded-2xl p-5 sm:p-8"
             >
               <h3 className="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                 <AlertCircle className="text-red-400" size={16} />
@@ -369,7 +369,7 @@ export default function Shipping() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-ayers-cream rounded-2xl p-8 relative"
+                  className="bg-ayers-cream rounded-2xl p-5 sm:p-8 relative"
                 >
                   <span className="text-6xl font-serif italic font-bold text-ayers-gold/10 absolute top-4 right-6">
                     {item.step}
@@ -406,13 +406,13 @@ export default function Shipping() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 to="/contact"
-                className="inline-flex items-center bg-ayers-gold text-white px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-ayers-dark transition-all"
+                className="inline-flex items-center bg-ayers-gold text-white px-6 sm:px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-ayers-dark transition-all"
               >
                 {t('shipping.ctaContact', 'Contact Us')} <ArrowRight size={16} className="ml-2" />
               </Link>
               <a
                 href="mailto:service@ayersguitars.com"
-                className="inline-flex items-center bg-transparent border-2 border-ayers-ink/20 text-ayers-ink px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:border-ayers-gold hover:text-ayers-gold transition-all"
+                className="inline-flex items-center bg-transparent border-2 border-ayers-ink/20 text-ayers-ink px-6 sm:px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest hover:border-ayers-gold hover:text-ayers-gold transition-all"
               >
                 service@ayersguitars.com
               </a>

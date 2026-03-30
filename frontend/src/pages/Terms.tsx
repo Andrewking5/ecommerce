@@ -98,7 +98,7 @@ export default function Terms() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-6">
               {t('terms.heroLabel', 'Legal')}
             </p>
-            <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
               {t('terms.heroTitle', 'Terms of Service')}
             </h1>
             <p className="text-lg text-white/50 max-w-2xl mx-auto">
@@ -119,7 +119,7 @@ export default function Terms() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-16"
+            className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5 mb-16"
           >
             <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-ayers-gold mb-6">
               {t('terms.tableOfContents', 'Table of Contents')}
@@ -150,7 +150,7 @@ export default function Terms() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5"
+                className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5"
               >
                 <div className="flex items-center space-x-4 mb-8">
                   <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center">

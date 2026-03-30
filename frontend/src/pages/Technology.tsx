@@ -32,7 +32,7 @@ export default function Technology() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-serif italic font-bold mb-6"
+            className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold mb-6"
           >
             AYERS 2.0: <br />
             {t('tech.heroTitle', '重新定義聲學卓越')}
@@ -68,7 +68,7 @@ export default function Technology() {
             </div>
 
             <div>
-              <h2 className="text-4xl font-serif italic font-bold mb-8">{t('tech.bracingTitle', 'The Ayers 2.0 Bracing System')}</h2>
+              <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-8">{t('tech.bracingTitle', 'The Ayers 2.0 Bracing System')}</h2>
               <div className="space-y-8">
                 <FeatureItem
                   icon={<Zap className="text-ayers-gold" />}
@@ -95,7 +95,7 @@ export default function Technology() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl font-serif italic font-bold mb-6">{t('tech.lacquerTitle', '七層 PU 漆工藝')}</h2>
+            <h2 className="text-2xl sm:text-4xl font-serif italic font-bold mb-6">{t('tech.lacquerTitle', '七層 PU 漆工藝')}</h2>
             <p className="text-lg text-ayers-ink/60">{t('tech.lacquerDesc', '手工噴塗七層 PU 漆，堅持傳統 Dovetail 榫接工法，賦予每把琴獨特的光澤與保護。')}</p>
           </div>
 
@@ -105,7 +105,7 @@ export default function Technology() {
             <ProcessStep number="03" title={t('tech.step3Title', 'TFT 認證木材')} desc={t('tech.step3Desc', '所有木材均通過 TFT（The Forest Trust）認證，確保永續來源。琴身七層 PU 漆、琴頸 NC 軟漆分開處理。')} />
           </div>
 
-          <div className="mt-16 aspect-[21/9] rounded-[3rem] overflow-hidden">
+          <div className="mt-16 aspect-[21/9] rounded-2xl sm:rounded-[3rem] overflow-hidden">
             <OptimizedImage
               src="/images/products/wave/a05c-wave-detail.jpg"
               alt={t('tech.workshopAlt', 'Ayers 工坊')}
@@ -150,8 +150,8 @@ function FeatureItem({ icon, title, desc }: { icon: React.ReactNode, title: stri
 
 function ProcessStep({ number, title, desc }: { number: string, title: string, desc: string }) {
   return (
-    <div className="p-10 bg-ayers-cream rounded-3xl border border-ayers-ink/5 hover:border-ayers-gold transition-colors group">
-      <span className="text-4xl font-serif italic font-bold text-ayers-gold/20 group-hover:text-ayers-gold transition-colors mb-6 block">{number}</span>
+    <div className="p-6 sm:p-10 bg-ayers-cream rounded-2xl sm:rounded-3xl border border-ayers-ink/5 hover:border-ayers-gold transition-colors group">
+      <span className="text-2xl sm:text-4xl font-serif italic font-bold text-ayers-gold/20 group-hover:text-ayers-gold transition-colors mb-6 block">{number}</span>
       <h3 className="text-xl font-bold mb-4">{title}</h3>
       <p className="text-sm text-ayers-ink/60 leading-relaxed">{desc}</p>
     </div>

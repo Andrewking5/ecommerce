@@ -24,12 +24,12 @@ export default function Support() {
     <div className="bg-ayers-cream min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="text-center mb-16 bg-ayers-dark text-white p-16 rounded-[3rem] relative overflow-hidden">
+        <header className="text-center mb-16 bg-ayers-dark text-white p-8 sm:p-16 rounded-2xl sm:rounded-[3rem] relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-ayers-gold via-transparent to-transparent" />
           </div>
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-serif italic font-bold mb-8">{t('support.title')}</h1>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif italic font-bold mb-8">{t('support.title')}</h1>
             <div className="relative">
               <input
                 type="text"
@@ -43,7 +43,7 @@ export default function Support() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-12">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-12">
             {/* Categories */}
@@ -55,7 +55,7 @@ export default function Support() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-white p-10 rounded-[2rem] shadow-sm hover:shadow-xl transition-all cursor-pointer group border border-ayers-ink/5"
+                  className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[2rem] shadow-sm hover:shadow-xl transition-all cursor-pointer group border border-ayers-ink/5"
                 >
                   <div className="w-16 h-16 bg-ayers-cream rounded-2xl flex items-center justify-center mb-6 group-hover:bg-ayers-gold group-hover:text-white transition-colors">
                     {cat.icon}
@@ -70,7 +70,7 @@ export default function Support() {
             </div>
 
             {/* Instrument Care */}
-            <section className="bg-white p-12 rounded-[3rem] shadow-sm border border-ayers-ink/5">
+            <section className="bg-white p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] shadow-sm border border-ayers-ink/5">
               <div className="flex items-center space-x-4 mb-12">
                 <div className="w-12 h-12 bg-ayers-gold/10 rounded-full flex items-center justify-center text-ayers-gold">
                   <Wrench size={24} />
@@ -121,7 +121,7 @@ export default function Support() {
 
           {/* Sidebar Contact */}
           <aside className="space-y-6">
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-ayers-ink/5 space-y-6">
+            <div className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm border border-ayers-ink/5 space-y-6">
               <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">{t('support.needMoreHelp', 'Need more help?')}</h3>
               <a href="https://line.me/R/ti/p/@868lgkhc" target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-4 bg-ayers-cream rounded-2xl hover:bg-ayers-gold hover:text-white transition-all group">
                 <div className="flex items-center space-x-4">

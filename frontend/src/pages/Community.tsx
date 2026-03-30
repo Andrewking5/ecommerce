@@ -92,7 +92,7 @@ export default function Community() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl"
           >
-            <h1 className="text-5xl md:text-7xl font-serif italic font-bold mb-6">{t('community.title', 'Ayers Artist Gallery & Community')}</h1>
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold mb-6">{t('community.title', 'Ayers Artist Gallery & Community')}</h1>
             <p className="text-xl text-white/70 font-light tracking-wide">{t('community.subtitle', 'Hear the stories. Feel the sound. Join the family.')}</p>
           </motion.div>
         </div>
@@ -102,7 +102,7 @@ export default function Community() {
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold uppercase tracking-[0.3em] mb-16">{t('community.artistsTitle', 'Professional Artists & Performances')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-12">
             {ARTISTS_DATA.map((artist, i) => (
               <motion.div
                 key={artist.nameKey}
@@ -112,7 +112,7 @@ export default function Community() {
                 transition={{ delay: i * 0.1 }}
                 className="group cursor-pointer"
               >
-                <div className="relative aspect-[4/5] rounded-3xl overflow-hidden mb-6">
+                <div className="relative aspect-[4/5] rounded-2xl sm:rounded-3xl overflow-hidden mb-6">
                   <OptimizedImage
                     src={artist.img}
                     alt={t(artist.nameKey, artist.nameFallback)}
@@ -158,12 +158,12 @@ export default function Community() {
               <h2 className="text-3xl font-bold uppercase tracking-[0.3em] mb-4">{t('community.galleryTitle', 'User Gallery: Your Ayers Story')}</h2>
               <p className="text-white/50">{t('community.galleryDesc', 'Share your moments with us! Tag @ayersguitar to be featured.')}</p>
             </div>
-            <button className="bg-ayers-gold text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all">
+            <button className="bg-ayers-gold text-white px-6 sm:px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-opacity-90 transition-all">
               {t('community.uploadStory', 'Upload Your Story')}
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {USER_GALLERY.map((item, i) => (
               <motion.div
                 key={i}

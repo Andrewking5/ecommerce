@@ -64,7 +64,7 @@ export default function Contact() {
             <p className="text-xs font-bold uppercase tracking-[0.4em] text-ayers-gold mb-6">
               {t('contact.getInTouch')}
             </p>
-            <h1 className="text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-serif italic font-bold text-white mb-6">
               {t('contact.title')}
             </h1>
             <p className="text-lg text-white/50 max-w-2xl mx-auto">
@@ -128,7 +128,7 @@ export default function Contact() {
       {/* Form + Sidebar */}
       <section className="pb-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12">
             {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -136,7 +136,7 @@ export default function Contact() {
               viewport={{ once: true }}
               className="lg:col-span-2"
             >
-              <div className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5">
+              <div className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5">
                 <h2 className="text-2xl font-serif italic font-bold mb-2">{t('contact.sendMessage')}</h2>
                 <p className="text-sm text-ayers-ink/50 mb-8">
                   {t('contact.formSubtitle', 'Fill out the form below and our team will get back to you promptly.')}
@@ -180,7 +180,7 @@ export default function Contact() {
                           placeholder={t('contact.namePlaceholder', 'Your name')}
                           value={formData.name}
                           onChange={(e) => handleChange('name', e.target.value)}
-                          className="w-full bg-ayers-cream border-none rounded-xl py-4 px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20"
+                          className="w-full bg-ayers-cream border-none rounded-xl py-3 px-4 sm:py-4 sm:px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20"
                         />
                       </div>
                       <div className="space-y-2">
@@ -193,7 +193,7 @@ export default function Contact() {
                           placeholder="you@email.com"
                           value={formData.email}
                           onChange={(e) => handleChange('email', e.target.value)}
-                          className="w-full bg-ayers-cream border-none rounded-xl py-4 px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20"
+                          className="w-full bg-ayers-cream border-none rounded-xl py-3 px-4 sm:py-4 sm:px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20"
                         />
                       </div>
                     </div>
@@ -206,7 +206,7 @@ export default function Contact() {
                         required
                         value={formData.subject}
                         onChange={(e) => handleChange('subject', e.target.value)}
-                        className="w-full bg-ayers-cream border-none rounded-xl py-4 px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all appearance-none"
+                        className="w-full bg-ayers-cream border-none rounded-xl py-3 px-4 sm:py-4 sm:px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all appearance-none"
                       >
                         <option value="">{t('contact.selectSubject')}</option>
                         <option value="general">{t('contact.generalInquiry')}</option>
@@ -230,7 +230,7 @@ export default function Contact() {
                         placeholder={t('contact.messagePlaceholder')}
                         value={formData.message}
                         onChange={(e) => handleChange('message', e.target.value)}
-                        className="w-full bg-ayers-cream border-none rounded-xl py-4 px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20 resize-none"
+                        className="w-full bg-ayers-cream border-none rounded-xl py-3 px-4 sm:py-4 sm:px-6 text-sm focus:ring-2 focus:ring-ayers-gold transition-all placeholder:text-ayers-ink/20 resize-none"
                       />
                     </div>
 
@@ -255,10 +255,10 @@ export default function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="space-y-8"
+              className="space-y-4 sm:space-y-8"
             >
               {/* Dealer Inquiries */}
-              <div className="bg-ayers-dark rounded-[2rem] p-8 text-white">
+              <div className="bg-ayers-dark rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 text-white">
                 <div className="w-10 h-10 rounded-xl bg-ayers-gold/20 flex items-center justify-center mb-4">
                   <Building2 className="text-ayers-gold" size={20} />
                 </div>
@@ -285,7 +285,7 @@ export default function Contact() {
               </div>
 
               {/* Quick Links */}
-              <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-ayers-ink/5">
+              <div className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-sm border border-ayers-ink/5">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-ayers-gold mb-6">
                   {t('contact.helpfulLinks', 'Helpful Links')}
                 </h3>
@@ -311,7 +311,7 @@ export default function Contact() {
               </div>
 
               {/* Business Hours */}
-              <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-ayers-ink/5">
+              <div className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-sm border border-ayers-ink/5">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-ayers-gold mb-6">
                   {t('contact.businessHoursGmt', 'Business Hours (GMT+8)')}
                 </h3>
@@ -343,7 +343,7 @@ export default function Contact() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-ayers-dark rounded-[2rem] overflow-hidden relative"
+            className="bg-ayers-dark rounded-2xl sm:rounded-[2rem] overflow-hidden relative"
           >
             <div className="aspect-[21/9] flex items-center justify-center relative">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-ayers-gold/5 via-transparent to-transparent" />

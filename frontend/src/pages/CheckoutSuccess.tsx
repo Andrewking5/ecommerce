@@ -85,7 +85,7 @@ export default function CheckoutSuccess() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-ayers-ink/5 text-left space-y-6 mb-8"
+            className="bg-white rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 md:p-12 shadow-sm border border-ayers-ink/5 text-left space-y-6 mb-8"
           >
             <div className="flex items-start space-x-4">
               <div className="w-10 h-10 rounded-xl bg-ayers-gold/10 flex items-center justify-center flex-shrink-0">
@@ -112,13 +112,13 @@ export default function CheckoutSuccess() {
           >
             <Link
               to="/account"
-              className="inline-flex items-center bg-ayers-gold text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-opacity-90 transition-all"
+              className="inline-flex items-center bg-ayers-gold text-white px-6 sm:px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-opacity-90 transition-all"
             >
               {t('checkoutSuccess.viewOrders')} <ArrowRight size={16} className="ml-2" />
             </Link>
             <Link
               to="/collections"
-              className="inline-flex items-center bg-transparent border-2 border-ayers-ink/20 text-ayers-ink px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm hover:border-ayers-gold hover:text-ayers-gold transition-all"
+              className="inline-flex items-center bg-transparent border-2 border-ayers-ink/20 text-ayers-ink px-6 sm:px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm hover:border-ayers-gold hover:text-ayers-gold transition-all"
             >
               {t('checkoutSuccess.continueShopping')}
             </Link>
