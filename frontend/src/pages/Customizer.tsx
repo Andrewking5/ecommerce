@@ -1345,16 +1345,16 @@ export default function Customizer() {
                       return acc + (opt?.add || 0);
                     }, 0);
                     return (
-                      <div key={section.titleKey} className="rounded-xl border border-white/[0.04] overflow-hidden">
-                        {/* Section header — clickable on mobile */}
+                      <div key={section.titleKey} className="rounded-xl border border-white/10 overflow-hidden">
+                        {/* Section header — clickable accordion */}
                         <button
                           onClick={() => setExpandedSections(prev => ({ ...prev, [section.titleKey]: !prev[section.titleKey] }))}
-                          className="w-full flex items-center gap-2 px-3 py-2.5 lg:py-2 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                          className="w-full flex items-center gap-2.5 px-4 py-3 bg-white/[0.06] active:bg-white/[0.1] transition-colors"
                         >
-                          <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-ayers-gold/50 flex-1 text-left">{t(section.titleKey)}</span>
-                          <span className="text-[9px] text-white/30 font-medium">{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
-                          {sectionAdd > 0 && <span className="text-[8px] text-ayers-gold/40 font-bold">+US${sectionAdd.toLocaleString()}</span>}
-                          <ChevronDown size={12} className={cn('text-white/30 transition-transform duration-200', isExpanded && 'rotate-180')} />
+                          <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/80 flex-1 text-left">{t(section.titleKey)}</span>
+                          <span className="text-[10px] text-white/40 font-medium">{itemCount}</span>
+                          {sectionAdd > 0 && <span className="text-[9px] text-ayers-gold/60 font-bold">+${sectionAdd.toLocaleString()}</span>}
+                          <ChevronDown size={14} className={cn('text-white/50 transition-transform duration-200', isExpanded && 'rotate-180')} />
                         </button>
                         {/* Section content */}
                         <AnimatePresence initial={false}>
