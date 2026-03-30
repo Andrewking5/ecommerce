@@ -233,37 +233,6 @@ export default function Navbar() {
               )}
             </nav>
 
-            {/* Bottom: account + language */}
-            <div
-              className={cn(
-                "mt-auto pt-8 flex items-center justify-between transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                isMenuVisible
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-8 opacity-0"
-              )}
-              style={{ transitionDelay: isMenuVisible ? `${150 + (navLinks.length + 1) * 70}ms` : '0ms' }}
-            >
-              <div className="flex items-center space-x-5">
-                {isAuthenticated ? (
-                  <LocalizedLink to="/account" onClick={closeMenu} className="flex items-center space-x-3">
-                    {user?.avatar ? (
-                      <img src={user.avatar} alt="" className="w-8 h-8 rounded-full object-cover ring-1 ring-white/20" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">
-                        {user?.firstName?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                    <span className="text-sm text-white/60">{user?.firstName || t('nav.account')}</span>
-                  </LocalizedLink>
-                ) : (
-                  <LocalizedLink to="/login" onClick={closeMenu} className="flex items-center space-x-3 text-white/60 hover:text-white transition-colors">
-                    <User size={20} />
-                    <span className="text-sm">{t('nav.login')}</span>
-                  </LocalizedLink>
-                )}
-              </div>
-              <LanguageSwitcher isDark={true} />
-            </div>
           </div>
         </div>,
         document.body
@@ -357,6 +326,7 @@ export default function Navbar() {
 
             {/* Mobile icons + hamburger */}
             <div className="md:hidden flex items-center space-x-3">
+              <LanguageSwitcher isDark={isDark} />
               {isAuthenticated ? (
                 <LocalizedLink to="/account" className="p-2 hover:opacity-70 transition-opacity">
                   {user?.avatar ? (

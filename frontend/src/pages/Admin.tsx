@@ -4,7 +4,7 @@ import {
   ChevronRight, TrendingUp, BarChart3, Package, Plus,
   Trash2, RefreshCw, Edit, AlertTriangle, CheckCircle, XCircle,
   Upload, Download, FileSpreadsheet, X, Image, ChevronUp, ChevronDown,
-  Eye, EyeOff, Save, MessageSquare, Star, Ticket,
+  Eye, EyeOff, Save, MessageSquare, Star, Ticket, Megaphone,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/src/lib/utils';
@@ -46,16 +46,30 @@ const STATUS_COLORS: Record<string, string> = {
 
 type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons';
 
-const SIDEBAR_ITEMS: { id: Tab; icon: React.ReactNode; labelKey: string }[] = [
+type SidebarItem =
+  | { id: Tab; icon: React.ReactNode; labelKey: string; children?: never }
+  | { id: string; icon: React.ReactNode; labelKey: string; children: { id: Tab; labelKey: string }[] };
+
+const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'dashboard', icon: <LayoutDashboard size={18} />, labelKey: 'admin.sidebar.dashboard' },
   { id: 'orders', icon: <ShoppingBag size={18} />, labelKey: 'admin.sidebar.orders' },
-  { id: 'products', icon: <Package size={18} />, labelKey: 'admin.sidebar.products' },
-  { id: 'categories', icon: <Box size={18} />, labelKey: 'admin.sidebar.categories' },
-  { id: 'inventory', icon: <BarChart3 size={18} />, labelKey: 'admin.sidebar.inventory' },
+  {
+    id: 'products-group', icon: <Package size={18} />, labelKey: 'admin.sidebar.products',
+    children: [
+      { id: 'products', labelKey: 'admin.sidebar.productsList' },
+      { id: 'categories', labelKey: 'admin.sidebar.categories' },
+      { id: 'inventory', labelKey: 'admin.sidebar.inventory' },
+    ],
+  },
   { id: 'customers', icon: <Users size={18} />, labelKey: 'admin.sidebar.customers' },
-  { id: 'banners', icon: <Image size={18} />, labelKey: 'admin.sidebar.banners' },
-  { id: 'reviews', icon: <MessageSquare size={18} />, labelKey: 'admin.sidebar.reviews' },
-  { id: 'coupons', icon: <Ticket size={18} />, labelKey: 'admin.sidebar.coupons' },
+  {
+    id: 'marketing-group', icon: <Megaphone size={18} />, labelKey: 'admin.sidebar.marketing',
+    children: [
+      { id: 'banners', labelKey: 'admin.sidebar.banners' },
+      { id: 'coupons', labelKey: 'admin.sidebar.coupons' },
+      { id: 'reviews', labelKey: 'admin.sidebar.reviews' },
+    ],
+  },
 ];
 
 /* ─── Main ─── */
@@ -65,6 +79,13 @@ export default function Admin() {
   const { user, isAuthenticated, isLoading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (groupId: string) =>
+    setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+
+  const isGroupActive = (item: SidebarItem) =>
+    item.children?.some((c) => c.id === activeTab) ?? false;
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || !isAdmin)) navigate('/login');
@@ -76,29 +97,73 @@ export default function Admin() {
   return (
     <div className="min-h-screen text-white flex flex-col lg:flex-row" style={{ background: ESPRESSO_DARK }}>
       {/* ── Sidebar ── */}
-      <aside className="w-full lg:w-64 flex-shrink-0 border-r border-white/5 flex flex-col" style={{ background: ESPRESSO }}>
-        <div className="p-6 border-b border-white/5">
+      <aside className="w-full lg:w-64 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col" style={{ background: ESPRESSO }}>
+        <div className="hidden lg:block p-6 border-b border-white/5">
           <h1 className="text-sm font-bold uppercase tracking-[0.25em] text-ayers-gold">{t('admin.panel')}</h1>
           <p className="text-[10px] text-white/30 mt-1">{t('admin.brandName')}</p>
         </div>
-        <nav className="flex-grow p-4 space-y-1">
-          {SIDEBAR_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all',
-                activeTab === item.id
-                  ? 'bg-ayers-gold/10 text-ayers-gold'
-                  : 'text-white/35 hover:bg-white/5 hover:text-white/70'
-              )}
-            >
-              {item.icon}
-              {t(item.labelKey)}
-            </button>
-          ))}
+        <nav className="flex-grow p-2 lg:p-4 lg:space-y-1 flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1 lg:gap-0 scrollbar-hide">
+          {SIDEBAR_ITEMS.map((item) =>
+            item.children ? (
+              <div key={item.id} className="lg:w-full">
+                <button
+                  onClick={() => toggleGroup(item.id)}
+                  className={cn(
+                    'flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[10px] lg:text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap lg:w-full',
+                    isGroupActive(item) ? 'text-ayers-gold' : 'text-white/35 hover:bg-white/5 hover:text-white/70'
+                  )}
+                >
+                  {item.icon}
+                  <span className="flex-1 text-left">{t(item.labelKey)}</span>
+                  <ChevronDown size={14} className={cn('hidden lg:block transition-transform', (expandedGroups[item.id] || isGroupActive(item)) && 'rotate-180')} />
+                </button>
+                {/* Desktop: collapsible sub-items */}
+                <div className={cn('hidden lg:flex flex-col ml-7 mt-0.5 space-y-0.5 overflow-hidden transition-all', (expandedGroups[item.id] || isGroupActive(item)) ? 'max-h-40' : 'max-h-0')}>
+                  {item.children.map((child) => (
+                    <button
+                      key={child.id}
+                      onClick={() => setActiveTab(child.id)}
+                      className={cn(
+                        'text-left px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all',
+                        activeTab === child.id ? 'bg-ayers-gold/10 text-ayers-gold' : 'text-white/30 hover:bg-white/5 hover:text-white/60'
+                      )}
+                    >
+                      {t(child.labelKey)}
+                    </button>
+                  ))}
+                </div>
+                {/* Mobile: inline sub-items */}
+                {(expandedGroups[item.id] || isGroupActive(item)) && item.children.map((child) => (
+                  <button
+                    key={child.id}
+                    onClick={() => setActiveTab(child.id)}
+                    className={cn(
+                      'lg:hidden flex items-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap',
+                      activeTab === child.id ? 'bg-ayers-gold/10 text-ayers-gold' : 'text-white/30 hover:bg-white/5 hover:text-white/60'
+                    )}
+                  >
+                    {t(child.labelKey)}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as Tab)}
+                className={cn(
+                  'flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[10px] lg:text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap lg:w-full',
+                  activeTab === item.id
+                    ? 'bg-ayers-gold/10 text-ayers-gold'
+                    : 'text-white/35 hover:bg-white/5 hover:text-white/70'
+                )}
+              >
+                {item.icon}
+                {t(item.labelKey)}
+              </button>
+            )
+          )}
         </nav>
-        <div className="p-4 border-t border-white/5 flex items-center gap-3">
+        <div className="hidden lg:flex p-4 border-t border-white/5 items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-ayers-gold/20 flex items-center justify-center text-ayers-gold">
             <User size={14} />
           </div>
@@ -110,7 +175,7 @@ export default function Admin() {
       </aside>
 
       {/* ── Main Content ── */}
-      <main className="flex-grow p-6 lg:p-10 overflow-y-auto">
+      <main className="flex-grow p-4 sm:p-6 lg:p-10 overflow-y-auto">
         {activeTab === 'dashboard' && <DashboardTab />}
         {activeTab === 'orders' && <OrdersTab />}
         {activeTab === 'products' && <ProductsTab />}
@@ -188,10 +253,10 @@ function DashboardTab() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold uppercase tracking-[0.2em] mb-8">{t('admin.dashboard.title')}</h2>
+      <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em] mb-6 sm:mb-8">{t('admin.dashboard.title')}</h2>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((s, i) => (
           <motion.div
             key={s.label}
@@ -200,7 +265,7 @@ function DashboardTab() {
             className="p-5 rounded-2xl border border-white/5" style={{ background: CARD_BG }}
           >
             <div className={cn('mb-3', s.color)}>{s.icon}</div>
-            <p className="text-2xl font-bold">{loading ? '…' : s.value}</p>
+            <p className="text-xl sm:text-2xl font-bold">{loading ? '…' : s.value}</p>
             <p className="text-[10px] uppercase tracking-widest text-white/30 mt-1">{s.label}</p>
           </motion.div>
         ))}
@@ -278,8 +343,8 @@ function OrdersTab() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.orders.title')}</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.orders.title')}</h2>
         <button onClick={fetchOrders} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={16} /></button>
       </div>
       <Card>
@@ -453,7 +518,7 @@ function ProductsTab() {
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.products.title')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.products.title')}</h2>
         <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={openNewProduct}
@@ -477,7 +542,7 @@ function ProductsTab() {
             <input
               value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder={t('admin.products.searchPlaceholder')}
-              className="bg-white/5 border border-white/10 rounded-full py-2 px-8 text-xs focus:outline-none focus:border-ayers-gold transition-all w-48"
+              className="bg-white/5 border border-white/10 rounded-full py-2 px-8 text-xs focus:outline-none focus:border-ayers-gold transition-all w-full sm:w-48"
             />
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" size={12} />
           </div>
@@ -490,7 +555,7 @@ function ProductsTab() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !saving && setEditingProduct(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-4 sm:p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -778,7 +843,7 @@ function CategoriesTab() {
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.sidebar.categories', '商品分類')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.sidebar.categories', '商品分類')}</h2>
         <div className="flex items-center gap-3">
           <button onClick={fetchCategories} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={14} /></button>
           <button
@@ -795,7 +860,7 @@ function CategoriesTab() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !saving && setEditingCat(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-6 max-w-lg w-full shadow-2xl"
+            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-4 sm:p-6 max-w-lg w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -902,7 +967,7 @@ function InventoryTab() {
 
   return (
     <>
-      <h2 className="text-2xl font-bold uppercase tracking-[0.2em] mb-8">{t('admin.inventory.title')}</h2>
+      <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em] mb-6 sm:mb-8">{t('admin.inventory.title')}</h2>
       <Card>
         {loading ? <Spinner /> : (
           <div className="overflow-x-auto">
@@ -1029,12 +1094,12 @@ function CustomersTab() {
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.customers.title')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.customers.title')}</h2>
         <div className="relative">
           <input
             value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder={t('admin.customers.searchPlaceholder')}
-            className="bg-white/5 border border-white/10 rounded-full py-2 px-8 text-xs focus:outline-none focus:border-ayers-gold transition-all w-48"
+            className="bg-white/5 border border-white/10 rounded-full py-2 px-8 text-xs focus:outline-none focus:border-ayers-gold transition-all w-full sm:w-48"
           />
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" size={12} />
         </div>
@@ -1124,7 +1189,7 @@ function CustomersTab() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setViewUser(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -1173,7 +1238,7 @@ function CustomersTab() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !updating && setRoleConfirm(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -1223,7 +1288,7 @@ function CustomersTab() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => !deleting && setDeleteConfirm(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-6 max-w-md w-full shadow-2xl"
+            className="bg-[#2a1f14] border border-white/10 rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -1479,7 +1544,7 @@ function BannersTab() {
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.banners.title')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.banners.title')}</h2>
         <div className="flex items-center gap-3">
           <button onClick={fetchBanners} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={14} /></button>
           <button
@@ -1497,7 +1562,7 @@ function BannersTab() {
           <Card title={editingBanner.id ? '編輯橫幅' : '新增橫幅'} action={
             <button onClick={() => setEditingBanner(null)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
           }>
-            <div className="p-5 space-y-6">
+            <div className="p-4 sm:p-5 space-y-4 sm:space-y-6">
 
               {/* ── Section 1: Basic Info ── */}
               <div>
@@ -1861,7 +1926,7 @@ function CouponsTab() {
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.coupons.title', 'Coupons')}</h2>
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.coupons.title', 'Coupons')}</h2>
         <div className="flex items-center gap-3">
           <button onClick={fetchCoupons} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={14} /></button>
           <button
@@ -2120,8 +2185,8 @@ function ReviewsTab() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.reviews.title', 'Reviews')}</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.reviews.title', 'Reviews')}</h2>
         <div className="flex items-center gap-3">
           <select
             value={filterStatus}
