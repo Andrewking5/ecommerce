@@ -824,12 +824,14 @@
       "dashboard": "ダッシュボード",
       "orders": "注文",
       "products": "商品",
+      "productsList": "商品一覧",
       "inventory": "在庫",
       "customers": "顧客",
       "banners": "バナー",
       "categories": "カテゴリ",
       "reviews": "レビュー管理",
-      "coupons": "クーポン"
+      "coupons": "クーポン",
+      "marketing": "マーケティング"
     },
     "dashboard": {
       "title": "ダッシュボード",

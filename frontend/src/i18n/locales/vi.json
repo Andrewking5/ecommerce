@@ -824,12 +824,14 @@
       "dashboard": "Tổng quan",
       "orders": "Đơn hàng",
       "products": "Sản phẩm",
+      "productsList": "Danh sách sản phẩm",
       "inventory": "Kho hàng",
       "customers": "Khách hàng",
       "banners": "Banner",
       "categories": "Danh mục",
       "reviews": "Đánh giá",
-      "coupons": "Mã giảm giá"
+      "coupons": "Mã giảm giá",
+      "marketing": "Tiếp thị"
     },
     "dashboard": {
       "title": "Tổng quan",

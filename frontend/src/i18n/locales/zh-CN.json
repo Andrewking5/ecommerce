@@ -824,12 +824,14 @@
       "dashboard": "仪表盘",
       "orders": "订单",
       "products": "商品",
+      "productsList": "商品列表",
       "inventory": "库存",
       "customers": "客户",
       "banners": "轮播图",
       "categories": "商品分类",
       "reviews": "评论管理",
-      "coupons": "优惠券"
+      "coupons": "优惠券",
+      "marketing": "营销推广"
     },
     "dashboard": {
       "title": "仪表盘",

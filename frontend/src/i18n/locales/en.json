@@ -826,12 +826,14 @@
       "dashboard": "Dashboard",
       "orders": "Orders",
       "products": "Products",
+      "productsList": "Product List",
       "inventory": "Inventory",
       "customers": "Customers",
       "banners": "Banners",
       "categories": "Categories",
       "reviews": "Reviews",
-      "coupons": "Coupons"
+      "coupons": "Coupons",
+      "marketing": "Marketing"
     },
     "dashboard": {
       "title": "Dashboard",

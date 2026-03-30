@@ -828,12 +828,14 @@
       "dashboard": "儀表板",
       "orders": "訂單",
       "products": "商品",
+      "productsList": "商品列表",
       "categories": "商品分類",
       "inventory": "庫存",
       "customers": "客戶",
       "banners": "輪播圖",
       "reviews": "評論管理",
-      "coupons": "優惠券"
+      "coupons": "優惠券",
+      "marketing": "行銷推廣"
     },
     "dashboard": {
       "title": "儀表板",
