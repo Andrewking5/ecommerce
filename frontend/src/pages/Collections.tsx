@@ -233,7 +233,7 @@ function HeroBannerCarousel() {
 function PageIntro({ onComplete }: { onComplete: () => void }) {
   return (
     <motion.div
-      className="fixed inset-0 z-[100] bg-ayers-cream flex items-center justify-center"
+      className="fixed inset-0 z-[100] bg-ayers-dark flex items-center justify-center"
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
       transition={{ duration: 0.4, delay: 1.2 }}
