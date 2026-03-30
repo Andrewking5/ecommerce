@@ -2,7 +2,7 @@ import { useState, Suspense, useRef, useEffect, useMemo, useCallback } from 'rea
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Environment, ContactShadows, Center, Bounds, Points, PointMaterial } from '@react-three/drei';
-import { ChevronRight, ChevronLeft, ChevronDown, Check, ShoppingCart, Eye, Compass, Maximize2, X, Upload, Link2, Camera, Heart, Users, ArrowRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, ShoppingCart, Eye, Compass, Maximize2, X, Upload, Link2, Camera, Heart, Users, ArrowRight } from 'lucide-react';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import { cn } from '@/src/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -956,7 +956,7 @@ export default function Customizer() {
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shared, setShared] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [specSheetOpen, setSpecSheetOpen] = useState(false);
 
   // Detect mobile (< lg breakpoint)
   useEffect(() => {
@@ -1321,93 +1321,66 @@ export default function Customizer() {
                   <div className="w-5 h-0.5 bg-ayers-gold mt-2" />
                 </div>
 
-                {/* Sectioned options — accordion on mobile, always open on desktop */}
-                <div className="overflow-y-auto flex-1 px-5 py-2 space-y-1.5">
+                {/* Mobile: button to open fullscreen spec sheet */}
+                <div className="flex-1 min-h-0 flex flex-col lg:hidden px-5 py-3">
+                  <button
+                    onClick={() => setSpecSheetOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/10 bg-white/[0.04] active:bg-white/[0.08] transition-colors"
+                  >
+                    <Eye size={14} className="text-ayers-gold/70" />
+                    <span className="text-[12px] font-bold uppercase tracking-wider text-white/70">{t('customizer.viewAllSpecs', '查看完整規格')}</span>
+                    <ChevronRight size={14} className="text-white/30" />
+                  </button>
+                </div>
+
+                {/* Desktop: inline sectioned list (unchanged) */}
+                <div className="overflow-y-auto flex-1 px-5 py-2 space-y-3 hidden lg:block">
                   {SUMMARY_SECTIONS.map(section => {
                     const sectionStages = STAGES.filter(s => section.stageIds.includes(s.id));
                     const sectionFields = sectionStages.flatMap(s => getVisibleFields(s, guitarType));
                     if (sectionFields.length === 0) return null;
-                    // Count items in this section
-                    const itemCount = sectionFields.reduce((acc, f) => {
-                      if (f.multi) {
-                        return acc + (selections[f.key] || '').split(',').filter(Boolean).length;
-                      }
-                      return acc + (selections[f.key] ? 1 : 0);
-                    }, 0);
-                    const isExpanded = expandedSections[section.titleKey] ?? false;
-                    // Sum add-on price for this section
-                    const sectionAdd = sectionFields.reduce((acc, f) => {
-                      if (f.multi) {
-                        const ids = (selections[f.key] || '').split(',').filter(Boolean);
-                        return acc + f.options.filter(o => ids.includes(o.id)).reduce((s, o) => s + o.add, 0);
-                      }
-                      const opt = f.options.find(o => o.id === selections[f.key]);
-                      return acc + (opt?.add || 0);
-                    }, 0);
                     return (
-                      <div key={section.titleKey} className="rounded-xl border border-white/10 overflow-hidden">
-                        {/* Section header — clickable accordion */}
-                        <button
-                          onClick={() => setExpandedSections(prev => ({ ...prev, [section.titleKey]: !prev[section.titleKey] }))}
-                          className="w-full flex items-center gap-2.5 px-4 py-3 bg-white/[0.06] active:bg-white/[0.1] transition-colors"
-                        >
-                          <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/80 flex-1 text-left">{t(section.titleKey)}</span>
-                          <span className="text-[10px] text-white/40 font-medium">{itemCount}</span>
-                          {sectionAdd > 0 && <span className="text-[9px] text-ayers-gold/60 font-bold">+${sectionAdd.toLocaleString()}</span>}
-                          <ChevronDown size={14} className={cn('text-white/50 transition-transform duration-200', isExpanded && 'rotate-180')} />
-                        </button>
-                        {/* Section content */}
-                        <AnimatePresence initial={false}>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-3 pb-2.5 space-y-1">
-                                {sectionFields.map(f => {
-                                  if (f.multi) {
-                                    const selectedIds = (selections[f.key] || '').split(',').filter(Boolean);
-                                    const selectedOpts = f.options.filter(o => selectedIds.includes(o.id));
-                                    if (selectedOpts.length === 0) return null;
-                                    return selectedOpts.map(opt => (
-                                      <div key={opt.id} className="flex items-center gap-2.5 py-1">
-                                        <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center flex-shrink-0 text-[10px]">✓</div>
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
-                                          <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
-                                        </div>
-                                        {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
-                                      </div>
-                                    ));
-                                  }
-                                  const opt = f.options.find(o => o.id === selections[f.key]);
-                                  if (!opt) return null;
-                                  return (
-                                    <div key={f.key} className="flex items-center gap-2.5 py-1">
-                                      {opt.img ? (
-                                        <div className="w-7 h-7 rounded-md overflow-hidden bg-white/5 flex-shrink-0">
-                                          <img src={opt.img} alt="" className="w-full h-full object-contain" />
-                                        </div>
-                                      ) : opt.swatch ? (
-                                        <div className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-white/10" style={{ backgroundColor: opt.swatch }} />
-                                      ) : (
-                                        <div className="w-7 h-7 rounded-md bg-white/5 flex-shrink-0" />
-                                      )}
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
-                                        <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
-                                      </div>
-                                      {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
-                                    </div>
-                                  );
-                                })}
+                      <div key={section.titleKey}>
+                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-ayers-gold/40">{t(section.titleKey)}</span>
+                        <div className="mt-1.5 space-y-1">
+                          {sectionFields.map(f => {
+                            if (f.multi) {
+                              const selectedIds = (selections[f.key] || '').split(',').filter(Boolean);
+                              const selectedOpts = f.options.filter(o => selectedIds.includes(o.id));
+                              if (selectedOpts.length === 0) return null;
+                              return selectedOpts.map(opt => (
+                                <div key={opt.id} className="flex items-center gap-2.5 py-1">
+                                  <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center flex-shrink-0 text-[10px]">✓</div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
+                                    <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
+                                  </div>
+                                  {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
+                                </div>
+                              ));
+                            }
+                            const opt = f.options.find(o => o.id === selections[f.key]);
+                            if (!opt) return null;
+                            return (
+                              <div key={f.key} className="flex items-center gap-2.5 py-1">
+                                {opt.img ? (
+                                  <div className="w-7 h-7 rounded-md overflow-hidden bg-white/5 flex-shrink-0">
+                                    <img src={opt.img} alt="" className="w-full h-full object-contain" />
+                                  </div>
+                                ) : opt.swatch ? (
+                                  <div className="w-7 h-7 rounded-md flex-shrink-0 ring-1 ring-white/10" style={{ backgroundColor: opt.swatch }} />
+                                ) : (
+                                  <div className="w-7 h-7 rounded-md bg-white/5 flex-shrink-0" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[11px] text-white/70 font-medium">{t(opt.nameKey)}</p>
+                                  <p className="text-[8px] text-white/20">{t(f.labelKey)}</p>
+                                </div>
+                                {opt.add > 0 && <span className="text-[8px] text-ayers-gold/40">+US${opt.add.toLocaleString()}</span>}
                               </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                            );
+                          })}
+                        </div>
                       </div>
                     );
                   })}
@@ -1575,6 +1548,100 @@ export default function Customizer() {
         </div>
       </motion.div>
       )}
+
+      {/* ── Mobile Fullscreen Spec Sheet ─────────────────────────────── */}
+      <AnimatePresence>
+        {specSheetOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex flex-col bg-[#0c0c0e]/98 backdrop-blur-xl lg:hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/[0.06] flex-shrink-0">
+              <div>
+                <h2 className="text-sm font-bold">{t('customizer.summaryTitle')}</h2>
+                <p className="text-[10px] text-white/30 mt-0.5">{configLine}</p>
+              </div>
+              <button
+                onClick={() => setSpecSheetOpen(false)}
+                aria-label="Close"
+                className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center"
+              >
+                <X size={16} className="text-white/70" />
+              </button>
+            </div>
+
+            {/* Scrollable spec list */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-5">
+              {SUMMARY_SECTIONS.map(section => {
+                const sectionStages = STAGES.filter(s => section.stageIds.includes(s.id));
+                const sectionFields = sectionStages.flatMap(s => getVisibleFields(s, guitarType));
+                if (sectionFields.length === 0) return null;
+                return (
+                  <div key={section.titleKey}>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ayers-gold/50">{t(section.titleKey)}</span>
+                    <div className="mt-2 space-y-1.5">
+                      {sectionFields.map(f => {
+                        if (f.multi) {
+                          const selectedIds = (selections[f.key] || '').split(',').filter(Boolean);
+                          const selectedOpts = f.options.filter(o => selectedIds.includes(o.id));
+                          if (selectedOpts.length === 0) return null;
+                          return selectedOpts.map(opt => (
+                            <div key={opt.id} className="flex items-center gap-3 py-1.5">
+                              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 text-xs">✓</div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] text-white/80 font-medium">{t(opt.nameKey)}</p>
+                                <p className="text-[10px] text-white/25">{t(f.labelKey)}</p>
+                              </div>
+                              {opt.add > 0 && <span className="text-[10px] text-ayers-gold/50 font-bold">+US${opt.add.toLocaleString()}</span>}
+                            </div>
+                          ));
+                        }
+                        const opt = f.options.find(o => o.id === selections[f.key]);
+                        if (!opt) return null;
+                        return (
+                          <div key={f.key} className="flex items-center gap-3 py-1.5">
+                            {opt.img ? (
+                              <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                                <img src={opt.img} alt="" className="w-full h-full object-contain" />
+                              </div>
+                            ) : opt.swatch ? (
+                              <div className="w-9 h-9 rounded-lg flex-shrink-0 ring-1 ring-white/10" style={{ backgroundColor: opt.swatch }} />
+                            ) : (
+                              <div className="w-9 h-9 rounded-lg bg-white/5 flex-shrink-0" />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] text-white/80 font-medium">{t(opt.nameKey)}</p>
+                              <p className="text-[10px] text-white/25">{t(f.labelKey)}</p>
+                            </div>
+                            {opt.add > 0 && <span className="text-[10px] text-ayers-gold/50 font-bold">+US${opt.add.toLocaleString()}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom: total + close */}
+            <div className="px-5 py-4 border-t border-white/[0.06] flex-shrink-0 flex items-center justify-between">
+              <div>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-white/25">{t('customizer.total')}</span>
+                <p className="text-xl font-serif italic font-bold text-ayers-gold"><AnimPrice value={price} size="large" /></p>
+              </div>
+              <button
+                onClick={() => setSpecSheetOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-white/10 text-[11px] font-bold uppercase tracking-wider text-white/70 active:bg-white/15 transition-colors"
+              >
+                {t('customizer.close', '關閉')}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Community Gallery — Sun Icon Trigger + Drawer ──────────────── */}
       {!mobileFullscreen3D && (
