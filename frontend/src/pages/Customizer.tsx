@@ -601,10 +601,9 @@ function useShouldUseLowLOD(): boolean {
   const [isLow, setIsLow] = useState(false);
   useEffect(() => {
     // Use low LOD on mobile or devices with < 4GB RAM
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
     const lowMemory = 'deviceMemory' in navigator && (navigator as any).deviceMemory < 4;
     const lowCores = navigator.hardwareConcurrency < 4;
-    setIsLow(isMobile || lowMemory || lowCores);
+    setIsLow(lowMemory || lowCores);
   }, []);
   return isLow;
 }
@@ -1180,7 +1179,7 @@ export default function Customizer() {
           <Canvas
             className={cn('absolute inset-0 transition-[filter] duration-500', stageBlur && 'blur-[2px]')}
             camera={{ fov: 40, position: [0, 0, 6] }}
-            dpr={isMobile ? [1, 1] : [1, 2]}
+            dpr={[1, 2]}
             shadows={!isMobile}
           >
             <fog attach="fog" args={['#0c0c0e', 14, 28]} />
