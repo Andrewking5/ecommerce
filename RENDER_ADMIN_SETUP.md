@@ -19,8 +19,8 @@
 4. 添加以下環境變數：
 
 ```env
-INIT_ADMIN_EMAIL=admin@gmail.com
-INIT_ADMIN_PASSWORD=Admin123!
+INIT_ADMIN_EMAIL=your-admin-email
+INIT_ADMIN_PASSWORD=your-secure-password
 INIT_ADMIN_FIRST_NAME=Admin
 INIT_ADMIN_LAST_NAME=User
 ```
@@ -37,11 +37,11 @@ INIT_ADMIN_LAST_NAME=User
 如果還沒有任何管理員，可以使用 API 端點創建：
 
 ```bash
-curl -X POST https://ecommerce-1w9j.onrender.com/api/admin/create-first-admin \
+curl -X POST https://your-backend.onrender.com/api/admin/create-first-admin \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@gmail.com",
-    "password": "Admin123!",
+    "email": "your-admin-email",
+    "password": "your-secure-password",
     "firstName": "Admin",
     "lastName": "User"
   }'
@@ -128,8 +128,8 @@ FRONTEND_URL=https://your-frontend.vercel.app
 API_URL=https://your-backend.onrender.com/api
 
 # 初始管理員（首次部署使用）
-INIT_ADMIN_EMAIL=admin@gmail.com
-INIT_ADMIN_PASSWORD=Admin123!
+INIT_ADMIN_EMAIL=your-admin-email
+INIT_ADMIN_PASSWORD=your-secure-password
 INIT_ADMIN_FIRST_NAME=Admin
 INIT_ADMIN_LAST_NAME=User
 ```

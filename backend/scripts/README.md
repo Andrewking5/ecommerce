@@ -39,7 +39,7 @@ npx ts-node scripts/update-user-role.ts user@example.com USER
 
 1. 更新角色後，用戶需要**重新登錄**才能使更改生效
 2. 只有 ADMIN 角色的用戶才能訪問管理員功能
-3. 默認的管理員帳號：`admin@example.com`（密碼：`Admin123!`）
+3. 管理員帳號請透過環境變數或 `update-user-role.ts` 腳本設定
 
 ## 故障排除
 

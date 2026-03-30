@@ -422,12 +422,12 @@ const prisma = new PrismaClient();
 
 async function main() {
   // 創建管理員用戶
-  const adminPassword = await bcrypt.hash('Admin123!', 12);
+  const adminPassword = await bcrypt.hash(process.env.INIT_ADMIN_PASSWORD!, 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
+    where: { email: process.env.INIT_ADMIN_EMAIL! },
     update: {},
     create: {
-      email: 'admin@example.com',
+      email: process.env.INIT_ADMIN_EMAIL!,
       password: adminPassword,
       firstName: 'Admin',
       lastName: 'User',

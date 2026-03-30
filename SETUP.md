@@ -96,15 +96,10 @@ npm run dev
 - 後端 API: http://localhost:3001/api
 - API 文件: http://localhost:3001/api/health
 
-## 測試帳號
+## 帳號設定
 
-### 管理員帳號
-- Email: admin@example.com
-- Password: Admin123!
-
-### 一般用戶帳號
-- Email: user@example.com
-- Password: User123!
+管理員帳號請透過環境變數 `INIT_ADMIN_EMAIL` / `INIT_ADMIN_PASSWORD` 設定，
+或使用 `scripts/update-user-role.ts` 將現有用戶升級為管理員。
 
 ## 功能特色
 

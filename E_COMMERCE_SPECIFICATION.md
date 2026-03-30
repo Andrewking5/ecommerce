@@ -217,8 +217,8 @@ ALLOWED_FILE_TYPES=image/jpeg,image/png,image/webp
 # ============================================
 # 初始管理員帳號（僅首次部署使用）
 # ============================================
-INIT_ADMIN_EMAIL=admin@example.com
-INIT_ADMIN_PASSWORD=Admin123!
+INIT_ADMIN_EMAIL=your-admin-email
+INIT_ADMIN_PASSWORD=your-secure-password
 INIT_ADMIN_FIRST_NAME=Admin
 INIT_ADMIN_LAST_NAME=User
 ```

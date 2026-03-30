@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -21,39 +20,6 @@ async function main() {
   await prisma.productAttributeTemplate.deleteMany({});
   await prisma.category.deleteMany({});
   console.log('✅ Old data cleaned');
-
-  // 創建管理員用戶
-  const adminPassword = await bcrypt.hash('Admin123!', 12);
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@ayersguitars.com' },
-    update: {},
-    create: {
-      email: 'admin@ayersguitars.com',
-      password: adminPassword,
-      firstName: 'Ayers',
-      lastName: 'Admin',
-      role: 'ADMIN',
-    },
-  });
-
-  console.log('✅ Admin user created:', admin.email);
-
-  // 創建測試用戶
-  const userPassword = await bcrypt.hash('User123!', 12);
-  const user = await prisma.user.upsert({
-    where: { email: 'user@example.com' },
-    update: {},
-    create: {
-      email: 'user@example.com',
-      password: userPassword,
-      firstName: 'Test',
-      lastName: 'User',
-      phone: '+886912345678',
-      role: 'USER',
-    },
-  });
-
-  console.log('✅ Test user created:', user.email);
 
   // 創建商品分類 - Ayers 吉他系列
   const categories = await Promise.all([
@@ -2052,8 +2018,6 @@ async function main() {
 
   console.log('🎉 Database seeding completed successfully!');
   console.log('\n📋 Summary:');
-  console.log(`- Admin user: ${admin.email} (password: Admin123!)`);
-  console.log(`- Test user: ${user.email} (password: User123!)`);
   console.log(`- Categories: ${categories.length} (Wave, Light, Sun, Master, Vintage, Uluru, Accessories)`);
   console.log(`- Products: ${products.length}`);
   console.log(`- Reviews: ${reviews.length}`);
