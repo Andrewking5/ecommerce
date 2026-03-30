@@ -6,6 +6,7 @@ import { registerSchema, loginSchema } from '../utils/validation';
 import { AuthController } from '../controllers/authController';
 import { SocialAuthController } from '../controllers/socialAuthController';
 import { authenticateToken } from '../middleware/auth';
+import { csrfTokenEndpoint } from '../middleware/csrf';
 
 const router = Router();
 
@@ -17,6 +18,9 @@ router.use((req, res, next) => {
     next();
   }
 });
+
+// CSRF token（供跨域前端取得 token）
+router.get('/csrf-token', csrfTokenEndpoint);
 
 // 註冊
 router.post('/register', 

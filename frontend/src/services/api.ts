@@ -10,11 +10,21 @@ function getLoginPath(): string {
   return `/${lang}/login`;
 }
 
-/** Read CSRF token from cookie */
-function getCsrfToken(): string | null {
-  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+/** CSRF token cached in memory (fetched from API for cross-origin support) */
+let csrfToken: string | null = null;
+
+async function fetchCsrfToken(): Promise<string | null> {
+  try {
+    const res = await axios.get(`${API_URL}/auth/csrf-token`, { withCredentials: true });
+    csrfToken = res.data.csrfToken;
+    return csrfToken;
+  } catch {
+    return null;
+  }
 }
+
+// Eagerly fetch CSRF token on module load
+fetchCsrfToken();
 
 const api = axios.create({
   baseURL: API_URL,
@@ -26,17 +36,19 @@ const api = axios.create({
 
 // Request interceptor - attach access token + CSRF token
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     // Access token (still in localStorage — short-lived, 15m)
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // CSRF token (from cookie, sent as header for double-submit validation)
-    const csrf = getCsrfToken();
-    if (csrf) {
-      config.headers['X-CSRF-Token'] = csrf;
+    // CSRF token (fetched from API, sent as header for double-submit validation)
+    if (!csrfToken) {
+      await fetchCsrfToken();
+    }
+    if (csrfToken) {
+      config.headers['X-CSRF-Token'] = csrfToken;
     }
 
     return config;
