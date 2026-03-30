@@ -13,7 +13,7 @@ import { WishlistProvider } from './contexts/WishlistContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
-import ChatWidget from './components/ChatWidget';
+// import ChatWidget from './components/ChatWidget';
 import ErrorBoundary from './components/ErrorBoundary';
 
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
@@ -156,7 +156,7 @@ function AppLayout() {
       </main>
       {!isFullscreen && <Footer />}
       <CookieConsent />
-      <ChatWidget />
+      {/* <ChatWidget /> */}
     </div>
   );
 }
