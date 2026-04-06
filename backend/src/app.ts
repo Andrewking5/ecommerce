@@ -115,7 +115,7 @@ app.use(cors({
       'http://localhost:3000',
       'http://localhost:5173',
       process.env.FRONTEND_URL,
-      'https://ecommerce-frontend-liard-omega.vercel.app',
+      'https://ayers.vercel.app',
     ].filter(Boolean);
 
     if (!origin) {
@@ -193,7 +193,7 @@ app.use('/uploads', (req, res, next): void => {
     'http://localhost:3000',
     'http://localhost:5173',
     process.env.FRONTEND_URL,
-    'https://ecommerce-frontend-liard-omega.vercel.app',
+    'https://ayers.vercel.app',
   ].filter(Boolean);
 
   const isAllowed = origin && allowedOrigins.includes(origin);
