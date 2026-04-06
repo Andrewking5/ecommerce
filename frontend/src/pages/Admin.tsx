@@ -2445,11 +2445,12 @@ function EventsTab() {
                 fgColor="#1a1a1a"
                 qrStyle="dots"
                 eyeRadius={8}
+                ecLevel="H"
                 logoImage="/images/ayers-logo.svg"
-                logoWidth={80}
-                logoHeight={44}
+                logoWidth={60}
+                logoHeight={33}
                 logoOpacity={1}
-                logoPadding={3}
+                logoPadding={2}
                 logoPaddingStyle="circle"
                 removeQrCodeBehindLogo
               />

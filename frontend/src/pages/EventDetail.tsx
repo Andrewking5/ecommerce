@@ -206,11 +206,12 @@ export default function EventDetail() {
                       fgColor="#1a1a1a"
                       qrStyle="dots"
                       eyeRadius={8}
+                      ecLevel="H"
                       logoImage="/images/ayers-logo.svg"
-                      logoWidth={74}
-                      logoHeight={40}
+                      logoWidth={55}
+                      logoHeight={30}
                       logoOpacity={1}
-                      logoPadding={3}
+                      logoPadding={2}
                       logoPaddingStyle="circle"
                       removeQrCodeBehindLogo
                     />
