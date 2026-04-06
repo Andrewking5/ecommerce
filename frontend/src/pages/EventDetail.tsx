@@ -205,7 +205,7 @@ export default function EventDetail() {
                       size={200}
                       bgColor="#ffffff"
                       fgColor="#1a1a1a"
-                      qrStyle="squares"
+                      qrStyle="dots"
                       eyeRadius={8}
                       ecLevel="H"
                       logoImage="/images/ayers-logo.svg"
