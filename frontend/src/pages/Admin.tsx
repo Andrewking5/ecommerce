@@ -24,6 +24,8 @@ import api from '@/src/services/api';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import couponService, { type Coupon } from '@/src/services/couponService';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 import { QRCode } from 'react-qrcode-logo';
 
 /* ─── Constants ─── */
@@ -2395,7 +2397,7 @@ function EventsTab() {
   };
 
   const handleCopyLink = async (event: EventType) => {
-    const url = `${window.location.origin}/api/events/r/${event.referralCode}`;
+    const url = `${API_BASE}/events/r/${event.referralCode}`;
     await navigator.clipboard.writeText(url);
     setCopiedId(event.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -2439,11 +2441,11 @@ function EventsTab() {
             <p className="text-[10px] text-white/40 mb-6">推薦碼：{viewingQr.referralCode}</p>
             <div ref={qrRef} className="inline-block p-4 bg-white rounded-xl mb-4">
               <QRCode
-                value={`${window.location.origin}/api/events/r/${viewingQr.referralCode}`}
+                value={`${API_BASE}/events/r/${viewingQr.referralCode}`}
                 size={220}
                 bgColor="#ffffff"
                 fgColor="#1a1a1a"
-                qrStyle="dots"
+                qrStyle="squares"
                 eyeRadius={8}
                 ecLevel="H"
                 logoImage="/images/ayers-logo.svg"
@@ -2456,7 +2458,7 @@ function EventsTab() {
               />
             </div>
             <p className="text-[10px] text-white/30 mb-4 break-all font-mono">
-              {`${window.location.origin}/api/events/r/${viewingQr.referralCode}`}
+              {`${API_BASE}/events/r/${viewingQr.referralCode}`}
             </p>
             <div className="flex gap-3 justify-center">
               <button

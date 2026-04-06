@@ -9,6 +9,8 @@ import OptimizedImage from '../components/OptimizedImage';
 import { GuitarSunLoader } from '../components/guitar';
 import eventService, { type Event } from '../services/eventService';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('zh-TW', {
     year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
@@ -35,8 +37,7 @@ export default function EventDetail() {
 
   const getQrUrl = () => {
     if (!event) return '';
-    const base = window.location.origin;
-    let url = `${base}/api/events/r/${event.referralCode}`;
+    let url = `${API_BASE}/events/r/${event.referralCode}`;
     const params = new URLSearchParams();
     if (event.utmSource) params.set('utm_source', event.utmSource);
     if (event.utmMedium) params.set('utm_medium', event.utmMedium);
@@ -204,7 +205,7 @@ export default function EventDetail() {
                       size={200}
                       bgColor="#ffffff"
                       fgColor="#1a1a1a"
-                      qrStyle="dots"
+                      qrStyle="squares"
                       eyeRadius={8}
                       ecLevel="H"
                       logoImage="/images/ayers-logo.svg"
