@@ -2706,7 +2706,9 @@ function EventsTab() {
                   {/* Info */}
                   <div className="flex-grow min-w-0">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-sm font-bold truncate">{event.title}</h3>
+                      <h3 className="text-sm font-bold truncate cursor-pointer hover:text-ayers-gold transition-colors"
+                        onClick={() => window.open(`/${(document.location.pathname.split('/')[1] || 'zh-TW')}/events/${event.slug}`, '_blank')}
+                      >{event.title}</h3>
                       <span className={cn('shrink-0 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest', EVENT_STATUS_COLORS[event.status])}>
                         {event.status}
                       </span>
@@ -2722,6 +2724,10 @@ function EventsTab() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => window.open(`/${(document.location.pathname.split('/')[1] || 'zh-TW')}/events/${event.slug}`, '_blank')} title="開啟活動頁面"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      <ExternalLink size={14} />
+                    </button>
                     <button onClick={() => setViewingQr(event)} title="QR Code"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
                       <QrCode size={14} />
