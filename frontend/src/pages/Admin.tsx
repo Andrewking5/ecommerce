@@ -2446,9 +2446,11 @@ function EventsTab() {
                 qrStyle="dots"
                 eyeRadius={8}
                 logoImage="/images/ayers-logo.svg"
-                logoWidth={50}
-                logoHeight={28}
-                logoOpacity={0.9}
+                logoWidth={80}
+                logoHeight={44}
+                logoOpacity={1}
+                logoPadding={3}
+                logoPaddingStyle="circle"
                 removeQrCodeBehindLogo
               />
             </div>

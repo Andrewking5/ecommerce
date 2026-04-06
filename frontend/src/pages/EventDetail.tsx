@@ -207,9 +207,11 @@ export default function EventDetail() {
                       qrStyle="dots"
                       eyeRadius={8}
                       logoImage="/images/ayers-logo.svg"
-                      logoWidth={46}
-                      logoHeight={26}
-                      logoOpacity={0.9}
+                      logoWidth={74}
+                      logoHeight={40}
+                      logoOpacity={1}
+                      logoPadding={3}
+                      logoPaddingStyle="circle"
                       removeQrCodeBehindLogo
                     />
                   </div>
