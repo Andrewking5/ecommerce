@@ -2313,15 +2313,17 @@ function toLocalDatetimeValue(val: string | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-/** Auto-generate slug from title: 中文→pinyin-ish, spaces→dashes, lowercase */
+/** Auto-generate slug: strip non-ASCII, spaces→dashes, lowercase, a-z0-9 only */
 function toSlug(str: string): string {
   return str
     .toLowerCase()
     .trim()
+    .replace(/[^\x00-\x7F]/g, '')   // remove non-ASCII (中文, etc.)
     .replace(/[\s_]+/g, '-')
-    .replace(/[^\w\u4e00-\u9fff-]/g, '')
+    .replace(/[^a-z0-9-]/g, '')
     .replace(/--+/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/^-|-$/g, '')
+    || `event-${Date.now().toString(36)}`;   // fallback if title is all Chinese
 }
 
 function EventsTab() {

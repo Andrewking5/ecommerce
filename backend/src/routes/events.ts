@@ -10,7 +10,7 @@ const router = Router();
 
 const createEventSchema = Joi.object({
   title: Joi.string().required().min(1).max(200),
-  slug: Joi.string().required().min(1).max(100).pattern(/^[a-z0-9-]+$/),
+  slug: Joi.string().required().min(1).max(100).pattern(/^[a-z0-9\u4e00-\u9fff-]+$/),
   description: Joi.string().required().min(1).max(5000),
   coverImage: Joi.string().max(500).allow('', null),
   location: Joi.string().max(300).allow('', null),
@@ -28,7 +28,7 @@ const createEventSchema = Joi.object({
 
 const updateEventSchema = Joi.object({
   title: Joi.string().min(1).max(200),
-  slug: Joi.string().min(1).max(100).pattern(/^[a-z0-9-]+$/),
+  slug: Joi.string().min(1).max(100).pattern(/^[a-z0-9\u4e00-\u9fff-]+$/),
   description: Joi.string().min(1).max(5000),
   coverImage: Joi.string().max(500).allow('', null),
   location: Joi.string().max(300).allow('', null),
