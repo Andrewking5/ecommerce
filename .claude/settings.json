@@ -12,13 +12,14 @@
       "Bash(grep -rn from.*animations c:UsersanpenAIweb_designE-commercefrontendsrc --include=*.tsx --include=*.ts)",
       "Bash(sort -t'|' -k1 -rn)",
       "Bash(npm uninstall:*)",
-      "Bash(grep -r \"import.*redis\\\\|from.*redis\\\\|require.*redis\" /c/Users/anpen/Desktop/ai/ecommerce-main/backend/src --include=*.ts --include=*.js)",
-      "Bash(grep -n \"useCallback.*\\\\[\\\\]\" /c/Users/anpen/Desktop/ai/ecommerce-main/frontend/src/contexts/*.tsx)",
-      "Bash(ls -la c:/Users/anpen/Desktop/ai/ecommerce-main/backend/*.md)",
-      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
-      "Bash(git remote:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(xargs -I {} basename {})",
+      "Bash(grep -r \"analytics\\\\|tracking\\\\|gtag\\\\|segment\" /c/Users/anpen/AI/web_design/E-commerce/frontend/src --include=*.tsx --include=*.ts)",
+      "Bash(find /c/Users/anpen/AI/web_design/E-commerce -name *.md -type f)",
+      "Bash(find c:/Users/anpen/AI/web_design/E-commerce/frontend -path *locales* -type f -name *.json)",
+      "Bash(npx vitest:*)",
+      "Bash(node -e \"const p = require\\(''@testing-library/react/package.json''\\); console.log\\(''testing-library/react:'', p.version\\)\")",
+      "Bash(node -e \"const p = require\\(''c:/Users/anpen/AI/web_design/E-commerce/node_modules/react-dom/package.json''\\); console.log\\(''root react-dom:'', p.version\\)\")",
+      "Bash(grep -r UserBehavior c:/Users/anpen/AI/web_design/E-commerce --include=*.ts --include=*.tsx)"
     ]
   }
 }

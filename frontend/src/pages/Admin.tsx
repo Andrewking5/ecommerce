@@ -2304,6 +2304,17 @@ const EMPTY_EVENT: Partial<EventType> = {
   couponCode: '', discountNote: '', isActive: true,
 };
 
+/** Auto-generate slug from title: 中文→pinyin-ish, spaces→dashes, lowercase */
+function toSlug(str: string): string {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^\w\u4e00-\u9fff-]/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 function EventsTab() {
   const { t } = useTranslation();
   const [events, setEvents] = useState<EventType[]>([]);
@@ -2314,6 +2325,8 @@ function EventsTab() {
   const [analytics, setAnalytics] = useState<EventAnalytics | null>(null);
   const [analyticsEvent, setAnalyticsEvent] = useState<EventType | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -2395,7 +2408,7 @@ function EventsTab() {
         <div className="flex items-center gap-3">
           <button onClick={fetchEvents} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={14} /></button>
           <button
-            onClick={() => setEditingEvent({ ...EMPTY_EVENT })}
+            onClick={() => { setEditingEvent({ ...EMPTY_EVENT }); setShowAdvanced(false); setSlugManuallyEdited(false); }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 transition-all"
           >
             <Plus size={12} /> {t('admin.events.addEvent', '新增活動')}
@@ -2514,105 +2527,149 @@ function EventsTab() {
             <button onClick={() => setEditingEvent(null)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
           }>
             <div className="p-5 space-y-6">
-              {/* Basic Info */}
-              <div>
-                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">基本設定</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">活動名稱</label>
-                    <input type="text" value={editingEvent.title || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, title: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：2026 春季吉他展" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">Slug（網址識別碼）</label>
-                    <input type="text" value={editingEvent.slug || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, slug: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="例：spring-2026-guitar-show" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">開始日期</label>
-                    <input type="datetime-local" value={editingEvent.startDate ? new Date(editingEvent.startDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, startDate: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">結束日期</label>
-                    <input type="datetime-local" value={editingEvent.endDate ? new Date(editingEvent.endDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, endDate: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">活動地點</label>
-                    <input type="text" value={editingEvent.location || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, location: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：台北世貿中心" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">狀態</label>
-                    <select value={editingEvent.status || 'DRAFT'} onChange={(e) => setEditingEvent(p => p ? { ...p, status: e.target.value as EventType['status'] } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all">
-                      <option value="DRAFT" className="bg-[#1e160d]">草稿</option>
-                      <option value="ACTIVE" className="bg-[#1e160d]">啟用</option>
-                      <option value="ENDED" className="bg-[#1e160d]">已結束</option>
-                      <option value="CANCELLED" className="bg-[#1e160d]">已取消</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">封面圖片 URL</label>
-                    <input type="text" value={editingEvent.coverImage || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, coverImage: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="https://..." />
-                  </div>
+
+              {/* ── 基本模式：必填欄位 ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] text-white/40 mb-1.5">活動名稱 <span className="text-red-400">*</span></label>
+                  <input type="text" value={editingEvent.title || ''}
+                    onChange={(e) => {
+                      const title = e.target.value;
+                      const autoSlug = !slugManuallyEdited ? toSlug(title) : editingEvent.slug;
+                      const autoUtmCampaign = !showAdvanced ? toSlug(title) : editingEvent.utmCampaign;
+                      setEditingEvent(p => p ? { ...p, title, slug: autoSlug, utmCampaign: autoUtmCampaign } : p);
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：2026 春季吉他展" />
                 </div>
-                <div className="mt-4">
-                  <label className="block text-[11px] text-white/40 mb-1.5">活動描述</label>
-                  <textarea value={editingEvent.description || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, description: e.target.value } : p)} rows={4}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all resize-none" placeholder="詳細描述活動內容..." />
+                <div>
+                  <label className="block text-[11px] text-white/40 mb-1.5">開始日期 <span className="text-red-400">*</span></label>
+                  <input type="datetime-local" value={editingEvent.startDate ? new Date(editingEvent.startDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, startDate: e.target.value } : p)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-white/40 mb-1.5">結束日期 <span className="text-red-400">*</span></label>
+                  <input type="datetime-local" value={editingEvent.endDate ? new Date(editingEvent.endDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, endDate: e.target.value } : p)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] text-white/40 mb-1.5">活動描述 <span className="text-red-400">*</span></label>
+                  <textarea value={editingEvent.description || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, description: e.target.value } : p)} rows={3}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all resize-none" placeholder="簡述活動內容..." />
                 </div>
               </div>
 
-              {/* QR Code & UTM Settings */}
-              <div>
-                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">QR Code 與引流設定</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">自訂導向網址（選填）</label>
-                    <input type="text" value={editingEvent.landingUrl || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, landingUrl: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="掃碼後導向的網址" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Source</label>
-                    <input type="text" value={editingEvent.utmSource || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmSource: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：flyer, poster, social" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Medium</label>
-                    <input type="text" value={editingEvent.utmMedium || 'qrcode'} onChange={(e) => setEditingEvent(p => p ? { ...p, utmMedium: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：qrcode" />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Campaign</label>
-                    <input type="text" value={editingEvent.utmCampaign || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmCampaign: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：spring-2026" />
+              {/* Auto-filled hint */}
+              {!showAdvanced && (editingEvent.slug || editingEvent.utmCampaign) && (
+                <div className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
+                  <p className="text-[10px] text-white/25 uppercase tracking-widest mb-2">自動產生</p>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] text-white/40">
+                    {editingEvent.slug && <span>Slug：<span className="font-mono text-white/60">{editingEvent.slug}</span></span>}
+                    <span>UTM Medium：<span className="font-mono text-white/60">qrcode</span></span>
+                    {editingEvent.utmCampaign && <span>UTM Campaign：<span className="font-mono text-white/60">{editingEvent.utmCampaign}</span></span>}
+                    <span>狀態：<span className="text-white/60">草稿</span></span>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* Coupon Settings */}
-              <div>
-                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">優惠券關聯（選填）</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* ── 進階選項展開按鈕 ── */}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors"
+              >
+                <ChevronDown size={12} className={cn('transition-transform', showAdvanced && 'rotate-180')} />
+                {showAdvanced ? '收起進階選項' : '展開進階選項（Slug、圖片、地點、UTM、優惠券⋯）'}
+              </button>
+
+              {/* ── 進階選項 ── */}
+              {showAdvanced && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-6 overflow-hidden">
+
+                  {/* Slug, Status, Location, Cover */}
                   <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">優惠碼</label>
-                    <input type="text" value={editingEvent.couponCode || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, couponCode: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="例：SPRING2026" />
+                    <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">詳細設定</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">Slug（網址識別碼）</label>
+                        <input type="text" value={editingEvent.slug || ''}
+                          onChange={(e) => { setSlugManuallyEdited(true); setEditingEvent(p => p ? { ...p, slug: e.target.value } : p); }}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="自動由名稱產生" />
+                        <p className="text-[9px] text-white/20 mt-1">留空或不修改將由活動名稱自動產生</p>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">狀態</label>
+                        <select value={editingEvent.status || 'DRAFT'} onChange={(e) => setEditingEvent(p => p ? { ...p, status: e.target.value as EventType['status'] } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all">
+                          <option value="DRAFT" className="bg-[#1e160d]">草稿</option>
+                          <option value="ACTIVE" className="bg-[#1e160d]">啟用</option>
+                          <option value="ENDED" className="bg-[#1e160d]">已結束</option>
+                          <option value="CANCELLED" className="bg-[#1e160d]">已取消</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">活動地點</label>
+                        <input type="text" value={editingEvent.location || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, location: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：台北世貿中心" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">封面圖片 URL</label>
+                        <input type="text" value={editingEvent.coverImage || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, coverImage: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="https://..." />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* QR Code & UTM */}
                   <div>
-                    <label className="block text-[11px] text-white/40 mb-1.5">優惠說明</label>
-                    <input type="text" value={editingEvent.discountNote || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, discountNote: e.target.value } : p)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：全館 9 折優惠" />
+                    <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">QR Code 與引流設定</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">自訂導向網址</label>
+                        <input type="text" value={editingEvent.landingUrl || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, landingUrl: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="留空則導向活動頁面" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">UTM Source</label>
+                        <input type="text" value={editingEvent.utmSource || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmSource: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：flyer, poster, social" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">UTM Medium</label>
+                        <input type="text" value={editingEvent.utmMedium || 'qrcode'} onChange={(e) => setEditingEvent(p => p ? { ...p, utmMedium: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="預設：qrcode" />
+                        <p className="text-[9px] text-white/20 mt-1">預設為 qrcode</p>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">UTM Campaign</label>
+                        <input type="text" value={editingEvent.utmCampaign || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmCampaign: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="自動由名稱產生" />
+                        <p className="text-[9px] text-white/20 mt-1">留空將由活動名稱自動產生</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+
+                  {/* Coupon */}
+                  <div>
+                    <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">優惠券關聯</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">優惠碼</label>
+                        <input type="text" value={editingEvent.couponCode || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, couponCode: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="例：SPRING2026" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">優惠說明</label>
+                        <input type="text" value={editingEvent.discountNote || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, discountNote: e.target.value } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：全館 9 折優惠" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Save Button */}
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setEditingEvent(null)} className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">取消</button>
+                <button onClick={() => { setEditingEvent(null); setShowAdvanced(false); setSlugManuallyEdited(false); }} className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">取消</button>
                 <button onClick={handleSave} disabled={saving}
                   className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 disabled:opacity-40 transition-all">
                   <Save size={12} /> {saving ? '儲存中...' : '儲存'}
@@ -2670,7 +2727,7 @@ function EventsTab() {
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
                       {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
                     </button>
-                    <button onClick={() => setEditingEvent({ ...event })} title="編輯"
+                    <button onClick={() => { setEditingEvent({ ...event }); setShowAdvanced(true); setSlugManuallyEdited(true); }} title="編輯"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
                       <Edit size={14} />
                     </button>
