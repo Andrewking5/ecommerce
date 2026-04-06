@@ -835,7 +835,8 @@
       "banners": "輪播圖",
       "reviews": "評論管理",
       "coupons": "優惠券",
-      "marketing": "行銷推廣"
+      "marketing": "行銷推廣",
+      "events": "活動管理"
     },
     "dashboard": {
       "title": "儀表板",

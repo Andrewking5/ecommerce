@@ -831,7 +831,8 @@
       "categories": "商品分类",
       "reviews": "评论管理",
       "coupons": "优惠券",
-      "marketing": "营销推广"
+      "marketing": "营销推广",
+      "events": "活动管理"
     },
     "dashboard": {
       "title": "仪表盘",

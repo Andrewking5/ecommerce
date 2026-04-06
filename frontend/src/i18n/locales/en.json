@@ -833,7 +833,8 @@
       "categories": "Categories",
       "reviews": "Reviews",
       "coupons": "Coupons",
-      "marketing": "Marketing"
+      "marketing": "Marketing",
+      "events": "Events"
     },
     "dashboard": {
       "title": "Dashboard",

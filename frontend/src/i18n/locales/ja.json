@@ -831,7 +831,8 @@
       "categories": "カテゴリ",
       "reviews": "レビュー管理",
       "coupons": "クーポン",
-      "marketing": "マーケティング"
+      "marketing": "マーケティング",
+      "events": "イベント"
     },
     "dashboard": {
       "title": "ダッシュボード",
