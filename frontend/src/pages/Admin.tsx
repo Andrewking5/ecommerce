@@ -2445,6 +2445,11 @@ function EventsTab() {
                 fgColor="#1a1a1a"
                 qrStyle="dots"
                 eyeRadius={8}
+                logoImage="/images/ayers-logo.svg"
+                logoWidth={50}
+                logoHeight={28}
+                logoOpacity={0.9}
+                removeQrCodeBehindLogo
               />
             </div>
             <p className="text-[10px] text-white/30 mb-4 break-all font-mono">

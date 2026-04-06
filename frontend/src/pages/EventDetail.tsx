@@ -206,6 +206,11 @@ export default function EventDetail() {
                       fgColor="#1a1a1a"
                       qrStyle="dots"
                       eyeRadius={8}
+                      logoImage="/images/ayers-logo.svg"
+                      logoWidth={46}
+                      logoHeight={26}
+                      logoOpacity={0.9}
+                      removeQrCodeBehindLogo
                     />
                   </div>
                   <p className="text-[10px] text-ayers-ink/40 mt-3">
