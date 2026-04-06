@@ -31,13 +31,19 @@ export default function EventDetail() {
       try {
         const data = await eventService.getEventBySlug(slug);
         setEvent(data);
+        // Track visit if coming from QR scan (referral code in URL)
+        if (data?.referralCode) {
+          eventService.trackClick(data.referralCode).catch(() => {});
+        }
       } catch { /* silent */ } finally { setLoading(false); }
     })();
   }, [slug]);
 
   const getQrUrl = () => {
     if (!event) return '';
-    let url = `${API_BASE}/events/r/${event.referralCode}`;
+    const base = window.location.origin;
+    const lang = document.location.pathname.split('/')[1] || 'zh-TW';
+    let url = `${base}/${lang}/events/${event.slug}`;
     const params = new URLSearchParams();
     if (event.utmSource) params.set('utm_source', event.utmSource);
     if (event.utmMedium) params.set('utm_medium', event.utmMedium);

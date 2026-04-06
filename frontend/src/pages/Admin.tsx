@@ -2397,7 +2397,8 @@ function EventsTab() {
   };
 
   const handleCopyLink = async (event: EventType) => {
-    const url = `${API_BASE}/events/r/${event.referralCode}`;
+    const lang = document.location.pathname.split('/')[1] || 'zh-TW';
+    const url = `${window.location.origin}/${lang}/events/${event.slug}`;
     await navigator.clipboard.writeText(url);
     setCopiedId(event.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -2441,7 +2442,7 @@ function EventsTab() {
             <p className="text-[10px] text-white/40 mb-6">推薦碼：{viewingQr.referralCode}</p>
             <div ref={qrRef} className="inline-block p-4 bg-white rounded-xl mb-4">
               <QRCode
-                value={`${API_BASE}/events/r/${viewingQr.referralCode}`}
+                value={`${window.location.origin}/${(document.location.pathname.split('/')[1] || 'zh-TW')}/events/${viewingQr.slug}`}
                 size={220}
                 bgColor="#ffffff"
                 fgColor="#1a1a1a"
@@ -2458,7 +2459,7 @@ function EventsTab() {
               />
             </div>
             <p className="text-[10px] text-white/30 mb-4 break-all font-mono">
-              {`${API_BASE}/events/r/${viewingQr.referralCode}`}
+              {`${window.location.origin}/${(document.location.pathname.split('/')[1] || 'zh-TW')}/events/${viewingQr.slug}`}
             </p>
             <div className="flex gap-3 justify-center">
               <button
