@@ -619,3 +619,74 @@ model CustomConfigLike {
   @@unique([configId, userId])
   @@map("custom_config_likes")
 }
+
+// 活動狀態枚舉
+enum EventStatus {
+  DRAFT
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+// 活動模型
+model Event {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  description String      @db.Text
+  coverImage  String?                          // 封面圖片
+  location    String?                          // 活動地點
+  startDate   DateTime
+  endDate     DateTime
+  status      EventStatus @default(DRAFT)
+
+  // QR Code 與引流設定
+  referralCode  String    @unique              // 唯一推薦碼（用於 QR Code 連結）
+  landingUrl    String?                        // QR Code 掃描後導向的自訂網址
+  utmSource     String?                        // UTM 來源標記
+  utmMedium     String?   @default("qrcode")   // UTM 媒介
+  utmCampaign   String?                        // UTM 活動名稱
+
+  // 活動關聯的優惠
+  couponCode    String?                        // 關聯的優惠券代碼
+  discountNote  String?                        // 優惠說明文字
+
+  // 統計
+  totalScans    Int       @default(0)          // QR Code 掃描總次數
+  uniqueVisitors Int      @default(0)          // 不重複訪客數
+
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // 關聯
+  clicks      EventClick[]
+
+  @@index([status])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@index([referralCode])
+  @@index([slug])
+  @@map("events")
+}
+
+// 活動點擊/掃描追蹤
+model EventClick {
+  id          String   @id @default(cuid())
+  eventId     String
+  ip          String?                          // 訪客 IP
+  userAgent   String?                          // 瀏覽器資訊
+  referer     String?                          // 來源頁面
+  country     String?                          // 國家
+  city        String?                          // 城市
+  device      String?                          // 裝置類型：mobile/desktop/tablet
+  createdAt   DateTime @default(now())
+
+  // 關聯
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([createdAt])
+  @@index([eventId, createdAt])
+  @@map("event_clicks")
+}

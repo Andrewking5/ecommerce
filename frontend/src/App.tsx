@@ -48,6 +48,8 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const Events = lazy(() => import('./pages/Events'));
+const EventDetail = lazy(() => import('./pages/EventDetail'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -145,6 +147,8 @@ function AppLayout() {
             <Route path="shipping" element={<Shipping />} />
             <Route path="contact" element={<Contact />} />
             <Route path="about" element={<About />} />
+            <Route path="events" element={<Events />} />
+            <Route path="events/:slug" element={<EventDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

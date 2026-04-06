@@ -4,7 +4,8 @@ import {
   ChevronRight, TrendingUp, BarChart3, Package, Plus,
   Trash2, RefreshCw, Edit, AlertTriangle, CheckCircle, XCircle,
   Upload, Download, FileSpreadsheet, X, Image, ChevronUp, ChevronDown,
-  Eye, EyeOff, Save, MessageSquare, Star, Ticket, Megaphone,
+  Eye, EyeOff, Save, MessageSquare, Star, Ticket, Megaphone, CalendarDays,
+  MapPin, QrCode, Link, Copy, Check, ExternalLink,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/src/lib/utils';
@@ -22,6 +23,8 @@ import bannerService, { type HomeBanner } from '@/src/services/bannerService';
 import api from '@/src/services/api';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import couponService, { type Coupon } from '@/src/services/couponService';
+import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
+import { QRCode } from 'react-qrcode-logo';
 
 /* ─── Constants ─── */
 
@@ -44,7 +47,7 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-500/10 text-red-500',
 };
 
-type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons';
+type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons' | 'events';
 
 type SidebarItem =
   | { id: Tab; icon: React.ReactNode; labelKey: string; children?: never }
@@ -68,6 +71,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
       { id: 'banners', labelKey: 'admin.sidebar.banners' },
       { id: 'coupons', labelKey: 'admin.sidebar.coupons' },
       { id: 'reviews', labelKey: 'admin.sidebar.reviews' },
+      { id: 'events', labelKey: 'admin.sidebar.events' },
     ],
   },
 ];
@@ -185,6 +189,7 @@ export default function Admin() {
         {activeTab === 'banners' && <BannersTab />}
         {activeTab === 'reviews' && <ReviewsTab />}
         {activeTab === 'coupons' && <CouponsTab />}
+        {activeTab === 'events' && <EventsTab />}
       </main>
     </div>
   );
@@ -2280,6 +2285,413 @@ function ReviewsTab() {
     </>
   );
 }
+
+/* ═══════════════════════════════════════════════════════
+   EVENTS TAB
+   ═══════════════════════════════════════════════════════ */
+
+const EVENT_STATUS_COLORS: Record<string, string> = {
+  DRAFT: 'bg-white/10 text-white/50',
+  ACTIVE: 'bg-green-500/10 text-green-500',
+  ENDED: 'bg-white/10 text-white/30',
+  CANCELLED: 'bg-red-500/10 text-red-500',
+};
+
+const EMPTY_EVENT: Partial<EventType> = {
+  title: '', slug: '', description: '', coverImage: '', location: '',
+  startDate: '', endDate: '', status: 'DRAFT',
+  landingUrl: '', utmSource: '', utmMedium: 'qrcode', utmCampaign: '',
+  couponCode: '', discountNote: '', isActive: true,
+};
+
+function EventsTab() {
+  const { t } = useTranslation();
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingEvent, setEditingEvent] = useState<Partial<EventType> | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [viewingQr, setViewingQr] = useState<EventType | null>(null);
+  const [analytics, setAnalytics] = useState<EventAnalytics | null>(null);
+  const [analyticsEvent, setAnalyticsEvent] = useState<EventType | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
+
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await eventService.getAllEvents();
+      setEvents(data);
+    } catch { /* silent */ } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchEvents(); }, [fetchEvents]);
+
+  const handleToggle = async (id: string) => {
+    try {
+      const res = await eventService.toggleEvent(id);
+      if (res.success) setEvents((prev) => prev.map((e) => e.id === id ? { ...e, isActive: !e.isActive } : e));
+    } catch { /* silent */ }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('確定要刪除此活動？')) return;
+    try {
+      const res = await eventService.deleteEvent(id);
+      if (res.success) setEvents((prev) => prev.filter((e) => e.id !== id));
+    } catch { /* silent */ }
+  };
+
+  const handleSave = async () => {
+    if (!editingEvent) return;
+    setSaving(true);
+    try {
+      if (editingEvent.id) {
+        const res = await eventService.updateEvent(editingEvent.id, editingEvent);
+        if (res.success) {
+          setEvents((prev) => prev.map((e) => e.id === editingEvent.id ? { ...e, ...editingEvent } as EventType : e));
+          setEditingEvent(null);
+        }
+      } else {
+        const res = await eventService.createEvent(editingEvent);
+        if (res.success) {
+          setEditingEvent(null);
+          fetchEvents();
+        }
+      }
+    } catch { /* silent */ } finally { setSaving(false); }
+  };
+
+  const handleViewAnalytics = async (event: EventType) => {
+    setAnalyticsEvent(event);
+    setAnalytics(null);
+    try {
+      const data = await eventService.getEventAnalytics(event.id);
+      setAnalytics(data);
+    } catch { /* silent */ }
+  };
+
+  const handleCopyLink = async (event: EventType) => {
+    const url = `${window.location.origin}/api/events/r/${event.referralCode}`;
+    await navigator.clipboard.writeText(url);
+    setCopiedId(event.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDownloadQr = () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (!canvas || !viewingQr) return;
+    const link = document.createElement('a');
+    link.download = `${viewingQr.slug}-qrcode.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
+
+  return (
+    <>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <h2 className="text-2xl font-bold uppercase tracking-[0.2em]">{t('admin.events.title', '活動管理')}</h2>
+        <div className="flex items-center gap-3">
+          <button onClick={fetchEvents} className="text-white/40 hover:text-white transition-colors"><RefreshCw size={14} /></button>
+          <button
+            onClick={() => setEditingEvent({ ...EMPTY_EVENT })}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 transition-all"
+          >
+            <Plus size={12} /> {t('admin.events.addEvent', '新增活動')}
+          </button>
+        </div>
+      </div>
+
+      {/* ── QR Code Modal ── */}
+      {viewingQr && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setViewingQr(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl p-8 max-w-md w-full mx-4 text-center" style={{ background: CARD_BG }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold mb-2">{viewingQr.title}</h3>
+            <p className="text-[10px] text-white/40 mb-6">推薦碼：{viewingQr.referralCode}</p>
+            <div ref={qrRef} className="inline-block p-4 bg-white rounded-xl mb-4">
+              <QRCode
+                value={`${window.location.origin}/api/events/r/${viewingQr.referralCode}`}
+                size={220}
+                bgColor="#ffffff"
+                fgColor="#1a1a1a"
+                qrStyle="dots"
+                eyeRadius={8}
+              />
+            </div>
+            <p className="text-[10px] text-white/30 mb-4 break-all font-mono">
+              {`${window.location.origin}/api/events/r/${viewingQr.referralCode}`}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleDownloadQr}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white/20 transition-all"
+              >
+                <Download size={12} /> 下載 PNG
+              </button>
+              <button
+                onClick={() => handleCopyLink(viewingQr)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 transition-all"
+              >
+                {copiedId === viewingQr.id ? <><Check size={12} /> 已複製</> : <><Copy size={12} /> 複製連結</>}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── Analytics Modal ── */}
+      {analyticsEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setAnalyticsEvent(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl p-8 max-w-lg w-full mx-4" style={{ background: CARD_BG }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">{analyticsEvent.title} — 數據分析</h3>
+              <button onClick={() => setAnalyticsEvent(null)} className="text-white/30 hover:text-white"><X size={14} /></button>
+            </div>
+            {!analytics ? (
+              <div className="py-10 text-center"><GuitarSunLoader size={24} /></div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="rounded-xl p-4 bg-white/5 text-center">
+                    <p className="text-2xl font-bold text-ayers-gold">{analytics.totalScans}</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">掃描次數</p>
+                  </div>
+                  <div className="rounded-xl p-4 bg-white/5 text-center">
+                    <p className="text-2xl font-bold text-ayers-gold">{analytics.totalClicks}</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">點擊次數</p>
+                  </div>
+                  <div className="rounded-xl p-4 bg-white/5 text-center">
+                    <p className="text-2xl font-bold text-ayers-gold">{analytics.uniqueVisitors}</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">不重複訪客</p>
+                  </div>
+                </div>
+                {analytics.deviceBreakdown.length > 0 && (
+                  <div>
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-3">裝置分佈</h4>
+                    <div className="flex gap-3">
+                      {analytics.deviceBreakdown.map((d) => (
+                        <div key={d.device} className="flex-1 rounded-xl p-3 bg-white/5 text-center">
+                          <p className="text-lg font-bold">{d.count}</p>
+                          <p className="text-[10px] text-white/40 capitalize">{d.device}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {analytics.dailyClicks.length > 0 && (
+                  <div>
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-3">每日點擊</h4>
+                    <ResponsiveContainer width="100%" height={160}>
+                      <BarChart data={analytics.dailyClicks}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }} />
+                        <YAxis tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }} />
+                        <Tooltip contentStyle={{ background: '#1e160d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 11 }} />
+                        <Bar dataKey="count" fill="#c5a059" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── Edit / Create Form ── */}
+      {editingEvent && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <Card title={editingEvent.id ? '編輯活動' : '新增活動'} action={
+            <button onClick={() => setEditingEvent(null)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
+          }>
+            <div className="p-5 space-y-6">
+              {/* Basic Info */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">基本設定</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">活動名稱</label>
+                    <input type="text" value={editingEvent.title || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, title: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：2026 春季吉他展" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">Slug（網址識別碼）</label>
+                    <input type="text" value={editingEvent.slug || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, slug: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="例：spring-2026-guitar-show" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">開始日期</label>
+                    <input type="datetime-local" value={editingEvent.startDate ? new Date(editingEvent.startDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, startDate: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">結束日期</label>
+                    <input type="datetime-local" value={editingEvent.endDate ? new Date(editingEvent.endDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, endDate: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">活動地點</label>
+                    <input type="text" value={editingEvent.location || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, location: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：台北世貿中心" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">狀態</label>
+                    <select value={editingEvent.status || 'DRAFT'} onChange={(e) => setEditingEvent(p => p ? { ...p, status: e.target.value as EventType['status'] } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all">
+                      <option value="DRAFT" className="bg-[#1e160d]">草稿</option>
+                      <option value="ACTIVE" className="bg-[#1e160d]">啟用</option>
+                      <option value="ENDED" className="bg-[#1e160d]">已結束</option>
+                      <option value="CANCELLED" className="bg-[#1e160d]">已取消</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">封面圖片 URL</label>
+                    <input type="text" value={editingEvent.coverImage || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, coverImage: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="https://..." />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-[11px] text-white/40 mb-1.5">活動描述</label>
+                  <textarea value={editingEvent.description || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, description: e.target.value } : p)} rows={4}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all resize-none" placeholder="詳細描述活動內容..." />
+                </div>
+              </div>
+
+              {/* QR Code & UTM Settings */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">QR Code 與引流設定</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">自訂導向網址（選填）</label>
+                    <input type="text" value={editingEvent.landingUrl || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, landingUrl: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="掃碼後導向的網址" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Source</label>
+                    <input type="text" value={editingEvent.utmSource || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmSource: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：flyer, poster, social" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Medium</label>
+                    <input type="text" value={editingEvent.utmMedium || 'qrcode'} onChange={(e) => setEditingEvent(p => p ? { ...p, utmMedium: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：qrcode" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">UTM Campaign</label>
+                    <input type="text" value={editingEvent.utmCampaign || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, utmCampaign: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：spring-2026" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Coupon Settings */}
+              <div>
+                <h3 className="text-xs font-bold text-white/50 mb-3 uppercase tracking-widest">優惠券關聯（選填）</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">優惠碼</label>
+                    <input type="text" value={editingEvent.couponCode || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, couponCode: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all font-mono" placeholder="例：SPRING2026" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-white/40 mb-1.5">優惠說明</label>
+                    <input type="text" value={editingEvent.discountNote || ''} onChange={(e) => setEditingEvent(p => p ? { ...p, discountNote: e.target.value } : p)}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" placeholder="例：全館 9 折優惠" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end gap-3 pt-2">
+                <button onClick={() => setEditingEvent(null)} className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">取消</button>
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 disabled:opacity-40 transition-all">
+                  <Save size={12} /> {saving ? '儲存中...' : '儲存'}
+                </button>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* ── Events List ── */}
+      {loading ? <Spinner /> : events.length === 0 ? (
+        <div className="py-16 text-center">
+          <CalendarDays size={40} className="mx-auto text-white/10 mb-3" />
+          <p className="text-xs text-white/30 uppercase tracking-widest">尚無活動</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {events.map((event) => (
+            <Card key={event.id}>
+              <div className="p-5">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                  {/* Info */}
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-sm font-bold truncate">{event.title}</h3>
+                      <span className={cn('shrink-0 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest', EVENT_STATUS_COLORS[event.status])}>
+                        {event.status}
+                      </span>
+                      {!event.isActive && <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold">隱藏</span>}
+                    </div>
+                    <div className="flex flex-wrap gap-4 text-[10px] text-white/40">
+                      <span className="flex items-center gap-1"><CalendarDays size={10} /> {fmtDate(event.startDate)} — {fmtDate(event.endDate)}</span>
+                      {event.location && <span className="flex items-center gap-1"><MapPin size={10} /> {event.location}</span>}
+                      <span className="flex items-center gap-1"><QrCode size={10} /> 掃描 {event.totalScans} 次</span>
+                      {event.couponCode && <span className="flex items-center gap-1"><Ticket size={10} /> {event.couponCode}</span>}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={() => setViewingQr(event)} title="QR Code"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      <QrCode size={14} />
+                    </button>
+                    <button onClick={() => handleCopyLink(event)} title="複製連結"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      {copiedId === event.id ? <Check size={14} className="text-green-400" /> : <Link size={14} />}
+                    </button>
+                    <button onClick={() => handleViewAnalytics(event)} title="數據分析"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      <BarChart3 size={14} />
+                    </button>
+                    <button onClick={() => handleToggle(event.id)} title={event.isActive ? '隱藏' : '顯示'}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
+                      {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
+                    </button>
+                    <button onClick={() => setEditingEvent({ ...event })} title="編輯"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      <Edit size={14} />
+                    </button>
+                    <button onClick={() => handleDelete(event.id)} title="刪除"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHARED COMPONENTS
+   ═══════════════════════════════════════════════════════ */
 
 function Card({ title, action, children }: { title?: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
