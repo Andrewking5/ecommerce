@@ -2304,6 +2304,15 @@ const EMPTY_EVENT: Partial<EventType> = {
   couponCode: '', discountNote: '', isActive: true,
 };
 
+/** Format Date to local datetime-local input value (avoids UTC shift from toISOString) */
+function toLocalDatetimeValue(val: string | undefined): string {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return val.slice(0, 16); // already a raw string like "2026-04-07T16:00"
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 /** Auto-generate slug from title: 中文→pinyin-ish, spaces→dashes, lowercase */
 function toSlug(str: string): string {
   return str
@@ -2543,12 +2552,12 @@ function EventsTab() {
                 </div>
                 <div>
                   <label className="block text-[11px] text-white/40 mb-1.5">開始日期 <span className="text-red-400">*</span></label>
-                  <input type="datetime-local" value={editingEvent.startDate ? new Date(editingEvent.startDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, startDate: e.target.value } : p)}
+                  <input type="datetime-local" value={toLocalDatetimeValue(editingEvent.startDate)} onChange={(e) => setEditingEvent(p => p ? { ...p, startDate: e.target.value } : p)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
                 </div>
                 <div>
                   <label className="block text-[11px] text-white/40 mb-1.5">結束日期 <span className="text-red-400">*</span></label>
-                  <input type="datetime-local" value={editingEvent.endDate ? new Date(editingEvent.endDate).toISOString().slice(0, 16) : ''} onChange={(e) => setEditingEvent(p => p ? { ...p, endDate: e.target.value } : p)}
+                  <input type="datetime-local" value={toLocalDatetimeValue(editingEvent.endDate)} onChange={(e) => setEditingEvent(p => p ? { ...p, endDate: e.target.value } : p)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all" />
                 </div>
                 <div className="sm:col-span-2">
