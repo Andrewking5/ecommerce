@@ -98,7 +98,7 @@ export default function Events() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  onClick={() => navigate(`/events/${event.slug}`)}
+                  onClick={() => window.location.href = `/e/${event.slug}`}
                   className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-ayers-ink/5"
                 >
                   {/* Cover Image */}

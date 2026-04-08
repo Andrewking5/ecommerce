@@ -42,8 +42,7 @@ export default function EventDetail() {
   const getQrUrl = () => {
     if (!event) return '';
     const base = window.location.origin;
-    const lang = document.location.pathname.split('/')[1] || 'zh-TW';
-    let url = `${base}/${lang}/events/${event.slug}`;
+    let url = `${base}/e/${event.slug}`;
     const params = new URLSearchParams();
     if (event.utmSource) params.set('utm_source', event.utmSource);
     if (event.utmMedium) params.set('utm_medium', event.utmMedium);

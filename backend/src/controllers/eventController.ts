@@ -92,7 +92,7 @@ export class EventController {
       ]);
 
       // Redirect to landing URL or event page
-      const redirectUrl = event.landingUrl || `/events/${event.slug}`;
+      const redirectUrl = event.landingUrl || `/e/${event.slug}`;
       res.json({ success: true, redirectUrl });
     } catch (error) {
       console.error('Failed to track click:', error);

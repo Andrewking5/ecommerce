@@ -19,6 +19,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { isSupportedLang, useStrippedLocation } from './lib/i18nRouting';
 import { usePageViewTracking } from './hooks/useAnalytics';
 import { FullPageLoader } from './components/guitar';
+import i18n from './i18n/config';
 
 // Eagerly load the home page for fast initial render
 import Home from './pages/Home';
@@ -104,6 +105,29 @@ function RootRedirect() {
   return <Navigate to={`/${lang}`} replace />;
 }
 
+/**
+ * Standalone layout for /e/:slug event landing pages.
+ * Forces zh-TW language and renders full site chrome.
+ */
+function EventLandingLayout() {
+  useEffect(() => {
+    if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main id="main-content" role="main" className="flex-grow pt-20">
+        <Suspense fallback={<PageLoader />}>
+          <EventDetail />
+        </Suspense>
+      </main>
+      <Footer />
+      <CookieConsent />
+    </div>
+  );
+}
+
 function AppLayout() {
   const location = useStrippedLocation();
   const isFullscreen = location.pathname === '/customizer';
@@ -174,6 +198,8 @@ export default function App() {
               <Route path="/" element={<RootRedirect />} />
               {/* OAuth callback — outside /:lang/ because backend redirects to /auth/callback */}
               <Route path="/auth/callback" element={<Suspense fallback={<PageLoader />}><AuthCallback /></Suspense>} />
+              {/* Short event landing page — /e/:slug, no language prefix */}
+              <Route path="/e/:slug" element={<EventLandingLayout />} />
               {/* All pages under /:lang/ */}
               <Route path="/:lang/*" element={<AppLayout />} />
             </Routes>
