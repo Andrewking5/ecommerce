@@ -2390,21 +2390,31 @@ function EventsTab() {
     if (payload.endDate && typeof payload.endDate === 'string') {
       payload.endDate = new Date(payload.endDate as string).toISOString();
     }
+    console.log('📤 Event save payload:', JSON.stringify(payload, null, 2));
     try {
       if (editingEvent.id) {
         const res = await eventService.updateEvent(editingEvent.id, payload);
         if (res.success) {
           setEvents((prev) => prev.map((e) => e.id === editingEvent.id ? { ...e, ...editingEvent } as EventType : e));
           setEditingEvent(null);
+        } else {
+          alert(`更新失敗：${res.message || res.error || JSON.stringify(res.details || res)}`);
         }
       } else {
         const res = await eventService.createEvent(payload);
         if (res.success) {
           setEditingEvent(null);
           fetchEvents();
+        } else {
+          alert(`新增失敗：${res.message || res.error || JSON.stringify(res.details || res)}`);
         }
       }
-    } catch { /* silent */ } finally { setSaving(false); }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data?.error || err?.message || '未知錯誤';
+      const details = err?.response?.data?.details;
+      console.error('Event save error:', err?.response?.data || err);
+      alert(`儲存失敗：${msg}${details ? '\n' + (Array.isArray(details) ? details.join('\n') : JSON.stringify(details)) : ''}`);
+    } finally { setSaving(false); }
   };
 
   const handleViewAnalytics = async (event: EventType) => {
