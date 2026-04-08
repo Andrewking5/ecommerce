@@ -2370,15 +2370,35 @@ function EventsTab() {
   const handleSave = async () => {
     if (!editingEvent) return;
     setSaving(true);
+    // Only send schema-recognized fields (strip id, referralCode, _count, timestamps, etc.)
+    const payload: Record<string, unknown> = {};
+    const allowedKeys = [
+      'title', 'slug', 'description', 'coverImage', 'location',
+      'startDate', 'endDate', 'status',
+      'landingUrl', 'utmSource', 'utmMedium', 'utmCampaign',
+      'couponCode', 'discountNote', 'isActive',
+    ];
+    for (const key of allowedKeys) {
+      if ((editingEvent as Record<string, unknown>)[key] !== undefined) {
+        payload[key] = (editingEvent as Record<string, unknown>)[key];
+      }
+    }
+    // Ensure dates are proper ISO strings
+    if (payload.startDate && typeof payload.startDate === 'string') {
+      payload.startDate = new Date(payload.startDate as string).toISOString();
+    }
+    if (payload.endDate && typeof payload.endDate === 'string') {
+      payload.endDate = new Date(payload.endDate as string).toISOString();
+    }
     try {
       if (editingEvent.id) {
-        const res = await eventService.updateEvent(editingEvent.id, editingEvent);
+        const res = await eventService.updateEvent(editingEvent.id, payload);
         if (res.success) {
           setEvents((prev) => prev.map((e) => e.id === editingEvent.id ? { ...e, ...editingEvent } as EventType : e));
           setEditingEvent(null);
         }
       } else {
-        const res = await eventService.createEvent(editingEvent);
+        const res = await eventService.createEvent(payload);
         if (res.success) {
           setEditingEvent(null);
           fetchEvents();
