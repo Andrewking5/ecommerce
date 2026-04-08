@@ -198,8 +198,8 @@ export default function App() {
               <Route path="/" element={<RootRedirect />} />
               {/* OAuth callback — outside /:lang/ because backend redirects to /auth/callback */}
               <Route path="/auth/callback" element={<Suspense fallback={<PageLoader />}><AuthCallback /></Suspense>} />
-              {/* Short event landing page — /e/:slug, no language prefix */}
-              <Route path="/e/:slug" element={<EventLandingLayout />} />
+              {/* Short event landing page — /e/*, no language prefix, supports slashes in slug */}
+              <Route path="/e/*" element={<EventLandingLayout />} />
               {/* All pages under /:lang/ */}
               <Route path="/:lang/*" element={<AppLayout />} />
             </Routes>

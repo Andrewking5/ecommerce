@@ -41,7 +41,8 @@ export class EventController {
   /** Get single event by slug (public) */
   static async getEventBySlug(req: Request, res: Response): Promise<void> {
     try {
-      const { slug } = req.params;
+      // Express 4 wildcard: req.params[0] contains the matched path after /slug/
+      const slug = req.params.slug || req.params[0];
       const event = await prisma.event.findUnique({
         where: { slug },
         select: {

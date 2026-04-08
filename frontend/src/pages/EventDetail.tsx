@@ -19,7 +19,9 @@ function formatDate(dateStr: string): string {
 
 export default function EventDetail() {
   const { t } = useTranslation();
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams();
+  // Support both /e/some/slug (wildcard *) and /:lang/events/:slug
+  const slug = params['*'] || params.slug;
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
