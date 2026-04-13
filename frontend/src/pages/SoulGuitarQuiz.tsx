@@ -96,11 +96,14 @@ function QuizOption({
   label,
   onClick,
   delay,
+  active,
 }: {
   label: string;
   onClick: () => void;
   delay: number;
+  active: boolean;
 }) {
+  // active = 剛被點擊，顯示灰底白字回饋
   return (
     <motion.button
       type="button"
@@ -115,19 +118,19 @@ function QuizOption({
       <img
         src={`${BASE}/btn-default.png`}
         alt=""
-        className="w-full h-auto transition-opacity duration-200 group-hover:opacity-0"
+        className={`w-full h-auto transition-opacity duration-200 ${active ? 'opacity-0' : 'group-hover:opacity-0'}`}
         draggable={false}
       />
-      {/* Hover：灰底按鈕圖片 */}
+      {/* 已選/Hover：灰底按鈕圖片 */}
       <img
         src={`${BASE}/btn-selected.png`}
         alt=""
-        className="absolute inset-0 w-full h-auto opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        className={`absolute inset-0 w-full h-auto transition-opacity duration-200 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
         draggable={false}
       />
       {/* 文字疊在按鈕上 */}
       <span
-        className="absolute inset-0 flex items-center justify-center text-[0.95rem] leading-snug text-[#2a2a2a] transition-colors duration-200 group-hover:text-white whitespace-pre-line text-center px-4"
+        className={`absolute inset-0 flex items-center justify-center text-[0.95rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`}
         style={{ fontFamily: QUIZ_FONT }}
       >
         {label}
@@ -330,6 +333,7 @@ export default function SoulGuitarQuiz() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [direction, setDirection] = useState(1);
+  const [tapped, setTapped] = useState<number | null>(null);
 
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
@@ -338,11 +342,15 @@ export default function SoulGuitarQuiz() {
   const handleLoadingDone = () => setPhase('quiz');
 
   const handleSelect = (optionIndex: number) => {
+    if (tapped !== null) return; // 防止連點
+    setTapped(optionIndex);
+
     const newAnswers = [...answers];
     newAnswers[currentQ] = optionIndex;
     setAnswers(newAnswers);
 
     setTimeout(() => {
+      setTapped(null);
       if (currentQ < questions.length - 1) {
         setDirection(1);
         setCurrentQ(currentQ + 1);
@@ -436,6 +444,7 @@ export default function SoulGuitarQuiz() {
                           label={opt}
                           onClick={() => handleSelect(i)}
                           delay={0.05 + i * 0.06}
+                          active={tapped === i}
                         />
                       ))}
                     </div>
