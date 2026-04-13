@@ -19,6 +19,8 @@ const question = {
 
 // 圖片牆壁主色 → 電腦版兩側邊框
 const WALL_COLOR = '#6ba3b5';
+// 未來熒黑字體
+const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 /** 漸層邊框膠囊按鈕 */
 function QuizOption({
@@ -45,7 +47,7 @@ function QuizOption({
       {selected ? (
         /* ── 已選：灰底白字 ── */
         <div className="rounded-full bg-[#a0a0a0] py-3 px-6">
-          <span className="text-[0.95rem] font-medium text-white">{label}</span>
+          <span className="text-[1.05rem]" style={{ fontFamily: QUIZ_FONT, color: '#fff' }}>{label}</span>
         </div>
       ) : (
         /* ── 未選：漸層邊框 + 白底 ── */
@@ -56,7 +58,7 @@ function QuizOption({
           }}
         >
           <div className="rounded-full bg-white py-3 px-6">
-            <span className="text-[0.95rem] font-medium text-[#2a2a2a]">{label}</span>
+            <span className="text-[1.05rem] text-[#2a2a2a]" style={{ fontFamily: QUIZ_FONT }}>{label}</span>
           </div>
         </div>
       )}
