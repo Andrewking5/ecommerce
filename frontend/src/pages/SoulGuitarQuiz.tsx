@@ -1,36 +1,40 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { ChevronLeft } from 'lucide-react';
 
 /* ──────────────────────────────────────
-   Soul Guitar — 心理測驗 Q1
-   背景：原始圖片（含 Q1 文字）
-   按鈕：漸層邊框膠囊（未選）/ 灰底白字（已選）
+   Soul Guitar — 心理測驗
+   - hover 膨脹按鈕
+   - 點擊直接下一題
+   - 左上角「上一題」按鈕
    ────────────────────────────────────── */
 
-const question = {
-  id: 1,
-  options: [
-    '找一家舒服的小店坐著放鬆',
-    '隨便出門走走看看城市',
-    '待在房間聽歌或想事情',
-    '找朋友出去玩熱鬧一下',
-  ],
-};
+const questions = [
+  {
+    id: 1,
+    bg: '/images/events/quiz/q1.jpg',
+    options: [
+      '找一家舒服的小店坐著放鬆',
+      '隨便出門走走看看城市',
+      '待在房間聽歌或想事情',
+      '找朋友出去玩熱鬧一下',
+    ],
+  },
+  // 之後加更多題目...
+];
 
 // 圖片牆壁主色 → 電腦版兩側邊框
 const WALL_COLOR = '#6ba3b5';
 // 未來熒黑字體
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
-/** 漸層邊框膠囊按鈕 */
+/** 漸層邊框膠囊按鈕 — hover 膨脹，點擊觸發下一題 */
 function QuizOption({
   label,
-  selected,
   onClick,
   delay,
 }: {
   label: string;
-  selected: boolean;
   onClick: () => void;
   delay: number;
 }) {
@@ -40,47 +44,57 @@ function QuizOption({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay }}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="w-full cursor-pointer"
+      className="w-full cursor-pointer group"
     >
-      {selected ? (
-        /* ── 已選：灰底白字，膨脹到完整大小 ── */}
-        <motion.div
-          className="rounded-full bg-[#a0a0a0] px-6"
-          initial={{ paddingTop: 6, paddingBottom: 6 }}
-          animate={{ paddingTop: 12, paddingBottom: 12 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        >
-          <motion.span
-            className="block"
-            style={{ fontFamily: QUIZ_FONT, color: '#fff' }}
-            initial={{ fontSize: '0.85rem' }}
-            animate={{ fontSize: '1.05rem' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      <div
+        className="rounded-full p-[2.5px]"
+        style={{
+          background: 'linear-gradient(90deg, #c5a059 0%, #d4b06a 30%, #a0b8c0 70%, #6ba3b5 100%)',
+        }}
+      >
+        <div className="rounded-full bg-white transition-all duration-200 ease-out py-1.5 px-6 group-hover:py-3">
+          <span
+            className="text-[0.85rem] text-[#2a2a2a] transition-all duration-200 ease-out group-hover:text-[1.05rem]"
+            style={{ fontFamily: QUIZ_FONT }}
           >
             {label}
-          </motion.span>
-        </motion.div>
-      ) : (
-        /* ── 未選：漸層邊框 + 白底，較矮 ── */
-        <div
-          className="rounded-full p-[2.5px]"
-          style={{
-            background: 'linear-gradient(90deg, #c5a059 0%, #d4b06a 30%, #a0b8c0 70%, #6ba3b5 100%)',
-          }}
-        >
-          <div className="rounded-full bg-white py-1.5 px-6">
-            <span className="text-[0.85rem] text-[#2a2a2a]" style={{ fontFamily: QUIZ_FONT }}>{label}</span>
-          </div>
+          </span>
         </div>
-      )}
+      </div>
     </motion.button>
   );
 }
 
 export default function SoulGuitarQuiz() {
-  const [selected, setSelected] = useState<number | null>(null);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [answers, setAnswers] = useState<number[]>([]);
+
+  const question = questions[currentQ];
+  const isFirstQ = currentQ === 0;
+
+  const handleSelect = (optionIndex: number) => {
+    // 儲存答案
+    const newAnswers = [...answers];
+    newAnswers[currentQ] = optionIndex;
+    setAnswers(newAnswers);
+
+    // 短暫延遲後跳下一題（讓使用者看到點擊反饋）
+    setTimeout(() => {
+      if (currentQ < questions.length - 1) {
+        setCurrentQ(currentQ + 1);
+      } else {
+        // TODO: 最後一題 → 顯示結果
+      }
+    }, 400);
+  };
+
+  const handlePrev = () => {
+    if (currentQ > 0) {
+      setCurrentQ(currentQ - 1);
+    }
+  };
 
   return (
     <div
@@ -89,51 +103,58 @@ export default function SoulGuitarQuiz() {
     >
       {/* 手機卡片 — 電腦版兩側露出邊框色 */}
       <div className="relative w-full max-w-[430px] min-h-dvh mx-auto overflow-hidden">
-        {/* 背景圖片（含 Q1 文字） */}
-        <img
-          src="/images/events/quiz/q1.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          draggable={false}
-        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentQ}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0"
+          >
+            {/* 背景圖片（含題目文字） */}
+            <img
+              src={question.bg}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
+            />
 
-        {/* 互動層 */}
-        <div className="relative z-10 flex flex-col h-dvh">
-          {/* 上方留白 — 讓出圖片中的 Q1 文字區域（約佔 52%） */}
-          <div className="flex-none" style={{ height: '52%' }} />
-
-          {/* 選項按鈕 */}
-          <div className="flex-1 flex flex-col justify-start px-6 gap-3">
-            {question.options.map((opt, i) => (
-              <QuizOption
-                key={i}
-                label={opt}
-                selected={selected === i}
-                onClick={() => setSelected(i)}
-                delay={0.1 + i * 0.08}
-              />
-            ))}
-
-            {/* 下一題 */}
-            <AnimatePresence>
-              {selected !== null && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-4 flex justify-center"
+            {/* 互動層 */}
+            <div className="relative z-10 flex flex-col h-dvh">
+              {/* 上一題按鈕 */}
+              {!isFirstQ && (
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  onClick={handlePrev}
+                  className="absolute top-6 left-4 z-20 flex items-center gap-1 text-[#2a2a2a]/70 hover:text-[#2a2a2a] transition-colors"
+                  style={{ fontFamily: QUIZ_FONT }}
                 >
-                  <button
-                    type="button"
-                    className="px-10 py-3 rounded-full bg-ayers-ink text-white font-bold text-sm tracking-wider hover:bg-ayers-ink/80 transition-colors shadow-lg"
-                  >
-                    下一題 →
-                  </button>
-                </motion.div>
+                  <ChevronLeft size={20} />
+                  <span className="text-sm">上一題</span>
+                </motion.button>
               )}
-            </AnimatePresence>
-          </div>
-        </div>
+
+              {/* 上方留白 — 讓出圖片中的題目文字區域 */}
+              <div className="flex-none" style={{ height: '52%' }} />
+
+              {/* 選項按鈕 */}
+              <div className="flex-1 flex flex-col justify-start px-6 gap-3">
+                {question.options.map((opt, i) => (
+                  <QuizOption
+                    key={`${currentQ}-${i}`}
+                    label={opt}
+                    onClick={() => handleSelect(i)}
+                    delay={0.1 + i * 0.08}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
