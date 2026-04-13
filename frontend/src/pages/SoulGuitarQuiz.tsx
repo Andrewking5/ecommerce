@@ -442,7 +442,7 @@ export default function SoulGuitarQuiz() {
                     )}
 
                     {/* 進度條 — 絕對定位在 Q 文字右邊同一行 */}
-                    <div className="absolute z-20" style={{ top: '27.5%', left: '22%', right: '4%' }}>
+                    <div className="absolute z-20" style={{ top: 'calc(27.5% - 2px)', left: '22%', right: '4%' }}>
                       <ProgressBar current={currentQ} />
                     </div>
 
