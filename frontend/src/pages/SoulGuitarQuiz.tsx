@@ -290,9 +290,9 @@ function CoverPage({ onStart }: { onStart: () => void }) {
           opacity: 1,
           y: 0,
           filter: [
-            'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
-            'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
-            'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
+            'drop-shadow(0 0 0px rgba(218,165,50,0.2))',
+            'drop-shadow(0 0 14px rgba(218,165,50,0.7))',
+            'drop-shadow(0 0 0px rgba(218,165,50,0.2))',
           ],
         }}
         transition={{
@@ -321,10 +321,10 @@ function CoverPage({ onStart }: { onStart: () => void }) {
             style={{ animation: 'marquee 15s linear infinite' }}
           >
             <div className="flex items-center justify-around w-1/2">
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto" draggable={false} />
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} />
             </div>
             <div className="flex items-center justify-around w-1/2">
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto" draggable={false} />
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} />
             </div>
           </div>
         </div>
