@@ -1,17 +1,17 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
-import { Guitar, Music, Trophy, Users, Clock, Star, ChevronDown, ExternalLink, FileText, X, ZoomIn } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { Guitar, Music, Trophy, Users, Star, ChevronDown, ExternalLink, FileText, X, ZoomIn, ArrowUp, Menu as MenuIcon } from 'lucide-react';
 import SEO from '../components/SEO';
 
-const POSTER_SRC = '/images/events/soul-guitar-poster.jpg';
+const POSTER_SRC = '/images/events/soul-guitar-poster.png';
 
-const THEME_COLORS = [
-  { name: '藍', bg: 'bg-blue-500', text: 'text-blue-500', border: 'border-blue-500', hex: '#3b82f6' },
-  { name: '紅', bg: 'bg-red-500', text: 'text-red-500', border: 'border-red-500', hex: '#ef4444' },
-  { name: '黃', bg: 'bg-yellow-400', text: 'text-yellow-500', border: 'border-yellow-400', hex: '#facc15' },
-  { name: '橘', bg: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500', hex: '#f97316' },
-  { name: '黑', bg: 'bg-black', text: 'text-black', border: 'border-black', hex: '#000000' },
-  { name: '白', bg: 'bg-white', text: 'text-gray-700', border: 'border-gray-300', hex: '#ffffff' },
+const CONTEST_COLORS = [
+  { name: '藍', hex: '#3b82f6' },
+  { name: '紅', hex: '#ef4444' },
+  { name: '黃', hex: '#facc15' },
+  { name: '橘', hex: '#f97316' },
+  { name: '黑', hex: '#1a1a1a' },
+  { name: '白', hex: '#ffffff' },
 ];
 
 const JUDGES = [
@@ -23,55 +23,13 @@ const JUDGES = [
 ];
 
 const AWARDS = [
-  {
-    title: '最佳彈唱獎',
-    prize: 'AYERS 全單吉他 A07c-30th Anniversary',
-    value: 'NT$48,800 + 獎金 NT$5,000',
-    color: 'from-yellow-400 to-orange-500',
-    icon: '🏆',
-  },
-  {
-    title: '最佳演奏獎',
-    prize: 'AYERS 全單吉他 A07c-30th-Engelmann Anniversary（英格曼雲衫版）',
-    value: 'NT$48,800 + 獎金 NT$5,000',
-    color: 'from-orange-500 to-red-500',
-    icon: '🎸',
-  },
-  {
-    title: '最佳吉他手',
-    prize: 'AYERS 全單吉他 A07c Sun + 雲聲錄音電容麥克風一隻',
-    value: '市價 NT$42,000',
-    color: 'from-red-500 to-pink-500',
-    icon: '🌟',
-  },
-  {
-    title: '最佳 Vocal',
-    prize: 'AYERS 全單吉他 A02c Sun + 聲潮麥克風一隻',
-    value: '市價 NT$26,000',
-    color: 'from-blue-500 to-indigo-500',
-    icon: '🎤',
-  },
-  {
-    title: '最佳人氣獎',
-    prize: 'AYERS 面單彩色吉他 ST2-Color Light',
-    value: '市價 NT$15,500',
-    color: 'from-pink-500 to-purple-500',
-    icon: '❤️',
-  },
-  {
-    title: '評審團優選',
-    prize: 'AYERS 與評審獎牌、AYERS 吉他架與奧昇弦釘',
-    value: '五位',
-    color: 'from-indigo-500 to-blue-500',
-    icon: '🏅',
-  },
-  {
-    title: '海馬特別獎',
-    prize: '一年海馬91PU會員',
-    value: '五位（由海馬執行長王翰選出）',
-    color: 'from-teal-500 to-cyan-500',
-    icon: '🐴',
-  },
+  { title: '最佳彈唱獎', prize: 'AYERS 全單吉他 A07c-30th Anniversary', value: 'NT$48,800 + 獎金 NT$5,000', icon: '🏆' },
+  { title: '最佳演奏獎', prize: 'AYERS 全單吉他 A07c-30th-Engelmann Anniversary（英格曼雲衫版）', value: 'NT$48,800 + 獎金 NT$5,000', icon: '🎸' },
+  { title: '最佳吉他手', prize: 'AYERS 全單吉他 A07c Sun + 雲聲錄音電容麥克風一隻', value: '市價 NT$42,000', icon: '🌟' },
+  { title: '最佳 Vocal', prize: 'AYERS 全單吉他 A02c Sun + 聲潮麥克風一隻', value: '市價 NT$26,000', icon: '🎤' },
+  { title: '最佳人氣獎', prize: 'AYERS 面單彩色吉他 ST2-Color Light', value: '市價 NT$15,500', icon: '❤️' },
+  { title: '評審團優選', prize: 'AYERS 與評審獎牌、AYERS 吉他架與奧昇弦釘', value: '五位', icon: '🏅' },
+  { title: '海馬特別獎', prize: '一年海馬91PU會員', value: '五位（由海馬執行長王翰選出）', icon: '🐴' },
 ];
 
 const TIMELINE = [
@@ -80,33 +38,74 @@ const TIMELINE = [
   { label: '得獎公佈', date: '2026/6/29', sub: '台灣時間 21:00', icon: Trophy },
 ];
 
+const NAV_ITEMS = [
+  { label: '宗旨', href: '#mission' },
+  { label: '時程', href: '#timeline' },
+  { label: '評審', href: '#judges' },
+  { label: '評分', href: '#scoring' },
+  { label: '獎項', href: '#awards' },
+  { label: '規則', href: '#rules' },
+];
+
+/* ── Shared ── */
+
 function SectionTitle({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
     <motion.h2
       id={id}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="text-3xl md:text-4xl font-bold text-center mb-12 text-white"
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      className="font-serif italic font-bold text-3xl md:text-4xl text-center mb-3 text-ayers-ink"
     >
       {children}
     </motion.h2>
   );
 }
 
-function ColorBar() {
+function SectionSub({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-1.5 w-full">
-      {THEME_COLORS.map((c) => (
+    <p className="text-center text-ayers-ink/30 text-[10px] tracking-[0.3em] uppercase mb-14">{children}</p>
+  );
+}
+
+function ContestColorBar() {
+  return (
+    <div className="flex h-1">
+      {CONTEST_COLORS.map((c) => (
         <div key={c.name} className="flex-1" style={{ backgroundColor: c.hex }} />
       ))}
     </div>
   );
 }
 
+function GoldDivider() {
+  return (
+    <div className="flex justify-center py-10">
+      <div className="w-20 h-px bg-gradient-to-r from-transparent via-ayers-gold/40 to-transparent" />
+    </div>
+  );
+}
+
+/* ── Main ── */
+
 export default function SoulGuitarInfo() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [posterOpen, setPosterOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+
+  useEffect(() => {
+    const fn = () => {
+      setScrolled(window.scrollY > 60);
+      setShowTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
 
   const rules = [
     '演奏組參賽者須將影片上傳至 YouTube 及 Instagram / Facebook，並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。',
@@ -134,210 +133,247 @@ export default function SoulGuitarInfo() {
   ];
 
   return (
-    <div className="bg-[#0a0a0a] min-h-screen text-white">
+    <div className="bg-ayers-cream min-h-screen text-ayers-ink selection:bg-ayers-gold/30">
       <SEO
         title="2026 Ayers 靈魂吉他手大賽 | 活動簡章"
         description="拿起手中那一把吉他，展現你的靈魂性格。2026 Ayers Soul Guitar 靈魂吉他手大賽，獎項總價值超過 NT$200,000！"
       />
 
-      {/* ─── Poster Lightbox ─── */}
+      {/* ── Scroll progress ── */}
+      <motion.div className="fixed top-0 left-0 right-0 h-[2px] z-[100] origin-left bg-ayers-gold" style={{ width: progressWidth }} />
+
+      {/* ── Floating Nav ── */}
+      <motion.header
+        initial={{ y: -80 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-[90] transition-all duration-500 ${
+          scrolled ? 'bg-ayers-cream/90 backdrop-blur-xl shadow-sm border-b border-ayers-gold/10' : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+          <a href="/e/soul-guitar/info" className="flex items-center gap-3">
+            <img src="/images/ayers-logo.svg" alt="Ayers" className="h-6 opacity-70" />
+          </a>
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_ITEMS.map((item) => (
+              <a key={item.href} href={item.href} className="px-3 py-1.5 text-[10px] font-bold tracking-[0.15em] uppercase text-ayers-ink/40 hover:text-ayers-ink transition-colors">
+                {item.label}
+              </a>
+            ))}
+            <a
+              href="https://forms.gle/Wat3juxXdQ6vXbAi9"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-3 px-5 py-2 text-[10px] font-bold tracking-[0.15em] uppercase bg-ayers-ink text-white rounded-full hover:bg-ayers-ink/80 transition-colors"
+            >
+              立即報名
+            </a>
+          </nav>
+          <button type="button" aria-label="選單" className="md:hidden p-2 text-ayers-ink/50" onClick={() => setMobileNavOpen(true)}>
+            <MenuIcon size={20} />
+          </button>
+        </div>
+      </motion.header>
+
+      {/* ── Mobile Nav ── */}
       <AnimatePresence>
-        {posterOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={() => setPosterOpen(false)}
-          >
+        {mobileNavOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[95] bg-ayers-ink/40 backdrop-blur-sm md:hidden" onClick={() => setMobileNavOpen(false)}>
             <motion.div
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.85, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="relative max-w-lg w-full max-h-[90vh]"
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="absolute right-0 top-0 bottom-0 w-72 bg-ayers-cream border-l border-ayers-gold/15 p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                type="button"
-                aria-label="關閉海報"
-                onClick={() => setPosterOpen(false)}
-                className="absolute -top-12 right-0 text-white/60 hover:text-white transition-colors"
-              >
-                <X size={28} />
-              </button>
-              <img
-                src={POSTER_SRC}
-                alt="2026 Ayers 靈魂吉他手大賽 官方海報"
-                className="w-full h-auto rounded-2xl shadow-2xl shadow-black/50"
-              />
+              <button type="button" aria-label="關閉" onClick={() => setMobileNavOpen(false)} className="absolute top-4 right-4 text-ayers-ink/30 hover:text-ayers-ink"><X size={20} /></button>
+              <div className="mt-12 space-y-1">
+                {NAV_ITEMS.map((item) => (
+                  <a key={item.href} href={item.href} onClick={() => setMobileNavOpen(false)} className="block px-4 py-3 text-sm text-ayers-ink/60 hover:text-ayers-ink hover:bg-ayers-gold/5 rounded-xl transition-colors">{item.label}</a>
+                ))}
+                <div className="pt-4 mt-4 border-t border-ayers-gold/10 space-y-3">
+                  <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer" className="block text-center px-4 py-3 text-sm font-bold bg-ayers-ink text-white rounded-xl">立即報名</a>
+                  <a href="/e/soul-guitar" className="block text-center px-4 py-3 text-sm font-bold text-ayers-gold border border-ayers-gold/30 rounded-xl">心理測驗</a>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ─── Hero ─── */}
-      <section className="relative min-h-[100vh] flex items-center overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-[#0a0a0a] to-red-900/30" />
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[128px] animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-400/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
-        </div>
+      {/* ── Poster Lightbox ── */}
+      <AnimatePresence>
+        {posterOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] bg-ayers-ink/90 backdrop-blur-md flex items-center justify-center p-4" onClick={() => setPosterOpen(false)}>
+            <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.85, opacity: 0 }} transition={{ type: 'spring', damping: 25 }} className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+              <button type="button" aria-label="關閉海報" onClick={() => setPosterOpen(false)} className="absolute -top-12 right-0 text-white/60 hover:text-white transition-colors"><X size={28} /></button>
+              <img src={POSTER_SRC} alt="2026 Ayers 靈魂吉他手大賽 官方海報" className="w-full h-auto rounded-2xl shadow-2xl" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Color dots decoration */}
-        <div className="absolute top-8 left-0 right-0 flex justify-center gap-3">
-          {THEME_COLORS.map((c) => (
-            <div
-              key={c.name}
-              className="w-3 h-3 rounded-full opacity-60"
-              style={{ backgroundColor: c.hex }}
-            />
-          ))}
-        </div>
+      {/* ── Back to Top ── */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button type="button" aria-label="回到頂部" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="fixed bottom-6 right-6 z-[80] w-10 h-10 rounded-full bg-ayers-ink text-white flex items-center justify-center shadow-lg hover:bg-ayers-ink/80 transition-colors">
+            <ArrowUp size={16} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+      {/* ═══════════ HERO ═══════════ */}
+      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-ayers-dark">
+        {/* Subtle warm gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ayers-dark via-ayers-dark to-[#2a1a0e]/80" />
+        {/* Ambient gold glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-ayers-gold/[0.04] rounded-full blur-[150px]" />
 
-            {/* Left: Text & CTA */}
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:py-0">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-14 items-center">
+
+            {/* Text — 3 cols */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="order-2 md:order-1 text-center md:text-left"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="md:col-span-3 order-2 md:order-1 text-center md:text-left"
             >
-              <p className="text-sm md:text-base uppercase tracking-[0.3em] text-white/40 mb-6">
-                2026 Ayers Guitar Competition
+              <p className="text-[10px] tracking-[0.4em] uppercase text-ayers-gold/60 mb-6 font-mono">
+                2026 Ayers Soul Guitar Competition
               </p>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-[1.1]">
-                <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent">
-                  靈魂吉他手
-                </span>
+              <h1 className="font-serif italic font-bold text-5xl md:text-6xl lg:text-7xl text-white mb-4 leading-[1.1]">
+                靈魂吉他手
                 <br />
-                <span className="text-white/90">大賽</span>
+                <span className="text-ayers-gold">大賽</span>
               </h1>
-              <p className="text-lg md:text-xl text-white/50 max-w-md mx-auto md:mx-0 mb-10 leading-relaxed">
+              <p className="text-base md:text-lg text-white/40 max-w-md mx-auto md:mx-0 mb-6 leading-relaxed">
                 拿起手中那一把吉他，展現你的靈魂性格
               </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center">
+              {/* Info pills */}
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-10">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/50 text-xs">
+                  <FileText size={11} /> 收件 4/22 – 6/7
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/50 text-xs">
+                  <Users size={11} /> 限額 200 位
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ayers-gold/10 border border-ayers-gold/20 text-ayers-gold text-xs">
+                  <Trophy size={11} /> 獎品總值 20 萬+
+                </span>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 <a
                   href="https://forms.gle/Wat3juxXdQ6vXbAi9"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-red-500/25"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-ayers-gold text-ayers-dark font-bold text-sm hover:bg-ayers-gold-light transition-colors"
                 >
-                  <FileText size={20} />
+                  <FileText size={16} />
                   立即報名
-                  <ExternalLink size={14} className="opacity-60" />
+                  <ExternalLink size={11} className="opacity-40 group-hover:opacity-80" />
                 </a>
-                <a
-                  href="/e/soul-guitar/register"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-white/20 text-white font-bold text-lg hover:bg-white/5 transition-colors"
-                >
+                <a href="/e/soul-guitar/register" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-white/15 text-white/70 font-bold text-sm hover:bg-white/5 transition-colors">
                   活動報名頁
                 </a>
-              </div>
-              <div className="mt-4 flex justify-center md:justify-start">
-                <a
-                  href="/e/soul-guitar"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-yellow-400/30 text-yellow-400 font-bold text-lg hover:bg-yellow-400/5 transition-colors"
-                >
-                  <Guitar size={20} />
-                  心理測驗
+                <a href="/e/soul-guitar" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-ayers-gold/25 text-ayers-gold font-bold text-sm hover:bg-ayers-gold/5 transition-colors">
+                  <Guitar size={16} /> 心理測驗
                 </a>
               </div>
             </motion.div>
 
-            {/* Right: Poster */}
+            {/* Poster — 2 cols */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="order-1 md:order-2 flex justify-center"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="md:col-span-2 order-1 md:order-2 flex justify-center"
             >
               <div className="relative group cursor-pointer" onClick={() => setPosterOpen(true)}>
-                {/* Glow effect behind poster */}
-                <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 via-yellow-400/10 to-red-500/20 rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                {/* Color border accent */}
-                <div className="absolute -inset-[2px] bg-gradient-to-br from-blue-500 via-yellow-400 to-red-500 rounded-2xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+                <div className="absolute -inset-4 bg-ayers-gold/[0.06] rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-b from-ayers-gold/30 via-ayers-gold/10 to-transparent opacity-50 group-hover:opacity-80 transition-opacity" />
                 <img
                   src={POSTER_SRC}
                   alt="2026 Ayers 靈魂吉他手大賽 官方海報"
-                  className="relative w-full max-w-[360px] h-auto rounded-2xl shadow-2xl shadow-black/60 group-hover:scale-[1.02] transition-transform duration-500"
+                  className="relative w-full max-w-[320px] h-auto rounded-2xl shadow-2xl shadow-black/50 group-hover:scale-[1.02] transition-transform duration-500"
                 />
-                {/* Zoom hint */}
-                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ZoomIn size={18} className="text-white" />
+                <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/15 transition-colors duration-300 flex items-center justify-center">
+                  <div className="bg-black/50 backdrop-blur-sm rounded-full p-2.5 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
+                    <ZoomIn size={18} className="text-white" />
+                  </div>
                 </div>
               </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <ChevronDown size={24} className="text-white/30" />
+        {/* Contest color bar at bottom of hero */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <ContestColorBar />
+        </div>
+
+        <motion.div className="absolute bottom-10 left-1/2 -translate-x-1/2" animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
+          <ChevronDown size={18} className="text-white/20" />
         </motion.div>
       </section>
 
-      <ColorBar />
-
-      {/* ─── Mission ─── */}
-      <section className="py-20 md:py-28 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* ═══════════ MISSION ═══════════ */}
+      <section className="py-24 md:py-32 px-4" id="mission">
+        <div className="max-w-3xl mx-auto text-center">
           <SectionTitle>大賽宗旨</SectionTitle>
+          <SectionSub>Our Mission</SectionSub>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-lg md:text-xl text-white/60 leading-relaxed max-w-3xl mx-auto"
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-base md:text-lg text-ayers-ink/55 leading-[2] tracking-wide"
           >
             在網路上有各式吉他彈唱演奏的短影音，音樂製作及推廣已經不像以往需要高成本、人力，現今吉他手除了練習琴藝、歌藝、練團，還需要網路社群平台推廣。怎麼樣在短影音吸引目光？Ayers 特此辦比賽號召世界各地琴友，讓各位靈魂吉他手們在網路相聚，展現你最獨特的風格。
           </motion.p>
         </div>
       </section>
 
-      {/* ─── Platform ─── */}
-      <section className="py-16 px-4 bg-white/[0.02]">
+      <GoldDivider />
+
+      {/* ═══════════ PLATFORM ═══════════ */}
+      <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <SectionTitle>比賽平台</SectionTitle>
+          <SectionSub>Platforms</SectionSub>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center"
+            className="bg-white/60 rounded-2xl p-10 border border-ayers-gold/10 text-center"
           >
-            <p className="text-lg text-white/70 mb-6">
+            <p className="text-sm text-ayers-ink/50 mb-8">
               將你的彈唱（限中文或英文）或演奏影片上傳至
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              {['YouTube', 'Instagram', 'Facebook'].map((platform) => (
-                <span
-                  key={platform}
-                  className="px-6 py-3 rounded-full bg-white/10 text-white font-bold text-lg border border-white/10"
-                >
-                  {platform}
+              {['YouTube', 'Instagram', 'Facebook'].map((p) => (
+                <span key={p} className="px-7 py-3.5 rounded-xl bg-ayers-cream border border-ayers-ink/8 text-ayers-ink font-bold text-base">
+                  {p}
                 </span>
               ))}
             </div>
-            <p className="text-sm text-white/40 mt-6">
-              報名上限 200 位，依 Google 表單收件時間，額滿為止
+            <p className="text-[11px] text-ayers-ink/30 mt-8 tracking-wide">
+              報名上限 200 位 ・ 依 Google 表單收件時間 ・ 額滿為止
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* ─── Timeline ─── */}
-      <section className="py-20 md:py-28 px-4">
+      <GoldDivider />
+
+      {/* ═══════════ TIMELINE ═══════════ */}
+      <section className="py-24 md:py-32 px-4" id="timeline">
         <div className="max-w-4xl mx-auto">
           <SectionTitle>重要時程</SectionTitle>
+          <SectionSub>Timeline</SectionSub>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {TIMELINE.map((item, i) => (
               <motion.div
@@ -345,69 +381,85 @@ export default function SoulGuitarInfo() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center group hover:border-white/20 transition-colors"
+                transition={{ delay: i * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="relative bg-white/60 rounded-2xl p-8 border border-ayers-gold/10 text-center group hover:shadow-md hover:shadow-ayers-gold/5 transition-all duration-300"
               >
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-red-500/20 flex items-center justify-center mx-auto mb-5">
-                  <item.icon size={24} className="text-white/70" />
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-ayers-ink text-white text-[9px] font-bold tracking-widest">
+                  STEP {i + 1}
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">{item.label}</h3>
-                <p className="text-2xl font-black bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent mb-1">
-                  {item.date}
-                </p>
-                {item.sub && <p className="text-sm text-white/40">{item.sub}</p>}
+                <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center mx-auto mb-5 mt-2">
+                  <item.icon size={20} className="text-ayers-gold" />
+                </div>
+                <h3 className="text-base font-bold text-ayers-ink mb-2">{item.label}</h3>
+                <p className="text-xl font-serif italic font-bold text-ayers-gold mb-1">{item.date}</p>
+                {item.sub && <p className="text-[11px] text-ayers-ink/30">{item.sub}</p>}
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <ColorBar />
+      <ContestColorBar />
 
-      {/* ─── Judges ─── */}
-      <section className="py-20 md:py-28 px-4 bg-white/[0.02]">
+      {/* ═══════════ JUDGES ═══════════ */}
+      <section className="py-24 md:py-32 px-4 bg-ayers-dark text-white" id="judges">
         <div className="max-w-4xl mx-auto">
-          <SectionTitle>評審陣容</SectionTitle>
-          <p className="text-center text-white/40 text-sm mb-10">5 名評審</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {JUDGES.map((judge, i) => (
-              <motion.div
-                key={judge.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center hover:border-white/20 transition-colors"
-              >
-                <div
-                  className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: THEME_COLORS[i % THEME_COLORS.length].hex + '20' }}
+          <motion.h2
+            id="judges-title"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-serif italic font-bold text-3xl md:text-4xl text-center mb-3 text-white"
+          >
+            評審陣容
+          </motion.h2>
+          <p className="text-center text-white/25 text-[10px] tracking-[0.3em] uppercase mb-14">5 Judges</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
+            {JUDGES.map((judge, i) => {
+              const color = CONTEST_COLORS[i % CONTEST_COLORS.length];
+              return (
+                <motion.div
+                  key={judge.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  className="bg-white/5 rounded-2xl p-6 border border-white/8 text-center hover:border-ayers-gold/30 transition-all duration-300 group"
                 >
-                  <Star size={24} style={{ color: THEME_COLORS[i % THEME_COLORS.length].hex }} />
-                </div>
-                <h3 className="font-bold text-white text-sm md:text-base">{judge.name}</h3>
-                <p className="text-xs text-white/40 mt-1">{judge.role}</p>
-              </motion.div>
-            ))}
+                  <div
+                    className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                    style={{ backgroundColor: color.hex + '15' }}
+                  >
+                    <Star size={20} style={{ color: color.hex === '#1a1a1a' ? '#888' : color.hex }} />
+                  </div>
+                  <h3 className="font-bold text-white text-sm leading-tight">{judge.name}</h3>
+                  <p className="text-[10px] text-white/25 mt-1 tracking-widest uppercase">{judge.role}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ─── Scoring ─── */}
-      <section className="py-20 md:py-28 px-4">
+      <ContestColorBar />
+
+      {/* ═══════════ SCORING ═══════════ */}
+      <section className="py-24 md:py-32 px-4" id="scoring">
         <div className="max-w-5xl mx-auto">
           <SectionTitle>評分標準</SectionTitle>
+          <SectionSub>Scoring Criteria</SectionSub>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Singing */}
+            {/* 彈唱 */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white/60 rounded-2xl p-8 border border-ayers-gold/10"
             >
-              <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Music size={20} className="text-blue-400" />
+              <h3 className="text-xl font-serif italic font-bold mb-8 flex items-center gap-3 text-ayers-ink">
+                <span className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                  <Music size={18} className="text-blue-500" />
                 </span>
                 彈唱組
               </h3>
@@ -415,41 +467,42 @@ export default function SoulGuitarInfo() {
                 {[
                   { label: 'Vocal', pct: 35, desc: '音準、動態、聲音表現', color: '#3b82f6' },
                   { label: '吉他', pct: 30, desc: '內聲部編排、節奏感', color: '#f97316' },
-                  { label: '融合度', pct: 10, desc: 'Vocal 和吉他搭配協調性', color: '#facc15' },
                   { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
-                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#a855f7' },
+                  { label: '融合度', pct: 10, desc: 'Vocal 和吉他搭配協調性', color: '#facc15' },
+                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div className="flex justify-between items-baseline mb-2">
-                      <span className="font-bold text-white">{item.label}</span>
-                      <span className="text-sm font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
+                    <div className="flex justify-between items-baseline mb-1.5">
+                      <span className="font-bold text-ayers-ink text-sm">{item.label}</span>
+                      <span className="text-xs font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-2 bg-ayers-ink/[0.06] rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${item.pct}%` }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.2 }}
+                        transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="h-full rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
                     </div>
-                    <p className="text-xs text-white/40 mt-1">{item.desc}</p>
+                    <p className="text-[11px] text-ayers-ink/30 mt-1">{item.desc}</p>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* Instrumental */}
+            {/* 演奏 */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-white/60 rounded-2xl p-8 border border-ayers-gold/10"
             >
-              <h3 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                  <Guitar size={20} className="text-orange-400" />
+              <h3 className="text-xl font-serif italic font-bold mb-8 flex items-center gap-3 text-ayers-ink">
+                <span className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                  <Guitar size={18} className="text-orange-500" />
                 </span>
                 演奏組
               </h3>
@@ -458,31 +511,31 @@ export default function SoulGuitarInfo() {
                   { label: '技巧', pct: 40, desc: '音色、精準度', color: '#f97316' },
                   { label: '音樂性', pct: 35, desc: '旋律、和聲、節奏呈現', color: '#3b82f6' },
                   { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
-                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#a855f7' },
+                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div className="flex justify-between items-baseline mb-2">
-                      <span className="font-bold text-white">{item.label}</span>
-                      <span className="text-sm font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
+                    <div className="flex justify-between items-baseline mb-1.5">
+                      <span className="font-bold text-ayers-ink text-sm">{item.label}</span>
+                      <span className="text-xs font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-2 bg-ayers-ink/[0.06] rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${item.pct}%` }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.2 }}
+                        transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="h-full rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
                     </div>
-                    <p className="text-xs text-white/40 mt-1">{item.desc}</p>
+                    <p className="text-[11px] text-ayers-ink/30 mt-1">{item.desc}</p>
                   </div>
                 ))}
               </div>
             </motion.div>
           </div>
 
-          <p className="text-center text-sm text-white/30 mt-6">
+          <p className="text-center text-[11px] text-ayers-ink/25 mt-8 leading-relaxed">
             最佳彈唱獎、最佳演奏獎、最佳吉他手、最佳 Vocal 由五位評審共同評分選出
             <br />
             最佳人氣獎：Facebook、Instagram 讚數最高獲得 ｜ 評審團優選：五位評審各自選出
@@ -490,80 +543,111 @@ export default function SoulGuitarInfo() {
         </div>
       </section>
 
-      <ColorBar />
+      <GoldDivider />
 
-      {/* ─── Awards ─── */}
-      <section className="py-20 md:py-28 px-4 bg-white/[0.02]">
+      {/* ═══════════ AWARDS ═══════════ */}
+      <section className="py-24 md:py-32 px-4" id="awards">
         <div className="max-w-5xl mx-auto">
           <SectionTitle>獎項</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {AWARDS.map((award, i) => (
+          <SectionSub>Awards</SectionSub>
+
+          {/* Top 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            {AWARDS.slice(0, 2).map((award, i) => (
               <motion.div
                 key={award.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all group overflow-hidden"
+                transition={{ delay: i * 0.1, duration: 0.7 }}
+                className="relative bg-white/60 rounded-2xl p-8 border border-ayers-gold/15 hover:shadow-md hover:shadow-ayers-gold/5 transition-all overflow-hidden"
               >
-                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${award.color}`} />
-                <div className="text-3xl mb-4">{award.icon}</div>
-                <h3 className="text-lg font-bold text-white mb-2">{award.title}</h3>
-                <p className="text-sm text-white/60 mb-3 leading-relaxed">{award.prize}</p>
-                <p className="text-xs font-mono font-bold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-                  {award.value}
-                </p>
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-ayers-gold" />
+                <div className="flex items-start gap-5">
+                  <div className="text-3xl">{award.icon}</div>
+                  <div>
+                    <h3 className="text-lg font-serif italic font-bold text-ayers-ink mb-1">{award.title}</h3>
+                    <p className="text-sm text-ayers-ink/50 mb-2 leading-relaxed">{award.prize}</p>
+                    <p className="text-sm font-mono font-bold text-ayers-gold">{award.value}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Rest */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {AWARDS.slice(2).map((award, i) => (
+              <motion.div
+                key={award.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06, duration: 0.7 }}
+                className="relative bg-white/60 rounded-2xl p-6 border border-ayers-gold/10 hover:shadow-md hover:shadow-ayers-gold/5 transition-all overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-ayers-gold/30" />
+                <div className="text-2xl mb-3">{award.icon}</div>
+                <h3 className="text-base font-bold text-ayers-ink mb-1">{award.title}</h3>
+                <p className="text-xs text-ayers-ink/45 mb-2 leading-relaxed">{award.prize}</p>
+                <p className="text-xs font-mono font-bold text-ayers-gold">{award.value}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Rules ─── */}
-      <section className="py-20 md:py-28 px-4">
+      <ContestColorBar />
+
+      {/* ═══════════ RULES ═══════════ */}
+      <section className="py-24 md:py-32 px-4 bg-ayers-dark text-white" id="rules">
         <div className="max-w-4xl mx-auto">
-          <SectionTitle>參賽規則</SectionTitle>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-serif italic font-bold text-3xl md:text-4xl text-center mb-3 text-white"
+          >
+            參賽規則
+          </motion.h2>
+          <p className="text-center text-white/25 text-[10px] tracking-[0.3em] uppercase mb-14">Competition Rules</p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 divide-y divide-white/5"
+            className="bg-white/5 rounded-2xl border border-white/8 divide-y divide-white/5 overflow-hidden"
           >
             {rules.map((rule, i) => (
-              <div
-                key={i}
-                className="px-6 py-5 flex gap-4 items-start hover:bg-white/[0.02] transition-colors cursor-pointer"
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-              >
-                <span className="shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-red-500/20 flex items-center justify-center text-sm font-bold text-white/60">
+              <div key={i} className="px-6 md:px-8 py-5 flex gap-4 items-start hover:bg-white/[0.03] transition-colors">
+                <span className="shrink-0 w-7 h-7 rounded-lg bg-ayers-gold/15 flex items-center justify-center text-[11px] font-bold text-ayers-gold mt-0.5">
                   {i + 1}
                 </span>
-                <p className={`text-sm leading-relaxed ${openFaq === i ? 'text-white/80' : 'text-white/50'} transition-colors`}>
-                  {rule}
-                </p>
+                <p className="text-sm text-white/50 leading-relaxed">{rule}</p>
               </div>
             ))}
           </motion.div>
 
-          {/* Dress code colors */}
+          {/* Dress code */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-8 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+            className="mt-8 bg-white/5 rounded-2xl p-10 border border-white/8"
           >
-            <h3 className="text-lg font-bold text-white mb-4 text-center">指定穿著顏色</h3>
-            <div className="flex flex-wrap justify-center gap-4">
-              {THEME_COLORS.map((c) => (
-                <div key={c.name} className="flex flex-col items-center gap-2">
+            <h3 className="text-base font-serif italic font-bold text-white mb-1 text-center">指定穿著顏色</h3>
+            <p className="text-[10px] text-white/20 text-center mb-8 tracking-wide">同一組別穿著顏色需相同</p>
+            <div className="flex flex-wrap justify-center gap-6">
+              {CONTEST_COLORS.map((c) => (
+                <div key={c.name} className="flex flex-col items-center gap-2 group">
                   <div
-                    className="w-14 h-14 rounded-xl border-2 shadow-lg"
+                    className="w-14 h-14 rounded-xl border-2 shadow-lg group-hover:scale-110 transition-transform duration-300"
                     style={{
                       backgroundColor: c.hex,
-                      borderColor: c.name === '白' ? '#d1d5db' : c.hex,
+                      borderColor: c.name === '白' ? '#555' : c.hex === '#1a1a1a' ? '#444' : c.hex + '80',
                     }}
                   />
-                  <span className="text-xs text-white/50">{c.name}色</span>
+                  <span className="text-[10px] text-white/35">{c.name}色</span>
                 </div>
               ))}
             </div>
@@ -571,78 +655,76 @@ export default function SoulGuitarInfo() {
         </div>
       </section>
 
-      <ColorBar />
+      <ContestColorBar />
 
-      {/* ─── Notes ─── */}
-      <section className="py-20 md:py-28 px-4 bg-white/[0.02]">
+      {/* ═══════════ NOTES ═══════════ */}
+      <section className="py-24 md:py-32 px-4" id="notes">
         <div className="max-w-4xl mx-auto">
           <SectionTitle>注意事項</SectionTitle>
+          <SectionSub>Important Notes</SectionSub>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-3"
           >
             {notes.map((note, i) => (
-              <div
-                key={i}
-                className="flex gap-4 items-start bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10"
-              >
-                <span className="shrink-0 w-6 h-6 rounded-full bg-yellow-400/20 flex items-center justify-center text-xs font-bold text-yellow-400">
+              <div key={i} className="flex gap-4 items-start bg-white/60 rounded-xl p-5 border border-ayers-gold/8">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-ayers-gold/15 flex items-center justify-center text-[10px] font-bold text-ayers-gold">
                   {i + 1}
                 </span>
-                <p className="text-sm text-white/60 leading-relaxed">{note}</p>
+                <p className="text-sm text-ayers-ink/50 leading-relaxed">{note}</p>
               </div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ─── CTA Footer ─── */}
-      <section className="py-20 md:py-28 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-5xl font-black mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent">
-                準備好了嗎？
-              </span>
+      <GoldDivider />
+
+      {/* ═══════════ FINAL CTA ═══════════ */}
+      <section className="py-28 md:py-36 px-4 bg-ayers-dark text-white relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-ayers-gold/[0.04] rounded-full blur-[120px]" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="font-serif italic font-bold text-4xl md:text-5xl text-white mb-4">
+              準備好了嗎？
             </h2>
-            <p className="text-lg text-white/50 mb-10">
-              展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手
-            </p>
+            <p className="text-base text-white/35 mb-12">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="https://forms.gle/Wat3juxXdQ6vXbAi9"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-10 py-5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-xl hover:scale-105 transition-transform shadow-lg shadow-red-500/25"
+                className="group inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-ayers-gold text-ayers-dark font-bold text-lg hover:bg-ayers-gold-light transition-colors"
               >
-                <FileText size={22} />
+                <FileText size={20} />
                 Google 表單報名
-                <ExternalLink size={14} className="opacity-60" />
+                <ExternalLink size={12} className="opacity-40 group-hover:opacity-80" />
               </a>
-              <a
-                href="/e/soul-guitar/register"
-                className="inline-flex items-center gap-2 px-10 py-5 rounded-full border-2 border-white/20 text-white font-bold text-xl hover:bg-white/5 transition-colors"
-              >
+              <a href="/e/soul-guitar/register" className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full border border-white/15 text-white/70 font-bold text-lg hover:bg-white/5 transition-colors">
                 活動報名頁
               </a>
             </div>
-            <p className="text-xs text-white/30 mt-8">
-              報名上限 200 位，依 Google 表單收件時間，額滿為止
-            </p>
+            <p className="text-[10px] text-white/15 mt-10 tracking-wide">報名上限 200 位 ・ 依 Google 表單收件時間 ・ 額滿為止</p>
           </motion.div>
         </div>
       </section>
 
-      <ColorBar />
+      <ContestColorBar />
 
-      {/* Bottom spacing for footer */}
-      <div className="h-4 bg-[#0a0a0a]" />
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer className="py-10 px-4 bg-ayers-cream">
+        <div className="max-w-4xl mx-auto text-center">
+          <img src="/images/ayers-logo.svg" alt="Ayers Guitars" className="h-7 mx-auto opacity-25 mb-4" />
+          <p className="text-[10px] text-ayers-ink/20 tracking-wide">&copy; 2026 Ayers Guitars. All rights reserved.</p>
+          <div className="flex justify-center gap-6 mt-3">
+            <a href="https://ayersguitars.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-ayers-ink/20 hover:text-ayers-ink/40 transition-colors tracking-widest uppercase">Official Site</a>
+            <a href="/e/soul-guitar" className="text-[10px] text-ayers-ink/20 hover:text-ayers-ink/40 transition-colors tracking-widest uppercase">心理測驗</a>
+            <a href="/e/soul-guitar/register" className="text-[10px] text-ayers-ink/20 hover:text-ayers-ink/40 transition-colors tracking-widest uppercase">活動報名</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
