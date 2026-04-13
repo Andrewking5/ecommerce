@@ -87,16 +87,23 @@ function Sub({ children }: { children: React.ReactNode }) {
 type Slice = { label: string; pct: number; desc: string; color: string };
 
 function Donut({ slices, title, icon }: { slices: Slice[]; title: string; icon: React.ReactNode }) {
-  const size = 180;
-  const sw = 28;
+  const size = 220;
+  const sw = 34;
   const r = (size - sw) / 2;
   const C = 2 * Math.PI * r;
+  const labelR = r + sw / 2 + 22; // radius for % labels outside the ring
+
   let acc = 0;
   const arcs = slices.map((s) => {
+    const startPct = acc;
     const off = C - (acc / 100) * C;
     const len = (s.pct / 100) * C;
     acc += s.pct;
-    return { ...s, off, len };
+    const midAngle = ((startPct + s.pct / 2) / 100) * 360 - 90; // -90 because SVG starts at top
+    const rad = (midAngle * Math.PI) / 180;
+    const lx = size / 2 + labelR * Math.cos(rad);
+    const ly = size / 2 + labelR * Math.sin(rad);
+    return { ...s, off, len, lx, ly };
   });
 
   return (
@@ -112,40 +119,55 @@ function Donut({ slices, title, icon }: { slices: Slice[]; title: string; icon: 
         {title}
       </h3>
       <div className="flex flex-col items-center gap-6">
-        <div className="relative">
-          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+        {/* Donut with % labels on slices */}
+        <div className="relative" style={{ width: size + 60, height: size + 60 }}>
+          <svg width={size + 60} height={size + 60} viewBox={`-30 -30 ${size + 60} ${size + 60}`}>
+            {/* Background ring */}
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="white" strokeOpacity={0.04} strokeWidth={sw} />
+            {/* Slices — no rotation needed, we calculate angles manually */}
             {arcs.map((a) => (
               <motion.circle
                 key={a.label} cx={size / 2} cy={size / 2} r={r} fill="none"
                 stroke={a.color} strokeWidth={sw} strokeLinecap="butt"
                 strokeDasharray={`${a.len} ${C - a.len}`}
-                initial={{ strokeDashoffset: C }}
-                whileInView={{ strokeDashoffset: a.off }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, delay: 0.2, ease: EXPO }}
+                strokeDashoffset={a.off}
+                className="-rotate-90 origin-center"
+                style={{ transformOrigin: `${size / 2}px ${size / 2}px` }}
               />
             ))}
+            {/* % labels positioned at midpoint of each arc */}
+            {arcs.map((a) => (
+              <text
+                key={a.label + '-label'}
+                x={a.lx}
+                y={a.ly}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill={a.color}
+                fontSize={a.pct >= 15 ? 13 : 11}
+                fontWeight="bold"
+                fontFamily="ui-monospace, monospace"
+              >
+                {a.pct}%
+              </text>
+            ))}
           </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xl font-bold text-white/80">100%</span>
-          </div>
         </div>
+
+        {/* Legend */}
         <div className="w-full space-y-2.5">
           {slices.map((s) => (
             <div key={s.label} className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
               <span className="flex-1 text-sm text-white/70">{s.label}</span>
-              <span className="text-sm font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+              <span className="text-xs text-white/30">{s.desc}</span>
             </div>
           ))}
         </div>
-        <div className="w-full pt-4 border-t border-white/5 space-y-1">
-          {slices.map((s) => (
-            <p key={s.label} className="text-[11px] text-white/25">
-              <span style={{ color: s.color }}>{s.label}</span> — {s.desc}
-            </p>
-          ))}
+        <div className="w-full pt-4 border-t border-white/5 text-center">
+          <p className="text-[11px] text-white/25">
+            {slices.map((s, i) => (<span key={s.label}><span style={{ color: s.color }}>{s.label} {s.pct}%</span>{i < slices.length - 1 ? ' · ' : ''}</span>))}
+          </p>
         </div>
       </div>
     </motion.div>
