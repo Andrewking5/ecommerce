@@ -420,16 +420,13 @@ export default function SoulGuitarQuiz() {
                       </motion.button>
                     )}
 
-                    {/* 上方留白到 Q 文字區（約 20%） */}
-                    <div className="flex-none" style={{ height: '18%' }} />
-
-                    {/* 進度條 — Q 文字旁邊的位置 */}
-                    <div className="px-4 mb-1">
+                    {/* 進度條 — 絕對定位在 Q 文字右邊同一行 */}
+                    <div className="absolute z-20" style={{ top: '28%', left: '22%', right: '4%' }}>
                       <ProgressBar current={currentQ} />
                     </div>
 
                     {/* 留白 — 讓出背景圖中的題目文字（Q + 問題） */}
-                    <div className="flex-none" style={{ height: '24%' }} />
+                    <div className="flex-none" style={{ height: '50%' }} />
 
                     {/* 選項按鈕 */}
                     <div className="flex-1 flex flex-col justify-start px-5 gap-2">
