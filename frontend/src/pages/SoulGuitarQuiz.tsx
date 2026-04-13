@@ -383,13 +383,28 @@ export default function SoulGuitarQuiz() {
     exit: { opacity: 0 },
   };
 
+  // 目前背景圖（用於模糊背景）
+  const currentBg = phase === 'quiz' ? question.bg : '';
+
   return (
-    <div
-      className="w-full min-h-dvh flex items-center justify-center"
-      style={{ backgroundColor: phase === 'cover' ? '#0a1628' : WALL_COLOR }}
-    >
-      {/* 手機卡片 — 封面、loading、測驗都在同一個容器內 */}
-      <div className="relative w-full max-w-[430px] h-dvh mx-auto overflow-hidden">
+    <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden">
+      {/* 模糊背景 — 電腦版兩側可見 */}
+      {phase === 'quiz' && (
+        <div
+          className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 brightness-50"
+          style={{ backgroundImage: `url(${currentBg})` }}
+        />
+      )}
+      {/* 封面/loading 用深色背景 */}
+      {phase !== 'quiz' && (
+        <div className="absolute inset-0 bg-[#0a1628]" />
+      )}
+
+      {/* 9:16 卡片 — 高度滿版，寬度按比例 */}
+      <div
+        className="relative h-dvh mx-auto overflow-hidden"
+        style={{ width: 'min(100vw, calc(100dvh * 9 / 16))' }}
+      >
         <AnimatePresence>
           {phase === 'cover' && <CoverPage onStart={handleStart} />}
           {phase === 'loading' && <LoadingScreen onDone={handleLoadingDone} />}
