@@ -248,7 +248,7 @@ function CoverPage({ onStart }: { onStart: () => void }) {
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 flex flex-col overflow-hidden"
+      className="absolute inset-0 z-50 overflow-hidden"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
@@ -261,90 +261,54 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         muted
         playsInline
       />
-      {/* 暗色疊層讓白字更清楚 */}
-      <div className="absolute inset-0 bg-black/40" />
 
-      {/* 內容 */}
-      <div className="relative z-10 flex flex-col items-center h-full">
-        {/* 上半 — 標題居中 */}
-        <div className="flex-1 flex items-center justify-center">
-          <motion.img
-            src={`${BASE}/cover-title.png`}
-            alt="解鎖你的吉他靈魂檔案"
-            className="w-[75%] max-w-[300px] h-auto drop-shadow-lg"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+      {/* 開始按鈕 — 偏下方，呼吸光暈 */}
+      <motion.button
+        type="button"
+        onClick={onStart}
+        className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[15%] w-[50%] max-w-[200px] active:scale-95 transition-transform"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          filter: [
+            'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
+            'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
+            'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
+          ],
+        }}
+        transition={{
+          opacity: { duration: 0.6, delay: 0.5 },
+          y: { duration: 0.6, delay: 0.5 },
+          filter: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+        }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <img
+          src={`${BASE}/cover-start-btn.png`}
+          alt="解鎖你的吉他靈魂檔案"
+          className="w-full h-auto"
+          draggable={false}
+        />
+      </motion.button>
+
+      {/* 跑馬燈 — 最底部，漸層條背景 + 白字滾動 */}
+      <div className="absolute z-10 bottom-0 left-0 right-0">
+        <div className="relative w-full h-10">
+          {/* 漸層條背景 */}
+          <img
+            src={`${BASE}/cover-btn.png`}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
           />
-        </div>
-
-        {/* 下方固定區域 — 開始報名 + 跑馬燈 */}
-        <div className="w-full flex flex-col items-center">
-          {/* 開始按鈕 — 姐所.png 圖片 + 呼吸光暈 */}
-          <motion.button
-            type="button"
-            onClick={onStart}
-            className="mb-6 w-[55%] max-w-[220px] active:scale-95 transition-transform"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              filter: [
-                'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
-                'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
-                'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
-              ],
-            }}
-            transition={{
-              opacity: { duration: 0.6, delay: 0.8 },
-              y: { duration: 0.6, delay: 0.8 },
-              filter: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <img
-              src={`${BASE}/cover-start-btn.png`}
-              alt="開始報名"
-              className="w-full h-auto"
-              draggable={false}
-            />
-          </motion.button>
-
-          {/* 跑馬燈 — 漸層條背景撐滿寬度 + 白色文字滾動 */}
-          <motion.div
-            className="w-full relative"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-          >
-            {/* 漸層條背景 — 撐滿寬度，固定高度 */}
-            <div className="w-full h-10 overflow-hidden">
-              <img
-                src={`${BASE}/cover-btn.png`}
-                alt=""
-                className="w-full h-full object-cover"
-                draggable={false}
-              />
+          {/* 白字滾動 */}
+          <div className="absolute inset-0 flex items-center overflow-hidden">
+            <div className="flex shrink-0 animate-marquee">
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 mx-8" draggable={false} />
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 mx-8" draggable={false} />
             </div>
-            {/* 白色文字在漸層條上滾動 */}
-            <div className="absolute inset-0 flex items-center overflow-hidden">
-              <div className="flex shrink-0 animate-marquee whitespace-nowrap">
-                <img
-                  src={`${BASE}/cover-marquee.png`}
-                  alt=""
-                  className="h-3.5 w-auto shrink-0 mx-8"
-                  draggable={false}
-                />
-                <img
-                  src={`${BASE}/cover-marquee.png`}
-                  alt=""
-                  className="h-3.5 w-auto shrink-0 mx-8"
-                  draggable={false}
-                />
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </motion.div>
