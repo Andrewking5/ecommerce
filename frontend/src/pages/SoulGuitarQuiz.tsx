@@ -284,7 +284,7 @@ function CoverPage({ onStart }: { onStart: () => void }) {
       <motion.button
         type="button"
         onClick={onStart}
-        className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[12%] w-[50%] max-w-[200px] active:scale-95 transition-transform"
+        className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[12%] w-[65%] max-w-[260px] active:scale-95 transition-transform"
         initial={{ opacity: 0, y: 10 }}
         animate={{
           opacity: 1,
@@ -318,14 +318,17 @@ function CoverPage({ onStart }: { onStart: () => void }) {
           className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
         />
-        <div className="absolute inset-0 flex items-center overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
           <div
-            className="flex shrink-0"
-            style={{ animation: 'marquee 20s linear infinite' }}
+            className="flex items-center h-full w-[200%]"
+            style={{ animation: 'marquee 15s linear infinite' }}
           >
-            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
-            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
-            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
+            <div className="flex items-center justify-around w-1/2">
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto" draggable={false} />
+            </div>
+            <div className="flex items-center justify-around w-1/2">
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto" draggable={false} />
+            </div>
           </div>
         </div>
       </div>
