@@ -270,9 +270,9 @@ function CoverPage({ onStart }: { onStart: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 影片背景 — 填滿整個卡片 */}
+      {/* 影片背景 — 完整顯示不裁切 */}
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain"
         src="/videos/soul-guitar-cover.mp4"
         autoPlay
         loop
