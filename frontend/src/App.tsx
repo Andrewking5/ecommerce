@@ -52,6 +52,7 @@ const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const Events = lazy(() => import('./pages/Events'));
 const EventDetail = lazy(() => import('./pages/EventDetail'));
 const SoulGuitarInfo = lazy(() => import('./pages/SoulGuitarInfo'));
+const SoulGuitarQuiz = lazy(() => import('./pages/SoulGuitarQuiz'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -113,24 +114,27 @@ function RootRedirect() {
 function EventLandingLayout() {
   const location = useLocation();
   const isSoulGuitarInfo = location.pathname === '/e/soul-guitar/info';
+  const isSoulGuitarQuiz = location.pathname === '/e/soul-guitar';
 
   useEffect(() => {
     if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
   }, []);
 
-  // Soul Guitar info page uses its own dark background — no pt-20 offset
+  // Soul Guitar quiz — fullscreen, no navbar/footer
+  if (isSoulGuitarQuiz) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <SoulGuitarQuiz />
+      </Suspense>
+    );
+  }
+
+  // Soul Guitar info page — standalone, no site Navbar/Footer
   if (isSoulGuitarInfo) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main id="main-content" role="main" className="flex-grow">
-          <Suspense fallback={<PageLoader />}>
-            <SoulGuitarInfo />
-          </Suspense>
-        </main>
-        <Footer />
-        <CookieConsent />
-      </div>
+      <Suspense fallback={<PageLoader />}>
+        <SoulGuitarInfo />
+      </Suspense>
     );
   }
 
