@@ -15,11 +15,11 @@ const CONTEST_COLORS = [
 ];
 
 const JUDGES = [
-  { name: '四分衛-虎神', role: '評審' },
-  { name: 'Pia 吳蓓雅', role: '評審' },
-  { name: 'Joyce', role: '評審' },
-  { name: '林小歐', role: '評審' },
-  { name: '張仲麟', role: '評審' },
+  { name: '四分衛-虎神', role: '吉他手 / 四分衛樂團團長', photo: '/images/events/judges/hushen.jpg', color: '#ef4444' },
+  { name: 'Pia 吳蓓雅', role: '創作歌手 / 木吉他手', photo: '/images/events/judges/pia.jpg', color: '#f97316' },
+  { name: 'Joyce 就以斯', role: '創作歌手', photo: '/images/events/judges/joyce.jpg', color: '#facc15' },
+  { name: '林小歐', role: '吉他手 / 最佳吉他手獎', photo: '/images/events/judges/linxiaoou.jpg', color: '#3b82f6' },
+  { name: '張仲麟', role: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.jpg', color: '#c5a059' },
 ];
 
 const AWARDS = [
@@ -374,27 +374,34 @@ export default function SoulGuitarInfo() {
         <div className="max-w-4xl mx-auto">
           <SectionTitle>重要時程</SectionTitle>
           <SectionSub>Timeline</SectionSub>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TIMELINE.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="relative bg-white/60 rounded-2xl p-8 border border-ayers-gold/10 text-center group hover:shadow-md hover:shadow-ayers-gold/5 transition-all duration-300"
-              >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-ayers-ink text-white text-[9px] font-bold tracking-widest">
-                  STEP {i + 1}
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-ayers-gold/10 flex items-center justify-center mx-auto mb-5 mt-2">
-                  <item.icon size={20} className="text-ayers-gold" />
-                </div>
-                <h3 className="text-base font-bold text-ayers-ink mb-2">{item.label}</h3>
-                <p className="text-xl font-serif italic font-bold text-ayers-gold mb-1">{item.date}</p>
-                {item.sub && <p className="text-[11px] text-ayers-ink/30">{item.sub}</p>}
-              </motion.div>
-            ))}
+          {/* Connected timeline */}
+          <div className="relative">
+            {/* Connecting line — desktop only */}
+            <div className="hidden md:block absolute top-[72px] left-[16.67%] right-[16.67%] h-px bg-ayers-gold/20" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {TIMELINE.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative text-center"
+                >
+                  {/* Circle node */}
+                  <div className="relative z-10 w-14 h-14 rounded-full bg-ayers-cream border-2 border-ayers-gold/30 flex items-center justify-center mx-auto mb-6 group-hover:border-ayers-gold transition-colors">
+                    <item.icon size={20} className="text-ayers-gold" />
+                  </div>
+                  {/* Card */}
+                  <div className="bg-white/70 rounded-2xl p-6 border border-ayers-gold/8 hover:shadow-lg hover:shadow-ayers-gold/5 hover:-translate-y-1 transition-all duration-500">
+                    <span className="inline-block px-2.5 py-0.5 rounded-full bg-ayers-ink text-white text-[8px] font-bold tracking-[0.2em] mb-3">STEP {i + 1}</span>
+                    <h3 className="text-base font-bold text-ayers-ink mb-2">{item.label}</h3>
+                    <p className="text-xl font-serif italic font-bold text-ayers-gold mb-1">{item.date}</p>
+                    {item.sub && <p className="text-[11px] text-ayers-ink/30">{item.sub}</p>}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -403,9 +410,8 @@ export default function SoulGuitarInfo() {
 
       {/* ═══════════ JUDGES ═══════════ */}
       <section className="py-24 md:py-32 px-4 bg-ayers-dark text-white" id="judges">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <motion.h2
-            id="judges-title"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -413,30 +419,55 @@ export default function SoulGuitarInfo() {
           >
             評審陣容
           </motion.h2>
-          <p className="text-center text-white/25 text-[10px] tracking-[0.3em] uppercase mb-14">5 Judges</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
-            {JUDGES.map((judge, i) => {
-              const color = CONTEST_COLORS[i % CONTEST_COLORS.length];
-              return (
-                <motion.div
-                  key={judge.name}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="bg-white/5 rounded-2xl p-6 border border-white/8 text-center hover:border-ayers-gold/30 transition-all duration-300 group"
-                >
+          <p className="text-center text-white/25 text-[10px] tracking-[0.3em] uppercase mb-16">5 Judges</p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
+            {JUDGES.map((judge, i) => (
+              <motion.div
+                key={judge.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="text-center group"
+              >
+                {/* Photo container */}
+                <div className="relative mx-auto mb-5 w-28 h-28 md:w-32 md:h-32">
+                  {/* Colored ring on hover */}
                   <div
-                    className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                    style={{ backgroundColor: color.hex + '15' }}
+                    className="absolute -inset-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
+                    style={{ backgroundColor: judge.color + '30' }}
+                  />
+                  <div
+                    className="absolute -inset-[2px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ border: `2px solid ${judge.color}50` }}
+                  />
+                  <img
+                    src={judge.photo}
+                    alt={judge.name}
+                    className="relative w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 shadow-lg"
+                    onError={(e) => {
+                      // Fallback: show star icon if photo not found
+                      const target = e.currentTarget;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                  {/* Fallback icon (hidden by default) */}
+                  <div
+                    className="relative w-full h-full rounded-full items-center justify-center bg-white/5 border border-white/10"
+                    style={{ display: 'none' }}
                   >
-                    <Star size={20} style={{ color: color.hex === '#1a1a1a' ? '#888' : color.hex }} />
+                    <Star size={28} style={{ color: judge.color }} />
                   </div>
-                  <h3 className="font-bold text-white text-sm leading-tight">{judge.name}</h3>
-                  <p className="text-[10px] text-white/25 mt-1 tracking-widest uppercase">{judge.role}</p>
-                </motion.div>
-              );
-            })}
+                </div>
+
+                {/* Name & role */}
+                <h3 className="font-bold text-white text-sm md:text-base leading-tight mb-1 group-hover:text-ayers-gold transition-colors duration-300">{judge.name}</h3>
+                <p className="text-[10px] text-white/30 leading-snug">{judge.role}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
