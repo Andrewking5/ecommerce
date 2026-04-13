@@ -285,50 +285,58 @@ function CoverPage({ onStart }: { onStart: () => void }) {
           <motion.button
             type="button"
             onClick={onStart}
-            className="px-10 py-3.5 rounded-full text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
+            className="px-10 py-3.5 rounded-full border-2 border-white/60 text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
             style={{ fontFamily: QUIZ_FONT }}
             initial={{ opacity: 0, y: 10 }}
             animate={{
               opacity: 1,
               y: 0,
               boxShadow: [
-                '0 0 0 2px rgba(255,255,255,0.4)',
-                '0 0 15px 3px rgba(255,255,255,0.6)',
-                '0 0 0 2px rgba(255,255,255,0.4)',
+                '0 0 0 2px rgba(255,255,255,0.3)',
+                '0 0 18px 4px rgba(255,255,255,0.5)',
+                '0 0 0 2px rgba(255,255,255,0.3)',
               ],
-              borderColor: ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.4)'],
             }}
             transition={{
               opacity: { duration: 0.6, delay: 0.8 },
               y: { duration: 0.6, delay: 0.8 },
               boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-              borderColor: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
             }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="relative z-10">開始報名</span>
+            開始報名
           </motion.button>
 
-          {/* 跑馬燈（離底部一小段距離） */}
+          {/* 跑馬燈 — 漸層條背景 + 白色文字滾動 */}
           <motion.div
-            className="w-full overflow-hidden"
+            className="w-full overflow-hidden relative"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
           >
-            <div className="flex animate-marquee">
-              <img
-                src={`${BASE}/cover-marquee.png`}
-                alt=""
-                className="h-5 w-auto shrink-0 mr-12 drop-shadow"
-                draggable={false}
-              />
-              <img
-                src={`${BASE}/cover-marquee.png`}
-                alt=""
-                className="h-5 w-auto shrink-0 mr-12 drop-shadow"
-                draggable={false}
-              />
+            {/* 漸層條背景 */}
+            <img
+              src={`${BASE}/cover-btn.png`}
+              alt=""
+              className="w-full h-auto"
+              draggable={false}
+            />
+            {/* 白色文字在漸層條上滾動 */}
+            <div className="absolute inset-0 flex items-center overflow-hidden">
+              <div className="flex animate-marquee">
+                <img
+                  src={`${BASE}/cover-marquee.png`}
+                  alt=""
+                  className="h-4 w-auto shrink-0 mr-16"
+                  draggable={false}
+                />
+                <img
+                  src={`${BASE}/cover-marquee.png`}
+                  alt=""
+                  className="h-4 w-auto shrink-0 mr-16"
+                  draggable={false}
+                />
+              </div>
             </div>
           </motion.div>
         </div>
