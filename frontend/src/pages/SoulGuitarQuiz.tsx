@@ -270,14 +270,12 @@ function CoverPage({ onStart }: { onStart: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 影片背景 — 完整顯示不裁切 */}
-      <video
-        className="absolute inset-0 w-full h-full object-contain"
-        src="/videos/soul-guitar-cover.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
+      {/* 封面背景圖 */}
+      <img
+        src={`${BASE}/cover-bg.webp`}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        draggable={false}
       />
 
       {/* 開始按鈕 — 疊在影片上，偏下方 */}
@@ -395,27 +393,15 @@ export default function SoulGuitarQuiz() {
   };
 
   // 目前背景圖（用於模糊背景）
-  const currentBg = phase === 'quiz' ? question.bg : '';
+  const currentBg = phase === 'quiz' ? question.bg : `${BASE}/cover-bg.webp`;
 
   return (
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden">
-      {/* 模糊背景 — IG Story 風格 */}
-      {/* 封面：模糊影片 / 測驗：模糊背景圖 */}
-      {phase === 'cover' || phase === 'loading' ? (
-        <video
-          className="absolute inset-0 w-full h-full object-cover blur-lg scale-105 brightness-[0.35]"
-          src="/videos/soul-guitar-cover.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      ) : (
-        <div
-          className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35] transition-all duration-500"
-          style={{ backgroundImage: `url(${currentBg})` }}
-        />
-      )}
+      {/* 模糊背景 — IG Story 風格（全部用靜態圖片） */}
+      <div
+        className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35] transition-all duration-500"
+        style={{ backgroundImage: `url(${currentBg})` }}
+      />
 
       {/* 9:16 卡片 — 高度滿版，寬度按比例 */}
       <div
