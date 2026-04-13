@@ -292,21 +292,19 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         />
       </motion.button>
 
-      {/* 跑馬燈 — 最底部，漸層條背景 + 白字滾動 */}
+      {/* 跑馬燈 — 影片底部內，漸層條 + 白字滾動 */}
       <div className="absolute z-10 bottom-0 left-0 right-0">
-        <div className="relative w-full h-10">
-          {/* 漸層條背景 */}
+        <div className="relative w-full h-8">
           <img
             src={`${BASE}/cover-btn.png`}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
           />
-          {/* 白字滾動 */}
           <div className="absolute inset-0 flex items-center overflow-hidden">
             <div className="flex shrink-0 animate-marquee">
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 mx-8" draggable={false} />
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 mx-8" draggable={false} />
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3 w-auto shrink-0 mx-8" draggable={false} />
+              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3 w-auto shrink-0 mx-8" draggable={false} />
             </div>
           </div>
         </div>
@@ -370,13 +368,14 @@ export default function SoulGuitarQuiz() {
       className="w-full min-h-dvh flex items-center justify-center"
       style={{ backgroundColor: WALL_COLOR }}
     >
-      {/* 手機卡片 */}
+      {/* 封面 — 全螢幕不限寬 */}
+      <AnimatePresence>
+        {phase === 'cover' && <CoverPage onStart={handleStart} />}
+      </AnimatePresence>
+
+      {/* 手機卡片（測驗用） */}
       <div className="relative w-full max-w-[430px] h-dvh mx-auto overflow-hidden">
         <AnimatePresence>
-          {/* 封面 */}
-          {phase === 'cover' && <CoverPage onStart={handleStart} />}
-
-          {/* Loading */}
           {phase === 'loading' && <LoadingScreen onDone={handleLoadingDone} />}
         </AnimatePresence>
 
@@ -420,7 +419,7 @@ export default function SoulGuitarQuiz() {
                     )}
 
                     {/* 進度條 — 絕對定位在 Q 文字右邊同一行 */}
-                    <div className="absolute z-20" style={{ top: 'calc(27.5% - 10px)', left: '22%', right: '4%' }}>
+                    <div className="absolute z-20" style={{ top: 'calc(27.5% - 14px)', left: '22%', right: '4%' }}>
                       <ProgressBar current={currentQ} />
                     </div>
 
