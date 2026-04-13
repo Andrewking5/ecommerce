@@ -9,7 +9,7 @@ import SEO from '../components/SEO';
    一頁式簡章，資訊清晰、視覺大氣
    ═══════════════════════════════════════════════════ */
 
-const POSTER = '/images/events/soul-guitar-poster.jpg';
+const POSTER = '/images/events/soul-guitar-poster.webp';
 const GOLD = '#c5a059';
 const DARK = '#111827';
 
@@ -17,10 +17,10 @@ const SIX = ['#3b82f6', '#ef4444', '#facc15', '#f97316', '#1a1a1a', '#f5f5f5'];
 const SIX_NAMES = ['藍', '紅', '黃', '橘', '黑', '白'];
 
 const JUDGES = [
-  { name: '四分衛-虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.jpg', link: 'https://www.instagram.com/quarterback_band/' },
-  { name: 'Pia 吳蓓雅', title: '創作歌手 / 木吉他手', photo: '/images/events/judges/pia.jpg', link: 'https://www.instagram.com/piaxstudio/' },
-  { name: 'Joyce 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.jpg', link: 'https://www.instagram.com/joyce.ch0627/' },
-  { name: '林小歐', title: '吉他手 / 最佳吉他手獎', photo: '/images/events/judges/linxiaoou.jpg', link: 'https://www.facebook.com/novsherry/' },
+  { name: '四分衛-虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp', link: 'https://www.instagram.com/quarterback_band/' },
+  { name: 'Pia 吳蓓雅', title: '創作歌手 / 木吉他手', photo: '/images/events/judges/pia.webp', link: 'https://www.instagram.com/piaxstudio/' },
+  { name: 'Joyce 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.webp', link: 'https://www.instagram.com/joyce.ch0627/' },
+  { name: '林小歐', title: '吉他手 / 最佳吉他手獎', photo: '/images/events/judges/linxiaoou.webp', link: 'https://www.facebook.com/novsherry/' },
   { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.jpg', link: 'https://www.facebook.com/woodywoody2g/' },
 ];
 
@@ -268,50 +268,80 @@ export default function SoulGuitarInfo() {
       <Strip />
 
       {/* ═══════════ 獎項 ═══════════ */}
-      <section className="text-white" style={{ backgroundColor: DARK }}>
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
-          <h3 className="text-2xl font-bold text-center mb-2">獎項</h3>
-          <p className="text-center text-white/30 text-sm mb-10">總價值超過 NT$200,000</p>
+      <section className="relative overflow-hidden text-white" style={{ backgroundColor: DARK }}>
+        {/* Background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[150px] pointer-events-none" style={{ backgroundColor: GOLD + '08' }} />
 
-          {/* 前兩大獎 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <div className="relative max-w-6xl mx-auto px-6 lg:px-8 py-20">
+          <h3 className="text-3xl font-black text-center mb-1">獎項</h3>
+          <p className="text-center text-sm mb-12" style={{ color: GOLD }}>AWARDS — 總價值超過 NT$200,000</p>
+
+          {/* Grand prizes — 2 column highlight */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {[
-              { icon: '🏆', title: '最佳彈唱獎', guitar: 'AYERS A07c-30th Anniversary 全單吉他', money: 'NT$48,800 + 獎金 NT$5,000' },
-              { icon: '🎸', title: '最佳演奏獎', guitar: 'AYERS A07c-30th-Engelmann Anniversary 全單吉他', money: 'NT$48,800 + 獎金 NT$5,000' },
+              { icon: '🏆', rank: '1st', title: '最佳彈唱獎', guitar: 'AYERS 全單吉他', model: 'A07c-30th Anniversary', money: 'NT$48,800', bonus: '+ 獎金 NT$5,000', color: '#facc15' },
+              { icon: '🎸', rank: '1st', title: '最佳演奏獎', guitar: 'AYERS 全單吉他', model: 'A07c-30th-Engelmann Anniversary（英格曼雲衫版）', money: 'NT$48,800', bonus: '+ 獎金 NT$5,000', color: '#f97316' },
             ].map((a) => (
-              <div key={a.title} className="rounded-2xl p-6 border border-white/10 bg-white/[0.03] relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, ${GOLD}, #f97316)` }} />
-                <div className="flex gap-4">
-                  <span className="text-4xl">{a.icon}</span>
-                  <div>
-                    <h4 className="text-lg font-bold mb-1">{a.title}</h4>
-                    <p className="text-sm text-white/40 mb-2">{a.guitar}</p>
-                    <p className="text-base font-mono font-bold" style={{ color: GOLD }}>{a.money}</p>
+              <motion.div key={a.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-2xl overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+                {/* Gold gradient top border */}
+                <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${a.color}, ${GOLD})` }} />
+                <div className="p-8 bg-gradient-to-b from-white/[0.06] to-white/[0.02] border border-t-0 border-white/[0.08] rounded-b-2xl">
+                  <div className="flex items-start gap-5">
+                    <div className="text-5xl">{a.icon}</div>
+                    <div className="flex-1">
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: a.color }}>{a.rank} PRIZE</p>
+                      <h4 className="text-xl font-black mb-3">{a.title}</h4>
+                      <p className="text-sm text-white/40 mb-1">{a.guitar}</p>
+                      <p className="text-xs text-white/25 mb-4 leading-relaxed">{a.model}</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black font-mono" style={{ color: GOLD }}>{a.money}</span>
+                        <span className="text-sm text-white/30">{a.bonus}</span>
+                      </div>
+                    </div>
                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Secondary prizes — 3 column */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+            {[
+              { icon: '🌟', title: '最佳吉他手', guitar: 'AYERS A07c Sun 全單吉他', extra: '+ 雲聲錄音電容麥克風', money: 'NT$42,000' },
+              { icon: '🎤', title: '最佳 Vocal', guitar: 'AYERS A02c Sun 全單吉他', extra: '+ 聲潮麥克風', money: 'NT$26,000' },
+              { icon: '❤️', title: '最佳人氣獎', guitar: 'AYERS ST2-Color Light 面單彩色吉他', extra: 'FB/IG 讚數最高獲得', money: 'NT$15,500' },
+            ].map((a) => (
+              <motion.div key={a.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl p-6 border border-white/[0.08] bg-white/[0.03] hover:-translate-y-1 transition-transform duration-300 text-center">
+                <span className="text-3xl block mb-3">{a.icon}</span>
+                <h4 className="text-base font-bold mb-2">{a.title}</h4>
+                <p className="text-xs text-white/35 leading-relaxed mb-1">{a.guitar}</p>
+                <p className="text-[10px] text-white/20 mb-3">{a.extra}</p>
+                <p className="text-lg font-mono font-black" style={{ color: GOLD }}>{a.money}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Special prizes — 2 column compact */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { icon: '🏅', title: '評審團優選', count: '5 位', desc: 'AYERS 與評審獎牌、AYERS 吉他架與奧昇弦釘', note: '五位評審各自選出' },
+              { icon: '🐴', title: '海馬特別獎', count: '5 位', desc: '一年海馬91PU會員', note: '由海馬執行長王翰選出' },
+            ].map((a) => (
+              <div key={a.title} className="rounded-xl p-5 border border-white/[0.06] bg-white/[0.02] flex items-start gap-4">
+                <span className="text-2xl">{a.icon}</span>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-sm font-bold">{a.title}</h4>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-white/30">{a.count}</span>
+                  </div>
+                  <p className="text-xs text-white/35 mb-0.5">{a.desc}</p>
+                  <p className="text-[10px] text-white/20">{a.note}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* 其他獎項 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {[
-              { icon: '🌟', t: '最佳吉他手', v: 'A07c Sun + 麥克風', m: 'NT$42,000' },
-              { icon: '🎤', t: '最佳Vocal', v: 'A02c Sun + 麥克風', m: 'NT$26,000' },
-              { icon: '❤️', t: '最佳人氣獎', v: 'ST2-Color Light', m: 'NT$15,500' },
-              { icon: '🏅', t: '評審優選 x5', v: '獎牌+吉他架', m: '' },
-              { icon: '🐴', t: '海馬特別獎 x5', v: '91PU會員一年', m: '' },
-            ].map((a) => (
-              <div key={a.t} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] text-center">
-                <span className="text-2xl block mb-2">{a.icon}</span>
-                <p className="text-xs font-bold">{a.t}</p>
-                <p className="text-[10px] text-white/30 mt-0.5">{a.v}</p>
-                {a.m && <p className="text-[11px] font-mono font-bold mt-1" style={{ color: GOLD }}>{a.m}</p>}
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
+          <div className="text-center mt-10">
             <CTA />
           </div>
         </div>
