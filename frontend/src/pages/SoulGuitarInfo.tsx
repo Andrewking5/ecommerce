@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Guitar, Music, Trophy, Users, Star, ChevronDown, ExternalLink, FileText, X, ZoomIn, ArrowUp, Menu as MenuIcon } from 'lucide-react';
 import SEO from '../components/SEO';
 
-const POSTER_SRC = '/images/events/soul-guitar-poster.png';
+const POSTER_SRC = '/images/events/soul-guitar-poster.jpg';
 
 const CONTEST_COLORS = [
   { name: '藍', hex: '#3b82f6' },
