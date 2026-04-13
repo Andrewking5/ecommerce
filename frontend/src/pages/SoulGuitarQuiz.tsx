@@ -14,7 +14,7 @@ const WALL_COLOR = '#6ba3b5';
 const questions = [
   {
     id: 1,
-    bg: `${BASE}/q1.jpg`,
+    bg: `${BASE}/q1.webp`,
     options: [
       '找一家舒服的小店坐著放鬆',
       '隨便出門走走看看城市',
@@ -24,7 +24,7 @@ const questions = [
   },
   {
     id: 2,
-    bg: `${BASE}/q2.jpg`,
+    bg: `${BASE}/q2.webp`,
     options: [
       '旋律很溫暖很好聽',
       '整體感覺很自由很流動',
@@ -34,7 +34,7 @@ const questions = [
   },
   {
     id: 3,
-    bg: `${BASE}/q3.jpg`,
+    bg: `${BASE}/q3.webp`,
     options: [
       '小咖啡店 acoustic 演出',
       '戶外音樂表演',
@@ -44,7 +44,7 @@ const questions = [
   },
   {
     id: 4,
-    bg: `${BASE}/q4.jpg`,
+    bg: `${BASE}/q4.webp`,
     options: [
       '和朋友在咖啡店聊天的午後',
       '海邊吹著風的海岸',
@@ -54,7 +54,7 @@ const questions = [
   },
   {
     id: 5,
-    bg: `${BASE}/q5.jpg`,
+    bg: `${BASE}/q5.webp`,
     options: [
       '覺得心情變得很舒服',
       '開始想像很多畫面',
@@ -64,7 +64,7 @@ const questions = [
   },
   {
     id: 6,
-    bg: `${BASE}/q6.jpg`,
+    bg: `${BASE}/q6.webp`,
     options: [
       '需要有人陪著聊天、\n分享心事的時候',
       '突然想出門、\n說走就走的時候',
@@ -74,7 +74,7 @@ const questions = [
   },
   {
     id: 7,
-    bg: `${BASE}/q7.jpg`,
+    bg: `${BASE}/q7.webp`,
     options: [
       '停下來聽一下，\n看看是不是熟悉的旋律',
       '邊走邊聽，\n覺得街道變得很有感覺',
@@ -230,6 +230,19 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
    影片背景 + 標題 + 跑馬燈 + 開始按鈕
    ────────────────────────────────────── */
 function CoverPage({ onStart }: { onStart: () => void }) {
+  // 預載所有題目背景圖
+  useEffect(() => {
+    questions.forEach((q) => {
+      const img = new Image();
+      img.src = q.bg;
+    });
+    // 也預載按鈕圖
+    ['/btn-default.png', '/btn-selected.png'].forEach((f) => {
+      const img = new Image();
+      img.src = `${BASE}${f}`;
+    });
+  }, []);
+
   return (
     <motion.div
       className="absolute inset-0 z-50 flex flex-col overflow-hidden"
@@ -245,20 +258,20 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         muted
         playsInline
       />
-      {/* 暗色疊層讓文字更清楚 */}
-      <div className="absolute inset-0 bg-black/30" />
+      {/* 暗色疊層讓白字更清楚 */}
+      <div className="absolute inset-0 bg-black/40" />
 
       {/* 內容 */}
       <div className="relative z-10 flex flex-col items-center justify-between h-full py-16">
         {/* 上方留白 */}
         <div />
 
-        {/* 中間：標題 */}
+        {/* 中間：標題（白色去背文字） */}
         <div className="flex flex-col items-center gap-8">
           <motion.img
             src={`${BASE}/cover-title.png`}
             alt="解鎖你的吉他靈魂檔案"
-            className="w-[75%] max-w-[300px] h-auto"
+            className="w-[80%] max-w-[320px] h-auto drop-shadow-lg"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -281,25 +294,24 @@ function CoverPage({ onStart }: { onStart: () => void }) {
           </motion.button>
         </div>
 
-        {/* 底部：跑馬燈 */}
+        {/* 底部：跑馬燈（白色去背文字） */}
         <motion.div
           className="w-full overflow-hidden"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.6 }}
+          animate={{ opacity: 0.7 }}
           transition={{ duration: 1, delay: 1.2 }}
         >
           <div className="flex animate-marquee">
-            {/* 重複兩次做無限滾動 */}
             <img
               src={`${BASE}/cover-marquee.png`}
               alt=""
-              className="h-5 w-auto shrink-0 mr-12"
+              className="h-5 w-auto shrink-0 mr-12 drop-shadow"
               draggable={false}
             />
             <img
               src={`${BASE}/cover-marquee.png`}
               alt=""
-              className="h-5 w-auto shrink-0 mr-12"
+              className="h-5 w-auto shrink-0 mr-12 drop-shadow"
               draggable={false}
             />
           </div>
@@ -394,32 +406,30 @@ export default function SoulGuitarQuiz() {
 
                   {/* 互動層 */}
                   <div className="relative z-10 flex flex-col h-full">
-                    {/* 頂部：上一題 + 進度條 */}
-                    <div className="flex items-center px-4 pt-4 gap-2">
-                      {/* 上一題按鈕 */}
-                      {!isFirstQ ? (
-                        <motion.button
-                          type="button"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          onClick={handlePrev}
-                          className="shrink-0 flex items-center gap-0.5 rounded-full bg-white/40 backdrop-blur-sm pl-1 pr-2.5 py-1 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all"
-                        >
-                          <ChevronLeft size={14} />
-                          <span className="text-[10px]" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
-                        </motion.button>
-                      ) : (
-                        <div className="w-14" />
-                      )}
+                    {/* 上一題按鈕 — 左上角 */}
+                    {!isFirstQ && (
+                      <motion.button
+                        type="button"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={handlePrev}
+                        className="absolute top-4 left-4 z-20 flex items-center gap-0.5 rounded-full bg-white/40 backdrop-blur-sm pl-1 pr-2.5 py-1 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all"
+                      >
+                        <ChevronLeft size={14} />
+                        <span className="text-[10px]" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
+                      </motion.button>
+                    )}
 
-                      {/* 進度條（在 Q 旁邊） */}
-                      <div className="flex-1">
-                        <ProgressBar current={currentQ} />
-                      </div>
+                    {/* 上方留白到 Q 文字區（約 20%） */}
+                    <div className="flex-none" style={{ height: '18%' }} />
+
+                    {/* 進度條 — Q 文字旁邊的位置 */}
+                    <div className="px-4 mb-1">
+                      <ProgressBar current={currentQ} />
                     </div>
 
-                    {/* 留白 — 讓出背景圖中的題目文字 */}
-                    <div className="flex-none" style={{ height: '42%' }} />
+                    {/* 留白 — 讓出背景圖中的題目文字（Q + 問題） */}
+                    <div className="flex-none" style={{ height: '24%' }} />
 
                     {/* 選項按鈕 */}
                     <div className="flex-1 flex flex-col justify-start px-5 gap-2">
