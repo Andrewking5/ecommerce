@@ -265,12 +265,9 @@ function CoverPage({ onStart }: { onStart: () => void }) {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* 內容 */}
-      <div className="relative z-10 flex flex-col items-center justify-between h-full py-16">
-        {/* 上方留白 */}
-        <div />
-
-        {/* 中間：標題（白色去背文字） */}
-        <div className="flex flex-col items-center gap-8">
+      <div className="relative z-10 flex flex-col items-center h-full">
+        {/* 上方：標題（居中偏上） */}
+        <div className="flex-1 flex items-center">
           <motion.img
             src={`${BASE}/cover-title.png`}
             alt="解鎖你的吉他靈魂檔案"
@@ -280,45 +277,61 @@ function CoverPage({ onStart }: { onStart: () => void }) {
             transition={{ duration: 0.8, delay: 0.3 }}
             draggable={false}
           />
+        </div>
 
-          {/* 開始按鈕 */}
+        {/* 下方：開始報名按鈕 + 跑馬燈 */}
+        <div className="flex flex-col items-center gap-5 pb-8 w-full">
+          {/* 開始報名 — 呼吸感邊框 */}
           <motion.button
             type="button"
             onClick={onStart}
-            className="px-10 py-3.5 rounded-full border-2 border-white/80 text-white text-sm tracking-[0.2em] hover:bg-white/20 active:scale-95 transition-all"
+            className="px-10 py-3.5 rounded-full text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
             style={{ fontFamily: QUIZ_FONT }}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              boxShadow: [
+                '0 0 0 2px rgba(255,255,255,0.4)',
+                '0 0 15px 3px rgba(255,255,255,0.6)',
+                '0 0 0 2px rgba(255,255,255,0.4)',
+              ],
+              borderColor: ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.4)'],
+            }}
+            transition={{
+              opacity: { duration: 0.6, delay: 0.8 },
+              y: { duration: 0.6, delay: 0.8 },
+              boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+              borderColor: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+            }}
+            whileTap={{ scale: 0.95 }}
           >
-            開始測驗
+            <span className="relative z-10">開始報名</span>
           </motion.button>
-        </div>
 
-        {/* 底部：跑馬燈（白色去背文字） */}
-        <motion.div
-          className="w-full overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          transition={{ duration: 1, delay: 1.2 }}
-        >
-          <div className="flex animate-marquee">
-            <img
-              src={`${BASE}/cover-marquee.png`}
-              alt=""
-              className="h-5 w-auto shrink-0 mr-12 drop-shadow"
-              draggable={false}
-            />
-            <img
-              src={`${BASE}/cover-marquee.png`}
-              alt=""
-              className="h-5 w-auto shrink-0 mr-12 drop-shadow"
-              draggable={false}
-            />
-          </div>
-        </motion.div>
+          {/* 跑馬燈（離底部一小段距離） */}
+          <motion.div
+            className="w-full overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.7 }}
+            transition={{ duration: 1, delay: 1.2 }}
+          >
+            <div className="flex animate-marquee">
+              <img
+                src={`${BASE}/cover-marquee.png`}
+                alt=""
+                className="h-5 w-auto shrink-0 mr-12 drop-shadow"
+                draggable={false}
+              />
+              <img
+                src={`${BASE}/cover-marquee.png`}
+                alt=""
+                className="h-5 w-auto shrink-0 mr-12 drop-shadow"
+                draggable={false}
+              />
+            </div>
+          </motion.div>
+        </div>
       </div>
     </motion.div>
   );
