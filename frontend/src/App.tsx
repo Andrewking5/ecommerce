@@ -4,7 +4,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -51,6 +51,7 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const Events = lazy(() => import('./pages/Events'));
 const EventDetail = lazy(() => import('./pages/EventDetail'));
+const SoulGuitarInfo = lazy(() => import('./pages/SoulGuitarInfo'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -110,9 +111,28 @@ function RootRedirect() {
  * Forces zh-TW language and renders full site chrome.
  */
 function EventLandingLayout() {
+  const location = useLocation();
+  const isSoulGuitarInfo = location.pathname === '/e/soul-guitar/info';
+
   useEffect(() => {
     if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
   }, []);
+
+  // Soul Guitar info page uses its own dark background — no pt-20 offset
+  if (isSoulGuitarInfo) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main id="main-content" role="main" className="flex-grow">
+          <Suspense fallback={<PageLoader />}>
+            <SoulGuitarInfo />
+          </Suspense>
+        </main>
+        <Footer />
+        <CookieConsent />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
