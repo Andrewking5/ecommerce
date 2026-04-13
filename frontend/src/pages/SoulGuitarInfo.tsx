@@ -1,7 +1,9 @@
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
-import { Guitar, Music, Trophy, Users, Clock, Star, ChevronDown, ExternalLink, FileText } from 'lucide-react';
+import { Guitar, Music, Trophy, Users, Clock, Star, ChevronDown, ExternalLink, FileText, X, ZoomIn } from 'lucide-react';
 import SEO from '../components/SEO';
+
+const POSTER_SRC = '/images/events/soul-guitar-poster.jpg';
 
 const THEME_COLORS = [
   { name: '藍', bg: 'bg-blue-500', text: 'text-blue-500', border: 'border-blue-500', hex: '#3b82f6' },
@@ -104,6 +106,7 @@ function ColorBar() {
 
 export default function SoulGuitarInfo() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [posterOpen, setPosterOpen] = useState(false);
 
   const rules = [
     '演奏組參賽者須將影片上傳至 YouTube 及 Instagram / Facebook，並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。',
@@ -137,8 +140,44 @@ export default function SoulGuitarInfo() {
         description="拿起手中那一把吉他，展現你的靈魂性格。2026 Ayers Soul Guitar 靈魂吉他手大賽，獎項總價值超過 NT$200,000！"
       />
 
+      {/* ─── Poster Lightbox ─── */}
+      <AnimatePresence>
+        {posterOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setPosterOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              className="relative max-w-lg w-full max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                aria-label="關閉海報"
+                onClick={() => setPosterOpen(false)}
+                className="absolute -top-12 right-0 text-white/60 hover:text-white transition-colors"
+              >
+                <X size={28} />
+              </button>
+              <img
+                src={POSTER_SRC}
+                alt="2026 Ayers 靈魂吉他手大賽 官方海報"
+                className="w-full h-auto rounded-2xl shadow-2xl shadow-black/50"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── Hero ─── */}
-      <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[100vh] flex items-center overflow-hidden">
         {/* Animated gradient background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-[#0a0a0a] to-red-900/30" />
@@ -158,63 +197,94 @@ export default function SoulGuitarInfo() {
           ))}
         </div>
 
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <p className="text-sm md:text-base uppercase tracking-[0.3em] text-white/40 mb-6">
-              2026 Ayers Guitar Competition
-            </p>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[1.1]">
-              <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent">
-                靈魂吉他手
-              </span>
-              <br />
-              <span className="text-white/90">大賽</span>
-            </h1>
-            <p className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
-              拿起手中那一把吉他，展現你的靈魂性格
-            </p>
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a
-                href="https://forms.gle/Wat3juxXdQ6vXbAi9"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-red-500/25"
-              >
-                <FileText size={20} />
-                立即報名
-                <ExternalLink size={14} className="opacity-60" />
-              </a>
-              <a
-                href="/e/soul-guitar/register"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-white/20 text-white font-bold text-lg hover:bg-white/5 transition-colors"
-              >
-                活動報名頁
-              </a>
-              <a
-                href="/e/soul-guitar"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-yellow-400/30 text-yellow-400 font-bold text-lg hover:bg-yellow-400/5 transition-colors"
-              >
-                <Guitar size={20} />
-                心理測驗
-              </a>
-            </div>
-          </motion.div>
+            {/* Left: Text & CTA */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="order-2 md:order-1 text-center md:text-left"
+            >
+              <p className="text-sm md:text-base uppercase tracking-[0.3em] text-white/40 mb-6">
+                2026 Ayers Guitar Competition
+              </p>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-[1.1]">
+                <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent">
+                  靈魂吉他手
+                </span>
+                <br />
+                <span className="text-white/90">大賽</span>
+              </h1>
+              <p className="text-lg md:text-xl text-white/50 max-w-md mx-auto md:mx-0 mb-10 leading-relaxed">
+                拿起手中那一把吉他，展現你的靈魂性格
+              </p>
 
-          {/* Scroll indicator */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-          >
-            <ChevronDown size={24} className="text-white/30" />
-          </motion.div>
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center">
+                <a
+                  href="https://forms.gle/Wat3juxXdQ6vXbAi9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-lg hover:scale-105 transition-transform shadow-lg shadow-red-500/25"
+                >
+                  <FileText size={20} />
+                  立即報名
+                  <ExternalLink size={14} className="opacity-60" />
+                </a>
+                <a
+                  href="/e/soul-guitar/register"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-white/20 text-white font-bold text-lg hover:bg-white/5 transition-colors"
+                >
+                  活動報名頁
+                </a>
+              </div>
+              <div className="mt-4 flex justify-center md:justify-start">
+                <a
+                  href="/e/soul-guitar"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-yellow-400/30 text-yellow-400 font-bold text-lg hover:bg-yellow-400/5 transition-colors"
+                >
+                  <Guitar size={20} />
+                  心理測驗
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Right: Poster */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="order-1 md:order-2 flex justify-center"
+            >
+              <div className="relative group cursor-pointer" onClick={() => setPosterOpen(true)}>
+                {/* Glow effect behind poster */}
+                <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 via-yellow-400/10 to-red-500/20 rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Color border accent */}
+                <div className="absolute -inset-[2px] bg-gradient-to-br from-blue-500 via-yellow-400 to-red-500 rounded-2xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" />
+                <img
+                  src={POSTER_SRC}
+                  alt="2026 Ayers 靈魂吉他手大賽 官方海報"
+                  className="relative w-full max-w-[360px] h-auto rounded-2xl shadow-2xl shadow-black/60 group-hover:scale-[1.02] transition-transform duration-500"
+                />
+                {/* Zoom hint */}
+                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <ZoomIn size={18} className="text-white" />
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <ChevronDown size={24} className="text-white/30" />
+        </motion.div>
       </section>
 
       <ColorBar />
