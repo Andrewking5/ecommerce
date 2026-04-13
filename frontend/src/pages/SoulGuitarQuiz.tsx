@@ -266,11 +266,11 @@ function CoverPage({ onStart }: { onStart: () => void }) {
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 overflow-hidden"
+      className="fixed inset-0 z-50 overflow-hidden bg-black"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 背景影片 */}
+      {/* 背景影片 — 撐滿全螢幕 */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         src="/videos/soul-guitar-cover.mp4"
@@ -280,11 +280,11 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         playsInline
       />
 
-      {/* 開始按鈕 — 偏下方，呼吸光暈 */}
+      {/* 開始按鈕 — 跑馬燈上方 */}
       <motion.button
         type="button"
         onClick={onStart}
-        className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[15%] w-[50%] max-w-[200px] active:scale-95 transition-transform"
+        className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[12%] w-[50%] max-w-[200px] active:scale-95 transition-transform"
         initial={{ opacity: 0, y: 10 }}
         animate={{
           opacity: 1,
@@ -310,20 +310,24 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         />
       </motion.button>
 
-      {/* 跑馬燈 — 影片底部內，漸層條 + 白字滾動 */}
-      <div className="absolute z-10 bottom-0 left-0 right-0">
-        <div className="relative w-full h-8">
-          <img
-            src={`${BASE}/cover-btn.png`}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            draggable={false}
-          />
-          <div className="absolute inset-0 flex items-center overflow-hidden">
-            <div className="flex shrink-0 animate-marquee">
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3 w-auto shrink-0 mx-8" draggable={false} />
-              <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3 w-auto shrink-0 mx-8" draggable={false} />
-            </div>
+      {/* 跑馬燈 — 影片內底部，漸層條 + 白字滾動 */}
+      <div className="absolute z-10 bottom-0 left-0 right-0 h-9 overflow-hidden">
+        {/* 漸層條背景 */}
+        <img
+          src={`${BASE}/cover-btn.png`}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          draggable={false}
+        />
+        {/* 滾動文字 */}
+        <div className="absolute inset-0 flex items-center overflow-hidden whitespace-nowrap">
+          <div
+            className="flex shrink-0"
+            style={{ animation: 'marquee 20s linear infinite' }}
+          >
+            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
+            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
+            <img src={`${BASE}/cover-marquee.png`} alt="" className="h-3.5 w-auto shrink-0 px-6" draggable={false} />
           </div>
         </div>
       </div>
