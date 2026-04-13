@@ -45,20 +45,33 @@ function QuizOption({
       className="w-full cursor-pointer"
     >
       {selected ? (
-        /* ── 已選：灰底白字 ── */
-        <div className="rounded-full bg-[#a0a0a0] py-3 px-6">
-          <span className="text-[1.05rem]" style={{ fontFamily: QUIZ_FONT, color: '#fff' }}>{label}</span>
-        </div>
+        /* ── 已選：灰底白字，膨脹到完整大小 ── */}
+        <motion.div
+          className="rounded-full bg-[#a0a0a0] px-6"
+          initial={{ paddingTop: 6, paddingBottom: 6 }}
+          animate={{ paddingTop: 12, paddingBottom: 12 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          <motion.span
+            className="block"
+            style={{ fontFamily: QUIZ_FONT, color: '#fff' }}
+            initial={{ fontSize: '0.85rem' }}
+            animate={{ fontSize: '1.05rem' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          >
+            {label}
+          </motion.span>
+        </motion.div>
       ) : (
-        /* ── 未選：漸層邊框 + 白底 ── */
+        /* ── 未選：漸層邊框 + 白底，較矮 ── */
         <div
           className="rounded-full p-[2.5px]"
           style={{
             background: 'linear-gradient(90deg, #c5a059 0%, #d4b06a 30%, #a0b8c0 70%, #6ba3b5 100%)',
           }}
         >
-          <div className="rounded-full bg-white py-3 px-6">
-            <span className="text-[1.05rem] text-[#2a2a2a]" style={{ fontFamily: QUIZ_FONT }}>{label}</span>
+          <div className="rounded-full bg-white py-1.5 px-6">
+            <span className="text-[0.85rem] text-[#2a2a2a]" style={{ fontFamily: QUIZ_FONT }}>{label}</span>
           </div>
         </div>
       )}
