@@ -1,112 +1,86 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { Guitar, Music, Trophy, Users, FileText, X, ZoomIn, ExternalLink, Star, Hash, MessageCircle, Camera, Clock } from 'lucide-react';
+import { X, ZoomIn, ExternalLink, Star, ChevronDown } from 'lucide-react';
 import SEO from '../components/SEO';
+
+/* ═══════════════════════════════════════════════════
+   2026 Ayers 靈魂吉他手大賽 — 活動簡章
+   Inspired by: KIKK, Creative South, FlowFest
+   一頁式簡章，資訊清晰、視覺大氣
+   ═══════════════════════════════════════════════════ */
 
 const POSTER = '/images/events/soul-guitar-poster.jpg';
 const GOLD = '#c5a059';
+const DARK = '#111827';
 
-const SIX = [
-  { n: '藍', h: '#3b82f6' }, { n: '紅', h: '#ef4444' }, { n: '黃', h: '#facc15' },
-  { n: '橘', h: '#f97316' }, { n: '黑', h: '#111' }, { n: '白', h: '#f5f5f5' },
-];
+const SIX = ['#3b82f6', '#ef4444', '#facc15', '#f97316', '#1a1a1a', '#f5f5f5'];
+const SIX_NAMES = ['藍', '紅', '黃', '橘', '黑', '白'];
 
 const JUDGES = [
-  { name: '四分衛-虎神', title: '吉他手 / 四分衛樂團團長', photo: '/images/events/judges/hushen.jpg', ig: 'https://www.instagram.com/quarterback_band/' },
-  { name: 'Pia 吳蓓雅', title: '創作歌手 / 木吉他手', photo: '/images/events/judges/pia.jpg', ig: 'https://www.instagram.com/piaxstudio/' },
-  { name: 'Joyce 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.jpg', ig: 'https://www.instagram.com/joyce.ch0627/' },
-  { name: '林小歐', title: '吉他手 / 最佳吉他手獎', photo: '/images/events/judges/linxiaoou.jpg', ig: 'https://www.facebook.com/novsherry/' },
-  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.jpg', ig: 'https://www.facebook.com/woodywoody2g/' },
+  { name: '四分衛-虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.jpg', link: 'https://www.instagram.com/quarterback_band/' },
+  { name: 'Pia 吳蓓雅', title: '創作歌手 / 木吉他手', photo: '/images/events/judges/pia.jpg', link: 'https://www.instagram.com/piaxstudio/' },
+  { name: 'Joyce 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.jpg', link: 'https://www.instagram.com/joyce.ch0627/' },
+  { name: '林小歐', title: '吉他手 / 最佳吉他手獎', photo: '/images/events/judges/linxiaoou.jpg', link: 'https://www.facebook.com/novsherry/' },
+  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.jpg', link: 'https://www.facebook.com/woodywoody2g/' },
 ];
 
-/* Countdown hook */
-function useCountdown(target: string) {
-  const [left, setLeft] = useState({ d: 0, h: 0, m: 0 });
-  useEffect(() => {
-    const calc = () => {
-      const diff = new Date(target).getTime() - Date.now();
-      if (diff <= 0) return setLeft({ d: 0, h: 0, m: 0 });
-      setLeft({ d: Math.floor(diff / 86400000), h: Math.floor((diff % 86400000) / 3600000), m: Math.floor((diff % 3600000) / 60000) });
-    };
-    calc();
-    const id = setInterval(calc, 60000);
-    return () => clearInterval(id);
-  }, [target]);
-  return left;
+function Strip() {
+  return <div className="flex h-1.5">{SIX.map((c, i) => <div key={i} className="flex-1" style={{ backgroundColor: c }} />)}</div>;
 }
 
-/* Mini donut */
-function MiniDonut({ slices, label }: { slices: { name: string; pct: number; color: string; desc: string }[]; label: string }) {
-  const s = 140, sw = 22, r = (s - sw) / 2, C = 2 * Math.PI * r;
-  let acc = 0;
-  const arcs = slices.map((sl) => {
-    const off = C - (acc / 100) * C;
-    const len = (sl.pct / 100) * C;
-    const mid = ((acc + sl.pct / 2) / 100) * 360 - 90;
-    const rad = (mid * Math.PI) / 180;
-    const lr = r + sw / 2 + 18;
-    acc += sl.pct;
-    return { ...sl, off, len, lx: s / 2 + lr * Math.cos(rad), ly: s / 2 + lr * Math.sin(rad) };
-  });
+function CTA({ className = '' }: { className?: string }) {
   return (
-    <div>
-      <p className="text-xs font-bold text-white/80 mb-3 flex items-center gap-1.5">
-        {label === '彈唱組' ? <Music size={13} className="text-blue-400" /> : <Guitar size={13} className="text-orange-400" />}
-        {label}
-      </p>
-      <div className="flex items-start gap-4">
-        <svg width={s + 40} height={s + 40} viewBox={`-20 -20 ${s + 40} ${s + 40}`} className="shrink-0">
-          <circle cx={s / 2} cy={s / 2} r={r} fill="none" stroke="white" strokeOpacity={0.05} strokeWidth={sw} />
-          {arcs.map((a) => (
-            <circle key={a.name} cx={s / 2} cy={s / 2} r={r} fill="none" stroke={a.color} strokeWidth={sw} strokeLinecap="butt"
-              strokeDasharray={`${a.len} ${C - a.len}`} strokeDashoffset={a.off}
-              className="-rotate-90" style={{ transformOrigin: `${s / 2}px ${s / 2}px` }} />
-          ))}
-          {arcs.map((a) => (
-            <text key={a.name + 'l'} x={a.lx} y={a.ly} textAnchor="middle" dominantBaseline="central"
-              fill={a.color} fontSize={a.pct >= 15 ? 11 : 9} fontWeight="bold" fontFamily="ui-monospace, monospace">{a.pct}%</text>
-          ))}
-        </svg>
-        <div className="space-y-2 pt-3">
-          {slices.map((sl) => (
-            <div key={sl.name} className="flex items-start gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 mt-1" style={{ backgroundColor: sl.color }} />
-              <div>
-                <span className="text-[11px] font-bold text-white/60">{sl.name} <span className="font-mono" style={{ color: sl.color }}>{sl.pct}%</span></span>
-                <p className="text-[10px] text-white/25">{sl.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className={`flex flex-wrap items-center gap-3 ${className}`}>
+      <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-bold text-white hover:brightness-110 transition-all shadow-lg shadow-orange-500/20" style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}>
+        立即報名 <ExternalLink size={12} className="opacity-60" />
+      </a>
+      <a href="/e/soul-guitar/register" className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold border-2 border-white/15 text-white/70 hover:bg-white/5 transition-colors">活動報名頁</a>
+      <a href="/e/soul-guitar" className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold border-2 text-white/70 hover:bg-white/5 transition-colors" style={{ borderColor: GOLD + '50', color: GOLD }}>心理測驗</a>
     </div>
   );
 }
 
-/* Card component */
-function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-white/[0.06] bg-white/[0.03] ${className}`}>{children}</div>;
-}
-
-function GoldLabel({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-base font-bold text-white mb-0.5 flex items-center gap-2">{children}</h2>;
-}
-
-function GoldLine() {
-  return <div className="h-px mb-4" style={{ background: `linear-gradient(90deg, ${GOLD}50, transparent)` }} />;
-}
-
-function Strip() {
-  return <div className="flex h-1">{SIX.map((c) => <div key={c.n} className="flex-1" style={{ backgroundColor: c.h }} />)}</div>;
+function Countdown({ target }: { target: string }) {
+  const [left, setLeft] = useState({ d: 0, h: 0, m: 0 });
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(target).getTime() - Date.now();
+      if (diff <= 0) return;
+      setLeft({ d: Math.floor(diff / 86400000), h: Math.floor((diff % 86400000) / 3600000), m: Math.floor((diff % 3600000) / 60000) });
+    };
+    calc(); const id = setInterval(calc, 60000); return () => clearInterval(id);
+  }, [target]);
+  if (left.d === 0 && left.h === 0 && left.m === 0) return null;
+  return (
+    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono font-bold">
+      <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+      {left.d}天{left.h}時{left.m}分 截止
+    </span>
+  );
 }
 
 export default function SoulGuitarInfo() {
   const [posterOpen, setPosterOpen] = useState(false);
-  const countdown = useCountdown('2026-06-07T23:59:00+08:00');
-  const deadlinePassed = countdown.d === 0 && countdown.h === 0 && countdown.m === 0;
+  const [openRule, setOpenRule] = useState<number | null>(null);
+
+  const rules = [
+    { short: '影片上傳 YouTube + IG/FB', full: '並將影片標題命名為「參賽曲名_姓名_組別 #2026Ayers靈魂吉他手大賽」。IG / FB 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
+    { short: '影片開頭自我介紹', full: '「大家好我是（本名/藝名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂，（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
+    { short: '影片 30~120 秒', full: '影片總時長需為 30 秒至 120 秒。' },
+    { short: '直式一鏡到底', full: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。' },
+    { short: '穿著指定顏色', full: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。' },
+    { short: '露臉 + 完整上半身', full: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。' },
+    { short: '自選一首中/英文曲', full: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。' },
+    { short: '禁止效果器 / Loop', full: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。' },
+    { short: '1~5 人，至少一把鋼弦吉他', full: '禁止對嘴代彈，如不符合以上規定將取消比賽資格。' },
+    { short: '影片須維持公開', full: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。' },
+    { short: '每支影片對應一份表單', full: '' },
+    { short: 'Ayers 主辦保有最終決策權', full: '' },
+  ];
 
   return (
-    <div className="min-h-screen text-white" style={{ background: 'linear-gradient(180deg, #1a2744, #152036)' }}>
+    <div className="min-h-screen bg-white text-gray-900">
       <SEO title="2026 Ayers 靈魂吉他手大賽 | 活動簡章" description="拿起手中那一把吉他，展現你的靈魂性格。獎項總價值超過 NT$200,000！" />
 
       {/* Lightbox */}
@@ -121,361 +95,341 @@ export default function SoulGuitarInfo() {
         )}
       </AnimatePresence>
 
-      <Strip />
+      {/* ═══════════ HERO — 深藍全幅 ═══════════ */}
+      <section className="relative overflow-hidden text-white" style={{ background: `linear-gradient(135deg, #1a2744, #0f1b33)` }}>
+        <Strip />
 
-      {/* ═══════════════════════════════════════════
-          SECTION 1：Hero — 海報 + 所有關鍵資訊
-         ═══════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* Ambient */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/[0.04] rounded-full blur-[180px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[150px]" style={{ backgroundColor: GOLD + '06' }} />
 
-          {/* 海報 */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-1 flex justify-center lg:sticky lg:top-6">
-            <div className="relative group cursor-pointer" onClick={() => setPosterOpen(true)}>
-              <div className="absolute -inset-3 rounded-2xl blur-xl opacity-30 group-hover:opacity-60 transition-opacity" style={{ backgroundColor: GOLD + '20' }} />
-              <img src={POSTER} alt="官方海報" className="relative w-full max-w-[280px] rounded-xl shadow-2xl shadow-black/50 group-hover:scale-[1.01] transition-transform duration-500" />
-              <div className="absolute inset-0 rounded-xl flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
-                <div className="bg-black/50 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"><ZoomIn size={16} className="text-white" /></div>
-              </div>
-              <p className="text-center text-[9px] text-white/20 mt-2">點擊放大海報</p>
-            </div>
-          </motion.div>
-
-          {/* 右欄資訊 */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-2 space-y-5">
-
-            {/* 標題 */}
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
+        <div className="relative max-w-6xl mx-auto px-6 lg:px-8 py-16 md:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* 左：文字 */}
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+              <div className="flex items-center gap-2 mb-4">
                 <img src="/images/ayers-logo.svg" alt="Ayers" className="h-5 brightness-0 invert opacity-50" />
-                <span className="text-[9px] tracking-[0.3em] uppercase font-mono" style={{ color: GOLD + '80' }}>2026 Soul Guitar Competition</span>
+                <span className="text-[9px] tracking-[0.3em] uppercase font-mono" style={{ color: GOLD }}>2026 Soul Guitar Competition</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">靈魂吉他手<span className="font-serif italic" style={{ color: GOLD }}>大賽</span></h1>
-              <p className="text-sm text-white/35 mt-1">大聲點，讓世界聽見你的聲音！</p>
-            </div>
 
-            {/* 日期 + 倒數 + 報名 */}
-            <div className="flex flex-wrap items-center gap-3">
-              <Card className="flex items-center gap-3 px-4 py-2.5">
-                <div className="text-center">
-                  <p className="text-[8px] text-white/25 uppercase">開始</p>
-                  <p className="text-lg font-black" style={{ color: GOLD }}>4.22</p>
-                  <p className="text-[8px] text-white/20">Wed.</p>
+              <h1 className="text-5xl md:text-6xl font-black leading-[1.05] mb-2">
+                靈魂吉他手
+              </h1>
+              <h2 className="text-4xl md:text-5xl font-serif italic font-bold mb-6" style={{ color: GOLD }}>大賽</h2>
+
+              <p className="text-lg text-white/50 mb-8 max-w-lg">大聲點，讓世界聽見你的聲音！拿起手中那一把吉他，展現你的靈魂性格。</p>
+
+              {/* 日期 */}
+              <div className="flex items-end gap-6 mb-6">
+                <div>
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">收件開始</p>
+                  <p className="text-4xl font-black tracking-tight" style={{ color: GOLD }}>4.22</p>
                 </div>
-                <div className="w-4 h-px bg-white/15" />
-                <div className="text-center">
-                  <p className="text-[8px] text-white/25 uppercase">截止</p>
-                  <p className="text-lg font-black" style={{ color: GOLD }}>6.07</p>
-                  <p className="text-[8px] text-white/20">Sun.</p>
+                <div className="text-2xl text-white/15 font-light pb-1">—</div>
+                <div>
+                  <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">截止日期</p>
+                  <p className="text-4xl font-black tracking-tight" style={{ color: GOLD }}>6.07</p>
                 </div>
-              </Card>
-              {!deadlinePassed && (
-                <Card className="flex items-center gap-2 px-3 py-2">
-                  <Clock size={12} className="text-red-400" />
-                  <span className="text-[11px] font-mono font-bold text-red-400">{countdown.d}天 {countdown.h}時 {countdown.m}分</span>
-                  <span className="text-[9px] text-white/25">截止倒數</span>
-                </Card>
-              )}
-              <span className="text-[10px] text-white/25 px-2.5 py-1 rounded-full border border-white/10">限額 200 位</span>
-            </div>
+                <div className="pb-2">
+                  <Countdown target="2026-06-07T23:59:00+08:00" />
+                </div>
+              </div>
 
-            {/* CTA 按鈕列 */}
-            <div className="flex flex-wrap items-center gap-3">
-              <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-sm font-bold text-[#1a2744] hover:brightness-110 transition-all shadow-lg" style={{ backgroundColor: GOLD }}>
-                <FileText size={14} /> 立即報名（Google 表單）<ExternalLink size={10} className="opacity-50" />
-              </a>
-              <a href="/e/soul-guitar/register" className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-bold border border-white/15 text-white/60 hover:text-white hover:bg-white/5 transition-all">
-                活動報名頁
-              </a>
-              <a href="/e/soul-guitar" className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-bold border hover:bg-white/5 transition-all" style={{ borderColor: GOLD + '40', color: GOLD }}>
-                <Guitar size={14} /> 心理測驗
-              </a>
-            </div>
+              <CTA />
 
-            {/* 大賽宗旨 */}
-            <Card className="p-5">
-              <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: GOLD }}>大賽宗旨</h3>
-              <p className="text-[13px] text-white/40 leading-relaxed">
-                在網路上有各式吉他彈唱演奏的短影音，音樂製作及推廣已經不像以往需要高成本、人力。怎麼樣在短影音吸引目光？Ayers 特此辦比賽號召世界各地琴友，讓各位靈魂吉他手們在網路相聚，展現你最獨特的風格。
+              <p className="text-[11px] text-white/20 mt-4">報名上限 200 位 · 依 Google 表單收件時間 · 額滿為止</p>
+            </motion.div>
+
+            {/* 右：海報 */}
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.2 }} className="flex justify-center">
+              <div className="relative group cursor-pointer" onClick={() => setPosterOpen(true)}>
+                <div className="absolute -inset-4 rounded-2xl blur-2xl opacity-30 group-hover:opacity-60 transition-opacity" style={{ backgroundColor: GOLD + '20' }} />
+                <img src={POSTER} alt="官方海報" className="relative w-full max-w-[340px] rounded-2xl shadow-2xl shadow-black/50 group-hover:scale-[1.02] transition-transform duration-500" />
+                <div className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/0 group-hover:bg-black/15 transition-colors">
+                  <div className="bg-black/50 rounded-full p-3 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all"><ZoomIn size={20} className="text-white" /></div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+        <Strip />
+      </section>
+
+      {/* ═══════════ 快速資訊帶 ═══════════ */}
+      <section className="border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {[
+            { label: '比賽平台', value: 'YouTube · IG · FB' },
+            { label: '評審時間', value: '6/8 – 6/17' },
+            { label: '得獎公佈', value: '6/29 21:00' },
+            { label: '影片長度', value: '30 – 120 秒' },
+          ].map((item) => (
+            <div key={item.label}>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
+              <p className="text-sm font-bold text-gray-800">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════ 大賽宗旨 ═══════════ */}
+      <section className="max-w-3xl mx-auto px-6 lg:px-8 py-16 text-center">
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">大賽宗旨</h3>
+        <p className="text-gray-500 leading-relaxed">
+          在網路上有各式吉他彈唱演奏的短影音，音樂製作及推廣已經不像以往需要高成本、人力。怎麼樣在短影音吸引目光？Ayers 特此辦比賽號召世界各地琴友，讓各位靈魂吉他手們在網路相聚，展現你最獨特的風格。
+        </p>
+      </section>
+
+      {/* ═══════════ 評審 — 大照片網格 ═══════════ */}
+      <section className="text-white" style={{ backgroundColor: DARK }}>
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
+          <h3 className="text-2xl font-bold text-center mb-2">評審陣容</h3>
+          <p className="text-center text-white/30 text-sm mb-10">5 位音樂人共同評選</p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+            {JUDGES.map((j) => (
+              <a key={j.name} href={j.link} target="_blank" rel="noopener noreferrer" className="group block">
+                <div className="relative aspect-square rounded-2xl overflow-hidden mb-3 bg-gray-800">
+                  <img src={j.photo} alt={j.name}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex'; }}
+                  />
+                  <div className="w-full h-full items-center justify-center bg-gray-800" style={{ display: 'none' }}>
+                    <Star size={32} style={{ color: GOLD }} />
+                  </div>
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="text-sm font-bold text-white group-hover:text-[#c5a059] transition-colors">{j.name}</p>
+                <p className="text-[11px] text-white/30">{j.title}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ 評分標準 — 乾淨表格式 ═══════════ */}
+      <section className="max-w-5xl mx-auto px-6 lg:px-8 py-16">
+        <h3 className="text-2xl font-bold text-center mb-2">評分標準</h3>
+        <p className="text-center text-gray-400 text-sm mb-10">Scoring Criteria</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* 彈唱組 */}
+          <div>
+            <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-blue-500" /> 彈唱組
+            </h4>
+            {[
+              { label: 'Vocal', desc: '音準、動態、聲音表現', pct: 35, color: '#3b82f6' },
+              { label: '吉他', desc: '內聲部編排、節奏感', pct: 30, color: '#f97316' },
+              { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15, color: '#ef4444' },
+              { label: '融合度', desc: 'Vocal 和吉他搭配', pct: 10, color: '#facc15' },
+              { label: '風格特色', desc: '畫面、服裝、場景', pct: 10, color: GOLD },
+            ].map((s) => (
+              <div key={s.label} className="mb-4">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-sm font-bold">{s.label} <span className="font-normal text-gray-400 text-xs">— {s.desc}</span></span>
+                  <span className="text-sm font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${s.pct}%` }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="h-full rounded-full" style={{ backgroundColor: s.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* 演奏組 */}
+          <div>
+            <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-orange-500" /> 演奏組
+            </h4>
+            {[
+              { label: '技巧', desc: '音色、精準度', pct: 40, color: '#f97316' },
+              { label: '音樂性', desc: '旋律、和聲、節奏', pct: 35, color: '#3b82f6' },
+              { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15, color: '#ef4444' },
+              { label: '風格特色', desc: '畫面、服裝、場景', pct: 10, color: GOLD },
+            ].map((s) => (
+              <div key={s.label} className="mb-4">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-sm font-bold">{s.label} <span className="font-normal text-gray-400 text-xs">— {s.desc}</span></span>
+                  <span className="text-sm font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${s.pct}%` }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="h-full rounded-full" style={{ backgroundColor: s.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="text-center text-xs text-gray-300 mt-6">
+          最佳彈唱/演奏/吉他手/Vocal 由評審評分 · 人氣獎由社群讚數 · 評審優選由各評審選出
+        </p>
+      </section>
+
+      <Strip />
+
+      {/* ═══════════ 獎項 ═══════════ */}
+      <section className="text-white" style={{ backgroundColor: DARK }}>
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
+          <h3 className="text-2xl font-bold text-center mb-2">獎項</h3>
+          <p className="text-center text-white/30 text-sm mb-10">總價值超過 NT$200,000</p>
+
+          {/* 前兩大獎 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            {[
+              { icon: '🏆', title: '最佳彈唱獎', guitar: 'AYERS A07c-30th Anniversary 全單吉他', money: 'NT$48,800 + 獎金 NT$5,000' },
+              { icon: '🎸', title: '最佳演奏獎', guitar: 'AYERS A07c-30th-Engelmann Anniversary 全單吉他', money: 'NT$48,800 + 獎金 NT$5,000' },
+            ].map((a) => (
+              <div key={a.title} className="rounded-2xl p-6 border border-white/10 bg-white/[0.03] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, ${GOLD}, #f97316)` }} />
+                <div className="flex gap-4">
+                  <span className="text-4xl">{a.icon}</span>
+                  <div>
+                    <h4 className="text-lg font-bold mb-1">{a.title}</h4>
+                    <p className="text-sm text-white/40 mb-2">{a.guitar}</p>
+                    <p className="text-base font-mono font-bold" style={{ color: GOLD }}>{a.money}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 其他獎項 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[
+              { icon: '🌟', t: '最佳吉他手', v: 'A07c Sun + 麥克風', m: 'NT$42,000' },
+              { icon: '🎤', t: '最佳Vocal', v: 'A02c Sun + 麥克風', m: 'NT$26,000' },
+              { icon: '❤️', t: '最佳人氣獎', v: 'ST2-Color Light', m: 'NT$15,500' },
+              { icon: '🏅', t: '評審優選 x5', v: '獎牌+吉他架', m: '' },
+              { icon: '🐴', t: '海馬特別獎 x5', v: '91PU會員一年', m: '' },
+            ].map((a) => (
+              <div key={a.t} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] text-center">
+                <span className="text-2xl block mb-2">{a.icon}</span>
+                <p className="text-xs font-bold">{a.t}</p>
+                <p className="text-[10px] text-white/30 mt-0.5">{a.v}</p>
+                {a.m && <p className="text-[11px] font-mono font-bold mt-1" style={{ color: GOLD }}>{a.m}</p>}
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <CTA />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ 影片格式說明 ═══════════ */}
+      <section className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
+        <h3 className="text-2xl font-bold text-center mb-8">影片格式</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 標題命名 */}
+          <div className="rounded-2xl bg-gray-50 p-6">
+            <h4 className="text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">影片標題命名</h4>
+            <div className="space-y-2">
+              <p className="font-mono text-sm bg-white rounded-lg px-4 py-3 border-l-4 border-blue-500 text-gray-700">
+                <span className="text-blue-600">彈唱組：</span>曲名_姓名_彈唱組<br />
+                <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
               </p>
-            </Card>
-
-            {/* 時程 + 平台 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <GoldLabel><FileText size={14} style={{ color: GOLD }} /> 重要時程</GoldLabel>
-                <GoldLine />
-                <div className="space-y-2">
-                  {[
-                    { s: '1', l: '初賽收件', d: '4/22 – 6/7', sub: '23:59 截止' },
-                    { s: '2', l: '比賽評審', d: '6/8 – 6/17', sub: '' },
-                    { s: '3', l: '得獎公佈', d: '6/29', sub: '21:00 公佈' },
-                  ].map((t) => (
-                    <div key={t.s} className="flex items-center gap-3">
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded shrink-0" style={{ backgroundColor: GOLD, color: '#1a2744' }}>STEP {t.s}</span>
-                      <span className="text-[12px] text-white/50">{t.l}</span>
-                      <span className="text-[12px] font-bold font-serif italic ml-auto" style={{ color: GOLD }}>{t.d}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <GoldLabel><Camera size={14} style={{ color: GOLD }} /> 比賽平台</GoldLabel>
-                <GoldLine />
-                <p className="text-[12px] text-white/35 mb-2">將你的彈唱（限中文或英文）或演奏影片上傳至：</p>
-                <div className="flex flex-wrap gap-2">
-                  {['YouTube', 'Instagram', 'Facebook'].map((p) => (
-                    <span key={p} className="px-3 py-1.5 rounded-lg text-xs font-bold text-white/60 border border-white/[0.08] bg-white/[0.02]">{p}</span>
-                  ))}
-                </div>
-                <p className="text-[10px] text-white/20 mt-2">上傳後填寫報名表單，每支影片對應一份表單</p>
-              </div>
-            </div>
-
-            {/* Hashtag + 命名格式 */}
-            <Card className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Hash size={14} style={{ color: GOLD }} />
-                <span className="text-xs font-bold text-white/70">影片標題命名格式</span>
-              </div>
-              <div className="space-y-2">
-                <div className="rounded-lg bg-white/[0.04] px-4 py-2.5 font-mono text-[12px] text-white/60 border-l-2" style={{ borderColor: '#3b82f6' }}>
-                  <span className="text-blue-400">彈唱組：</span>參賽曲名_姓名_彈唱組 <span className="font-bold text-yellow-400">#2026Ayers靈魂吉他手大賽</span>
-                </div>
-                <div className="rounded-lg bg-white/[0.04] px-4 py-2.5 font-mono text-[12px] text-white/60 border-l-2" style={{ borderColor: '#f97316' }}>
-                  <span className="text-orange-400">演奏組：</span>參賽曲名_姓名_演奏組 <span className="font-bold text-yellow-400">#2026Ayers靈魂吉他手大賽</span>
-                </div>
-              </div>
-              <p className="text-[10px] text-white/20 mt-2">IG / FB 貼文亦須加上 <span className="text-yellow-400/60">#2026Ayers靈魂吉他手大賽</span></p>
-            </Card>
-
-            {/* 自我介紹範本 */}
-            <Card className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <MessageCircle size={14} style={{ color: GOLD }} />
-                <span className="text-xs font-bold text-white/70">影片開頭自我介紹（必說）</span>
-              </div>
-              <div className="rounded-lg bg-white/[0.04] px-4 py-3 text-[12px] text-white/50 leading-relaxed italic border-l-2" style={{ borderColor: GOLD }}>
-                「大家好我是<span className="text-white/80">（本名/藝名）</span>，今天來參加2026Ayers靈魂吉他手大賽，報名<span className="text-white/80">（演奏組/彈唱組）</span>，我的靈魂是<span className="text-white/80">（xx）</span>吉他魂，<span className="text-white/80">（想帶給大家的一句話）</span>。比賽曲目是<span className="text-white/80">（創作者）</span>的<span className="text-white/80">（歌名）</span>。」
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-
-      <Strip />
-
-      {/* ═══════════════════════════════════════════
-          SECTION 2：評審 + 評分
-         ═══════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-          {/* 評審 */}
-          <div>
-            <GoldLabel><Users size={14} style={{ color: GOLD }} /> 評審陣容 <span className="text-xs text-white/25 font-normal ml-1">5 Judges</span></GoldLabel>
-            <GoldLine />
-            <div className="space-y-4">
-              {JUDGES.map((j) => (
-                <div key={j.name} className="flex items-center gap-4 group">
-                  <div className="relative shrink-0 w-16 h-16">
-                    <img src={j.photo} alt={j.name}
-                      className="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 border-2 border-transparent group-hover:border-[#c5a059] shadow-md"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex'; }}
-                    />
-                    <div className="w-full h-full rounded-full items-center justify-center bg-white/5 border border-white/10" style={{ display: 'none' }}>
-                      <Star size={20} style={{ color: GOLD }} />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white group-hover:text-[#c5a059] transition-colors">{j.name}</p>
-                    <p className="text-[11px] text-white/30">{j.title}</p>
-                  </div>
-                  <a href={j.ig} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[10px] text-white/20 hover:text-white/50 transition-colors border border-white/10 rounded-full px-2.5 py-1 hover:border-white/20">
-                    {j.ig.includes('instagram') ? 'IG' : 'FB'} →
-                  </a>
-                </div>
-              ))}
+              <p className="font-mono text-sm bg-white rounded-lg px-4 py-3 border-l-4 border-orange-500 text-gray-700">
+                <span className="text-orange-600">演奏組：</span>曲名_姓名_演奏組<br />
+                <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
+              </p>
             </div>
           </div>
 
-          {/* 評分標準 */}
-          <div>
-            <GoldLabel><Trophy size={14} style={{ color: GOLD }} /> 評分標準 <span className="text-xs text-white/25 font-normal ml-1">Scoring</span></GoldLabel>
-            <GoldLine />
-            <div className="space-y-6">
-              <MiniDonut label="彈唱組" slices={[
-                { name: 'Vocal', pct: 35, color: '#3b82f6', desc: '音準、動態、聲音表現' },
-                { name: '吉他', pct: 30, color: '#f97316', desc: '內聲部編排、節奏感' },
-                { name: '影音呈現', pct: 15, color: '#ef4444', desc: '錄音品質、影像品質' },
-                { name: '融合度', pct: 10, color: '#facc15', desc: 'Vocal和吉他搭配' },
-                { name: '風格特色', pct: 10, color: GOLD, desc: '畫面、服裝、場景' },
-              ]} />
-              <MiniDonut label="演奏組" slices={[
-                { name: '技巧', pct: 40, color: '#f97316', desc: '音色、精準度' },
-                { name: '音樂性', pct: 35, color: '#3b82f6', desc: '旋律、和聲、節奏呈現' },
-                { name: '影音呈現', pct: 15, color: '#ef4444', desc: '錄音品質、影像品質' },
-                { name: '風格特色', pct: 10, color: GOLD, desc: '畫面、服裝、場景' },
-              ]} />
+          {/* 自我介紹 */}
+          <div className="rounded-2xl bg-gray-50 p-6">
+            <h4 className="text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">開頭自我介紹（必說）</h4>
+            <div className="bg-white rounded-lg px-4 py-3 text-sm text-gray-600 leading-relaxed border-l-4" style={{ borderColor: GOLD }}>
+              「大家好我是<b>（本名/藝名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
             </div>
-            <p className="text-[9px] text-white/15 mt-4 leading-relaxed">
-              最佳彈唱/演奏/吉他手/Vocal 由評審評分 ｜ 人氣獎由社群讚數 ｜ 評審優選由各評審選出
-            </p>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════
-          SECTION 3：獎項
-         ═══════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <GoldLabel><Trophy size={14} style={{ color: GOLD }} /> 獎項 <span className="text-xs text-white/25 font-normal ml-1">Awards · 總價值超過 NT$200,000</span></GoldLabel>
-        <GoldLine />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { icon: '🏆', t: '最佳彈唱獎', p: 'AYERS A07c-30th Anniversary 全單吉他', v: 'NT$48,800 + 獎金NT$5,000' },
-            { icon: '🎸', t: '最佳演奏獎', p: 'AYERS A07c-30th-Engelmann Anniversary', v: 'NT$48,800 + 獎金NT$5,000' },
-            { icon: '🌟', t: '最佳吉他手', p: 'AYERS A07c Sun + 雲聲錄音電容麥克風', v: '市價 NT$42,000' },
-            { icon: '🎤', t: '最佳Vocal', p: 'AYERS A02c Sun + 聲潮麥克風', v: '市價 NT$26,000' },
-          ].map((a) => (
-            <Card key={a.t} className="p-4 relative overflow-hidden hover:-translate-y-0.5 transition-transform duration-300">
-              <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ backgroundColor: GOLD }} />
-              <span className="text-xl block mb-2">{a.icon}</span>
-              <p className="text-xs font-bold text-white mb-0.5">{a.t}</p>
-              <p className="text-[10px] text-white/30 leading-snug mb-1.5">{a.p}</p>
-              <p className="text-[11px] font-mono font-bold" style={{ color: GOLD }}>{a.v}</p>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-          {[
-            { icon: '❤️', t: '最佳人氣獎', d: 'FB/IG 讚數最高', v: 'AYERS ST2-Color Light NT$15,500' },
-            { icon: '🏅', t: '評審團優選 x5', d: '五位評審各自選出', v: '獎牌 + 吉他架 + 奧昇弦釘' },
-            { icon: '🐴', t: '海馬特別獎 x5', d: '海馬執行長王翰選出', v: '一年海馬91PU會員' },
-          ].map((a) => (
-            <Card key={a.t} className="p-3 flex items-center gap-3">
-              <span className="text-lg">{a.icon}</span>
-              <div>
-                <p className="text-[11px] font-bold text-white">{a.t}</p>
-                <p className="text-[9px] text-white/20">{a.d}</p>
-                <p className="text-[9px] font-mono" style={{ color: GOLD }}>{a.v}</p>
+      {/* ═══════════ 規則 — 手風琴 ═══════════ */}
+      <section className="bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
+          <h3 className="text-2xl font-bold text-center mb-2">參賽規則</h3>
+          <p className="text-center text-gray-400 text-sm mb-8">共 {rules.length} 條規則</p>
+
+          <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100 overflow-hidden shadow-sm">
+            {rules.map((r, i) => (
+              <div key={i}>
+                <button
+                  type="button"
+                  className="w-full px-5 py-4 flex items-center gap-3 text-left hover:bg-gray-50 transition-colors"
+                  onClick={() => setOpenRule(openRule === i ? null : i)}
+                >
+                  <span className="shrink-0 w-6 h-6 rounded-full text-[10px] font-bold flex items-center justify-center" style={{ backgroundColor: GOLD + '15', color: GOLD }}>{i + 1}</span>
+                  <span className="flex-1 text-sm font-medium text-gray-700">{r.short}</span>
+                  {r.full && <ChevronDown size={16} className={`text-gray-300 transition-transform ${openRule === i ? 'rotate-180' : ''}`} />}
+                </button>
+                {openRule === i && r.full && (
+                  <div className="px-5 pb-4 pl-14 text-sm text-gray-400 leading-relaxed">{r.full}</div>
+                )}
               </div>
-            </Card>
+            ))}
+          </div>
+
+          {/* 穿著顏色 */}
+          <div className="mt-6 flex items-center gap-4 justify-center flex-wrap">
+            <span className="text-sm text-gray-400">指定穿著顏色：</span>
+            {SIX.map((c, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <div className="w-7 h-7 rounded-lg border" style={{ backgroundColor: c, borderColor: i >= 4 ? '#ccc' : c }} />
+                <span className="text-xs text-gray-400">{SIX_NAMES[i]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ 注意事項 ═══════════ */}
+      <section className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
+        <h3 className="text-lg font-bold mb-4 text-gray-600">注意事項</h3>
+        <div className="columns-1 md:columns-2 gap-6 text-sm text-gray-400 leading-relaxed space-y-2">
+          {[
+            '獲獎者須負擔國內外貨運費用（獎品由台灣、越南出貨）。',
+            '參賽者須注意翻唱曲目之版權規章，如遇侵權問題與主辦單位無關。',
+            '報名後同意影片授權公開於 AYERS 各網路平台推廣。',
+            '主辦單位保有修改活動辦法及變更獎品之權力。',
+            '影像呈現和聲音品質均列為評分標準。',
+            '請確認影片有在 YouTube 播放清單中。',
+            '每支影片對應一份表單。',
+          ].map((n, i) => (
+            <p key={i} className="break-inside-avoid">{i + 1}. {n}</p>
           ))}
         </div>
       </section>
 
-      <Strip />
+      {/* ═══════════ CTA Footer ═══════════ */}
+      <section className="text-white text-center" style={{ backgroundColor: DARK }}>
+        <Strip />
+        <div className="max-w-3xl mx-auto px-6 lg:px-8 py-20">
+          <h3 className="text-3xl md:text-4xl font-black mb-3">準備好了嗎？</h3>
+          <p className="text-white/40 mb-8">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
+          <CTA className="justify-center" />
+          <p className="text-[10px] text-white/15 mt-6">報名上限 200 位 · 依 Google 表單收件時間 · 額滿為止</p>
 
-      {/* ═══════════════════════════════════════════
-          SECTION 4：規則 + 注意事項 + CTA
-         ═══════════════════════════════════════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-
-          {/* 規則 — 3 cols */}
-          <div className="lg:col-span-3">
-            <GoldLabel><FileText size={14} style={{ color: GOLD }} /> 參賽規則 <span className="text-xs text-white/25 font-normal ml-1">Rules</span></GoldLabel>
-            <GoldLine />
-            <Card className="divide-y divide-white/[0.04] overflow-hidden">
-              {[
-                '影片上傳至 YouTube + IG/FB，標題依指定格式命名',
-                '影片開頭需自我介紹（姓名、組別、靈魂吉他魂、曲目）',
-                '影片總時長 30~120 秒',
-                '直式固定鏡頭一鏡到底，禁止剪輯/運鏡/轉場',
-                '同組別穿著指定顏色（藍/紅/黃/橘/黑/白 擇一）',
-                '清楚露臉，至少完整上半身可看清彈奏姿勢',
-                '自選一首中文/英文/演奏曲，改編曲及原創均可',
-                '僅限本人歌聲 + 木吉他聲，禁止效果器/Loop',
-                '限 1~5 人，至少一把鋼弦吉他，禁止對嘴代彈',
-                '影片須於評審期間維持公開狀態',
-                '每支影片對應一份報名表單',
-                'Ayers 主辦保有最終決策權',
-              ].map((r, i) => (
-                <div key={i} className="px-4 py-2 flex gap-3 items-start">
-                  <span className="shrink-0 w-5 h-5 rounded text-[9px] font-bold flex items-center justify-center mt-0.5" style={{ backgroundColor: GOLD + '15', color: GOLD }}>{i + 1}</span>
-                  <p className="text-[12px] text-white/40 leading-relaxed">{r}</p>
-                </div>
-              ))}
-            </Card>
-
-            {/* 穿著顏色 */}
-            <div className="mt-4 flex items-center gap-3 flex-wrap">
-              <span className="text-[11px] text-white/30">指定穿著顏色：</span>
-              {SIX.map((c) => (
-                <div key={c.n} className="flex items-center gap-1">
-                  <div className="w-5 h-5 rounded border" style={{ backgroundColor: c.h, borderColor: c.n === '白' || c.n === '黑' ? '#555' : c.h + '80' }} />
-                  <span className="text-[9px] text-white/20">{c.n}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 注意事項 + CTA — 2 cols */}
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <GoldLabel><FileText size={14} style={{ color: GOLD }} /> 注意事項</GoldLabel>
-              <GoldLine />
-              <div className="space-y-1.5">
-                {[
-                  '獎品由台灣/越南出貨，獲獎者須負擔運費',
-                  '翻唱曲目版權問題與主辦無關',
-                  '報名後同意影片授權於 AYERS 各平台推廣',
-                  '主辦保有活動修改及變更獎品之權力',
-                  '影像和聲音品質均列為評分標準',
-                  '請確認影片在 YouTube 播放清單中',
-                  '每支影片對應一份表單',
-                ].map((n, i) => (
-                  <div key={i} className="flex gap-2 items-start">
-                    <span className="shrink-0 w-4 h-4 rounded-full text-[8px] font-bold flex items-center justify-center mt-0.5" style={{ backgroundColor: GOLD + '15', color: GOLD }}>{i + 1}</span>
-                    <p className="text-[11px] text-white/30 leading-relaxed">{n}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 報名 CTA */}
-            <Card className="p-6 text-center">
-              <p className="text-lg font-bold text-white mb-1">準備好了嗎？</p>
-              <p className="text-[11px] text-white/25 mb-5">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
-              <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-7 py-3 rounded-full text-sm font-bold text-[#1a2744] hover:brightness-110 transition-all shadow-lg" style={{ backgroundColor: GOLD }}>
-                <FileText size={14} /> Google 表單報名 <ExternalLink size={10} className="opacity-50" />
-              </a>
-              <div className="flex justify-center gap-4 mt-4">
-                <a href="/e/soul-guitar/register" className="text-[11px] text-white/30 hover:text-white/60 underline underline-offset-2 transition-colors">活動報名頁</a>
-                <a href="/e/soul-guitar" className="text-[11px] underline underline-offset-2 hover:brightness-125 transition-colors" style={{ color: GOLD }}>心理測驗</a>
-              </div>
-            </Card>
-
-            {/* 官方連結 */}
-            <div>
-              <p className="text-[10px] text-white/20 mb-2">官方連結</p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: 'ayersguitars.com', url: 'https://ayersguitars.com' },
-                  { label: 'Instagram', url: 'https://www.instagram.com/ayersguitars/' },
-                  { label: 'Facebook', url: 'https://www.facebook.com/ayersguitars/' },
-                  { label: 'YouTube', url: 'https://www.youtube.com/@ayersguitars' },
-                ].map((l) => (
-                  <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/20 hover:text-white/40 border border-white/10 rounded-full px-2.5 py-1 hover:border-white/20 transition-all">
-                    {l.label} ↗
-                  </a>
-                ))}
-              </div>
-            </div>
+          {/* 官方連結 */}
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            {[
+              { label: 'ayersguitars.com', url: 'https://ayersguitars.com' },
+              { label: 'Instagram', url: 'https://www.instagram.com/ayersguitars/' },
+              { label: 'Facebook', url: 'https://www.facebook.com/ayersguitars/' },
+              { label: 'YouTube', url: 'https://www.youtube.com/@ayersguitars' },
+            ].map((l) => (
+              <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/20 hover:text-white/40 border border-white/10 rounded-full px-3 py-1 hover:border-white/20 transition-all">{l.label} ↗</a>
+            ))}
           </div>
         </div>
+
+        <footer className="border-t border-white/5 py-6">
+          <img src="/images/ayers-logo.svg" alt="Ayers" className="h-5 mx-auto brightness-0 invert opacity-10 mb-2" />
+          <p className="text-[9px] text-white/10">&copy; 2026 Ayers Guitars. All rights reserved.</p>
+        </footer>
       </section>
-
-      <Strip />
-
-      {/* Footer */}
-      <footer className="py-5 px-4 text-center" style={{ backgroundColor: '#0d1626' }}>
-        <img src="/images/ayers-logo.svg" alt="Ayers" className="h-5 mx-auto brightness-0 invert opacity-15 mb-2" />
-        <p className="text-[9px] text-white/10">&copy; 2026 Ayers Guitars. All rights reserved.</p>
-      </footer>
     </div>
   );
 }
