@@ -266,11 +266,11 @@ function CoverPage({ onStart }: { onStart: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 overflow-hidden bg-black"
+      className="absolute inset-0 z-50 overflow-hidden"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 背景影片 — 撐滿全螢幕 */}
+      {/* 影片背景 — 填滿整個卡片 */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         src="/videos/soul-guitar-cover.mp4"
@@ -280,7 +280,7 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         playsInline
       />
 
-      {/* 開始按鈕 — 跑馬燈上方 */}
+      {/* 開始按鈕 — 疊在影片上，偏下方 */}
       <motion.button
         type="button"
         onClick={onStart}
@@ -310,17 +310,15 @@ function CoverPage({ onStart }: { onStart: () => void }) {
         />
       </motion.button>
 
-      {/* 跑馬燈 — 影片內底部，漸層條 + 白字滾動 */}
+      {/* 跑馬燈 — 疊在影片上，最底部 */}
       <div className="absolute z-10 bottom-0 left-0 right-0 h-9 overflow-hidden">
-        {/* 漸層條背景 */}
         <img
           src={`${BASE}/cover-btn.png`}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
         />
-        {/* 滾動文字 */}
-        <div className="absolute inset-0 flex items-center overflow-hidden whitespace-nowrap">
+        <div className="absolute inset-0 flex items-center overflow-hidden">
           <div
             className="flex shrink-0"
             style={{ animation: 'marquee 20s linear infinite' }}
@@ -388,16 +386,12 @@ export default function SoulGuitarQuiz() {
   return (
     <div
       className="w-full min-h-dvh flex items-center justify-center"
-      style={{ backgroundColor: WALL_COLOR }}
+      style={{ backgroundColor: phase === 'cover' ? '#0a1628' : WALL_COLOR }}
     >
-      {/* 封面 — 全螢幕不限寬 */}
-      <AnimatePresence>
-        {phase === 'cover' && <CoverPage onStart={handleStart} />}
-      </AnimatePresence>
-
-      {/* 手機卡片（測驗用） */}
+      {/* 手機卡片 — 封面、loading、測驗都在同一個容器內 */}
       <div className="relative w-full max-w-[430px] h-dvh mx-auto overflow-hidden">
         <AnimatePresence>
+          {phase === 'cover' && <CoverPage onStart={handleStart} />}
           {phase === 'loading' && <LoadingScreen onDone={handleLoadingDone} />}
         </AnimatePresence>
 
