@@ -226,16 +226,104 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
 }
 
 /* ──────────────────────────────────────
+   封面頁
+   影片背景 + 標題 + 跑馬燈 + 開始按鈕
+   ────────────────────────────────────── */
+function CoverPage({ onStart }: { onStart: () => void }) {
+  return (
+    <motion.div
+      className="absolute inset-0 z-50 flex flex-col overflow-hidden"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* 背景影片 */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/videos/soul-guitar-cover.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      {/* 暗色疊層讓文字更清楚 */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      {/* 內容 */}
+      <div className="relative z-10 flex flex-col items-center justify-between h-full py-16">
+        {/* 上方留白 */}
+        <div />
+
+        {/* 中間：標題 */}
+        <div className="flex flex-col items-center gap-8">
+          <motion.img
+            src={`${BASE}/cover-title.png`}
+            alt="解鎖你的吉他靈魂檔案"
+            className="w-[75%] max-w-[300px] h-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            draggable={false}
+          />
+
+          {/* 開始按鈕 */}
+          <motion.button
+            type="button"
+            onClick={onStart}
+            className="px-10 py-3.5 rounded-full border-2 border-white/80 text-white text-sm tracking-[0.2em] hover:bg-white/20 active:scale-95 transition-all"
+            style={{ fontFamily: QUIZ_FONT }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            開始測驗
+          </motion.button>
+        </div>
+
+        {/* 底部：跑馬燈 */}
+        <motion.div
+          className="w-full overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ duration: 1, delay: 1.2 }}
+        >
+          <div className="flex animate-marquee">
+            {/* 重複兩次做無限滾動 */}
+            <img
+              src={`${BASE}/cover-marquee.png`}
+              alt=""
+              className="h-5 w-auto shrink-0 mr-12"
+              draggable={false}
+            />
+            <img
+              src={`${BASE}/cover-marquee.png`}
+              alt=""
+              className="h-5 w-auto shrink-0 mr-12"
+              draggable={false}
+            />
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ──────────────────────────────────────
    主元件
+   封面 → Loading → 7 題 → 結果
    ────────────────────────────────────── */
 export default function SoulGuitarQuiz() {
-  const [loading, setLoading] = useState(true);
+  const [phase, setPhase] = useState<'cover' | 'loading' | 'quiz'>('cover');
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [direction, setDirection] = useState(1); // 1=forward, -1=back
+  const [direction, setDirection] = useState(1);
 
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
+
+  const handleStart = () => setPhase('loading');
+  const handleLoadingDone = () => setPhase('quiz');
 
   const handleSelect = (optionIndex: number) => {
     const newAnswers = [...answers];
@@ -272,73 +360,84 @@ export default function SoulGuitarQuiz() {
       style={{ backgroundColor: WALL_COLOR }}
     >
       {/* 手機卡片 */}
-      <div className="relative w-full max-w-[430px] h-dvh mx-auto overflow-hidden flex flex-col">
-        {/* Loading */}
+      <div className="relative w-full max-w-[430px] h-dvh mx-auto overflow-hidden">
         <AnimatePresence>
-          {loading && <LoadingScreen onDone={() => setLoading(false)} />}
+          {/* 封面 */}
+          {phase === 'cover' && <CoverPage onStart={handleStart} />}
+
+          {/* Loading */}
+          {phase === 'loading' && <LoadingScreen onDone={handleLoadingDone} />}
         </AnimatePresence>
 
-        {/* 題目區域 */}
-        <div className="relative flex-1 overflow-hidden">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={currentQ}
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0"
-            >
-              {/* 背景圖片 */}
-              <img
-                src={question.bg}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                draggable={false}
-              />
+        {/* 題目（phase=quiz 時顯示） */}
+        {phase === 'quiz' && (
+          <div className="flex flex-col h-full">
+            <div className="relative flex-1 overflow-hidden">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={currentQ}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  className="absolute inset-0"
+                >
+                  {/* 背景圖片 */}
+                  <img
+                    src={question.bg}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    draggable={false}
+                  />
 
-              {/* 互動層 */}
-              <div className="relative z-10 flex flex-col h-full">
-                {/* 上一題按鈕 */}
-                {!isFirstQ && (
-                  <motion.button
-                    type="button"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    onClick={handlePrev}
-                    className="absolute top-5 left-4 z-20 flex items-center gap-0.5 rounded-full bg-white/40 backdrop-blur-sm pl-1.5 pr-3 py-1.5 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all"
-                  >
-                    <ChevronLeft size={16} />
-                    <span className="text-xs" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
-                  </motion.button>
-                )}
+                  {/* 互動層 */}
+                  <div className="relative z-10 flex flex-col h-full">
+                    {/* 頂部：上一題 + 進度條 */}
+                    <div className="flex items-center px-4 pt-4 gap-2">
+                      {/* 上一題按鈕 */}
+                      {!isFirstQ ? (
+                        <motion.button
+                          type="button"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          onClick={handlePrev}
+                          className="shrink-0 flex items-center gap-0.5 rounded-full bg-white/40 backdrop-blur-sm pl-1 pr-2.5 py-1 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all"
+                        >
+                          <ChevronLeft size={14} />
+                          <span className="text-[10px]" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
+                        </motion.button>
+                      ) : (
+                        <div className="w-14" />
+                      )}
 
-                {/* 上方留白 — 讓出背景圖中的題目文字 */}
-                <div className="flex-none" style={{ height: '50%' }} />
+                      {/* 進度條（在 Q 旁邊） */}
+                      <div className="flex-1">
+                        <ProgressBar current={currentQ} />
+                      </div>
+                    </div>
 
-                {/* 選項按鈕 */}
-                <div className="flex-1 flex flex-col justify-start px-5 gap-2">
-                  {question.options.map((opt, i) => (
-                    <QuizOption
-                      key={`${currentQ}-${i}`}
-                      label={opt}
-                      onClick={() => handleSelect(i)}
-                      delay={0.05 + i * 0.06}
-                    />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+                    {/* 留白 — 讓出背景圖中的題目文字 */}
+                    <div className="flex-none" style={{ height: '42%' }} />
 
-        {/* 進度條 — 固定在底部 */}
-        <div className="flex-none bg-[#f5f0e8]">
-          <ProgressBar current={currentQ} />
-        </div>
+                    {/* 選項按鈕 */}
+                    <div className="flex-1 flex flex-col justify-start px-5 gap-2">
+                      {question.options.map((opt, i) => (
+                        <QuizOption
+                          key={`${currentQ}-${i}`}
+                          label={opt}
+                          onClick={() => handleSelect(i)}
+                          delay={0.05 + i * 0.06}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
