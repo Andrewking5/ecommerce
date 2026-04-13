@@ -198,8 +198,26 @@ function ProgressBar({ current }: { current: number }) {
    ────────────────────────────────────── */
 function LoadingScreen({ onDone }: { onDone: () => void }) {
   useEffect(() => {
-    const timer = setTimeout(onDone, 2000);
-    return () => clearTimeout(timer);
+    // 等所有背景圖真正載完，最少顯示 1.5 秒
+    const minDelay = new Promise((r) => setTimeout(r, 1500));
+    const allImages = questions.map(
+      (q) => new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = q.bg;
+      }),
+    );
+    // 按鈕圖也一起預載
+    const btnImages = ['/btn-default.png', '/btn-selected.png'].map(
+      (f) => new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = `${BASE}${f}`;
+      }),
+    );
+    Promise.all([minDelay, ...allImages, ...btnImages]).then(onDone);
   }, [onDone]);
 
   return (
@@ -356,11 +374,11 @@ export default function SoulGuitarQuiz() {
     }
   };
 
-  // 滑動方向的動畫變數
-  const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? '-100%' : '100%', opacity: 0 }),
+  // 交叉淡入 — 新舊題同時存在，不會閃白
+  const fadeVariants = {
+    enter: { opacity: 0 },
+    center: { opacity: 1 },
+    exit: { opacity: 0 },
   };
 
   return (
@@ -383,15 +401,14 @@ export default function SoulGuitarQuiz() {
         {phase === 'quiz' && (
           <div className="flex flex-col h-full">
             <div className="relative flex-1 overflow-hidden">
-              <AnimatePresence mode="wait" custom={direction}>
+              <AnimatePresence>
                 <motion.div
                   key={currentQ}
-                  custom={direction}
-                  variants={slideVariants}
+                  variants={fadeVariants}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{ duration: 0.3 }}
                   className="absolute inset-0"
                 >
                   {/* 背景圖片 */}
