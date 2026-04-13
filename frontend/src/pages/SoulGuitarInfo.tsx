@@ -88,6 +88,91 @@ function GoldDivider() {
   );
 }
 
+type Slice = { label: string; pct: number; desc: string; color: string };
+
+function DonutChart({ slices, title, icon }: { slices: Slice[]; title: string; icon: React.ReactNode }) {
+  const size = 200;
+  const strokeWidth = 32;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  let accumulated = 0;
+  const arcs = slices.map((s) => {
+    const offset = circumference - (accumulated / 100) * circumference;
+    const length = (s.pct / 100) * circumference;
+    accumulated += s.pct;
+    return { ...s, offset, length };
+  });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      className="bg-white/70 rounded-2xl p-8 border border-ayers-gold/10"
+    >
+      <h3 className="text-xl font-serif italic font-bold mb-8 flex items-center gap-3 text-ayers-ink">
+        {icon}
+        {title}
+      </h3>
+
+      <div className="flex flex-col items-center gap-8">
+        {/* SVG Donut */}
+        <div className="relative">
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+            {/* Background ring */}
+            <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#1a1a1a" strokeOpacity={0.05} strokeWidth={strokeWidth} />
+            {/* Slices */}
+            {arcs.map((arc) => (
+              <motion.circle
+                key={arc.label}
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                fill="none"
+                stroke={arc.color}
+                strokeWidth={strokeWidth}
+                strokeLinecap="butt"
+                strokeDasharray={`${arc.length} ${circumference - arc.length}`}
+                initial={{ strokeDashoffset: circumference }}
+                whileInView={{ strokeDashoffset: arc.offset }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              />
+            ))}
+          </svg>
+          {/* Center label */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-serif italic font-bold text-ayers-ink">100%</span>
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="w-full space-y-3">
+          {slices.map((s) => (
+            <div key={s.label} className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+              <div className="flex-1 flex items-baseline justify-between">
+                <span className="text-sm font-bold text-ayers-ink">{s.label}</span>
+                <span className="text-xs font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="w-full space-y-1.5">
+          {slices.map((s) => (
+            <div key={s.label} className="flex items-center gap-2 text-[11px] text-ayers-ink/35">
+              <span className="font-bold" style={{ color: s.color }}>{s.label}</span>
+              <span>— {s.desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ── Main ── */
 
 export default function SoulGuitarInfo() {
@@ -480,90 +565,27 @@ export default function SoulGuitarInfo() {
           <SectionTitle>評分標準</SectionTitle>
           <SectionSub>Scoring Criteria</SectionSub>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* 彈唱 */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white/60 rounded-2xl p-8 border border-ayers-gold/10"
-            >
-              <h3 className="text-xl font-serif italic font-bold mb-8 flex items-center gap-3 text-ayers-ink">
-                <span className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                  <Music size={18} className="text-blue-500" />
-                </span>
-                彈唱組
-              </h3>
-              <div className="space-y-5">
-                {[
-                  { label: 'Vocal', pct: 35, desc: '音準、動態、聲音表現', color: '#3b82f6' },
-                  { label: '吉他', pct: 30, desc: '內聲部編排、節奏感', color: '#f97316' },
-                  { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
-                  { label: '融合度', pct: 10, desc: 'Vocal 和吉他搭配協調性', color: '#facc15' },
-                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between items-baseline mb-1.5">
-                      <span className="font-bold text-ayers-ink text-sm">{item.label}</span>
-                      <span className="text-xs font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
-                    </div>
-                    <div className="h-2 bg-ayers-ink/[0.06] rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${item.pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-ayers-ink/30 mt-1">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* 演奏 */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white/60 rounded-2xl p-8 border border-ayers-gold/10"
-            >
-              <h3 className="text-xl font-serif italic font-bold mb-8 flex items-center gap-3 text-ayers-ink">
-                <span className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                  <Guitar size={18} className="text-orange-500" />
-                </span>
-                演奏組
-              </h3>
-              <div className="space-y-5">
-                {[
-                  { label: '技巧', pct: 40, desc: '音色、精準度', color: '#f97316' },
-                  { label: '音樂性', pct: 35, desc: '旋律、和聲、節奏呈現', color: '#3b82f6' },
-                  { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
-                  { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between items-baseline mb-1.5">
-                      <span className="font-bold text-ayers-ink text-sm">{item.label}</span>
-                      <span className="text-xs font-mono font-bold" style={{ color: item.color }}>{item.pct}%</span>
-                    </div>
-                    <div className="h-2 bg-ayers-ink/[0.06] rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${item.pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: item.color }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-ayers-ink/30 mt-1">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            <DonutChart
+              title="彈唱組"
+              icon={<span className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><Music size={18} className="text-blue-500" /></span>}
+              slices={[
+                { label: 'Vocal', pct: 35, desc: '音準、動態、聲音表現', color: '#3b82f6' },
+                { label: '吉他', pct: 30, desc: '內聲部編排、節奏感', color: '#f97316' },
+                { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
+                { label: '融合度', pct: 10, desc: 'Vocal 和吉他搭配協調性', color: '#facc15' },
+                { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
+              ]}
+            />
+            <DonutChart
+              title="演奏組"
+              icon={<span className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center"><Guitar size={18} className="text-orange-500" /></span>}
+              slices={[
+                { label: '技巧', pct: 40, desc: '音色、精準度', color: '#f97316' },
+                { label: '音樂性', pct: 35, desc: '旋律、和聲、節奏呈現', color: '#3b82f6' },
+                { label: '影音呈現', pct: 15, desc: '錄音品質、影像品質', color: '#ef4444' },
+                { label: '風格特色', pct: 10, desc: '畫面、服裝、場景', color: '#c5a059' },
+              ]}
+            />
           </div>
 
           <p className="text-center text-[11px] text-ayers-ink/25 mt-8 leading-relaxed">
