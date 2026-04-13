@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 
@@ -343,11 +343,22 @@ export default function SoulGuitarQuiz() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [direction, setDirection] = useState(1);
   const [tapped, setTapped] = useState<number | null>(null);
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
 
-  const handleStart = () => setPhase('loading');
+  const handleStart = () => {
+    // 點擊時播放背景音樂（需要使用者互動才能播放）
+    if (!bgmRef.current) {
+      const audio = new Audio('/audio/quiz-bg.mp3');
+      audio.loop = true;
+      audio.volume = 0.3;
+      bgmRef.current = audio;
+    }
+    bgmRef.current.play().catch(() => {});
+    setPhase('loading');
+  };
   const handleLoadingDone = () => setPhase('quiz');
 
   const handleSelect = (optionIndex: number) => {
