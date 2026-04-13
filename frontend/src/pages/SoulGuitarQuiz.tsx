@@ -388,16 +388,23 @@ export default function SoulGuitarQuiz() {
 
   return (
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden">
-      {/* 模糊背景 — IG Story 風格，所有階段都有 */}
-      <div
-        className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35] transition-all duration-500"
-        style={{
-          backgroundImage: phase === 'cover'
-            ? 'none'
-            : `url(${currentBg})`,
-          backgroundColor: phase === 'cover' ? '#0a1628' : undefined,
-        }}
-      />
+      {/* 模糊背景 — IG Story 風格 */}
+      {/* 封面：模糊影片 / 測驗：模糊背景圖 */}
+      {phase === 'cover' || phase === 'loading' ? (
+        <video
+          className="absolute inset-0 w-full h-full object-cover blur-lg scale-105 brightness-[0.35]"
+          src="/videos/soul-guitar-cover.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35] transition-all duration-500"
+          style={{ backgroundImage: `url(${currentBg})` }}
+        />
+      )}
 
       {/* 9:16 卡片 — 高度滿版，寬度按比例 */}
       <div
