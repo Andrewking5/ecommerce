@@ -281,30 +281,34 @@ function CoverPage({ onStart }: { onStart: () => void }) {
 
         {/* 下方固定區域 — 開始報名 + 跑馬燈 */}
         <div className="w-full flex flex-col items-center">
-          {/* 開始報名 — 呼吸感邊框 */}
+          {/* 開始按鈕 — 姐所.png 圖片 + 呼吸光暈 */}
           <motion.button
             type="button"
             onClick={onStart}
-            className="mb-6 px-10 py-3.5 rounded-full border-2 border-white/60 text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
-            style={{ fontFamily: QUIZ_FONT }}
+            className="mb-6 w-[55%] max-w-[220px] active:scale-95 transition-transform"
             initial={{ opacity: 0, y: 10 }}
             animate={{
               opacity: 1,
               y: 0,
-              boxShadow: [
-                '0 0 0 2px rgba(255,255,255,0.3)',
-                '0 0 18px 4px rgba(255,255,255,0.5)',
-                '0 0 0 2px rgba(255,255,255,0.3)',
+              filter: [
+                'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
+                'drop-shadow(0 0 12px rgba(255,255,255,0.6))',
+                'drop-shadow(0 0 0px rgba(255,255,255,0.2))',
               ],
             }}
             transition={{
               opacity: { duration: 0.6, delay: 0.8 },
               y: { duration: 0.6, delay: 0.8 },
-              boxShadow: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+              filter: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
             }}
             whileTap={{ scale: 0.95 }}
           >
-            開始報名
+            <img
+              src={`${BASE}/cover-start-btn.png`}
+              alt="開始報名"
+              className="w-full h-auto"
+              draggable={false}
+            />
           </motion.button>
 
           {/* 跑馬燈 — 漸層條背景撐滿寬度 + 白色文字滾動 */}
