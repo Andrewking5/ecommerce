@@ -28,7 +28,12 @@ const WALL_COLOR = '#6ba3b5';
 // 未來熒黑字體
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
-/** 漸層邊框膠囊按鈕 — hover 膨脹，點擊觸發下一題 */
+/**
+ * 漸層邊框膠囊按鈕
+ * 預設：漸層邊框 + 白底
+ * Hover：灰底白字
+ * 點擊：選擇後跳下一題
+ */
 function QuizOption({
   label,
   onClick,
@@ -44,24 +49,28 @@ function QuizOption({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.96 }}
       onClick={onClick}
-      className="w-full cursor-pointer group"
+      className="w-full cursor-pointer group relative"
     >
+      {/* 漸層邊框外框 — hover 時隱藏 */}
       <div
-        className="rounded-full p-[2.5px]"
+        className="rounded-full p-[2.5px] transition-opacity duration-200 group-hover:opacity-0"
         style={{
           background: 'linear-gradient(90deg, #c5a059 0%, #d4b06a 30%, #a0b8c0 70%, #6ba3b5 100%)',
         }}
       >
-        <div className="rounded-full bg-white transition-all duration-200 ease-out py-1.5 px-6 group-hover:py-3">
-          <span
-            className="text-[0.85rem] text-[#2a2a2a] transition-all duration-200 ease-out group-hover:text-[1.05rem]"
-            style={{ fontFamily: QUIZ_FONT }}
-          >
+        <div className="rounded-full bg-white py-3.5 px-8">
+          <span className="text-[1.1rem] text-[#2a2a2a]" style={{ fontFamily: QUIZ_FONT }}>
             {label}
           </span>
         </div>
+      </div>
+      {/* hover 灰底白字 — 疊在同位置 */}
+      <div className="absolute inset-0 rounded-full bg-[#a0a0a0] py-3.5 px-8 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <span className="text-[1.1rem] text-white" style={{ fontFamily: QUIZ_FONT }}>
+          {label}
+        </span>
       </div>
     </motion.button>
   );
