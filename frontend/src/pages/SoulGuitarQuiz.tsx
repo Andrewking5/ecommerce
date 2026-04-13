@@ -266,12 +266,12 @@ function CoverPage({ onStart }: { onStart: () => void }) {
 
       {/* 內容 */}
       <div className="relative z-10 flex flex-col items-center h-full">
-        {/* 上方：標題（居中偏上） */}
-        <div className="flex-1 flex items-center">
+        {/* 上半 — 標題居中 */}
+        <div className="flex-1 flex items-center justify-center">
           <motion.img
             src={`${BASE}/cover-title.png`}
             alt="解鎖你的吉他靈魂檔案"
-            className="w-[80%] max-w-[320px] h-auto drop-shadow-lg"
+            className="w-[75%] max-w-[300px] h-auto drop-shadow-lg"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -279,13 +279,13 @@ function CoverPage({ onStart }: { onStart: () => void }) {
           />
         </div>
 
-        {/* 下方：開始報名按鈕 + 跑馬燈 */}
-        <div className="flex flex-col items-center gap-5 pb-8 w-full">
+        {/* 下方固定區域 — 開始報名 + 跑馬燈 */}
+        <div className="w-full flex flex-col items-center">
           {/* 開始報名 — 呼吸感邊框 */}
           <motion.button
             type="button"
             onClick={onStart}
-            className="px-10 py-3.5 rounded-full border-2 border-white/60 text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
+            className="mb-6 px-10 py-3.5 rounded-full border-2 border-white/60 text-white text-sm tracking-[0.2em] active:scale-95 transition-transform"
             style={{ fontFamily: QUIZ_FONT }}
             initial={{ opacity: 0, y: 10 }}
             animate={{
@@ -307,33 +307,35 @@ function CoverPage({ onStart }: { onStart: () => void }) {
             開始報名
           </motion.button>
 
-          {/* 跑馬燈 — 漸層條背景 + 白色文字滾動 */}
+          {/* 跑馬燈 — 漸層條背景撐滿寬度 + 白色文字滾動 */}
           <motion.div
-            className="w-full overflow-hidden relative"
+            className="w-full relative"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.2 }}
           >
-            {/* 漸層條背景 */}
-            <img
-              src={`${BASE}/cover-btn.png`}
-              alt=""
-              className="w-full h-auto"
-              draggable={false}
-            />
+            {/* 漸層條背景 — 撐滿寬度，固定高度 */}
+            <div className="w-full h-10 overflow-hidden">
+              <img
+                src={`${BASE}/cover-btn.png`}
+                alt=""
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            </div>
             {/* 白色文字在漸層條上滾動 */}
             <div className="absolute inset-0 flex items-center overflow-hidden">
-              <div className="flex animate-marquee">
+              <div className="flex shrink-0 animate-marquee whitespace-nowrap">
                 <img
                   src={`${BASE}/cover-marquee.png`}
                   alt=""
-                  className="h-4 w-auto shrink-0 mr-16"
+                  className="h-3.5 w-auto shrink-0 mx-8"
                   draggable={false}
                 />
                 <img
                   src={`${BASE}/cover-marquee.png`}
                   alt=""
-                  className="h-4 w-auto shrink-0 mr-16"
+                  className="h-3.5 w-auto shrink-0 mx-8"
                   draggable={false}
                 />
               </div>
@@ -450,7 +452,7 @@ export default function SoulGuitarQuiz() {
                     )}
 
                     {/* 進度條 — 絕對定位在 Q 文字右邊同一行 */}
-                    <div className="absolute z-20" style={{ top: 'calc(27.5% - 7px)', left: '22%', right: '4%' }}>
+                    <div className="absolute z-20" style={{ top: 'calc(27.5% - 10px)', left: '22%', right: '4%' }}>
                       <ProgressBar current={currentQ} />
                     </div>
 
