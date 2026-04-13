@@ -311,13 +311,10 @@ function CoverPage({ onStart }: { onStart: () => void }) {
       </motion.button>
 
       {/* 跑馬燈 — 疊在影片上，最底部 */}
-      <div className="absolute z-10 bottom-0 left-0 right-0 h-9 overflow-hidden">
-        <img
-          src={`${BASE}/cover-btn.png`}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          draggable={false}
-        />
+      <div
+        className="absolute z-10 bottom-0 left-0 right-0 h-9 overflow-hidden"
+        style={{ background: 'linear-gradient(90deg, #c5a059 0%, #a0a068 35%, #6a9a8a 65%, #4a7a8a 100%)' }}
+      >
         <div className="absolute inset-0 overflow-hidden">
           <div
             className="flex items-center h-full w-[200%]"
