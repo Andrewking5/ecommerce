@@ -292,7 +292,7 @@ export default function SoulGuitarQuiz() {
                     </div>
 
                     {/* 上半留白 — 讓出 Q 文字區域 */}
-                    <div className="flex-1" />
+                    <div className="flex-none" style={{ height: '52%' }} />
 
                     {/* 選項按鈕 */}
                     <div className="w-full flex flex-col items-center pb-14">
