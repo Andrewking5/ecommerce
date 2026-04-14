@@ -758,35 +758,29 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 背景 — 長條圖，跟隨內容滾動 */}
-      <div className="absolute inset-x-0 top-0 w-full z-0">
-        <img src={`${RF}/bg.webp`} alt="" className="w-full h-auto" draggable={false} />
-      </div>
+      {/* 背景 — 長條圖，跟內容同寬同步滾動 */}
+      <img src={`${RF}/bg.webp`} alt="" className="absolute top-0 left-0 w-full h-auto z-0" draggable={false} />
 
-      {/* 內容 */}
-      <div className="relative z-10 flex flex-col items-center w-full max-w-[430px] mx-auto px-5 pb-16">
+      {/* 內容 — 全寬，置中在桌機 */}
+      <div className="relative z-10 flex flex-col items-center w-full md:max-w-[430px] md:mx-auto pb-16">
 
-        {/* ─── Hero Card（可截圖分享的區塊） ─── */}
+        {/* ─── Hero Card（全寬，可截圖分享） ─── */}
         <motion.div
-          className="w-full mt-6 relative"
-          initial={{ opacity: 0, scale: 0.85 }}
+          className="w-full relative"
+          initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* 光暈呼吸 */}
-          <motion.div
-            className="absolute -inset-3 rounded-3xl pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at center, ${result.themeColor}40 0%, transparent 70%)` }}
-            animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.98, 1.02, 0.98] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          />
           <img
             src={`${RF}/hero-card.webp`}
             alt={result.name}
-            className="relative w-full h-auto rounded-2xl shadow-2xl"
+            className="relative w-full h-auto"
             draggable={false}
           />
         </motion.div>
+
+        {/* ─── 以下區塊加側邊 padding ─── */}
+        <div className="w-full px-5 flex flex-col items-center">
 
         {/* 長按儲存提示 — 輕微浮動 */}
         <motion.div
@@ -1004,6 +998,8 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* 底部留白 */}
         <div className="h-8" />
+
+        </div>{/* end px-5 wrapper */}
       </div>
     </motion.div>
   );
