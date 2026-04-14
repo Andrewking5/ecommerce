@@ -336,7 +336,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 right-0 z-30"
                 style={bubbleAbove
-                  ? { bottom: '100%', marginBottom: '48px' }
+                  ? { bottom: '100%', marginBottom: '58px' }
                   : { top: '100%', marginTop: '8px' }
                 }
               >
@@ -549,15 +549,282 @@ function QuestionView({
   );
 }
 
+/* ── 結果頁面資料夾對應 ── */
+const RESULT_FOLDER: Record<string, string> = {
+  FIRE_自由: 'fire',
+  // 其他角色待補：
+  // FIRE_故事: 'spark',
+  // SUN_自由: 'sunny',
+  // SUN_故事: 'soft-sun',
+  // WAVE_自由: 'wave',
+  // WAVE_故事: 'deep-wave',
+  // MOON_故事: 'moon',
+  // MOON_自由: 'dream-moon',
+};
+
+/* ── 結果頁 ── */
+function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => void }) {
+  const result = RESULTS[resultKey];
+  const folder = RESULT_FOLDER[resultKey] || 'fire';
+  const R = `${BASE}/result`;
+  const RF = `${R}/${folder}`;
+  const RS = `${R}/shared`;
+  const [showContent, setShowContent] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowContent(true), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const text = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的吉他靈魂 🎸`;
+    if (navigator.share) {
+      try { await navigator.share({ title: text, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  if (!result) return null;
+
+  return (
+    <motion.div
+      className="absolute inset-0 z-50 overflow-y-auto overflow-x-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* 背景 */}
+      <div className="fixed inset-0 z-0">
+        <img src={`${RF}/bg.png`} alt="" className="w-full h-full object-cover" draggable={false} />
+      </div>
+
+      {/* 內容 */}
+      <div className="relative z-10 flex flex-col items-center w-full max-w-[430px] mx-auto px-5 pb-16">
+
+        {/* ─── Hero Card（可截圖分享的區塊） ─── */}
+        <motion.div
+          className="w-full mt-6"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <img
+            src={`${RF}/hero-card.png`}
+            alt={result.name}
+            className="w-full h-auto rounded-2xl shadow-2xl"
+            draggable={false}
+          />
+        </motion.div>
+
+        {/* 長按儲存提示 */}
+        <motion.div
+          className="mt-3 w-[70%]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 0.7 : 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-save.png`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* 往下看提示 */}
+        <motion.div
+          className="mt-8 w-[75%]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 10 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <img src={`${RS}/text-scroll.png`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 你的個人特質 ─── */}
+        <motion.div
+          className="mt-8 w-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+        >
+          <img src={`${RF}/personality-card.png`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
+        </motion.div>
+
+        {/* 你聽出來了嗎 */}
+        <motion.div
+          className="mt-6 w-[80%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-heard.png`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 猜猜這是哪 + 城市卡 ─── */}
+        <motion.div
+          className="mt-8 w-[50%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-guess.png`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
+        </motion.div>
+        <motion.div
+          className="mt-3 w-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+        >
+          <img src={`${RF}/city-card.png`} alt={result.city} className="w-full h-auto rounded-xl" draggable={false} />
+        </motion.div>
+
+        {/* 這樣的你，會發出什麼樣的聲音？ */}
+        <motion.div
+          className="mt-10 w-[80%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-sound.png`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 你會愛上的吉他音樂風格 ─── */}
+        <motion.div
+          className="mt-6 w-[75%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/title-music-style.png`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* 音樂風格標籤 */}
+        <motion.div
+          className="mt-4 w-full flex flex-col gap-2.5"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          {[1, 2, 3, 4].map(i => (
+            <img key={i} src={`${RF}/tag-${i}.png`} alt="" className="w-full h-auto" draggable={false} />
+          ))}
+        </motion.div>
+
+        {/* ─── 你可能會喜歡的 Ayers 吉他款式 ─── */}
+        <motion.div
+          className="mt-10 w-[80%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/title-ayers.png`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* 兩把吉他 */}
+        <motion.div
+          className="mt-5 w-full grid grid-cols-2 gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {[1, 2].map(i => (
+            <div key={i} className="flex flex-col items-center gap-3">
+              <img src={`${RF}/guitar-${i}.png`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
+              <button type="button" className="w-[80%] active:scale-95 transition-transform">
+                <img src={`${RF}/btn-unlock-${i}.png`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
+              </button>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* ─── 靈魂顏色 ─── */}
+        <motion.div
+          className="mt-10 w-[55%]"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <img src={`${RF}/soul-color.png`} alt={`靈魂顏色：${result.colorName}`} className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 比賽資訊 ─── */}
+        <motion.div
+          className="mt-10 w-[85%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-chance.png`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
+        </motion.div>
+        <motion.div
+          className="mt-3 w-[85%]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RS}/text-contest-info.png`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 底部按鈕 ─── */}
+        <motion.div
+          className="mt-10 w-full flex flex-col items-center gap-3"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <button type="button" onClick={handleShare} className="w-[70%] active:scale-95 transition-transform relative">
+            <img src={`${RS}/btn-share.png`} alt="分享你的測驗結果" className="w-full h-auto" draggable={false} />
+            {copied && (
+              <motion.span
+                className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                style={{ fontFamily: QUIZ_FONT }}
+              >
+                已複製到剪貼簿
+              </motion.span>
+            )}
+          </button>
+          <button type="button" onClick={onRetry} className="w-[45%] active:scale-95 transition-transform">
+            <img src={`${RS}/btn-retry.png`} alt="再測一次" className="w-full h-auto" draggable={false} />
+          </button>
+          <Link to="/e/soul-guitar/info" className="w-[70%] active:scale-95 transition-transform">
+            <img src={`${RS}/btn-contest.png`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
+          </Link>
+        </motion.div>
+
+        {/* 底部留白 */}
+        <div className="h-8" />
+      </div>
+    </motion.div>
+  );
+}
+
 /* ──────────────────────────────────────
    主元件
    ────────────────────────────────────── */
 export default function SoulGuitarQuiz() {
   const isDesktop = useIsDesktop();
-  const [phase, setPhase] = useState<'cover' | 'loading' | 'quiz'>('cover');
+  const [phase, setPhase] = useState<'cover' | 'loading' | 'quiz' | 'result'>('cover');
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [tapped, setTapped] = useState<number | null>(null);
+  const [resultKey, setResultKey] = useState('');
   const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   const question = questions[currentQ];
@@ -584,13 +851,37 @@ export default function SoulGuitarQuiz() {
     const a = [...answers]; a[currentQ] = i; setAnswers(a);
     setTimeout(() => {
       setTapped(null);
-      if (currentQ < questions.length - 1) setCurrentQ(currentQ + 1);
+      if (currentQ < questions.length - 1) {
+        setCurrentQ(currentQ + 1);
+      } else {
+        // 最後一題 → 計算結果
+        const key = calculateResult(a);
+        setResultKey(key);
+        setPhase('result');
+      }
     }, 500);
   };
 
   const handlePrev = () => { if (currentQ > 0) setCurrentQ(currentQ - 1); };
 
+  const handleRetry = () => {
+    setCurrentQ(0);
+    setAnswers([]);
+    setTapped(null);
+    setResultKey('');
+    setPhase('cover');
+  };
+
   const currentBg = phase === 'quiz' ? (isDesktop ? question.bgWide : question.bg) : `${BASE}/cover-bg.webp`;
+
+  /* 結果頁：獨立全螢幕滾動，不需要 16:9 容器 */
+  if (phase === 'result') {
+    return (
+      <div className="w-full min-h-dvh relative bg-black">
+        <ResultPage resultKey={resultKey} onRetry={handleRetry} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden bg-black">
