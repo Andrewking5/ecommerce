@@ -48,22 +48,68 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
   );
 }
 
-/* ── 進度條 ── */
+/* ── 進度條（優化版） ── */
 function ProgressBar({ current }: { current: number }) {
+  const progress = (current / (CHARACTER_NAMES.length - 1)) * 100;
+
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="relative flex items-center justify-between w-full">
-        <div className="absolute left-4 right-4 top-1/2 -translate-y-1/2 h-[2px]">
-          <img src={`${BASE}/progress/line.png`} alt="" className="w-full h-full object-fill" draggable={false} />
-        </div>
-        {CHARACTER_NAMES.map((name, i) => (
-          <div key={i} className="relative z-10 flex flex-col items-center">
-            <motion.div animate={{ opacity: i <= current ? 1 : 0.3 }} transition={{ duration: 0.4 }}>
-              <img src={`${BASE}/progress/char-${i + 1}.png`} alt={name} className="w-6 h-6 md:w-8 md:h-8 object-contain" draggable={false} />
-            </motion.div>
-            <img src={`${BASE}/progress/${i <= current ? 'dot-on' : 'dot-off'}.png`} alt="" className="w-2 h-2 md:w-2.5 md:h-2.5 mt-0.5" draggable={false} />
-          </div>
-        ))}
+    <div className="w-full">
+      <div className="relative flex items-end justify-between">
+        {/* 底線 — 灰色 */}
+        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[2px] bg-[#ccc] rounded-full" />
+        {/* 進度線 — 漸層填充到當前位置 */}
+        <div
+          className="absolute left-4 bottom-[5px] md:bottom-[6px] h-[2px] rounded-full transition-all duration-500"
+          style={{
+            width: `calc(${progress}% * (100% - 32px) / 100)`,
+            background: 'linear-gradient(90deg, #c5a059, #6ba3b5)',
+          }}
+        />
+
+        {CHARACTER_NAMES.map((name, i) => {
+          const isCurrent = i === current;
+          const isPast = i < current;
+          const isFuture = i > current;
+
+          return (
+            <div key={i} className="relative z-10 flex flex-col items-center">
+              {/* 角色圖示 */}
+              <motion.div
+                className="relative"
+                animate={{
+                  scale: isCurrent ? 1.3 : 1,
+                  opacity: isFuture ? 0.25 : 1,
+                  filter: isFuture ? 'grayscale(100%)' : 'grayscale(0%)',
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              >
+                <img
+                  src={`${BASE}/progress/char-${i + 1}.png`}
+                  alt={name}
+                  className="w-6 h-6 md:w-7 md:h-7 object-contain"
+                  draggable={false}
+                />
+                {/* 當前角色發光 */}
+                {isCurrent && (
+                  <motion.div
+                    className="absolute -inset-1 rounded-full"
+                    style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.3) 0%, transparent 70%)' }}
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                )}
+              </motion.div>
+              {/* 圓點 */}
+              <motion.div
+                className={`w-2 h-2 md:w-2.5 md:h-2.5 mt-1 rounded-full ${
+                  isCurrent ? 'bg-[#c5a059]' : isPast ? 'bg-[#2a2a2a]' : 'bg-[#ccc]'
+                }`}
+                animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
+                transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
