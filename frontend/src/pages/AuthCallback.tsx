@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import { setAccessToken, clearAccessToken } from '../services/tokenManager';
 import { FullPageLoader } from '../components/guitar';
 
 /**
@@ -20,8 +21,8 @@ export default function AuthCallback() {
     const errorMsg = searchParams.get('error');
 
     if (success === 'true' && token) {
-      // Store the access token
-      localStorage.setItem('accessToken', token);
+      // Store the access token in memory only
+      setAccessToken(token);
 
       // Fetch user profile and update auth state
       api.get('/users/profile', {
@@ -40,7 +41,7 @@ export default function AuthCallback() {
         })
         .catch(() => {
           setError('登入成功但無法取得用戶資料，請重新登入。');
-          localStorage.removeItem('accessToken');
+          clearAccessToken();
         });
     } else {
       // Login failed

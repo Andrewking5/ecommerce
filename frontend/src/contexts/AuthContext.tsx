@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import api from '@/src/services/api';
+import { getAccessToken, setAccessToken, clearAccessToken } from '@/src/services/tokenManager';
 
 export interface User {
   id: string;
@@ -36,11 +37,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = !!user;
 
-  // Verify token on mount
+  // Verify token on mount — try silent refresh if we have a cached user
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token && user) {
-      api.get('/users/profile')
+    if (user) {
+      // Attempt silent refresh via HttpOnly cookie, then fetch profile
+      api.post('/auth/refresh', {}, { withCredentials: true })
+        .then(({ data: refreshData }) => {
+          if (refreshData.accessToken) {
+            setAccessToken(refreshData.accessToken);
+          }
+          return api.get('/users/profile');
+        })
         .then(({ data }) => {
           if (data.success) {
             setUser(data.data);
@@ -48,9 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         })
         .catch(() => {
-          // Token invalid, clear auth state
-          // (refreshToken cookie is HttpOnly, cleared by backend on logout)
-          localStorage.removeItem('accessToken');
+          clearAccessToken();
           localStorage.removeItem('user');
           setUser(null);
         })
@@ -63,9 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
     if (data.success) {
-      // accessToken in localStorage (short-lived, 15m)
+      // accessToken in memory only (short-lived, 15m)
       // refreshToken set as HttpOnly cookie by backend automatically
-      localStorage.setItem('accessToken', data.accessToken);
+      setAccessToken(data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
     } else {
@@ -76,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (registerData: { email: string; password: string; firstName: string; lastName: string; phone?: string }) => {
     const { data } = await api.post('/auth/register', registerData);
     if (data.success) {
-      localStorage.setItem('accessToken', data.accessToken);
+      setAccessToken(data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
     } else {
@@ -91,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore logout API errors
     } finally {
-      localStorage.removeItem('accessToken');
+      clearAccessToken();
       localStorage.removeItem('user');
       setUser(null);
     }

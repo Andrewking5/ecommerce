@@ -1,4 +1,5 @@
 import api from './api';
+import { setAccessToken, clearAccessToken } from './tokenManager';
 
 export interface User {
   id: string;
@@ -32,8 +33,7 @@ const authService = {
   async login(email: string, password: string): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/login', { email, password });
     if (data.success) {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      setAccessToken(data.accessToken);
     }
     return data;
   },
@@ -41,8 +41,7 @@ const authService = {
   async register(registerData: RegisterData): Promise<AuthResponse> {
     const { data } = await api.post<AuthResponse>('/auth/register', registerData);
     if (data.success) {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      setAccessToken(data.accessToken);
     }
     return data;
   },
@@ -53,19 +52,15 @@ const authService = {
     } catch {
       // Ignore logout errors
     } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      clearAccessToken();
     }
   },
 
   async refreshToken(): Promise<AuthResponse> {
-    const refreshToken = localStorage.getItem('refreshToken');
-    const { data } = await api.post<AuthResponse>('/auth/refresh', { refreshToken });
+    // refreshToken is sent automatically via HttpOnly cookie
+    const { data } = await api.post<AuthResponse>('/auth/refresh', {});
     if (data.accessToken) {
-      localStorage.setItem('accessToken', data.accessToken);
-    }
-    if (data.refreshToken) {
-      localStorage.setItem('refreshToken', data.refreshToken);
+      setAccessToken(data.accessToken);
     }
     return data;
   },

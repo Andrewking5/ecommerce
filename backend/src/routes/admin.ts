@@ -1,13 +1,34 @@
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { adminSetupLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 const prisma = new PrismaClient();
 
 // 創建第一個管理員帳號（僅在沒有管理員時可用）
-router.post('/create-first-admin', async (req, res): Promise<void> => {
+// 安全措施：需要 ADMIN_SETUP_SECRET 環境變數 + 嚴格 rate limit
+router.post('/create-first-admin', adminSetupLimiter, async (req, res): Promise<void> => {
   try {
+    // 驗證 setup secret（防止未授權存取）
+    const setupSecret = process.env.ADMIN_SETUP_SECRET;
+    if (!setupSecret) {
+      res.status(403).json({
+        success: false,
+        message: 'Admin setup is disabled. Set ADMIN_SETUP_SECRET environment variable to enable.',
+      });
+      return;
+    }
+
+    const { setupKey } = req.body;
+    if (!setupKey || setupKey !== setupSecret) {
+      res.status(403).json({
+        success: false,
+        message: 'Invalid setup key.',
+      });
+      return;
+    }
+
     // 檢查是否已有管理員
     const existingAdmin = await prisma.user.findFirst({
       where: { role: 'ADMIN' },

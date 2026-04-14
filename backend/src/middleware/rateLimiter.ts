@@ -21,6 +21,15 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+// 管理員初始化限制（極嚴格）
+export const adminSetupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 小時
+  max: 3, // 最多 3 次嘗試
+  message: {
+    error: 'Too many admin setup attempts, please try again later.',
+  },
+});
+
 // 上傳檔案限制
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 小時

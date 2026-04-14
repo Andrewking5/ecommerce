@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SUPPORTED_LANGS } from '@/src/lib/i18nRouting';
+import { getAccessToken, setAccessToken, clearAccessToken } from './tokenManager';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -37,8 +38,7 @@ const api = axios.create({
 // Request interceptor - attach access token + CSRF token
 api.interceptors.request.use(
   async (config) => {
-    // Access token (still in localStorage — short-lived, 15m)
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -104,14 +104,14 @@ api.interceptors.response.use(
         );
 
         const { accessToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
+        setAccessToken(accessToken);
 
         processQueue(null, accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem('accessToken');
+        clearAccessToken();
         localStorage.removeItem('user');
         window.location.href = getLoginPath();
         return Promise.reject(refreshError);
