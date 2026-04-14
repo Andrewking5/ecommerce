@@ -25,6 +25,24 @@ const questions = [
 
 const CHARACTER_NAMES = ['火焰', '太陽', '煙火', '微光', '海浪', '深海', '月光'];
 
+/* ── 角色閒聊台詞（3 秒沒選就出現） ── */
+const CHARACTER_LINES: string[][] = [
+  // Q1 — 火焰：熱情衝動
+  ['欸欸快選啦！想太久火都要滅了🔥', '哪有人放假還在猶豫的啦！', '直覺直覺！不要想太多！', '我已經等到快燒起來了⋯'],
+  // Q2 — 太陽：溫暖陽光
+  ['慢慢來沒關係～但我快曬到融化了☀️', '每首歌都有它的故事呢～', '想一下也好，音樂值得被認真對待', '選哪個都很棒的！相信自己～'],
+  // Q3 — 煙火：華麗短暫
+  ['快點快點！精彩的瞬間不等人的✨', '哇這題好難選！但煙火不能等太久～', '想像一下那個畫面，答案就出來了！', '別猶豫！最閃亮的選擇就是現在！'],
+  // Q4 — 微光：安靜溫柔
+  ['沒關係，慢慢想⋯我會在這裡等你🕯️', '每個風景都很美，就像你一樣', '靜靜感受一下，答案會自己浮現的', '不急不急，微光最懂等待的美'],
+  // Q5 — 海浪：自由奔放
+  ['跟著感覺走就對了🌊～', '音樂就像海浪，讓它帶著你吧', '想太多就不自由了喔！', '隨波逐流也是一種答案啦～'],
+  // Q6 — 深海：神秘深沉
+  ['⋯⋯（在深海裡安靜地等你）🫧', '有些答案藏在最深的地方', '不用急，深海的時間流動得很慢', '潛入內心深處，你會找到答案的'],
+  // Q7 — 月光：浪漫感性
+  ['月光不催人，但夜不會永遠等你🌙', '這是最後一題了，好好感受吧', '街頭的吉他聲⋯你聽見了嗎？', '用心去選，這會成為你的靈魂記憶'],
+];
+
 function useIsDesktop() {
   const [d, setD] = useState(false);
   useEffect(() => {
@@ -35,6 +53,67 @@ function useIsDesktop() {
     return () => mq.removeEventListener('change', h);
   }, []);
   return d;
+}
+
+/* ── 角色閒聊氣泡 ── */
+function IdleBubble({ currentQ }: { currentQ: number }) {
+  const [lineIdx, setLineIdx] = useState(-1); // -1 = hidden
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    setLineIdx(-1);
+    // 3 秒後顯示第一句
+    timerRef.current = setTimeout(() => {
+      setLineIdx(0);
+      // 之後每 5 秒換一句
+      intervalRef.current = setInterval(() => {
+        setLineIdx((prev) => {
+          const lines = CHARACTER_LINES[currentQ];
+          return (prev + 1) % lines.length;
+        });
+      }, 5000);
+    }, 3000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [currentQ]);
+
+  const lines = CHARACTER_LINES[currentQ];
+  if (lineIdx < 0 || !lines) return null;
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={`${currentQ}-${lineIdx}`}
+        initial={{ opacity: 0, scale: 0.8, y: 5 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: -5 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-start gap-1.5"
+      >
+        {/* 角色小頭像 */}
+        <img
+          src={`${BASE}/progress/char-${currentQ + 1}.png`}
+          alt={CHARACTER_NAMES[currentQ]}
+          className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0 mt-0.5"
+          draggable={false}
+        />
+        {/* 對話氣泡 */}
+        <div
+          className="relative bg-white/90 backdrop-blur-sm rounded-xl px-3 py-1.5 md:px-4 md:py-2 max-w-[200px] md:max-w-[240px] shadow-lg"
+          style={{ fontFamily: QUIZ_FONT }}
+        >
+          <div className="absolute -left-1.5 top-3 w-3 h-3 bg-white/90 rotate-45 rounded-sm" />
+          <p className="relative text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a] leading-snug">
+            {lines[lineIdx]}
+          </p>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
 }
 
 /* ── 按鈕 ── */
@@ -197,8 +276,13 @@ function QuestionView({
         </motion.button>
       )}
 
-      {/* 上半留白 */}
-      <div className="flex-1 min-h-[40px] md:min-h-0 md:flex-none md:h-[20%]" />
+      {/* 上半留白 + 角色閒聊氣泡 */}
+      <div className="flex-1 min-h-[40px] md:min-h-0 md:flex-none md:h-[20%] relative">
+        {/* 手機：留白區底部靠右 / 電腦：留白區底部靠右 */}
+        <div className="absolute bottom-0 right-5 md:right-[calc(30%-20px)]">
+          <IdleBubble currentQ={currentQ} />
+        </div>
+      </div>
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
