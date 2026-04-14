@@ -93,7 +93,7 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
 }
 
 /* ── 進度條（含角色氣泡） ── */
-function ProgressBar({ current, idleLine }: { current: number; idleLine: string | null }) {
+function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idleLine: string | null; bubbleAbove?: boolean }) {
   const progress = (current / (CHARACTER_NAMES.length - 1)) * 100;
   const isTalking = idleLine !== null;
 
@@ -132,11 +132,18 @@ function ProgressBar({ current, idleLine }: { current: number; idleLine: string 
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 right-0 z-30"
-                style={{ top: '100%', marginTop: '6px' }}
+                style={bubbleAbove
+                  ? { bottom: '100%', marginBottom: '6px' }
+                  : { top: '100%', marginTop: '6px' }
+                }
               >
-                {/* 尾巴 — 往上指向角色 */}
+                {/* 尾巴 — 指向角色 */}
                 <div
-                  className="absolute -top-[6px] w-3 h-3 rotate-45 border-l-2 border-t-2 border-[#2a2a2a] bg-white z-10"
+                  className={`absolute w-3 h-3 rotate-45 border-[#2a2a2a] bg-white z-10 ${
+                    bubbleAbove
+                      ? '-bottom-[6px] border-r-2 border-b-2'
+                      : '-top-[6px] border-l-2 border-t-2'
+                  }`}
                   style={{ left: `${charPct}%`, transform: 'translateX(-50%) rotate(45deg)' }}
                 />
                 {/* 對話框 */}
@@ -297,9 +304,9 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡在進度條下方 */}
-        <div className="md:hidden mb-1.5 pb-10">
-          <ProgressBar current={currentQ} idleLine={idleLine} />
+        {/* 手機版：進度條在 Q 上方，氣泡在進度條上方 */}
+        <div className="md:hidden mb-1.5 pt-10">
+          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
         </div>
 
         {/* Q 號碼 */}
