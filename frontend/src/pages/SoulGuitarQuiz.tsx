@@ -760,7 +760,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
     >
       {/* 背景 — 長條圖，跟隨內容滾動 */}
       <div className="absolute inset-x-0 top-0 w-full z-0">
-        <img src={`${RF}/bg.png`} alt="" className="w-full h-auto" draggable={false} />
+        <img src={`${RF}/bg.webp`} alt="" className="w-full h-auto" draggable={false} />
       </div>
 
       {/* 內容 */}
@@ -781,7 +781,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
           <img
-            src={`${RF}/hero-card.png`}
+            src={`${RF}/hero-card.webp`}
             alt={result.name}
             className="relative w-full h-auto rounded-2xl shadow-2xl"
             draggable={false}
@@ -849,7 +849,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={`${RF}/city-card.png`} alt={result.city} className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* 這樣的你，會發出什麼樣的聲音？ — blur 解除 */}
@@ -911,7 +911,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
-              <img src={`${RF}/guitar-${i}.png`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
               <motion.button
                 type="button"
                 className="w-[80%]"
