@@ -120,7 +120,7 @@ function ProgressBar({ current }: { current: number }) {
 /* ── Loading ── */
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
-    const min = new Promise((r) => setTimeout(r, 1500));
+    const min = new Promise((r) => setTimeout(r, 2000));
     const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(
       (src) => new Promise<void>((r) => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; }),
     );
