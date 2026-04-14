@@ -102,10 +102,11 @@ function ProgressBar({ current }: { current: number }) {
                 )}
               </motion.div>
               {/* 圓點 */}
-              <motion.div
-                className={`w-2 h-2 md:w-2.5 md:h-2.5 mt-1 rounded-full ${
-                  isCurrent ? 'bg-[#c5a059]' : isPast ? 'bg-[#8a8478]' : 'bg-[#d4d0c8]'
-                }`}
+              <motion.img
+                src={`${BASE}/progress/${isCurrent || isPast ? 'dot-on' : 'dot-off'}.png`}
+                alt=""
+                className="w-2.5 h-2.5 md:w-3 md:h-3 mt-1 object-contain"
+                draggable={false}
                 animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
                 transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
               />
@@ -179,10 +180,10 @@ function CoverPage({ onStart, isDesktop }: { onStart: () => void; isDesktop: boo
 
 /* ── 題目頁面（通用：手機＋電腦共用邏輯） ── */
 function QuestionView({
-  question, currentQ, isFirstQ, isDesktop, tapped,
+  question, currentQ, isFirstQ, tapped,
   onSelect, onPrev,
 }: {
-  question: typeof questions[0]; currentQ: number; isFirstQ: boolean; isDesktop: boolean;
+  question: typeof questions[0]; currentQ: number; isFirstQ: boolean;
   tapped: number | null; onSelect: (i: number) => void; onPrev: () => void;
 }) {
   return (
@@ -326,7 +327,7 @@ export default function SoulGuitarQuiz() {
             <AnimatePresence>
               <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0">
                 <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-                <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} isDesktop={isDesktop} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
+                <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
               </motion.div>
             </AnimatePresence>
           </>
