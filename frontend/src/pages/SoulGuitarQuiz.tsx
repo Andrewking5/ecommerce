@@ -9,16 +9,18 @@ import { ChevronLeft } from 'lucide-react';
    ────────────────────────────────────── */
 
 const BASE = '/images/events/quiz';
+const CACHE_V = '?v=2'; // cache bust
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
+const V = CACHE_V;
 const questions = [
-  { id: 1, bg: `${BASE}/q1.webp`, bgWide: `${BASE}/q1-wide.webp`, title: `${BASE}/titles/q1.png`, options: ['找一家舒服的小店坐著放鬆', '隨便出門走走看看城市', '待在房間聽歌或想事情', '找朋友出去玩熱鬧一下'] },
-  { id: 2, bg: `${BASE}/q2.webp`, bgWide: `${BASE}/q2-wide.webp`, title: `${BASE}/titles/q2.png`, options: ['旋律很溫暖很好聽', '整體感覺很自由很流動', '歌詞或氛圍很有情緒', '節奏很強讓人很想跳舞'] },
-  { id: 3, bg: `${BASE}/q3.webp`, bgWide: `${BASE}/q3-wide.webp`, title: `${BASE}/titles/q3.png`, options: ['小咖啡店 acoustic 演出', '戶外音樂表演', '深夜小酒吧', 'Live House 現場演出'] },
-  { id: 4, bg: `${BASE}/q4.webp`, bgWide: `${BASE}/q4-wide.webp`, title: `${BASE}/titles/q4.png`, options: ['和朋友在咖啡店聊天的午後', '海邊吹著風的海岸', '月光下安靜的夜晚', '充滿歡聲笑語居酒屋之夜'] },
-  { id: 5, bg: `${BASE}/q5.webp`, bgWide: `${BASE}/q5-wide.webp`, title: `${BASE}/titles/q5.png`, options: ['覺得心情變得很舒服', '開始想像很多畫面', '想到很多回憶', '跟著節奏點頭或動起來'] },
-  { id: 6, bg: `${BASE}/q6.webp`, bgWide: `${BASE}/q6-wide.webp`, title: `${BASE}/titles/q6.png`, options: ['需要有人陪著聊天、\n分享心事的時候', '突然想出門、\n說走就走的時候', '當想一個人靜靜待著、\n但又不想完全孤單的時候', '需要有人把氣氛炒熱、\n帶動大家的時候'] },
-  { id: 7, bg: `${BASE}/q7.webp`, bgWide: `${BASE}/q7-wide.webp`, title: `${BASE}/titles/q7.png`, options: ['停下來聽一下，\n看看是不是熟悉的旋律', '邊走邊聽，\n覺得街道變得很有感覺', '站遠一點靜靜聽完整首，\n能低調就低調', '忍不住走近一點，想看\n清楚表演者演出當下的樣子'] },
+  { id: 1, bg: `${BASE}/q1.webp${V}`, bgWide: `${BASE}/q1-wide.webp${V}`, title: `${BASE}/titles/q1.png`, options: ['找一家舒服的小店坐著放鬆', '隨便出門走走看看城市', '待在房間聯歌或想事情', '找朋友出去玩熱鬧一下'] },
+  { id: 2, bg: `${BASE}/q2.webp${V}`, bgWide: `${BASE}/q2-wide.webp${V}`, title: `${BASE}/titles/q2.png`, options: ['旋律很溫暖很好聽', '整體感覺很自由很流動', '歌詞或氛圍很有情緒', '節奏很強讓人很想跳舞'] },
+  { id: 3, bg: `${BASE}/q3.webp${V}`, bgWide: `${BASE}/q3-wide.webp${V}`, title: `${BASE}/titles/q3.png`, options: ['小咖啡店 acoustic 演出', '戶外音樂表演', '深夜小酒吧', 'Live House 現場演出'] },
+  { id: 4, bg: `${BASE}/q4.webp${V}`, bgWide: `${BASE}/q4-wide.webp${V}`, title: `${BASE}/titles/q4.png`, options: ['和朋友在咖啡店聊天的午後', '海邊吹著風的海岸', '月光下安靜的夜晚', '充滿歡聲笑語居酒屋之夜'] },
+  { id: 5, bg: `${BASE}/q5.webp${V}`, bgWide: `${BASE}/q5-wide.webp${V}`, title: `${BASE}/titles/q5.png`, options: ['覺得心情變得很舒服', '開始想像很多畫面', '想到很多回憶', '跟著節奏點頭或動起來'] },
+  { id: 6, bg: `${BASE}/q6.webp${V}`, bgWide: `${BASE}/q6-wide.webp${V}`, title: `${BASE}/titles/q6.png`, options: ['需要有人陪著聊天、\n分享心事的時候', '突然想出門、\n說走就走的時候', '當想一個人靜靜待著、\n但又不想完全孤單的時候', '需要有人把氣氛炒熱、\n帶動大家的時候'] },
+  { id: 7, bg: `${BASE}/q7.webp${V}`, bgWide: `${BASE}/q7-wide.webp${V}`, title: `${BASE}/titles/q7.png`, options: ['停下來聽一下，\n看看是不是熟悉的旋律', '邊走邊聽，\n覺得街道變得很有感覺', '站遠一點靜靜聽完整首，\n能低調就低調', '忍不住走近一點，想看\n清楚表演者演出當下的樣子'] },
 ];
 
 const CHARACTER_NAMES = ['火焰', '太陽', '煙火', '微光', '海浪', '深海', '月光'];
