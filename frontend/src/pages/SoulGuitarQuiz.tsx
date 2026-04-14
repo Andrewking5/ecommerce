@@ -93,7 +93,7 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
 }
 
 /* ── 進度條（含角色氣泡） ── */
-function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idleLine: string | null; bubbleAbove?: boolean }) {
+function ProgressBar({ current, idleLine }: { current: number; idleLine: string | null }) {
   const progress = (current / (CHARACTER_NAMES.length - 1)) * 100;
   const isTalking = idleLine !== null;
 
@@ -112,6 +112,50 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
             background: 'linear-gradient(90deg, #c5a059, #6ba3b5)',
           }}
         />
+
+        {/* 角色氣泡 — 進度條下方，跟隨角色位置 */}
+        {isTalking && (() => {
+          const charPct = (current / 6) * 100;
+          // 氣泡寬度約 60%，根據角色位置決定氣泡偏移，保持尾巴對齊角色
+          // 角色在左邊 → 氣泡偏右，角色在右邊 → 氣泡偏左
+          const bubbleW = 60; // 氣泡佔父容器寬度 %
+          const tailInBubble = Math.max(15, Math.min(85, charPct)); // 尾巴在氣泡內的位置 %
+          // 氣泡 left = 角色位置 - 尾巴在氣泡中的偏移
+          const bubbleLeft = Math.max(0, Math.min(100 - bubbleW, charPct - (bubbleW * tailInBubble / 100)));
+
+          return (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={idleLine}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.25 }}
+                className="absolute left-0 right-0 z-30"
+                style={{ top: '100%', marginTop: '6px' }}
+              >
+                {/* 尾巴 — 往上指向角色 */}
+                <div
+                  className="absolute -top-[6px] w-3 h-3 rotate-45 border-l-2 border-t-2 border-[#2a2a2a] bg-white z-10"
+                  style={{ left: `${charPct}%`, transform: 'translateX(-50%) rotate(45deg)' }}
+                />
+                {/* 對話框 */}
+                <div
+                  className="absolute rounded-2xl border-2 border-[#2a2a2a] bg-white px-4 py-2 shadow-md"
+                  style={{
+                    left: `${bubbleLeft}%`,
+                    width: `${bubbleW}%`,
+                    fontFamily: QUIZ_FONT,
+                  }}
+                >
+                  <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a] leading-snug text-center">
+                    {idleLine}
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          );
+        })()}
 
         {CHARACTER_NAMES.map((name, i) => {
           const isCurrent = i === current;
@@ -159,44 +203,6 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
               />
 
-              {/* 氣泡掛在講話角色上方或下方 */}
-              {isCurrent && isTalking && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={idleLine}
-                    initial={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
-                    transition={{ duration: 0.25 }}
-                    className={`absolute left-1/2 -translate-x-1/2 z-30 flex flex-col items-center ${
-                      bubbleAbove ? 'bottom-full mb-2' : 'top-full mt-2'
-                    }`}
-                  >
-                    {/* 對話框 + 三角尾巴 */}
-                    {bubbleAbove ? (
-                      <>
-                        <div
-                          className="whitespace-nowrap rounded-full border-2 border-[#2a2a2a] bg-white px-4 py-1.5 shadow-md"
-                          style={{ fontFamily: QUIZ_FONT }}
-                        >
-                          <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a]">{idleLine}</p>
-                        </div>
-                        <div className="w-3 h-3 -mt-1.5 rotate-45 border-r-2 border-b-2 border-[#2a2a2a] bg-white" />
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-3 h-3 -mb-1.5 rotate-45 border-l-2 border-t-2 border-[#2a2a2a] bg-white" />
-                        <div
-                          className="whitespace-nowrap rounded-full border-2 border-[#2a2a2a] bg-white px-4 py-1.5 shadow-md"
-                          style={{ fontFamily: QUIZ_FONT }}
-                        >
-                          <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a]">{idleLine}</p>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              )}
             </div>
           );
         })}
@@ -291,9 +297,9 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡在角色上方 */}
-        <div className="md:hidden mb-1.5">
-          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
+        {/* 手機版：進度條在 Q 上方，氣泡在進度條下方 */}
+        <div className="md:hidden mb-1.5 pb-10">
+          <ProgressBar current={currentQ} idleLine={idleLine} />
         </div>
 
         {/* Q 號碼 */}
@@ -335,8 +341,8 @@ function QuestionView({
           ))}
         </div>
 
-        {/* 電腦版：進度條在選項下方，氣泡在角色下方 */}
-        <div className="hidden md:block mt-6">
+        {/* 電腦版：進度條在選項下方，氣泡在進度條下方 */}
+        <div className="hidden md:block mt-6 pb-12">
           <ProgressBar current={currentQ} idleLine={idleLine} />
         </div>
       </div>
