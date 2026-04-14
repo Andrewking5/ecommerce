@@ -304,9 +304,9 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡在進度條上方 */}
-        <div className="md:hidden mb-1.5 pt-10">
-          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
+        {/* 手機版：進度條在 Q 上方，氣泡在進度條下方 */}
+        <div className="md:hidden mb-1.5 pb-10">
+          <ProgressBar current={currentQ} idleLine={idleLine} />
         </div>
 
         {/* Q 號碼 */}
