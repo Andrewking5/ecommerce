@@ -262,9 +262,9 @@ export default function SoulGuitarQuiz() {
         </>
       )}
 
-      {/* ===== 電腦版：16:9 全寬 ===== */}
+      {/* ===== 電腦版：16:9 全寬，容器鎖定 16:9 比例 ===== */}
       {isDesktop && (
-        <div className="relative w-full h-dvh overflow-hidden">
+        <div className="relative w-full overflow-hidden" style={{ height: 'min(100dvh, calc(100vw * 9 / 16))', maxWidth: 'calc(100dvh * 16 / 9)' }}>
           <AnimatePresence>
             {phase === 'cover' && <CoverPage onStart={handleStart} isDesktop />}
             {phase === 'loading' && <LoadingScreen onDone={handleLoadingDone} isDesktop />}
