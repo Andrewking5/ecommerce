@@ -14,13 +14,13 @@ const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 const V = CACHE_V;
 const questions = [
-  { id: 1, bg: `${BASE}/q1.webp${V}`, bgWide: `${BASE}/q1-wide.webp${V}`, title: `${BASE}/titles/q1.png`, options: ['找一家舒服的小店坐著放鬆', '隨便出門走走看看城市', '待在房間聯歌或想事情', '找朋友出去玩熱鬧一下'] },
-  { id: 2, bg: `${BASE}/q2.webp${V}`, bgWide: `${BASE}/q2-wide.webp${V}`, title: `${BASE}/titles/q2.png`, options: ['旋律很溫暖很好聽', '整體感覺很自由很流動', '歌詞或氛圍很有情緒', '節奏很強讓人很想跳舞'] },
-  { id: 3, bg: `${BASE}/q3.webp${V}`, bgWide: `${BASE}/q3-wide.webp${V}`, title: `${BASE}/titles/q3.png`, options: ['小咖啡店 acoustic 演出', '戶外音樂表演', '深夜小酒吧', 'Live House 現場演出'] },
-  { id: 4, bg: `${BASE}/q4.webp${V}`, bgWide: `${BASE}/q4-wide.webp${V}`, title: `${BASE}/titles/q4.png`, options: ['和朋友在咖啡店聊天的午後', '海邊吹著風的海岸', '月光下安靜的夜晚', '充滿歡聲笑語居酒屋之夜'] },
-  { id: 5, bg: `${BASE}/q5.webp${V}`, bgWide: `${BASE}/q5-wide.webp${V}`, title: `${BASE}/titles/q5.png`, options: ['覺得心情變得很舒服', '開始想像很多畫面', '想到很多回憶', '跟著節奏點頭或動起來'] },
-  { id: 6, bg: `${BASE}/q6.webp${V}`, bgWide: `${BASE}/q6-wide.webp${V}`, title: `${BASE}/titles/q6.png`, options: ['需要有人陪著聊天、\n分享心事的時候', '突然想出門、\n說走就走的時候', '當想一個人靜靜待著、\n但又不想完全孤單的時候', '需要有人把氣氛炒熱、\n帶動大家的時候'] },
-  { id: 7, bg: `${BASE}/q7.webp${V}`, bgWide: `${BASE}/q7-wide.webp${V}`, title: `${BASE}/titles/q7.png`, options: ['停下來聽一下，\n看看是不是熟悉的旋律', '邊走邊聽，\n覺得街道變得很有感覺', '站遠一點靜靜聽完整首，\n能低調就低調', '忍不住走近一點，想看\n清楚表演者演出當下的樣子'] },
+  { id: 1, bg: `${BASE}/q1.webp${V}`, bgWide: `${BASE}/q1-wide.webp${V}`, questionText: '如果今天突然有一整天的空閒，你最想？', options: ['找一家舒服的小店坐著放鬆', '隨便出門走走看看城市', '待在房間聽歌或想事情', '找朋友出去玩熱鬧一下'] },
+  { id: 2, bg: `${BASE}/q2.webp${V}`, bgWide: `${BASE}/q2-wide.webp${V}`, questionText: '如果有一首歌讓你反覆聽很多次，通常是因為？', options: ['旋律很溫暖很好聽', '整體感覺很自由很流動', '歌詞或氛圍很有情緒', '節奏很強讓人很想跳舞'] },
+  { id: 3, bg: `${BASE}/q3.webp${V}`, bgWide: `${BASE}/q3-wide.webp${V}`, questionText: '如果要去聽一場現場音樂，你比較想去？', options: ['小咖啡店 acoustic 演出', '戶外音樂表演', '深夜小酒吧', 'Live House 現場演出'] },
+  { id: 4, bg: `${BASE}/q4.webp${V}`, bgWide: `${BASE}/q4-wide.webp${V}`, questionText: '如果你的生活是一種風景，它比較像？', options: ['和朋友在咖啡店聊天的午後', '海邊吹著風的海岸', '月光下安靜的夜晚', '充滿歡聲笑語居酒屋之夜'] },
+  { id: 5, bg: `${BASE}/q5.webp${V}`, bgWide: `${BASE}/q5-wide.webp${V}`, questionText: '當你聽音樂時，你比較常呈現什麼樣的狀態？', options: ['覺得心情變得很舒服', '開始想像很多畫面', '想到很多回憶', '跟著節奏點頭或動起來'] },
+  { id: 6, bg: `${BASE}/q6.webp${V}`, bgWide: `${BASE}/q6-wide.webp${V}`, questionText: '朋友們通常在什麼樣的場合最容易想到你？', options: ['需要有人陪著聊天、\n分享心事的時候', '突然想出門、\n說走就走的時候', '當想一個人靜靜待著、\n但又不想完全孤單的時候', '需要有人把氣氛炒熱、\n帶動大家的時候'] },
+  { id: 7, bg: `${BASE}/q7.webp${V}`, bgWide: `${BASE}/q7-wide.webp${V}`, questionText: '如果你走在街上突然聽到有人彈吉他，你通常會？', options: ['停下來聽一下，\n看看是不是熟悉的旋律', '邊走邊聽，\n覺得街道變得很有感覺', '站遠一點靜靜聽完整首，\n能低調就低調', '忍不住走近一點，想看\n清楚表演者演出當下的樣子'] },
 ];
 
 const CHARACTER_NAMES = ['火焰', '太陽', '煙火', '微光', '海浪', '深海', '月光'];
@@ -142,26 +142,37 @@ function QuestionView({
       {/* 上半留白 */}
       <div className="flex-none h-[28%] md:h-[15%]" />
 
-      {/* Q 標題 + 進度條 + 選項 — 電腦版置中 */}
-      <div className="px-4 md:px-0 md:mx-auto md:w-[50%] md:max-w-[600px]">
-        {/* Q 標題 + 進度條 */}
-        <div className="flex items-start gap-2 mb-4">
-          <motion.img
-            src={question.title}
-            alt={`Q${question.id}`}
-            className="w-[60%] md:w-[55%] max-w-[300px] h-auto drop-shadow-md"
+      {/* 內容區 — 電腦版置中 */}
+      <div className="px-5 md:px-0 md:mx-auto md:w-[50%] md:max-w-[600px]">
+        {/* Q 號碼 + 進度條同一行 */}
+        <div className="flex items-center gap-3 mb-1">
+          <motion.span
+            className="text-[2.2rem] md:text-[2.5rem] font-black text-[#2a2a2a] leading-none drop-shadow-sm"
+            style={{ fontFamily: QUIZ_FONT }}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4 }}
-            draggable={false}
-          />
-          <div className="flex-1 pt-[0.2em]">
+            transition={{ duration: 0.3 }}
+          >
+            Q{question.id}
+          </motion.span>
+          <div className="flex-1">
             <ProgressBar current={currentQ} />
           </div>
         </div>
 
+        {/* 問題文字 */}
+        <motion.p
+          className="text-[1.3rem] md:text-[1.5rem] font-bold text-[#2a2a2a] leading-snug mb-5 drop-shadow-sm"
+          style={{ fontFamily: QUIZ_FONT }}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          {question.questionText}
+        </motion.p>
+
         {/* 選項按鈕 */}
-        <div className="flex flex-col gap-2.5 md:gap-3 px-2 md:px-0">
+        <div className="flex flex-col gap-2.5 md:gap-3">
           {question.options.map((opt, i) => (
             <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
           ))}
