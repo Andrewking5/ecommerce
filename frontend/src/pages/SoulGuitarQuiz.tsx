@@ -591,6 +591,166 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
   if (!result) return null;
 
+  const hasAssets = !!RESULT_FOLDER[resultKey];
+
+  /* ── 沒有素材的角色：簡易文字版結果頁 ── */
+  if (!hasAssets) {
+    return (
+      <motion.div
+        className="absolute inset-0 z-50 overflow-y-auto overflow-x-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        style={{ background: result.themeBg }}
+      >
+        <div className="relative z-10 flex flex-col items-center w-full max-w-[430px] mx-auto px-6 py-12" style={{ fontFamily: QUIZ_FONT }}>
+          {/* 角色圖 */}
+          <motion.img
+            src={result.charImg}
+            alt={result.name}
+            className="w-28 h-28 object-contain"
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, type: 'spring' }}
+            draggable={false}
+          />
+
+          {/* 標題 */}
+          <motion.p
+            className="mt-4 text-white/80 text-sm tracking-widest"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            你的吉他靈魂是
+          </motion.p>
+          <motion.h1
+            className="mt-1 text-white text-3xl font-black"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            {result.soulTitle}
+          </motion.h1>
+          <motion.p
+            className="mt-2 text-white/70 text-base font-bold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            {result.name}
+          </motion.p>
+
+          {/* 標籤 */}
+          <motion.p
+            className="mt-3 text-white/60 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            #{result.tag} #{result.colorName}
+          </motion.p>
+
+          {/* 描述 */}
+          <motion.div
+            className="mt-6 bg-white/15 backdrop-blur-sm rounded-2xl p-5 w-full"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            <p className="text-white/90 text-sm leading-relaxed">{result.description}</p>
+          </motion.div>
+
+          {/* 城市 */}
+          <motion.div
+            className="mt-4 bg-white/15 backdrop-blur-sm rounded-2xl p-5 w-full"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            <p className="text-white font-bold text-sm mb-1">你的音樂城市：{result.city}</p>
+            <p className="text-white/80 text-xs leading-relaxed">{result.cityDesc}</p>
+          </motion.div>
+
+          {/* 音樂風格 */}
+          <motion.div
+            className="mt-4 bg-white/15 backdrop-blur-sm rounded-2xl p-5 w-full"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.5 }}
+          >
+            <p className="text-white font-bold text-sm mb-2">你會愛上的吉他音樂風格</p>
+            <div className="flex flex-wrap gap-2">
+              {result.music.split(' ').map((tag, i) => (
+                <span key={i} className="bg-white/20 text-white/90 text-xs px-3 py-1 rounded-full">{tag}</span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* 相輔 / 相斥 */}
+          <motion.div
+            className="mt-4 grid grid-cols-2 gap-3 w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.5 }}
+          >
+            <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4">
+              <p className="text-white font-bold text-xs mb-1">靈魂相輔</p>
+              <p className="text-white/90 text-xs">{result.compatible}</p>
+              <p className="text-white/60 text-[10px] mt-1">{result.compatibleDesc}</p>
+            </div>
+            <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4">
+              <p className="text-white font-bold text-xs mb-1">靈魂相斥</p>
+              <p className="text-white/90 text-xs">{result.incompatible}</p>
+              <p className="text-white/60 text-[10px] mt-1">{result.incompatibleDesc}</p>
+            </div>
+          </motion.div>
+
+          {/* 靈魂顏色 */}
+          <motion.p
+            className="mt-6 text-white/70 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3 }}
+          >
+            你的靈魂顏色：<span className="text-white font-bold">{result.colorName}</span>
+          </motion.p>
+
+          {/* 按鈕 */}
+          <motion.div
+            className="mt-8 w-full flex flex-col items-center gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.5 }}
+          >
+            <button
+              type="button"
+              onClick={handleShare}
+              className="w-[70%] py-3 rounded-full font-bold text-sm text-[#2a2a2a] relative"
+              style={{ background: 'rgba(255,255,255,0.85)' }}
+            >
+              {copied ? '已複製到剪貼簿！' : '分享你的測驗結果'}
+            </button>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="w-[50%] py-2.5 rounded-full font-bold text-sm text-white border-2 border-white/50"
+            >
+              再測一次
+            </button>
+            <Link
+              to="/e/soul-guitar/info"
+              className="mt-1 text-white/60 text-xs underline underline-offset-2"
+            >
+              前往了解『2026 Ayers靈魂吉他手大賽』
+            </Link>
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  /* ── 有素材的角色：完整圖片版結果頁 ── */
   return (
     <motion.div
       className="absolute inset-0 z-50 overflow-y-auto overflow-x-hidden"
