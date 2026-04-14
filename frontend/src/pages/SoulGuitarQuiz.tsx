@@ -73,7 +73,7 @@ function ProgressBar({ current }: { current: number }) {
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
     const min = new Promise((r) => setTimeout(r, 1500));
-    const imgs = questions.flatMap((q) => [q.bg, q.bgWide, q.title]).map(
+    const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(
       (src) => new Promise<void>((r) => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; }),
     );
     const btns = ['/btn-default.png', '/btn-selected.png'].map(
@@ -140,15 +140,21 @@ function QuestionView({
       )}
 
       {/* 上半留白 */}
-      <div className="flex-none h-[28%] md:h-[15%]" />
+      <div className="flex-none h-[35%] md:h-[20%]" />
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[50%] md:max-w-[600px]">
         {/* Q 號碼 + 進度條同一行 */}
         <div className="flex items-center gap-3 mb-1">
           <motion.span
-            className="text-[2.2rem] md:text-[2.5rem] font-black text-[#2a2a2a] leading-none drop-shadow-sm"
-            style={{ fontFamily: QUIZ_FONT }}
+            className="text-[2.4rem] md:text-[2.8rem] leading-none"
+            style={{
+              fontFamily: QUIZ_FONT,
+              fontWeight: 900,
+              color: '#1a1a1a',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.15)',
+              WebkitTextStroke: '0.5px #1a1a1a',
+            }}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
@@ -162,8 +168,13 @@ function QuestionView({
 
         {/* 問題文字 */}
         <motion.p
-          className="text-[1.3rem] md:text-[1.5rem] font-bold text-[#2a2a2a] leading-snug mb-5 drop-shadow-sm"
-          style={{ fontFamily: QUIZ_FONT }}
+          className="text-[1.35rem] md:text-[1.6rem] leading-snug mb-5"
+          style={{
+            fontFamily: QUIZ_FONT,
+            fontWeight: 800,
+            color: '#1a1a1a',
+            textShadow: '1px 1px 3px rgba(0,0,0,0.1)',
+          }}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
