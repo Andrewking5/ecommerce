@@ -43,7 +43,7 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
     <motion.button type="button" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay }} whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
       <img src={`${BASE}/btn-default.png`} alt="" className={`w-full h-auto transition-opacity duration-200 ${active ? 'opacity-0' : 'group-hover:opacity-0'}`} draggable={false} />
       <img src={`${BASE}/btn-selected.png`} alt="" className={`absolute inset-0 w-full h-auto transition-opacity duration-200 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} draggable={false} />
-      <span className={`absolute inset-0 flex items-center justify-center text-[0.95rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`} style={{ fontFamily: QUIZ_FONT }}>{label}</span>
+      <span className={`absolute inset-0 flex items-center justify-center text-[1.1rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`} style={{ fontFamily: QUIZ_FONT }}>{label}</span>
     </motion.button>
   );
 }
@@ -56,7 +56,7 @@ function ProgressBar({ current }: { current: number }) {
     <div className="w-full">
       <div className="relative flex items-end justify-between">
         {/* 底線 — 灰色 */}
-        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[2px] bg-[#ccc] rounded-full" />
+        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[1.5px] bg-[#d4d0c8] rounded-full" />
         {/* 進度線 — 漸層填充到當前位置 */}
         <div
           className="absolute left-4 bottom-[5px] md:bottom-[6px] h-[2px] rounded-full transition-all duration-500"
@@ -102,7 +102,7 @@ function ProgressBar({ current }: { current: number }) {
               {/* 圓點 */}
               <motion.div
                 className={`w-2 h-2 md:w-2.5 md:h-2.5 mt-1 rounded-full ${
-                  isCurrent ? 'bg-[#c5a059]' : isPast ? 'bg-[#2a2a2a]' : 'bg-[#ccc]'
+                  isCurrent ? 'bg-[#c5a059]' : isPast ? 'bg-[#8a8478]' : 'bg-[#d4d0c8]'
                 }`}
                 animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
                 transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
@@ -190,30 +190,30 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* Q 號碼 + 進度條同一行 */}
-        <div className="flex items-center gap-3 mb-1">
-          <motion.span
-            className="text-[2.4rem] md:text-[2.8rem] leading-none"
-            style={{
-              fontFamily: QUIZ_FONT,
-              fontWeight: 900,
-              color: '#2a2a2a',
-              textShadow: '-1.5px -1.5px 0 #fff, 1.5px -1.5px 0 #fff, -1.5px 1.5px 0 #fff, 1.5px 1.5px 0 #fff, 0 -1.5px 0 #fff, 0 1.5px 0 #fff, -1.5px 0 0 #fff, 1.5px 0 0 #fff',
-            }}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            Q{question.id}
-          </motion.span>
-          <div className="flex-1">
-            <ProgressBar current={currentQ} />
-          </div>
+        {/* 手機版：進度條在 Q 上方 */}
+        <div className="md:hidden mb-2">
+          <ProgressBar current={currentQ} />
         </div>
+
+        {/* Q 號碼 */}
+        <motion.span
+          className="text-[2.4rem] md:text-[2.8rem] leading-none block mb-1"
+          style={{
+            fontFamily: QUIZ_FONT,
+            fontWeight: 900,
+            color: '#2a2a2a',
+            textShadow: '-1.5px -1.5px 0 #fff, 1.5px -1.5px 0 #fff, -1.5px 1.5px 0 #fff, 1.5px 1.5px 0 #fff, 0 -1.5px 0 #fff, 0 1.5px 0 #fff, -1.5px 0 0 #fff, 1.5px 0 0 #fff',
+          }}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          Q{question.id}
+        </motion.span>
 
         {/* 問題文字 */}
         <motion.p
-          className="text-[1.35rem] md:text-[1.5rem] leading-snug mb-5"
+          className="text-[1.35rem] md:text-[1.5rem] leading-snug mb-4"
           style={{
             fontFamily: QUIZ_FONT,
             fontWeight: 900,
@@ -232,6 +232,11 @@ function QuestionView({
           {question.options.map((opt, i) => (
             <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
           ))}
+        </div>
+
+        {/* 電腦版：進度條在選項下方 */}
+        <div className="hidden md:block mt-6">
+          <ProgressBar current={currentQ} />
         </div>
       </div>
 
