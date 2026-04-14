@@ -88,28 +88,28 @@ function IdleBubble({ currentQ }: { currentQ: number }) {
     <AnimatePresence mode="wait">
       <motion.div
         key={`${currentQ}-${lineIdx}`}
-        initial={{ opacity: 0, scale: 0.8, y: 5 }}
+        initial={{ opacity: 0, scale: 0.85, y: 4 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.8, y: -5 }}
+        exit={{ opacity: 0, scale: 0.85, y: -4 }}
         transition={{ duration: 0.3 }}
-        className="flex items-start gap-1.5"
       >
-        {/* 角色小頭像 */}
-        <img
-          src={`${BASE}/progress/char-${currentQ + 1}.png`}
-          alt={CHARACTER_NAMES[currentQ]}
-          className="w-7 h-7 md:w-8 md:h-8 object-contain flex-shrink-0 mt-0.5"
-          draggable={false}
-        />
-        {/* 對話氣泡 */}
-        <div
-          className="relative bg-white/90 backdrop-blur-sm rounded-xl px-3 py-1.5 md:px-4 md:py-2 max-w-[200px] md:max-w-[240px] shadow-lg"
-          style={{ fontFamily: QUIZ_FONT }}
+        {/* 漸層邊框 + 毛玻璃氣泡 */}
+        <div className="relative rounded-2xl p-[1.5px] max-w-[220px] md:max-w-[260px] shadow-lg"
+          style={{ background: 'linear-gradient(135deg, #c5a059, #6ba3b5)' }}
         >
-          <div className="absolute -left-1.5 top-3 w-3 h-3 bg-white/90 rotate-45 rounded-sm" />
-          <p className="relative text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a] leading-snug">
-            {lines[lineIdx]}
-          </p>
+          <div
+            className="rounded-2xl bg-white/85 backdrop-blur-md px-4 py-2.5"
+            style={{ fontFamily: QUIZ_FONT }}
+          >
+            <p className="text-[0.85rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug">
+              {lines[lineIdx]}
+            </p>
+          </div>
+          {/* 手機：箭頭朝上 / 電腦：箭頭朝下 */}
+          <div className="absolute -top-[6px] right-6 w-3 h-3 rotate-45 rounded-sm md:hidden"
+            style={{ background: 'linear-gradient(135deg, #c5a059, #b0a060)' }} />
+          <div className="hidden md:block absolute -bottom-[6px] right-6 w-3 h-3 rotate-45 rounded-sm"
+            style={{ background: 'linear-gradient(135deg, #6ba3b5, #5a9aaa)' }} />
         </div>
       </motion.div>
     </AnimatePresence>
@@ -276,18 +276,16 @@ function QuestionView({
         </motion.button>
       )}
 
-      {/* 上半留白 + 角色閒聊氣泡 */}
-      <div className="flex-1 min-h-[40px] md:min-h-0 md:flex-none md:h-[20%] relative">
-        {/* 手機：留白區底部靠右 / 電腦：留白區底部靠右 */}
-        <div className="absolute bottom-0 right-5 md:right-[calc(30%-20px)]">
-          <IdleBubble currentQ={currentQ} />
-        </div>
-      </div>
+      {/* 上半留白 */}
+      <div className="flex-1 min-h-[40px] md:min-h-0 md:flex-none md:h-[20%]" />
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方 */}
+        {/* 手機版：氣泡 + 進度條在 Q 上方 */}
         <div className="md:hidden mb-1.5">
+          <div className="flex justify-end mb-2">
+            <IdleBubble currentQ={currentQ} />
+          </div>
           <ProgressBar current={currentQ} />
         </div>
 
@@ -330,9 +328,12 @@ function QuestionView({
           ))}
         </div>
 
-        {/* 電腦版：進度條在選項下方 */}
+        {/* 電腦版：進度條 + 氣泡在選項下方 */}
         <div className="hidden md:block mt-6">
           <ProgressBar current={currentQ} />
+          <div className="mt-3 flex justify-end">
+            <IdleBubble currentQ={currentQ} />
+          </div>
         </div>
       </div>
 
