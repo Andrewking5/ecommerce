@@ -243,7 +243,10 @@ export default function SoulGuitarQuiz() {
                             <span className="text-[10px]" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
                           </motion.button>
                         )}
-                        <div className="absolute z-20" style={{ top: 'calc(27.5% - 14px)', left: 'calc(22% + 3px)', right: '4%' }}>
+                        {/* 用 aspect-ratio 計算：圖片是 9:16，Q文字在圖片的 ~27% 位置
+                             容器高度可能因瀏覽器工具列改變，但圖片用 object-cover 會裁切
+                             改用 vw 基準（因為寬度穩定）來算 Q 的位置 */}
+                        <div className="absolute z-20" style={{ top: 'max(calc(100vw * 16/9 * 0.27 - 14px), 20%)', left: 'calc(22% + 3px)', right: '4%' }}>
                           <ProgressBar current={currentQ} />
                         </div>
                         <div className="flex-none" style={{ height: '50%' }} />
