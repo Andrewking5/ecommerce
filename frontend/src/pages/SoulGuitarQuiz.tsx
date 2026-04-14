@@ -142,13 +142,14 @@ function QuestionView({
       {/* 上半留白 */}
       <div className="flex-none h-[28%] md:h-[15%]" />
 
-      {/* Q 標題 + 進度條 */}
-      <div className="px-4 md:px-[8%]">
-        <div className="flex items-start gap-2">
+      {/* Q 標題 + 進度條 + 選項 — 電腦版置中 */}
+      <div className="px-4 md:px-0 md:mx-auto md:w-[50%] md:max-w-[600px]">
+        {/* Q 標題 + 進度條 */}
+        <div className="flex items-start gap-2 mb-4">
           <motion.img
             src={question.title}
             alt={`Q${question.id}`}
-            className="w-[60%] md:w-[35%] max-w-[300px] h-auto drop-shadow-md"
+            className="w-[60%] md:w-[55%] max-w-[300px] h-auto drop-shadow-md"
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
@@ -158,11 +159,9 @@ function QuestionView({
             <ProgressBar current={currentQ} />
           </div>
         </div>
-      </div>
 
-      {/* 選項按鈕 */}
-      <div className="px-6 pt-4 pb-6 md:px-[12%] md:pt-6 md:pb-10">
-        <div className="flex flex-col gap-2.5 md:gap-3 max-w-[500px] md:max-w-[550px]">
+        {/* 選項按鈕 */}
+        <div className="flex flex-col gap-2.5 md:gap-3 px-2 md:px-0">
           {question.options.map((opt, i) => (
             <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
           ))}
