@@ -768,57 +768,65 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* ─── Hero Card（可截圖分享的區塊） ─── */}
         <motion.div
-          className="w-full mt-6"
-          initial={{ opacity: 0, scale: 0.9 }}
+          className="w-full mt-6 relative"
+          initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
+          {/* 光暈呼吸 */}
+          <motion.div
+            className="absolute -inset-3 rounded-3xl pointer-events-none"
+            style={{ background: `radial-gradient(ellipse at center, ${result.themeColor}40 0%, transparent 70%)` }}
+            animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.98, 1.02, 0.98] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          />
           <img
             src={`${RF}/hero-card.png`}
             alt={result.name}
-            className="w-full h-auto rounded-2xl shadow-2xl"
+            className="relative w-full h-auto rounded-2xl shadow-2xl"
             draggable={false}
           />
         </motion.div>
 
-        {/* 長按儲存提示 */}
+        {/* 長按儲存提示 — 輕微浮動 */}
         <motion.div
           className="mt-3 w-[70%]"
           initial={{ opacity: 0 }}
-          animate={{ opacity: showContent ? 0.7 : 0 }}
-          transition={{ duration: 0.5 }}
+          animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
+          transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
         >
           <img src={`${RS}/text-save.png`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* 往下看提示 */}
+        {/* 往下看提示 — 向下彈跳暗示 */}
         <motion.div
           className="mt-8 w-[75%]"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 10 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
+          transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
         >
           <img src={`${RS}/text-scroll.png`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 你的個人特質 ─── */}
+        {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
         <motion.div
           className="mt-8 w-full"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.6 }}
+          initial={{ opacity: 0, y: 30, rotateX: 8 }}
+          whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          style={{ perspective: 800 }}
         >
           <img src={`${RF}/personality-card.png`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
         </motion.div>
 
-        {/* 你聽出來了嗎 */}
+        {/* 你聽出來了嗎 — blur 解除 + scale */}
         <motion.div
           className="mt-6 w-[80%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6 }}
         >
           <img src={`${RS}/text-heard.png`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
         </motion.div>
@@ -826,30 +834,31 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
         {/* ─── 猜猜這是哪 + 城市卡 ─── */}
         <motion.div
           className="mt-8 w-[50%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RS}/text-guess.png`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
         </motion.div>
+        {/* 城市卡 — clipPath 揭露 */}
         <motion.div
-          className="mt-3 w-full"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="mt-3 w-full overflow-hidden rounded-xl"
+          initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
+          whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={`${RF}/city-card.png`} alt={result.city} className="w-full h-auto rounded-xl" draggable={false} />
+          <img src={`${RF}/city-card.png`} alt={result.city} className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* 這樣的你，會發出什麼樣的聲音？ */}
+        {/* 這樣的你，會發出什麼樣的聲音？ — blur 解除 */}
         <motion.div
           className="mt-10 w-[80%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
           <img src={`${RS}/text-sound.png`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
         </motion.div>
@@ -857,72 +866,85 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
         {/* ─── 你會愛上的吉他音樂風格 ─── */}
         <motion.div
           className="mt-6 w-[75%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RS}/title-music-style.png`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* 音樂風格標籤 */}
-        <motion.div
-          className="mt-4 w-full flex flex-col gap-2.5"
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        {/* 音樂風格標籤 — 逐個 stagger 從右滑入 */}
+        <div className="mt-4 w-full flex flex-col gap-2.5">
           {[1, 2, 3, 4].map(i => (
-            <img key={i} src={`${RF}/tag-${i}.png`} alt="" className="w-full h-auto" draggable={false} />
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img src={`${RF}/tag-${i}.png`} alt="" className="w-full h-auto" draggable={false} />
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
 
         {/* ─── 你可能會喜歡的 Ayers 吉他款式 ─── */}
         <motion.div
           className="mt-10 w-[80%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RS}/title-ayers.png`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* 兩把吉他 */}
-        <motion.div
-          className="mt-5 w-full grid grid-cols-2 gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
+        {/* 兩把吉他 — 左右各自從側邊滑入 */}
+        <div className="mt-5 w-full grid grid-cols-2 gap-4">
           {[1, 2].map(i => (
-            <div key={i} className="flex flex-col items-center gap-3">
+            <motion.div
+              key={i}
+              className="flex flex-col items-center gap-3"
+              initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
               <img src={`${RF}/guitar-${i}.png`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
-              <button type="button" className="w-[80%] active:scale-95 transition-transform">
+              <motion.button
+                type="button"
+                className="w-[80%]"
+                whileTap={{ scale: 0.93 }}
+              >
                 <img src={`${RF}/btn-unlock-${i}.png`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* ─── 靈魂顏色 ─── */}
+        {/* ─── 靈魂顏色 — 光暈脈動 ─── */}
         <motion.div
-          className="mt-10 w-[55%]"
-          initial={{ opacity: 0, scale: 0.9 }}
+          className="mt-10 w-[55%] relative"
+          initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={`${RF}/soul-color.png`} alt={`靈魂顏色：${result.colorName}`} className="w-full h-auto" draggable={false} />
+          <motion.div
+            className="absolute -inset-4 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${result.themeColor}30 0%, transparent 70%)` }}
+            animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <img src={`${RF}/soul-color.png`} alt={`靈魂顏色：${result.colorName}`} className="relative w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* ─── 比賽資訊 ─── */}
         <motion.div
           className="mt-10 w-[85%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
@@ -930,10 +952,10 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
         </motion.div>
         <motion.div
           className="mt-3 w-[85%]"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
         >
           <img src={`${RS}/text-contest-info.png`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
         </motion.div>
@@ -946,8 +968,20 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <button type="button" onClick={handleShare} className="w-[70%] active:scale-95 transition-transform relative">
-            <img src={`${RS}/btn-share.png`} alt="分享你的測驗結果" className="w-full h-auto" draggable={false} />
+          {/* 分享按鈕 — 金色呼吸光暈 */}
+          <motion.button
+            type="button"
+            onClick={handleShare}
+            className="w-[70%] relative"
+            whileTap={{ scale: 0.95 }}
+          >
+            <motion.div
+              className="absolute -inset-1 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.3) 0%, transparent 70%)' }}
+              animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.97, 1.03, 0.97] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <img src={`${RS}/btn-share.png`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
             {copied && (
               <motion.span
                 className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
@@ -959,10 +993,10 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
                 已複製到剪貼簿
               </motion.span>
             )}
-          </button>
-          <button type="button" onClick={onRetry} className="w-[45%] active:scale-95 transition-transform">
+          </motion.button>
+          <motion.button type="button" onClick={onRetry} className="w-[45%]" whileTap={{ scale: 0.93 }}>
             <img src={`${RS}/btn-retry.png`} alt="再測一次" className="w-full h-auto" draggable={false} />
-          </button>
+          </motion.button>
           <Link to="/e/soul-guitar/info" className="w-[70%] active:scale-95 transition-transform">
             <img src={`${RS}/btn-contest.png`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
           </Link>
