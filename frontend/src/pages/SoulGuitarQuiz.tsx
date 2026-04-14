@@ -63,18 +63,24 @@ function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirecti
 
   useEffect(() => {
     setLineIdx(-1);
-    timerRef.current = setTimeout(() => {
-      setLineIdx(0);
-      intervalRef.current = setInterval(() => {
+    const scheduleNext = () => {
+      const delay = 6000 + Math.random() * 4000; // 6~10 秒隨機
+      intervalRef.current = setTimeout(() => {
         setLineIdx((prev) => {
           const lines = CHARACTER_LINES[currentQ];
           return (prev + 1) % lines.length;
         });
-      }, 5000);
+        scheduleNext();
+      }, delay);
+    };
+    // 3 秒後顯示第一句
+    timerRef.current = setTimeout(() => {
+      setLineIdx(0);
+      scheduleNext();
     }, 3000);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) clearTimeout(intervalRef.current);
     };
   }, [currentQ]);
 
