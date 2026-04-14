@@ -113,50 +113,29 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
           }}
         />
 
-        {/* 角色氣泡 — 進度條下方，跟隨角色位置 */}
+        {/* 角色對話框 — 跟隨角色位置，不擋進度條 */}
         {isTalking && (() => {
           const charPct = (current / 6) * 100;
-          // 氣泡寬度約 60%，根據角色位置決定氣泡偏移，保持尾巴對齊角色
-          // 角色在左邊 → 氣泡偏右，角色在右邊 → 氣泡偏左
-          const bubbleW = 60; // 氣泡佔父容器寬度 %
-          const tailInBubble = Math.max(15, Math.min(85, charPct)); // 尾巴在氣泡內的位置 %
-          // 氣泡 left = 角色位置 - 尾巴在氣泡中的偏移
-          const bubbleLeft = Math.max(0, Math.min(100 - bubbleW, charPct - (bubbleW * tailInBubble / 100)));
+          const bubbleW = 55;
+          const bubbleLeft = Math.max(2, Math.min(100 - bubbleW - 2, charPct - bubbleW / 2));
 
           return (
             <AnimatePresence mode="wait">
               <motion.div
                 key={idleLine}
-                initial={{ opacity: 0, y: -4 }}
+                initial={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
+                exit={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 right-0 z-30"
                 style={bubbleAbove
-                  ? { bottom: '100%', marginBottom: '6px' }
-                  : { top: '100%', marginTop: '6px' }
+                  ? { bottom: '100%', marginBottom: '8px' }
+                  : { top: '100%', marginTop: '8px' }
                 }
               >
-                {/* 尾巴 — 雙三角形（外邊框 + 內填充）一體感 */}
-                {bubbleAbove ? (
-                  <>
-                    <div className="absolute z-10" style={{ left: `${charPct}%`, bottom: '-11px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '12px solid #2a2a2a' }} />
-                    <div className="absolute z-10" style={{ left: `${charPct}%`, bottom: '-8px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '10px solid white' }} />
-                  </>
-                ) : (
-                  <>
-                    <div className="absolute z-10" style={{ left: `${charPct}%`, top: '-11px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderBottom: '12px solid #2a2a2a' }} />
-                    <div className="absolute z-10" style={{ left: `${charPct}%`, top: '-8px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '10px solid white' }} />
-                  </>
-                )}
-                {/* 對話框 */}
                 <div
                   className="absolute rounded-2xl border-2 border-[#2a2a2a] bg-white px-4 py-2 shadow-md"
-                  style={{
-                    left: `${bubbleLeft}%`,
-                    width: `${bubbleW}%`,
-                    fontFamily: QUIZ_FONT,
-                  }}
+                  style={{ left: `${bubbleLeft}%`, width: `${bubbleW}%`, fontFamily: QUIZ_FONT }}
                 >
                   <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a] leading-snug text-center">
                     {idleLine}
@@ -307,8 +286,8 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡在進度條上方（留白區） */}
-        <div className="md:hidden mb-1.5 pt-12">
+        {/* 手機版：進度條在 Q 上方，氣泡浮在進度條上方（留白區） */}
+        <div className="md:hidden mb-1.5">
           <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
         </div>
 
