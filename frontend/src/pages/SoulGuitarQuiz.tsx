@@ -55,18 +55,16 @@ function useIsDesktop() {
   return d;
 }
 
-/* ── 角色閒聊氣泡 ── */
-function IdleBubble({ currentQ }: { currentQ: number }) {
-  const [lineIdx, setLineIdx] = useState(-1); // -1 = hidden
+/* ── 角色閒聊氣泡（漫畫指向式） ── */
+function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirection: 'down' | 'up' }) {
+  const [lineIdx, setLineIdx] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setLineIdx(-1);
-    // 3 秒後顯示第一句
     timerRef.current = setTimeout(() => {
       setLineIdx(0);
-      // 之後每 5 秒換一句
       intervalRef.current = setInterval(() => {
         setLineIdx((prev) => {
           const lines = CHARACTER_LINES[currentQ];
@@ -74,7 +72,6 @@ function IdleBubble({ currentQ }: { currentQ: number }) {
         });
       }, 5000);
     }, 3000);
-
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -84,35 +81,68 @@ function IdleBubble({ currentQ }: { currentQ: number }) {
   const lines = CHARACTER_LINES[currentQ];
   if (lineIdx < 0 || !lines) return null;
 
+  // 角色在進度條的水平位置（0~100%）
+  const charPercent = (currentQ / 6) * 100;
+  // SVG 尾巴：從氣泡中心指向角色
+  const tailFromX = 50;
+  const tailToX = charPercent;
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={`${currentQ}-${lineIdx}`}
-        initial={{ opacity: 0, scale: 0.85, y: 4 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.85, y: -4 }}
-        transition={{ duration: 0.3 }}
-      >
-        {/* 漸層邊框 + 毛玻璃氣泡 */}
-        <div className="relative rounded-2xl p-[1.5px] max-w-[220px] md:max-w-[260px] shadow-lg"
-          style={{ background: 'linear-gradient(135deg, #c5a059, #6ba3b5)' }}
+    <div className="absolute left-0 right-0" style={{ [tailDirection === 'down' ? 'top' : 'bottom']: '4px' }}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${currentQ}-${lineIdx}`}
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.85 }}
+          transition={{ duration: 0.3 }}
+          className="relative"
         >
-          <div
-            className="rounded-2xl bg-white/85 backdrop-blur-md px-4 py-2.5"
-            style={{ fontFamily: QUIZ_FONT }}
+          {/* 漫畫式尾巴 — SVG 曲線指向角色 */}
+          <svg
+            className="absolute left-0 w-full pointer-events-none"
+            style={{
+              [tailDirection === 'down' ? 'top' : 'bottom']: '0',
+              height: '20px',
+              ...(tailDirection === 'up' ? { transform: 'scaleY(-1)' } : {}),
+            }}
+            viewBox="0 0 100 20"
+            preserveAspectRatio="none"
           >
-            <p className="text-[0.85rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug">
-              {lines[lineIdx]}
-            </p>
+            <path
+              d={`M${tailFromX - 1},0 Q${(tailFromX + tailToX) / 2 - 2},16 ${tailToX},20`}
+              fill="none"
+              stroke="#c5a059"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={`M${tailFromX + 1},0 Q${(tailFromX + tailToX) / 2 + 2},14 ${tailToX},20`}
+              fill="none"
+              stroke="#6ba3b5"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+
+          {/* 氣泡本體 — 置中 */}
+          <div
+            className="relative mx-auto rounded-2xl p-[1.5px] w-[65%] max-w-[240px] md:max-w-[280px] shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, #c5a059, #6ba3b5)',
+              marginTop: tailDirection === 'down' ? '18px' : '0',
+              marginBottom: tailDirection === 'up' ? '18px' : '0',
+            }}
+          >
+            <div className="rounded-2xl bg-white/85 backdrop-blur-md px-3.5 py-2" style={{ fontFamily: QUIZ_FONT }}>
+              <p className="text-[0.8rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug text-center">
+                {lines[lineIdx]}
+              </p>
+            </div>
           </div>
-          {/* 手機：箭頭朝上 / 電腦：箭頭朝下 */}
-          <div className="absolute -top-[6px] right-6 w-3 h-3 rotate-45 rounded-sm md:hidden"
-            style={{ background: 'linear-gradient(135deg, #c5a059, #b0a060)' }} />
-          <div className="hidden md:block absolute -bottom-[6px] right-6 w-3 h-3 rotate-45 rounded-sm"
-            style={{ background: 'linear-gradient(135deg, #6ba3b5, #5a9aaa)' }} />
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -281,12 +311,12 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：氣泡 + 進度條在 Q 上方 */}
+        {/* 手機版：進度條 + 氣泡在 Q 上方 */}
         <div className="md:hidden mb-1.5">
-          <div className="flex justify-end mb-2">
-            <IdleBubble currentQ={currentQ} />
-          </div>
           <ProgressBar current={currentQ} />
+          <div className="relative h-0">
+            <IdleBubble currentQ={currentQ} tailDirection="up" />
+          </div>
         </div>
 
         {/* Q 號碼 */}
@@ -331,8 +361,8 @@ function QuestionView({
         {/* 電腦版：進度條 + 氣泡在選項下方 */}
         <div className="hidden md:block mt-6">
           <ProgressBar current={currentQ} />
-          <div className="mt-3 flex justify-end">
-            <IdleBubble currentQ={currentQ} />
+          <div className="relative h-[60px]">
+            <IdleBubble currentQ={currentQ} tailDirection="down" />
           </div>
         </div>
       </div>
