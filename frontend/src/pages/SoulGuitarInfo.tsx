@@ -30,12 +30,12 @@ function Strip() {
 
 function CTA({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap items-center gap-3 ${className}`}>
+    <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 ${className}`}>
       <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-sm font-bold text-white hover:brightness-110 transition-all shadow-lg shadow-orange-500/20" style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}>
+        className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-sm font-bold text-white hover:brightness-110 transition-all shadow-lg shadow-orange-500/20" style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}>
         立即報名 <ExternalLink size={12} className="opacity-60" />
       </a>
-      <a href="/e/soul-guitar" className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold border-2 text-white/70 hover:bg-white/5 transition-colors" style={{ borderColor: GOLD + '50', color: GOLD }}>心理測驗</a>
+      <a href="/e/soul-guitar" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold border-2 text-white/70 hover:bg-white/5 transition-colors" style={{ borderColor: GOLD + '50', color: GOLD }}>心理測驗</a>
     </div>
   );
 }
@@ -118,19 +118,19 @@ export default function SoulGuitarInfo() {
               <p className="text-lg text-white/50 mb-8 max-w-lg">大聲點，讓世界聽見你的聲音！拿起手中那一把吉他，展現你的靈魂性格。</p>
 
               {/* 日期 */}
-              <div className="flex items-end gap-6 mb-6">
+              <div className="flex items-end gap-4 sm:gap-6 mb-3">
                 <div>
                   <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">收件開始</p>
-                  <p className="text-4xl font-black tracking-tight" style={{ color: GOLD }}>4.22</p>
+                  <p className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: GOLD }}>4.22</p>
                 </div>
-                <div className="text-2xl text-white/15 font-light pb-1">—</div>
+                <div className="text-xl sm:text-2xl text-white/15 font-light pb-1">—</div>
                 <div>
                   <p className="text-[10px] text-white/30 uppercase tracking-wider mb-1">截止日期</p>
-                  <p className="text-4xl font-black tracking-tight" style={{ color: GOLD }}>6.07</p>
+                  <p className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: GOLD }}>6.07</p>
                 </div>
-                <div className="pb-2">
-                  <Countdown target="2026-06-07T23:59:00+08:00" />
-                </div>
+              </div>
+              <div className="mb-6">
+                <Countdown target="2026-06-07T23:59:00+08:00" />
               </div>
 
               <CTA />
@@ -184,10 +184,10 @@ export default function SoulGuitarInfo() {
           <h3 className="text-2xl font-bold text-center mb-2">評審陣容</h3>
           <p className="text-center text-white/30 text-sm mb-10">5 位音樂人共同評選</p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
             {JUDGES.map((j) => (
               <a key={j.name} href={j.link} target="_blank" rel="noopener noreferrer" className="group block">
-                <div className="relative aspect-square rounded-2xl overflow-hidden mb-3 bg-gray-800">
+                <div className="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 bg-gray-800">
                   <img src={j.photo} alt={j.name}
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                     onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex'; }}
@@ -198,8 +198,8 @@ export default function SoulGuitarInfo() {
                   {/* Overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <p className="text-sm font-bold text-white group-hover:text-[#c5a059] transition-colors">{j.name}</p>
-                <p className="text-[11px] text-white/30">{j.title}</p>
+                <p className="text-[11px] sm:text-sm font-bold text-white group-hover:text-[#c5a059] transition-colors leading-tight">{j.name}</p>
+                <p className="text-[9px] sm:text-[11px] text-white/30 leading-tight mt-0.5">{j.title}</p>
               </a>
             ))}
           </div>
@@ -211,10 +211,10 @@ export default function SoulGuitarInfo() {
         <h3 className="text-2xl font-bold text-center mb-2">評分標準</h3>
         <p className="text-center text-gray-400 text-sm mb-10">Scoring Criteria</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           {/* 彈唱組 */}
           <div>
-            <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
+            <h4 className="text-base sm:text-lg font-bold mb-4 sm:mb-5 flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-blue-500" /> 彈唱組
             </h4>
             {[
@@ -293,10 +293,10 @@ export default function SoulGuitarInfo() {
                     <p className="text-sm text-white/60">AYERS {a.type}</p>
                     <p className="text-xs text-white/30">{a.guitar}</p>
                   </div>
-                  <div className="flex items-end gap-1.5">
+                  <div className="flex flex-wrap items-end gap-x-1.5 gap-y-1">
                     <span className="text-[10px] text-white/25">NT$</span>
-                    <span className="text-3xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
-                    <span className="text-sm text-white/30 ml-2">+ 獎金 NT${a.bonus}</span>
+                    <span className="text-2xl sm:text-3xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
+                    <span className="text-xs sm:text-sm text-white/30">+ 獎金 NT${a.bonus}</span>
                   </div>
                   <p className="text-[10px] text-white/20 mt-3">{a.method}</p>
                 </div>
@@ -305,7 +305,7 @@ export default function SoulGuitarInfo() {
           </div>
 
           {/* 三個獎 — 中卡片 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-6">
             {[
               { icon: '🌟', title: '最佳吉他手', guitar: 'A07c Sun 全單吉他', extra: '+ 雲聲錄音電容麥克風', money: '42,000', method: '評審評分', color: GOLD },
               { icon: '🎤', title: '最佳 Vocal', guitar: 'A02c Sun 全單吉他', extra: '+ 聲潮麥克風', money: '26,000', method: '評審評分', color: '#3b82f6' },
@@ -355,29 +355,29 @@ export default function SoulGuitarInfo() {
       </section>
 
       {/* ═══════════ 影片格式說明 ═══════════ */}
-      <section className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
-        <h3 className="text-2xl font-bold text-center mb-8">影片格式</h3>
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <h3 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8">影片格式</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* 標題命名 */}
-          <div className="rounded-2xl bg-gray-50 p-6">
-            <h4 className="text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">影片標題命名</h4>
+          <div className="rounded-2xl bg-gray-50 p-4 sm:p-6">
+            <h4 className="text-xs sm:text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">影片標題命名</h4>
             <div className="space-y-2">
-              <p className="font-mono text-sm bg-white rounded-lg px-4 py-3 border-l-4 border-blue-500 text-gray-700">
-                <span className="text-blue-600">彈唱組：</span>曲名_姓名_彈唱組<br />
+              <div className="text-xs sm:text-sm bg-white rounded-lg px-3 sm:px-4 py-3 border-l-4 border-blue-500 text-gray-700 break-all">
+                <span className="text-blue-600 font-bold">彈唱組：</span>曲名_姓名_彈唱組<br />
                 <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
-              </p>
-              <p className="font-mono text-sm bg-white rounded-lg px-4 py-3 border-l-4 border-orange-500 text-gray-700">
-                <span className="text-orange-600">演奏組：</span>曲名_姓名_演奏組<br />
+              </div>
+              <div className="text-xs sm:text-sm bg-white rounded-lg px-3 sm:px-4 py-3 border-l-4 border-orange-500 text-gray-700 break-all">
+                <span className="text-orange-600 font-bold">演奏組：</span>曲名_姓名_演奏組<br />
                 <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
-              </p>
+              </div>
             </div>
           </div>
 
           {/* 自我介紹 */}
-          <div className="rounded-2xl bg-gray-50 p-6">
-            <h4 className="text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">開頭自我介紹（必說）</h4>
-            <div className="bg-white rounded-lg px-4 py-3 text-sm text-gray-600 leading-relaxed border-l-4" style={{ borderColor: GOLD }}>
+          <div className="rounded-2xl bg-gray-50 p-4 sm:p-6">
+            <h4 className="text-xs sm:text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">開頭自我介紹（必說）</h4>
+            <div className="bg-white rounded-lg px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 leading-relaxed border-l-4" style={{ borderColor: GOLD }}>
               「大家好我是<b>（本名/藝名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
             </div>
           </div>
@@ -386,8 +386,8 @@ export default function SoulGuitarInfo() {
 
       {/* ═══════════ 規則 ═══════════ */}
       <section className="bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
-          <h3 className="text-2xl font-bold text-center mb-2">參賽規則</h3>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <h3 className="text-xl sm:text-2xl font-bold text-center mb-2">參賽規則</h3>
           <p className="text-center text-gray-400 text-sm mb-8">共 {rules.length} 條規則</p>
 
           <div className="rounded-2xl bg-white border border-gray-200 divide-y divide-gray-100 overflow-hidden shadow-sm">
@@ -403,22 +403,24 @@ export default function SoulGuitarInfo() {
           </div>
 
           {/* 穿著顏色 */}
-          <div className="mt-6 flex items-center gap-4 justify-center flex-wrap">
-            <span className="text-sm text-gray-400">指定穿著顏色：</span>
-            {SIX.map((c, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <div className="w-7 h-7 rounded-lg border" style={{ backgroundColor: c, borderColor: i >= 4 ? '#ccc' : c }} />
-                <span className="text-xs text-gray-400">{SIX_NAMES[i]}</span>
-              </div>
-            ))}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-400 mb-3">指定穿著顏色：</p>
+            <div className="flex items-center gap-3 justify-center flex-wrap">
+              {SIX.map((c, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <div className="w-8 h-8 rounded-lg border" style={{ backgroundColor: c, borderColor: i >= 4 ? '#ccc' : c }} />
+                  <span className="text-[10px] text-gray-400">{SIX_NAMES[i]}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* ═══════════ 注意事項 ═══════════ */}
-      <section className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
-        <h3 className="text-lg font-bold mb-4 text-gray-600">注意事項</h3>
-        <div className="columns-1 md:columns-2 gap-6 text-sm text-gray-400 leading-relaxed space-y-2">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <h3 className="text-base sm:text-lg font-bold mb-4 text-gray-600">注意事項</h3>
+        <div className="columns-1 md:columns-2 gap-6 text-xs sm:text-sm text-gray-400 leading-relaxed space-y-2">
           {[
             '獲獎者須負擔國內外貨運費用（獎品由台灣、越南出貨）。',
             '參賽者須注意翻唱曲目之版權規章，如遇侵權問題與主辦單位無關。',
@@ -436,8 +438,8 @@ export default function SoulGuitarInfo() {
       {/* ═══════════ CTA Footer ═══════════ */}
       <section className="text-white text-center" style={{ backgroundColor: DARK }}>
         <Strip />
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 py-20">
-          <h3 className="text-3xl md:text-4xl font-black mb-3">準備好了嗎？</h3>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3">準備好了嗎？</h3>
           <p className="text-white/40 mb-8">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
           <CTA className="justify-center" />
           <p className="text-[10px] text-white/15 mt-6">報名上限 200 位 · 依 Google 表單收件時間 · 額滿為止</p>
