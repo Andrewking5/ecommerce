@@ -197,7 +197,7 @@ function QuestionView({
       )}
 
       {/* 上半留白 */}
-      <div className="flex-none h-[35%] md:h-[20%]" />
+      <div className="flex-none h-[28%] md:h-[20%]" />
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
