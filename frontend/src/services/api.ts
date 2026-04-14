@@ -80,7 +80,13 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Refresh token is now in HttpOnly cookie — no need to check localStorage
+      // Only attempt refresh if user was authenticated (had a token).
+      // Public API calls (events, products, etc.) should never trigger login redirect.
+      const hadToken = !!originalRequest.headers.Authorization;
+      if (!hadToken) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
