@@ -56,7 +56,9 @@ function ProgressBar({ current }: { current: number }) {
     <div className="w-full">
       <div className="relative flex items-end justify-between">
         {/* 底線 — 灰色 */}
-        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[1.5px] bg-[#d4d0c8] rounded-full" />
+        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[1.5px]">
+          <img src={`${BASE}/progress/line.png`} alt="" className="w-full h-full object-fill opacity-30" draggable={false} />
+        </div>
         {/* 進度線 — 漸層填充到當前位置 */}
         <div
           className="absolute left-4 bottom-[5px] md:bottom-[6px] h-[2px] rounded-full transition-all duration-500"
@@ -132,6 +134,15 @@ function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: b
     <motion.div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#f5f0e8]" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
       <motion.img src={`${BASE}/loading.png`} alt="載入中" className="w-40 h-40 object-contain" animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} draggable={false} />
       <motion.p className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest" style={{ fontFamily: QUIZ_FONT }} animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>正在為你準備測驗⋯</motion.p>
+      <motion.p
+        className="mt-4 text-[#2a2a2a]/40 text-xs flex items-center gap-1.5"
+        style={{ fontFamily: QUIZ_FONT }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+      >
+        <span className="text-base">🔊</span> 建議開啟聲音，體驗更佳
+      </motion.p>
     </motion.div>
   );
 }
