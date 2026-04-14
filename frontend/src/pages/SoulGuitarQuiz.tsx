@@ -286,15 +286,16 @@ export default function SoulGuitarQuiz() {
                       </motion.button>
                     )}
 
+                    {/* 進度條 — Q 文字旁邊（跟手機版一樣） */}
+                    <div className="absolute z-20" style={{ top: 'calc(27% - 14px)', left: '38%', right: '10%' }}>
+                      <ProgressBar current={currentQ} />
+                    </div>
+
                     {/* 上半留白 — 讓出 Q 文字區域 */}
                     <div className="flex-1" />
 
-                    {/* Q 文字正下方：進度條 + 選項按鈕 */}
+                    {/* 選項按鈕 */}
                     <div className="w-full flex flex-col items-center pb-14">
-                      {/* 進度條 */}
-                      <div className="w-full max-w-[420px] mb-4">
-                        <ProgressBar current={currentQ} />
-                      </div>
                       {/* 選項按鈕 */}
                       <div className="w-full max-w-[420px] flex flex-col gap-2.5 px-4">
                         {question.options.map((opt, i) => (
