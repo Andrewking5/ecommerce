@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, ComponentType } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HelmetProvider } from 'react-helmet-async';
@@ -24,35 +24,57 @@ import i18n from './i18n/config';
 // Eagerly load the home page for fast initial render
 import Home from './pages/Home';
 
+/**
+ * Wrap React.lazy with auto-reload on chunk load failure.
+ * After a new deploy, old chunk hashes no longer exist on the CDN.
+ * When a dynamic import fails, reload the page once to fetch the
+ * new index.html (which references the correct chunk filenames).
+ */
+function lazyWithRetry(factory: () => Promise<{ default: ComponentType<any> }>) {
+  return lazy(() =>
+    factory().catch((err) => {
+      const key = 'chunk_reload';
+      const hasReloaded = sessionStorage.getItem(key);
+      if (!hasReloaded) {
+        sessionStorage.setItem(key, '1');
+        window.location.reload();
+        return new Promise(() => {}); // never resolves — page is reloading
+      }
+      sessionStorage.removeItem(key);
+      throw err; // second failure → let ErrorBoundary handle it
+    })
+  );
+}
+
 // Lazy-load all other pages for code splitting
-const Collections = lazy(() => import('./pages/Collections'));
-const ProductDetail = lazy(() => import('./pages/ProductDetail'));
-const Customizer = lazy(() => import('./pages/Customizer'));
-const Community = lazy(() => import('./pages/Community'));
-const StoreLocator = lazy(() => import('./pages/StoreLocator'));
-const Support = lazy(() => import('./pages/Support'));
-const Account = lazy(() => import('./pages/Account'));
-const Admin = lazy(() => import('./pages/Admin'));
-const Checkout = lazy(() => import('./pages/Checkout'));
-const Technology = lazy(() => import('./pages/Technology'));
-const Login = lazy(() => import('./pages/Login'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Warranty = lazy(() => import('./pages/Warranty'));
-const Shipping = lazy(() => import('./pages/Shipping'));
-const Contact = lazy(() => import('./pages/Contact'));
-const About = lazy(() => import('./pages/About'));
-const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
-const OrderTracking = lazy(() => import('./pages/OrderTracking'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
-const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
-const AuthCallback = lazy(() => import('./pages/AuthCallback'));
-const Events = lazy(() => import('./pages/Events'));
-const EventDetail = lazy(() => import('./pages/EventDetail'));
-const SoulGuitarInfo = lazy(() => import('./pages/SoulGuitarInfo'));
-const SoulGuitarQuiz = lazy(() => import('./pages/SoulGuitarQuiz'));
+const Collections = lazyWithRetry(() => import('./pages/Collections'));
+const ProductDetail = lazyWithRetry(() => import('./pages/ProductDetail'));
+const Customizer = lazyWithRetry(() => import('./pages/Customizer'));
+const Community = lazyWithRetry(() => import('./pages/Community'));
+const StoreLocator = lazyWithRetry(() => import('./pages/StoreLocator'));
+const Support = lazyWithRetry(() => import('./pages/Support'));
+const Account = lazyWithRetry(() => import('./pages/Account'));
+const Admin = lazyWithRetry(() => import('./pages/Admin'));
+const Checkout = lazyWithRetry(() => import('./pages/Checkout'));
+const Technology = lazyWithRetry(() => import('./pages/Technology'));
+const Login = lazyWithRetry(() => import('./pages/Login'));
+const Privacy = lazyWithRetry(() => import('./pages/Privacy'));
+const Terms = lazyWithRetry(() => import('./pages/Terms'));
+const Warranty = lazyWithRetry(() => import('./pages/Warranty'));
+const Shipping = lazyWithRetry(() => import('./pages/Shipping'));
+const Contact = lazyWithRetry(() => import('./pages/Contact'));
+const About = lazyWithRetry(() => import('./pages/About'));
+const CheckoutSuccess = lazyWithRetry(() => import('./pages/CheckoutSuccess'));
+const OrderTracking = lazyWithRetry(() => import('./pages/OrderTracking'));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
+const ForgotPassword = lazyWithRetry(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazyWithRetry(() => import('./pages/ResetPassword'));
+const VerifyEmail = lazyWithRetry(() => import('./pages/VerifyEmail'));
+const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
+const Events = lazyWithRetry(() => import('./pages/Events'));
+const EventDetail = lazyWithRetry(() => import('./pages/EventDetail'));
+const SoulGuitarInfo = lazyWithRetry(() => import('./pages/SoulGuitarInfo'));
+const SoulGuitarQuiz = lazyWithRetry(() => import('./pages/SoulGuitarQuiz'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
