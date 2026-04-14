@@ -143,7 +143,7 @@ function QuestionView({
       {/* 下半：標題 + 進度條 + 選項（一起排列） */}
       <div className="px-5 pb-6 md:pb-10 flex flex-col md:items-center">
         <div className="w-full md:max-w-[420px]">
-          {/* Q 標題 + 進度條並排 */}
+          {/* Q 標題圖片 + 進度條（進度條對齊 Q1 那行） */}
           <div className="flex items-start gap-2 mb-3">
             <motion.img
               src={question.title}
@@ -154,7 +154,8 @@ function QuestionView({
               transition={{ duration: 0.4 }}
               draggable={false}
             />
-            <div className="flex-1 pt-1">
+            {/* 進度條 — 對齊圖片頂部（Q1 那行的高度） */}
+            <div className="flex-1 pt-[0.4em]">
               <ProgressBar current={currentQ} />
             </div>
           </div>
