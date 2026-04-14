@@ -304,15 +304,6 @@ export default function SoulGuitarQuiz() {
                       </div>
                     </div>
 
-                    {/* 跑馬燈 — 疊在背景底部 */}
-                    <div className="absolute bottom-0 left-0 right-0 h-9 overflow-hidden z-20" style={{ background: 'linear-gradient(90deg, #c5a059 0%, #a0a068 35%, #6a9a8a 65%, #4a7a8a 100%)' }}>
-                      <div className="absolute inset-0 overflow-hidden">
-                        <div className="flex items-center h-full w-[200%]" style={{ animation: 'marquee 15s linear infinite' }}>
-                          <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
-                          <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </motion.div>
               </AnimatePresence>
