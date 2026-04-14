@@ -758,9 +758,9 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 背景 */}
-      <div className="fixed inset-0 z-0">
-        <img src={`${RF}/bg.png`} alt="" className="w-full h-full object-cover" draggable={false} />
+      {/* 背景 — 長條圖，跟隨內容滾動 */}
+      <div className="absolute inset-x-0 top-0 w-full z-0">
+        <img src={`${RF}/bg.png`} alt="" className="w-full h-auto" draggable={false} />
       </div>
 
       {/* 內容 */}
