@@ -287,7 +287,7 @@ export default function SoulGuitarQuiz() {
                     )}
 
                     {/* 進度條 — Q 文字旁邊（跟手機版一樣） */}
-                    <div className="absolute z-20" style={{ top: 'calc(27% - 14px)', left: '38%', right: '10%' }}>
+                    <div className="absolute z-20" style={{ top: 'calc(27% - 14px)', left: '18%', right: '30%' }}>
                       <ProgressBar current={currentQ} />
                     </div>
 
