@@ -56,8 +56,8 @@ function ProgressBar({ current }: { current: number }) {
     <div className="w-full">
       <div className="relative flex items-end justify-between">
         {/* 底線 — 灰色 */}
-        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[1.5px]">
-          <img src={`${BASE}/progress/line.png`} alt="" className="w-full h-full object-fill opacity-30" draggable={false} />
+        <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[2px]">
+          <img src={`${BASE}/progress/line.png`} alt="" className="w-full h-full object-fill" draggable={false} />
         </div>
         {/* 進度線 — 漸層填充到當前位置 */}
         <div
@@ -294,7 +294,6 @@ export default function SoulGuitarQuiz() {
 
   const handlePrev = () => { if (currentQ > 0) setCurrentQ(currentQ - 1); };
 
-  const fadeVariants = { enter: { opacity: 0 }, center: { opacity: 1 }, exit: { opacity: 0 } };
   const currentBg = phase === 'quiz' ? (isDesktop ? question.bgWide : question.bg) : `${BASE}/cover-bg.webp`;
 
   return (
@@ -321,14 +320,16 @@ export default function SoulGuitarQuiz() {
         </AnimatePresence>
 
         {phase === 'quiz' && (
-          <AnimatePresence>
-            <motion.div key={currentQ} variants={fadeVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.3 }} className="absolute inset-0">
-              {/* 純背景圖 */}
-              <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-              {/* 題目互動層 */}
-              <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} isDesktop={isDesktop} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
-            </motion.div>
-          </AnimatePresence>
+          <>
+            {/* 底層背景 — 防止切換時露出黑底 */}
+            <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+            <AnimatePresence>
+              <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0">
+                <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+                <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} isDesktop={isDesktop} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
+              </motion.div>
+            </AnimatePresence>
+          </>
         )}
       </div>
     </div>
