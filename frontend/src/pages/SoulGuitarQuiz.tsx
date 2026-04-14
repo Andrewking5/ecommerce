@@ -290,7 +290,7 @@ export default function SoulGuitarQuiz() {
                     <div className="flex-1" />
 
                     {/* Q 文字正下方：進度條 + 選項按鈕 */}
-                    <div className="w-full flex flex-col items-center pb-8">
+                    <div className="w-full flex flex-col items-center pb-14">
                       {/* 進度條 */}
                       <div className="w-full max-w-[420px] mb-4">
                         <ProgressBar current={currentQ} />
@@ -300,6 +300,16 @@ export default function SoulGuitarQuiz() {
                         {question.options.map((opt, i) => (
                           <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => handleSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
                         ))}
+                      </div>
+                    </div>
+
+                    {/* 跑馬燈 — 疊在背景底部 */}
+                    <div className="absolute bottom-0 left-0 right-0 h-9 overflow-hidden z-20" style={{ background: 'linear-gradient(90deg, #c5a059 0%, #a0a068 35%, #6a9a8a 65%, #4a7a8a 100%)' }}>
+                      <div className="absolute inset-0 overflow-hidden">
+                        <div className="flex items-center h-full w-[200%]" style={{ animation: 'marquee 15s linear infinite' }}>
+                          <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
+                          <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
+                        </div>
                       </div>
                     </div>
                   </div>
