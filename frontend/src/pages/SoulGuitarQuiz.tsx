@@ -137,15 +137,18 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                   : { top: '100%', marginTop: '6px' }
                 }
               >
-                {/* 尾巴 — 指向角色 */}
-                <div
-                  className={`absolute w-3 h-3 rotate-45 border-[#2a2a2a] bg-white z-10 ${
-                    bubbleAbove
-                      ? '-bottom-[6px] border-r-2 border-b-2'
-                      : '-top-[6px] border-l-2 border-t-2'
-                  }`}
-                  style={{ left: `${charPct}%`, transform: 'translateX(-50%) rotate(45deg)' }}
-                />
+                {/* 尾巴 — 雙三角形（外邊框 + 內填充）一體感 */}
+                {bubbleAbove ? (
+                  <>
+                    <div className="absolute z-10" style={{ left: `${charPct}%`, bottom: '-11px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '12px solid #2a2a2a' }} />
+                    <div className="absolute z-10" style={{ left: `${charPct}%`, bottom: '-8px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '10px solid white' }} />
+                  </>
+                ) : (
+                  <>
+                    <div className="absolute z-10" style={{ left: `${charPct}%`, top: '-11px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderBottom: '12px solid #2a2a2a' }} />
+                    <div className="absolute z-10" style={{ left: `${charPct}%`, top: '-8px', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '10px solid white' }} />
+                  </>
+                )}
                 {/* 對話框 */}
                 <div
                   className="absolute rounded-2xl border-2 border-[#2a2a2a] bg-white px-4 py-2 shadow-md"
@@ -304,9 +307,9 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡在進度條下方 */}
-        <div className="md:hidden mb-1.5 pb-10">
-          <ProgressBar current={currentQ} idleLine={idleLine} />
+        {/* 手機版：進度條在 Q 上方，氣泡在進度條上方（留白區） */}
+        <div className="md:hidden mb-1.5 pt-12">
+          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
         </div>
 
         {/* Q 號碼 */}
