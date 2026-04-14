@@ -277,28 +277,30 @@ export default function SoulGuitarQuiz() {
                   {/* 16:9 背景 */}
                   <img src={question.bgWide} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
 
-                  <div className="relative z-10 flex h-full">
-                    {/* 左側：上一題 + 進度條（佔左半） */}
-                    <div className="flex-1 flex flex-col justify-center pl-[5%] pr-8">
-                      {/* 上一題 */}
-                      {!isFirstQ && (
-                        <motion.button type="button" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={handlePrev} className="absolute top-6 left-6 z-20 flex items-center gap-1 rounded-full bg-white/40 backdrop-blur-sm pl-2 pr-3.5 py-1.5 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all">
-                          <ChevronLeft size={16} />
-                          <span className="text-xs" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
-                        </motion.button>
-                      )}
+                  <div className="relative z-10 flex flex-col h-full">
+                    {/* 上一題 */}
+                    {!isFirstQ && (
+                      <motion.button type="button" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={handlePrev} className="absolute top-6 left-6 z-20 flex items-center gap-1 rounded-full bg-white/40 backdrop-blur-sm pl-2 pr-3.5 py-1.5 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all">
+                        <ChevronLeft size={16} />
+                        <span className="text-xs" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
+                      </motion.button>
+                    )}
 
-                      {/* 進度條 — Q 文字下方 */}
-                      <div className="mt-auto mb-8 max-w-[400px]">
+                    {/* 上半留白 — 讓出 Q 文字區域 */}
+                    <div className="flex-1" />
+
+                    {/* Q 文字正下方：進度條 + 選項按鈕 */}
+                    <div className="w-full flex flex-col items-center pb-8">
+                      {/* 進度條 */}
+                      <div className="w-full max-w-[420px] mb-4">
                         <ProgressBar current={currentQ} />
                       </div>
-                    </div>
-
-                    {/* 右側：選項按鈕 */}
-                    <div className="w-[40%] max-w-[450px] flex flex-col justify-center pr-[5%] gap-3">
-                      {question.options.map((opt, i) => (
-                        <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => handleSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
-                      ))}
+                      {/* 選項按鈕 */}
+                      <div className="w-full max-w-[420px] flex flex-col gap-2.5 px-4">
+                        {question.options.map((opt, i) => (
+                          <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => handleSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
