@@ -82,57 +82,62 @@ function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirecti
   if (lineIdx < 0 || !lines) return null;
 
   // 角色在進度條的水平位置（0~100%）
-  const charPercent = (currentQ / 6) * 100;
-  // SVG 尾巴：從氣泡中心指向角色
-  const tailFromX = 50;
-  const tailToX = charPercent;
+  const charPct = (currentQ / 6) * 100;
+  // 尾巴尖端位置 = 角色位置，氣泡根部兩側各偏移 8%
+  const tipX = charPct;
+  const baseL = Math.max(tipX - 8, 20);
+  const baseR = Math.min(tipX + 8, 80);
+
+  const isDown = tailDirection === 'down';
 
   return (
-    <div className="absolute left-0 right-0" style={{ [tailDirection === 'down' ? 'top' : 'bottom']: '4px' }}>
+    <div className="absolute left-0 right-0" style={{ [isDown ? 'top' : 'bottom']: '0' }}>
       <AnimatePresence mode="wait">
         <motion.div
           key={`${currentQ}-${lineIdx}`}
-          initial={{ opacity: 0, scale: 0.85 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.85 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.3 }}
           className="relative"
+          style={{ paddingTop: isDown ? '20px' : '0', paddingBottom: isDown ? '0' : '20px' }}
         >
-          {/* 漫畫式尾巴 — SVG 曲線指向角色 */}
+          {/* 漫畫三角尾巴 — 實心指向角色 */}
           <svg
             className="absolute left-0 w-full pointer-events-none"
             style={{
-              [tailDirection === 'down' ? 'top' : 'bottom']: '0',
-              height: '20px',
-              ...(tailDirection === 'up' ? { transform: 'scaleY(-1)' } : {}),
+              [isDown ? 'top' : 'bottom']: '0',
+              height: '22px',
+              ...(isDown ? {} : { transform: 'scaleY(-1)' }),
             }}
-            viewBox="0 0 100 20"
+            viewBox="0 0 100 22"
             preserveAspectRatio="none"
           >
-            <path
-              d={`M${tailFromX - 1},0 Q${(tailFromX + tailToX) / 2 - 2},16 ${tailToX},20`}
-              fill="none"
-              stroke="#c5a059"
-              strokeWidth="1.5"
-              vectorEffect="non-scaling-stroke"
+            <polygon
+              points={`${baseL},2 ${baseR},2 ${tipX},22`}
+              fill="white"
+              fillOpacity="0.85"
             />
             <path
-              d={`M${tailFromX + 1},0 Q${(tailFromX + tailToX) / 2 + 2},14 ${tailToX},20`}
+              d={`M${baseL},2 L${tipX},22 L${baseR},2`}
               fill="none"
-              stroke="#6ba3b5"
+              stroke="url(#tailGrad)"
               strokeWidth="1.5"
               vectorEffect="non-scaling-stroke"
+              strokeLinejoin="round"
             />
+            <defs>
+              <linearGradient id="tailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#c5a059" />
+                <stop offset="100%" stopColor="#6ba3b5" />
+              </linearGradient>
+            </defs>
           </svg>
 
-          {/* 氣泡本體 — 置中 */}
+          {/* 氣泡本體 */}
           <div
             className="relative mx-auto rounded-2xl p-[1.5px] w-[65%] max-w-[240px] md:max-w-[280px] shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, #c5a059, #6ba3b5)',
-              marginTop: tailDirection === 'down' ? '18px' : '0',
-              marginBottom: tailDirection === 'up' ? '18px' : '0',
-            }}
+            style={{ background: 'linear-gradient(135deg, #c5a059, #6ba3b5)' }}
           >
             <div className="rounded-2xl bg-white/85 backdrop-blur-md px-3.5 py-2" style={{ fontFamily: QUIZ_FONT }}>
               <p className="text-[0.8rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug text-center">
