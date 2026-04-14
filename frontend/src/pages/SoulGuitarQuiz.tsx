@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 /* ──────────────────────────────────────
    Soul Guitar — 心理測驗
@@ -42,6 +43,212 @@ const CHARACTER_LINES: string[][] = [
   // Q7 — 月光：浪漫感性
   ['月光不催人，但夜不會永遠等你🌙', '這是最後一題了，好好感受吧', '街頭的吉他聲⋯你聽見了嗎？', '用心去選，這會成為你的靈魂記憶'],
 ];
+
+/* ── 計分邏輯（依 PDF 設計） ── */
+type Soul = 'SUN' | 'WAVE' | 'MOON' | 'FIRE';
+type Dim = '自由' | '故事';
+
+// 每題 4 選項 → [Soul, Dimension]
+// Q4-A 是 SUN+自由，其餘 A 都是 SUN+故事
+const SCORING: [Soul, Dim][][] = [
+  /* Q1 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q2 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q3 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q4 */ [['SUN', '自由'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q5 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q6 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q7 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+];
+
+function calculateResult(ans: number[]): string {
+  const soul: Record<Soul, number> = { SUN: 0, WAVE: 0, MOON: 0, FIRE: 0 };
+  const dim: Record<Dim, number> = { '自由': 0, '故事': 0 };
+  const lastQ: Record<Soul, number> = { SUN: -1, WAVE: -1, MOON: -1, FIRE: -1 };
+
+  ans.forEach((a, q) => {
+    const [s, d] = SCORING[q][a];
+    soul[s]++;
+    dim[d]++;
+    lastQ[s] = q;
+  });
+
+  // Step 1: 最高 soul
+  const maxS = Math.max(...Object.values(soul));
+  const tops = (Object.keys(soul) as Soul[]).filter(s => soul[s] === maxS);
+  // Step 2: 平手 → 最後出現的贏
+  const mainSoul = tops.length === 1
+    ? tops[0]
+    : tops.reduce((a, b) => (lastQ[a] > lastQ[b] ? a : b));
+
+  // Step 3: 自由 vs 故事
+  let dimension: Dim;
+  if (dim['自由'] !== dim['故事']) {
+    dimension = dim['自由'] > dim['故事'] ? '自由' : '故事';
+  } else {
+    // Step 4: 平手 → 看 Q6（index 5）
+    dimension = SCORING[5][ans[5]][1];
+  }
+
+  return `${mainSoul}_${dimension}`;
+}
+
+/* ── 8 種結果資料（依 PDF） ── */
+interface ResultInfo {
+  name: string;
+  soulTitle: string;
+  tag: string;
+  city: string;
+  cityDesc: string;
+  description: string;
+  music: string;
+  compatible: string;
+  compatibleDesc: string;
+  incompatible: string;
+  incompatibleDesc: string;
+  colorName: string;
+  charImg: string;
+  themeColor: string;
+  themeBg: string;
+}
+
+const RESULTS: Record<string, ResultInfo> = {
+  SUN_自由: {
+    name: 'Sunny Taipei',
+    soulTitle: '溫暖大家的太陽吉他',
+    tag: '陽光型生活家',
+    city: '台北 華山文創園區',
+    cityDesc: '城市的街頭、咖啡廳、午後的陽光與人群。你的音樂像城市裡亮起的霓虹燈，在忙碌的生活中帶來一點光。',
+    description: '你給人的感覺自然、輕鬆，很容易讓人放下防備。你喜歡生活裡那些簡單卻舒服的瞬間，也很擅長把氣氛變得明亮。很多人和你相處時，會不自覺地放鬆下來。',
+    music: '#清新民謠 #acoustic pop #Indie Folk #Campfire Acoustic',
+    compatible: 'Wave Hualien',
+    compatibleDesc: '他的自由感會讓你的世界更開闊。',
+    incompatible: 'Deep Wave Jiufen',
+    incompatibleDesc: '你喜歡輕盈往前，他比較容易停留在情緒裡。',
+    colorName: '橘黃色',
+    charImg: `${BASE}/progress/char-2.png`,
+    themeColor: '#FF9A3E',
+    themeBg: 'linear-gradient(135deg, #FFF4CC 0%, #FFE4A0 50%, #FF9A3E 100%)',
+  },
+  SUN_故事: {
+    name: 'Soft Sun Taoyuan',
+    soulTitle: '溫柔共感的微光吉他',
+    tag: '溫暖的傾聽者',
+    city: '桃園 大溪老街',
+    cityDesc: '像城市與遠方之間的地方，安靜、溫和，也藏著很多故事。',
+    description: '你細膩、溫柔，也很懂得理解別人的感受。你不一定話最多，但你很會聽，也很會接住情緒。很多人會在你身邊感到安心。',
+    music: '#抒情民謠 #Acoustic Ballad #Folk Guitar #情感型彈唱',
+    compatible: 'Dream Moon Tainan',
+    compatibleDesc: '你的溫暖與他的情緒很容易產生共鳴。',
+    incompatible: 'Fire Taichung',
+    incompatibleDesc: '你喜歡慢慢醞釀，他習慣快速推進。',
+    colorName: '橘黃色',
+    charImg: `${BASE}/progress/char-4.png`,
+    themeColor: '#F0B860',
+    themeBg: 'linear-gradient(135deg, #FFF8E8 0%, #FFE8B0 50%, #F0B860 100%)',
+  },
+  WAVE_自由: {
+    name: 'Wave Hualien',
+    soulTitle: '嚮往自由的海浪靈魂',
+    tag: '自由的探索者',
+    city: '花蓮 七星潭海岸',
+    cityDesc: '海風、山與海的交界、自由延伸的海岸線。你就像山海之間的風，開闊、自由，也沒有太多限制。',
+    description: '你喜歡空間、變化和自由感，不太喜歡被固定模式困住。你很依靠感覺，也很容易被新的地方與新的體驗吸引。你的生活節奏通常比較流動，也讓身邊的人感到輕鬆自在。',
+    music: '#Fingerstyle Guitar #Indie Acoustic #Instrumental Guitar #Travel folk',
+    compatible: 'Sunny Taipei',
+    compatibleDesc: '他的輕鬆會讓你的自由更自在。',
+    incompatible: 'Moon Hsinchu',
+    incompatibleDesc: '你喜歡流動，他比較習慣停下來思考。',
+    colorName: '藍色',
+    charImg: `${BASE}/progress/char-5.png`,
+    themeColor: '#4A9EC5',
+    themeBg: 'linear-gradient(135deg, #E0F2FE 0%, #7EC8E3 50%, #4A9EC5 100%)',
+  },
+  WAVE_故事: {
+    name: 'Deep Wave Jiufen',
+    soulTitle: '深海吉他靈魂',
+    tag: '海霧裡的觀察者',
+    city: '九份 阿妹茶樓',
+    cityDesc: '像山城的霧與燈火，安靜、有故事，也帶著一點神秘感。',
+    description: '你是一個很有內在世界的人。你很會觀察，也很容易注意到細節與情緒。你不急著表達，但其實想得很多。你喜歡有層次、有深度的東西。',
+    music: '#Indie Folk #Ambient Acoustic #情緒指彈 #Acoustic Instrumental',
+    compatible: 'Dream Moon Tainan',
+    compatibleDesc: '你們都很容易感受到音樂裡的情緒。',
+    incompatible: 'Sunny Taipei',
+    incompatibleDesc: '你喜歡慢慢感受，他比較習慣輕快往前。',
+    colorName: '藍色',
+    charImg: `${BASE}/progress/char-6.png`,
+    themeColor: '#2E6B8A',
+    themeBg: 'linear-gradient(135deg, #C8E0EC 0%, #5A9AB5 50%, #2E6B8A 100%)',
+  },
+  MOON_故事: {
+    name: 'Moon Hsinchu',
+    soulTitle: '情感充沛的月光吉他',
+    tag: '安靜的思考者',
+    city: '新竹 新竹公園',
+    cityDesc: '像夜晚的風，安靜、清楚，也有自己的節奏。',
+    description: '你是一個很習慣向內思考的人。你習慣先觀察、先思考，再慢慢表達自己。你需要一些自己的空間，也很擅長整理內心的想法。你不是冷淡，只是比較安靜。',
+    music: '#Fingerstyle Guitar #Ambient Acoustic #Indie Acoustic #Melodic Guitar',
+    compatible: 'Fire Taichung',
+    compatibleDesc: '他的行動力會幫你把想法更勇敢地說出來。',
+    incompatible: 'Wave Hualien',
+    incompatibleDesc: '你需要沉澱，他習慣一直往前探索。',
+    colorName: '黑色 / 白色',
+    charImg: `${BASE}/progress/char-7.png`,
+    themeColor: '#6B6B9E',
+    themeBg: 'linear-gradient(135deg, #E8E8F0 0%, #A0A0C8 50%, #6B6B9E 100%)',
+  },
+  MOON_自由: {
+    name: 'Dream Moon Tainan',
+    soulTitle: '追求浪漫的夢月吉他',
+    tag: '月光裡的說故事的人',
+    city: '台南 神農街',
+    cityDesc: '老街的燈光、慢慢的步調與溫暖的人情味。老街的夜晚，慢慢流動，也帶著很多故事。',
+    description: '你感受力很強，也很容易被一段旋律或一個畫面打動。你不是最外放的人，但你的內在世界很豐富。很多情緒在你心裡都會停留很久。很多時候，你的想法都帶著一點浪漫與自由。',
+    music: '#Acoustic Folk #抒情民謠 #Indie Acoustic #情緒指彈',
+    compatible: 'Soft Sun Taoyuan',
+    compatibleDesc: '他的溫暖能接住你的情緒。',
+    incompatible: 'Wave Hualien',
+    incompatibleDesc: '你喜歡沉浸，他比較喜歡往外探索。',
+    colorName: '黑色 / 白色',
+    charImg: `${BASE}/progress/char-7.png`,
+    themeColor: '#7B6BA0',
+    themeBg: 'linear-gradient(135deg, #EDE8F5 0%, #B0A0D0 50%, #7B6BA0 100%)',
+  },
+  FIRE_自由: {
+    name: 'Fire Taichung',
+    soulTitle: '火焰吉他靈魂',
+    tag: '帶著能量的人',
+    city: '台中 勤美草悟道／圓滿舞台',
+    cityDesc: '像 Live House 的夜晚，有燈光、有節奏，也很有現場感。',
+    description: '你是一個很有行動力的人，想到什麼就會立刻去做，不太喜歡猶豫或等待。你喜歡熱鬧的氣氛，也很容易帶動身邊的人一起投入。很多時候，你的能量就像火一樣，讓場面瞬間變得有溫度、有速度。',
+    music: '#Rock Acoustic #Rhythm Guitar #Blues Guitar #Live Acoustic',
+    compatible: 'Moon Hsinchu',
+    compatibleDesc: '他給深度，你給行動力。',
+    incompatible: 'Soft Sun Taoyuan',
+    incompatibleDesc: '你想快一點，他想慢慢感受。',
+    colorName: '紅色',
+    charImg: `${BASE}/progress/char-1.png`,
+    themeColor: '#E04040',
+    themeBg: 'linear-gradient(135deg, #FFE0D0 0%, #F08060 50%, #E04040 100%)',
+  },
+  FIRE_故事: {
+    name: 'Spark Kaohsiung',
+    soulTitle: '煙花吉他靈魂',
+    tag: '帶著火花的創作者',
+    city: '高雄 駁二藝術特區',
+    cityDesc: '像港口夜晚的光與風，開闊、有力量，也很有城市故事。',
+    description: '你有很多想法，也很容易把感受變成表達。你不一定一直高調，但只要開始創作或說話，就很有力量。你喜歡有張力、有個性的東西。',
+    music: '#Blues Guitar #Indie Rock Acoustic #Singer-Songwriter #情緒搖滾',
+    compatible: 'Deep Wave Jiufen',
+    compatibleDesc: '他的細節會讓你的表達更有層次。',
+    incompatible: 'Sunny Taipei',
+    incompatibleDesc: '你喜歡重量，他偏向輕鬆明亮。',
+    colorName: '紅色',
+    charImg: `${BASE}/progress/char-3.png`,
+    themeColor: '#D05030',
+    themeBg: 'linear-gradient(135deg, #FFE8D8 0%, #E88060 50%, #D05030 100%)',
+  },
+};
 
 function useIsDesktop() {
   const [d, setD] = useState(false);
@@ -129,7 +336,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 right-0 z-30"
                 style={bubbleAbove
-                  ? { bottom: '100%', marginBottom: '28px' }
+                  ? { bottom: '100%', marginBottom: '48px' }
                   : { top: '100%', marginTop: '8px' }
                 }
               >
