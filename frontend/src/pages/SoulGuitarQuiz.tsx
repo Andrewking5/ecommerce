@@ -137,31 +137,34 @@ function QuestionView({
         </motion.button>
       )}
 
-      {/* 標題區：Q圖片 + 進度條並排 */}
-      <div className="flex items-start gap-2 px-4 pt-[22%] md:pt-[8%] md:px-[8%]">
-        {/* Q 標題圖片 */}
-        <motion.img
-          src={question.title}
-          alt={`Q${question.id}`}
-          className="w-[45%] md:w-[30%] max-w-[280px] h-auto drop-shadow-md"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-          draggable={false}
-        />
-        {/* 進度條 — Q 標題右邊 */}
-        <div className="flex-1 pt-1 md:pt-2">
-          <ProgressBar current={currentQ} />
-        </div>
-      </div>
-
-      {/* 選項按鈕 */}
+      {/* 上半留白 */}
       <div className="flex-1" />
-      <div className="px-5 pb-6 flex flex-col gap-2 md:items-center md:pb-10">
-        <div className="w-full md:max-w-[420px] flex flex-col gap-2">
-          {question.options.map((opt, i) => (
-            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
-          ))}
+
+      {/* 下半：標題 + 進度條 + 選項（一起排列） */}
+      <div className="px-5 pb-6 md:pb-10 flex flex-col md:items-center">
+        <div className="w-full md:max-w-[420px]">
+          {/* Q 標題 + 進度條並排 */}
+          <div className="flex items-start gap-2 mb-3">
+            <motion.img
+              src={question.title}
+              alt={`Q${question.id}`}
+              className="w-[45%] md:w-[40%] max-w-[250px] h-auto drop-shadow-md"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+              draggable={false}
+            />
+            <div className="flex-1 pt-1">
+              <ProgressBar current={currentQ} />
+            </div>
+          </div>
+
+          {/* 選項按鈕 */}
+          <div className="flex flex-col gap-2">
+            {question.options.map((opt, i) => (
+              <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
