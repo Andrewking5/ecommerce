@@ -198,7 +198,7 @@ function QuestionView({
       )}
 
       {/* 上半留白 */}
-      <div className="flex-none h-[28%] md:h-[20%]" />
+      <div className="flex-none h-[23%] md:h-[20%]" />
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
@@ -272,7 +272,7 @@ export default function SoulGuitarQuiz() {
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
 
-  const handleStart = () => {
+  const playBgm = () => {
     if (!bgmRef.current) {
       const audio = new Audio('/audio/quiz-bg.mp3');
       audio.loop = true;
@@ -280,6 +280,10 @@ export default function SoulGuitarQuiz() {
       bgmRef.current = audio;
     }
     bgmRef.current.play().catch(() => {});
+  };
+
+  const handleStart = () => {
+    playBgm();
     setPhase('loading');
   };
 
@@ -308,11 +312,11 @@ export default function SoulGuitarQuiz() {
       <div
         className={isDesktop
           ? 'relative w-full overflow-hidden'
-          : 'relative h-dvh mx-auto overflow-hidden'
+          : 'relative w-full h-dvh overflow-hidden'
         }
         style={isDesktop
           ? { height: 'min(100dvh, calc(100vw * 9 / 16))', maxWidth: 'calc(100dvh * 16 / 9)' }
-          : { width: 'min(100vw, calc(100dvh * 9 / 16))' }
+          : {}
         }
       >
         <AnimatePresence>
