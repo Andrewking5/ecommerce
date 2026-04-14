@@ -329,21 +329,36 @@ function useIsDesktop() {
 function useIdleLine(currentQ: number) {
   const [lineIdx, setLineIdx] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idxRef = useRef(0);
 
   useEffect(() => {
     setLineIdx(-1);
-    const scheduleNext = () => {
-      const delay = 6000 + Math.random() * 4000;
-      intervalRef.current = setTimeout(() => {
-        setLineIdx((prev) => (prev + 1) % CHARACTER_LINES[currentQ].length);
-        scheduleNext();
-      }, delay);
+    idxRef.current = 0;
+
+    const showNext = () => {
+      setLineIdx(idxRef.current);
+      // 4~6 秒後消失
+      const hideDelay = 4000 + Math.random() * 2000;
+      hideRef.current = setTimeout(() => {
+        setLineIdx(-1);
+        // 消失後 6~10 秒再出現下一句
+        const nextDelay = 6000 + Math.random() * 4000;
+        nextRef.current = setTimeout(() => {
+          idxRef.current = (idxRef.current + 1) % CHARACTER_LINES[currentQ].length;
+          showNext();
+        }, nextDelay);
+      }, hideDelay);
     };
-    timerRef.current = setTimeout(() => { setLineIdx(0); scheduleNext(); }, 3000);
+
+    // 3 秒後顯示第一句
+    timerRef.current = setTimeout(showNext, 3000);
+
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      if (intervalRef.current) clearTimeout(intervalRef.current);
+      if (hideRef.current) clearTimeout(hideRef.current);
+      if (nextRef.current) clearTimeout(nextRef.current);
     };
   }, [currentQ]);
 
