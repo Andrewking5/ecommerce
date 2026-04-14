@@ -137,35 +137,33 @@ function QuestionView({
         </motion.button>
       )}
 
-      {/* 上半留白 */}
-      <div className="flex-1" />
+      {/* 上半留白 — 手機 40% / 電腦 25% */}
+      <div className="flex-none h-[40%] md:h-[25%]" />
 
-      {/* 下半：標題 + 進度條 + 選項（一起排列） */}
-      <div className="px-5 pb-6 md:pb-10 flex flex-col md:items-center">
-        <div className="w-full md:max-w-[420px]">
-          {/* Q 標題圖片 + 進度條（進度條對齊 Q1 那行） */}
-          <div className="flex items-start gap-2 mb-3">
-            <motion.img
-              src={question.title}
-              alt={`Q${question.id}`}
-              className="w-[45%] md:w-[40%] max-w-[250px] h-auto drop-shadow-md"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              draggable={false}
-            />
-            {/* 進度條 — 對齊圖片頂部（Q1 那行的高度） */}
-            <div className="flex-1 pt-[0.4em]">
-              <ProgressBar current={currentQ} />
-            </div>
+      {/* 下半：標題 + 進度條 + 選項 */}
+      <div className="flex-1 flex flex-col px-5 md:px-[10%] pb-4 md:pb-8">
+        {/* Q 標題圖片 + 進度條 */}
+        <div className="flex items-start gap-3 mb-4">
+          <motion.img
+            src={question.title}
+            alt={`Q${question.id}`}
+            className="w-[55%] md:w-[35%] max-w-[320px] h-auto drop-shadow-md"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            draggable={false}
+          />
+          {/* 進度條 — 對齊 Q1 那行 */}
+          <div className="flex-1 pt-[0.3em]">
+            <ProgressBar current={currentQ} />
           </div>
+        </div>
 
-          {/* 選項按鈕 */}
-          <div className="flex flex-col gap-2">
-            {question.options.map((opt, i) => (
-              <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
-            ))}
-          </div>
+        {/* 選項按鈕 */}
+        <div className="flex flex-col gap-2.5 md:gap-3 w-full md:max-w-[550px]">
+          {question.options.map((opt, i) => (
+            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
+          ))}
         </div>
       </div>
     </div>
