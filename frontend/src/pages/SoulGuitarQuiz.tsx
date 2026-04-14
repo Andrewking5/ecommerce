@@ -83,11 +83,8 @@ function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirecti
 
   // 角色在進度條的水平位置（0~100%）
   const charPct = (currentQ / 6) * 100;
-  // 尾巴尖端位置 = 角色位置，氣泡根部兩側各偏移 8%
-  const tipX = charPct;
-  const baseL = Math.max(tipX - 8, 20);
-  const baseR = Math.min(tipX + 8, 80);
-
+  // 尾巴位置用 CSS left%
+  const tailLeft = `${charPct}%`;
   const isDown = tailDirection === 'down';
 
   return (
@@ -95,55 +92,39 @@ function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirecti
       <AnimatePresence mode="wait">
         <motion.div
           key={`${currentQ}-${lineIdx}`}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, y: isDown ? -6 : 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: isDown ? -6 : 6 }}
           transition={{ duration: 0.3 }}
           className="relative"
-          style={{ paddingTop: isDown ? '20px' : '0', paddingBottom: isDown ? '0' : '20px' }}
+          style={{ [isDown ? 'paddingTop' : 'paddingBottom']: '14px' }}
         >
-          {/* 漫畫三角尾巴 — 實心指向角色 */}
-          <svg
-            className="absolute left-0 w-full pointer-events-none"
-            style={{
-              [isDown ? 'top' : 'bottom']: '0',
-              height: '22px',
-              ...(isDown ? {} : { transform: 'scaleY(-1)' }),
-            }}
-            viewBox="0 0 100 22"
-            preserveAspectRatio="none"
-          >
-            <polygon
-              points={`${baseL},2 ${baseR},2 ${tipX},22`}
-              fill="white"
-              fillOpacity="0.85"
-            />
-            <path
-              d={`M${baseL},2 L${tipX},22 L${baseR},2`}
-              fill="none"
-              stroke="url(#tailGrad)"
-              strokeWidth="1.5"
-              vectorEffect="non-scaling-stroke"
-              strokeLinejoin="round"
-            />
-            <defs>
-              <linearGradient id="tailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#c5a059" />
-                <stop offset="100%" stopColor="#6ba3b5" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* 氣泡本體 */}
-          <div
-            className="relative mx-auto rounded-2xl p-[1.5px] w-[65%] max-w-[240px] md:max-w-[280px] shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #c5a059, #6ba3b5)' }}
-          >
-            <div className="rounded-2xl bg-white/85 backdrop-blur-md px-3.5 py-2" style={{ fontFamily: QUIZ_FONT }}>
+          {/* 漫畫對話框本體 */}
+          <div className="relative mx-auto w-[70%] max-w-[240px] md:max-w-[280px]">
+            <div
+              className="relative rounded-full border-[2.5px] border-[#2a2a2a] bg-white px-4 py-2 shadow-md"
+              style={{ fontFamily: QUIZ_FONT }}
+            >
               <p className="text-[0.8rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug text-center">
                 {lines[lineIdx]}
               </p>
             </div>
+
+            {/* 漫畫尾巴 — 用旋轉方塊做三角指向 */}
+            <div
+              className="absolute w-4 h-4 bg-white border-[2.5px] border-[#2a2a2a] rotate-45"
+              style={{
+                left: tailLeft,
+                transform: `translateX(-50%) rotate(45deg)`,
+                ...(isDown
+                  ? { top: '-8px', borderRight: 'none', borderTop: 'none' }
+                  : { bottom: '-8px', borderLeft: 'none', borderBottom: 'none' }
+                ),
+                clipPath: isDown
+                  ? 'polygon(0% 0%, 100% 100%, 0% 100%)'
+                  : 'polygon(0% 0%, 100% 0%, 100% 100%)',
+              }}
+            />
           </div>
         </motion.div>
       </AnimatePresence>
