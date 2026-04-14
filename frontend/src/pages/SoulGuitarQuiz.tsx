@@ -129,7 +129,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 right-0 z-30"
                 style={bubbleAbove
-                  ? { bottom: '100%', marginBottom: '8px' }
+                  ? { bottom: '100%', marginBottom: '28px' }
                   : { top: '100%', marginTop: '8px' }
                 }
               >
