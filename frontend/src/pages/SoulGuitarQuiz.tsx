@@ -55,29 +55,22 @@ function useIsDesktop() {
   return d;
 }
 
-/* ── 角色閒聊氣泡（漫畫指向式） ── */
-function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirection: 'down' | 'up' }) {
+/* ── 閒聊計時 hook ── */
+function useIdleLine(currentQ: number) {
   const [lineIdx, setLineIdx] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setLineIdx(-1);
     const scheduleNext = () => {
-      const delay = 6000 + Math.random() * 4000; // 6~10 秒隨機
+      const delay = 6000 + Math.random() * 4000;
       intervalRef.current = setTimeout(() => {
-        setLineIdx((prev) => {
-          const lines = CHARACTER_LINES[currentQ];
-          return (prev + 1) % lines.length;
-        });
+        setLineIdx((prev) => (prev + 1) % CHARACTER_LINES[currentQ].length);
         scheduleNext();
       }, delay);
     };
-    // 3 秒後顯示第一句
-    timerRef.current = setTimeout(() => {
-      setLineIdx(0);
-      scheduleNext();
-    }, 3000);
+    timerRef.current = setTimeout(() => { setLineIdx(0); scheduleNext(); }, 3000);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (intervalRef.current) clearTimeout(intervalRef.current);
@@ -85,57 +78,7 @@ function IdleBubble({ currentQ, tailDirection }: { currentQ: number; tailDirecti
   }, [currentQ]);
 
   const lines = CHARACTER_LINES[currentQ];
-  if (lineIdx < 0 || !lines) return null;
-
-  // 角色在進度條的水平位置（0~100%）
-  const charPct = (currentQ / 6) * 100;
-  // 尾巴位置用 CSS left%
-  const tailLeft = `${charPct}%`;
-  const isDown = tailDirection === 'down';
-
-  return (
-    <div className="absolute left-0 right-0" style={{ [isDown ? 'top' : 'bottom']: '0' }}>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${currentQ}-${lineIdx}`}
-          initial={{ opacity: 0, y: isDown ? -6 : 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: isDown ? -6 : 6 }}
-          transition={{ duration: 0.3 }}
-          className="relative"
-          style={{ [isDown ? 'paddingTop' : 'paddingBottom']: '14px' }}
-        >
-          {/* 漫畫對話框本體 */}
-          <div className="relative mx-auto w-[70%] max-w-[240px] md:max-w-[280px]">
-            <div
-              className="relative rounded-full border-[2.5px] border-[#2a2a2a] bg-white px-4 py-2 shadow-md"
-              style={{ fontFamily: QUIZ_FONT }}
-            >
-              <p className="text-[0.8rem] md:text-[0.95rem] text-[#2a2a2a] leading-snug text-center">
-                {lines[lineIdx]}
-              </p>
-            </div>
-
-            {/* 漫畫尾巴 — 用旋轉方塊做三角指向 */}
-            <div
-              className="absolute w-4 h-4 bg-white border-[2.5px] border-[#2a2a2a] rotate-45"
-              style={{
-                left: tailLeft,
-                transform: `translateX(-50%) rotate(45deg)`,
-                ...(isDown
-                  ? { top: '-8px', borderRight: 'none', borderTop: 'none' }
-                  : { bottom: '-8px', borderLeft: 'none', borderBottom: 'none' }
-                ),
-                clipPath: isDown
-                  ? 'polygon(0% 0%, 100% 100%, 0% 100%)'
-                  : 'polygon(0% 0%, 100% 0%, 100% 100%)',
-              }}
-            />
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
+  return lineIdx >= 0 && lines ? lines[lineIdx] : null;
 }
 
 /* ── 按鈕 ── */
@@ -149,18 +92,19 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
   );
 }
 
-/* ── 進度條（優化版） ── */
-function ProgressBar({ current }: { current: number }) {
+/* ── 進度條（含角色氣泡） ── */
+function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idleLine: string | null; bubbleAbove?: boolean }) {
   const progress = (current / (CHARACTER_NAMES.length - 1)) * 100;
+  const isTalking = idleLine !== null;
 
   return (
     <div className="w-full">
       <div className="relative flex items-end justify-between">
-        {/* 底線 — 灰色 */}
+        {/* 底線 */}
         <div className="absolute left-4 right-4 bottom-[5px] md:bottom-[6px] h-[2px]">
           <img src={`${BASE}/progress/line.png`} alt="" className="w-full h-full object-fill" draggable={false} />
         </div>
-        {/* 進度線 — 漸層填充到當前位置 */}
+        {/* 進度線 */}
         <div
           className="absolute left-4 bottom-[5px] md:bottom-[6px] h-[2px] rounded-full transition-all duration-500"
           style={{
@@ -183,8 +127,12 @@ function ProgressBar({ current }: { current: number }) {
                   scale: isCurrent ? 1.3 : 1,
                   opacity: isFuture ? 0.25 : 1,
                   filter: isFuture ? 'grayscale(100%)' : 'grayscale(0%)',
+                  ...(isCurrent && isTalking ? { rotate: [0, -8, 8, -5, 5, 0] } : { rotate: 0 }),
                 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                transition={isCurrent && isTalking
+                  ? { rotate: { duration: 0.5, repeat: Infinity, repeatDelay: 1.5 }, scale: { type: 'spring', stiffness: 300, damping: 20 } }
+                  : { type: 'spring', stiffness: 300, damping: 20 }
+                }
               >
                 <img
                   src={`${BASE}/progress/char-${i + 1}.png`}
@@ -192,7 +140,6 @@ function ProgressBar({ current }: { current: number }) {
                   className="w-6 h-6 md:w-7 md:h-7 object-contain"
                   draggable={false}
                 />
-                {/* 當前角色發光 */}
                 {isCurrent && (
                   <motion.div
                     className="absolute -inset-1 rounded-full"
@@ -211,6 +158,45 @@ function ProgressBar({ current }: { current: number }) {
                 animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
                 transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
               />
+
+              {/* 氣泡掛在講話角色上方或下方 */}
+              {isCurrent && isTalking && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={idleLine}
+                    initial={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: bubbleAbove ? 4 : -4 }}
+                    transition={{ duration: 0.25 }}
+                    className={`absolute left-1/2 -translate-x-1/2 z-30 flex flex-col items-center ${
+                      bubbleAbove ? 'bottom-full mb-2' : 'top-full mt-2'
+                    }`}
+                  >
+                    {/* 對話框 + 三角尾巴 */}
+                    {bubbleAbove ? (
+                      <>
+                        <div
+                          className="whitespace-nowrap rounded-full border-2 border-[#2a2a2a] bg-white px-4 py-1.5 shadow-md"
+                          style={{ fontFamily: QUIZ_FONT }}
+                        >
+                          <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a]">{idleLine}</p>
+                        </div>
+                        <div className="w-3 h-3 -mt-1.5 rotate-45 border-r-2 border-b-2 border-[#2a2a2a] bg-white" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-3 h-3 -mb-1.5 rotate-45 border-l-2 border-t-2 border-[#2a2a2a] bg-white" />
+                        <div
+                          className="whitespace-nowrap rounded-full border-2 border-[#2a2a2a] bg-white px-4 py-1.5 shadow-md"
+                          style={{ fontFamily: QUIZ_FONT }}
+                        >
+                          <p className="text-[0.75rem] md:text-[0.85rem] text-[#2a2a2a]">{idleLine}</p>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </div>
           );
         })}
@@ -287,6 +273,8 @@ function QuestionView({
   question: typeof questions[0]; currentQ: number; isFirstQ: boolean;
   tapped: number | null; onSelect: (i: number) => void; onPrev: () => void;
 }) {
+  const idleLine = useIdleLine(currentQ);
+
   return (
     <div className="relative z-10 flex flex-col h-full">
       {/* 上一題 */}
@@ -303,12 +291,9 @@ function QuestionView({
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條 + 氣泡在 Q 上方 */}
+        {/* 手機版：進度條在 Q 上方，氣泡在角色上方 */}
         <div className="md:hidden mb-1.5">
-          <ProgressBar current={currentQ} />
-          <div className="relative h-0">
-            <IdleBubble currentQ={currentQ} tailDirection="up" />
-          </div>
+          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
         </div>
 
         {/* Q 號碼 */}
@@ -350,12 +335,9 @@ function QuestionView({
           ))}
         </div>
 
-        {/* 電腦版：進度條 + 氣泡在選項下方 */}
+        {/* 電腦版：進度條在選項下方，氣泡在角色下方 */}
         <div className="hidden md:block mt-6">
-          <ProgressBar current={currentQ} />
-          <div className="relative h-[60px]">
-            <IdleBubble currentQ={currentQ} tailDirection="down" />
-          </div>
+          <ProgressBar current={currentQ} idleLine={idleLine} />
         </div>
       </div>
 
