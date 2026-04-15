@@ -75,6 +75,7 @@ const Events = lazyWithRetry(() => import('./pages/Events'));
 const EventDetail = lazyWithRetry(() => import('./pages/EventDetail'));
 const SoulGuitarInfo = lazyWithRetry(() => import('./pages/SoulGuitarInfo'));
 const SoulGuitarQuiz = lazyWithRetry(() => import('./pages/SoulGuitarQuiz'));
+const SoulGuitarResult = lazyWithRetry(() => import('./pages/SoulGuitarResult'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -137,6 +138,7 @@ function EventLandingLayout() {
   const location = useLocation();
   const isSoulGuitarInfo = location.pathname === '/e/soul-guitar/info';
   const isSoulGuitarQuiz = location.pathname === '/e/soul-guitar';
+  const isSoulGuitarResult = location.pathname.startsWith('/e/soul-guitar/') && !isSoulGuitarInfo;
 
   useEffect(() => {
     if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
@@ -147,6 +149,15 @@ function EventLandingLayout() {
     return (
       <Suspense fallback={<PageLoader />}>
         <SoulGuitarQuiz />
+      </Suspense>
+    );
+  }
+
+  // Soul Guitar result page — fullscreen, no navbar/footer
+  if (isSoulGuitarResult) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <SoulGuitarResult />
       </Suspense>
     );
   }

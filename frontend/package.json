@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
+    "postbuild": "tsx scripts/inject-event-og.ts",
     "images:optimize": "tsx scripts/optimize-images.ts",
-    "build:full": "tsx scripts/optimize-images.ts && tsx scripts/generate-sitemap.ts && vite build",
+    "build:full": "tsx scripts/optimize-images.ts && tsx scripts/generate-sitemap.ts && vite build && tsx scripts/inject-event-og.ts",
     "sitemap": "tsx scripts/generate-sitemap.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist",
