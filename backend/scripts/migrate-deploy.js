@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Prisma 迁移部署脚本（Node.js 版本）
- * 解决 Neon 连接池超时问题
+ * 解决 Neon 连接池超时问题，自動處理 P3009 failed migration
  */
 
 const { execSync } = require('child_process');
@@ -14,69 +14,56 @@ function sleep(ms) {
 }
 
 /**
- * Detect Prisma P3009 (failed migration in DB) and mark each failed
- * migration as rolled-back so migrate deploy can re-run it.
- * Safe because all our migration SQL uses IF NOT EXISTS.
+ * If migrate deploy fails with P3009, extract the failed migration name
+ * from the error message and mark it as rolled-back, then return true
+ * so the caller can retry.
+ *
+ * Error message format from Prisma:
+ *   The `20260415000000_add_event_metadata` migration started at ... failed
  */
-function resolveFailedMigrations() {
-  let output = '';
-  try {
-    execSync('npx prisma migrate status', {
-      env: process.env,
-      timeout: 30000,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-  } catch (err) {
-    output = (err.stdout || '').toString() + (err.stderr || '').toString();
+function tryResolveP3009(errorOutput) {
+  if (!errorOutput.includes('P3009') && !errorOutput.includes('failed migrations')) {
+    return false;
   }
 
-  if (!output.includes('failed')) return;
+  // Extract migration name from: The `<name>` migration started at ...
+  const match = /The `([\w]+)` migration/.exec(errorOutput);
+  if (!match) {
+    console.warn('⚠️  P3009 detected but could not extract migration name');
+    return false;
+  }
 
-  // Extract migration names from lines like:
-  //   • 20260415000000_add_event_metadata   (failed)
-  const failedPattern = /[•*]\s+([\w]+)\s+.*failed/g;
-  let match;
-  while ((match = failedPattern.exec(output)) !== null) {
-    const name = match[1];
-    console.log(`⚠️  Resolving failed migration: ${name}`);
-    try {
-      execSync(`npx prisma migrate resolve --rolled-back "${name}"`, {
-        stdio: 'inherit',
-        env: process.env,
-        timeout: 30000,
-      });
-      console.log(`✅ Marked ${name} as rolled-back`);
-    } catch (resolveErr) {
-      console.warn(`⚠️  Could not resolve ${name}: ${resolveErr.message}`);
-    }
+  const name = match[1];
+  console.log(`⚠️  P3009: resolving failed migration "${name}"...`);
+  try {
+    execSync(`npx prisma migrate resolve --rolled-back "${name}"`, {
+      stdio: 'inherit',
+      env: process.env,
+      timeout: 30000,
+    });
+    console.log(`✅ Marked "${name}" as rolled-back`);
+    return true;
+  } catch (resolveErr) {
+    console.warn(`⚠️  Could not resolve "${name}": ${resolveErr.message}`);
+    return false;
   }
 }
 
 async function runMigration() {
   const databaseUrl = process.env.DATABASE_URL;
-  
+
   if (!databaseUrl) {
     console.error('❌ DATABASE_URL is not set');
     process.exit(1);
   }
 
   // 如果有 DIRECT_DATABASE_URL，优先使用它（用于迁移）
-  // 否则直接使用 DATABASE_URL（Prisma 5.x 可以处理 pooler URL）
   if (process.env.DIRECT_DATABASE_URL) {
     console.log('✅ Using DIRECT_DATABASE_URL for migration');
     process.env.DATABASE_URL = process.env.DIRECT_DATABASE_URL;
   } else {
-    console.log('ℹ️  Using DATABASE_URL for migration (Prisma 5.x supports pooler URLs)');
+    console.log('ℹ️  Using DATABASE_URL for migration');
   }
-
-  // Prisma 5.22.0+ 不再需要 PRISMA_MIGRATE_SKIP_GENERATE
-  // 因为我们在构建阶段已经运行了 prisma generate
-
-  // P3009: resolve any previously failed migrations before deploying.
-  // This happens when a past deploy ran the SQL partially then crashed.
-  // Since our migration SQL is idempotent (uses IF NOT EXISTS), it is
-  // safe to mark it as rolled-back so Prisma will re-run it cleanly.
-  resolveFailedMigrations();
 
   let retryCount = 0;
   let success = false;
@@ -94,6 +81,14 @@ async function runMigration() {
       console.log('✅ Migration deployed successfully');
       success = true;
     } catch (error) {
+      const errorOutput = (error.message || '') + (error.stderr ? error.stderr.toString() : '') + (error.stdout ? error.stdout.toString() : '');
+
+      // P3009: failed migration in DB — resolve and retry immediately (don't count as a retry)
+      if (tryResolveP3009(errorOutput)) {
+        retryCount--; // don't consume a retry slot
+        continue;
+      }
+
       if (retryCount < MAX_RETRIES) {
         console.error(`❌ Migration failed: ${error.message}`);
         console.log(`🔄 Retrying in ${RETRY_DELAY / 1000} seconds...`);
@@ -117,4 +112,3 @@ runMigration().catch(error => {
   console.error('❌ Fatal error:', error);
   process.exit(1);
 });
-
