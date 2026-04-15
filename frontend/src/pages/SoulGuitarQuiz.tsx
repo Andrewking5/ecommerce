@@ -935,9 +935,9 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
           transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={result.charImg} alt={result.name} className="w-[75%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-left.webp`} alt="" className="absolute left-0 top-[10%] w-[20%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="absolute right-0 top-[20%] w-[20%] h-auto object-contain" draggable={false} />
+          <img src={result.charImg} alt={result.name} className="relative z-0 w-[82%] h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-left.webp`} alt="" className="absolute z-10 left-0 top-[10%] w-[14%] h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="absolute z-10 right-0 top-[20%] w-[14%] h-auto object-contain" draggable={false} />
         </motion.div>
 
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
