@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import {
   LayoutDashboard, ShoppingBag, Box, Users, Search, Bell, User,
-  ChevronRight, TrendingUp, BarChart3, Package, Plus,
+  ChevronLeft, ChevronRight, TrendingUp, BarChart3, Package, Plus,
   Trash2, RefreshCw, Edit, AlertTriangle, CheckCircle, XCircle,
   Upload, Download, FileSpreadsheet, X, Image, ChevronUp, ChevronDown,
   Eye, EyeOff, Save, MessageSquare, Star, Ticket, Megaphone, CalendarDays,
@@ -2356,7 +2356,7 @@ function EventsTab() {
   const [analytics, setAnalytics] = useState<EventAnalytics | null>(null);
   const [analyticsEvent, setAnalyticsEvent] = useState<EventType | null>(null);
   const [quizData, setQuizData] = useState<QuizAnalytics | null>(null);
-  const [quizPanel, setQuizPanel] = useState(false);
+  const [quizFullPage, setQuizFullPage] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -2443,7 +2443,7 @@ function EventsTab() {
   const handleViewAnalytics = async (event: EventType) => {
     // Soul Guitar quiz event → show full quiz analytics panel
     if (event.slug.startsWith('soul-guitar')) {
-      setQuizPanel(true);
+      setQuizFullPage(true);
       setQuizData(null);
       try {
         const data = await quizService.getAnalytics();
@@ -2512,6 +2512,19 @@ function EventsTab() {
   };
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
+
+  if (quizFullPage) {
+    return (
+      <QuizFullPage
+        data={quizData}
+        onBack={() => setQuizFullPage(false)}
+        onRefresh={async () => {
+          setQuizData(null);
+          try { setQuizData(await quizService.getAnalytics()); } catch { /* silent */ }
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -2645,118 +2658,6 @@ function EventsTab() {
               >
                 {copiedId === viewingQr.id ? <><Check size={12} /> 已複製</> : <><Copy size={12} /> 複製連結</>}
               </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* ── Quiz Analytics Full Panel ── */}
-      {quizPanel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setQuizPanel(false)}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto"
-            style={{ background: ESPRESSO_DARK }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-7 py-5 border-b border-white/5" style={{ background: ESPRESSO_DARK }}>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">吉他靈魂測驗 — 數據分析</h3>
-                <p className="text-[11px] text-white/30 mt-0.5">統計自測驗上線以來所有完成結果</p>
-              </div>
-              <button onClick={() => setQuizPanel(false)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
-            </div>
-            <div className="p-7">
-              {!quizData ? (
-                <div className="py-16 text-center"><GuitarSunLoader size={24} /></div>
-              ) : (
-                <div className="space-y-6">
-                  {/* KPI */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatCard title="總完成次數" value={quizData.total.toString()} />
-                    <StatCard
-                      title="最多人的結果"
-                      value={quizData.byResult[0] ? (RESULT_EMOJI[quizData.byResult[0].slug] + ' ' + quizData.byResult[0].label.split(' ')[0]) : '—'}
-                      sub={quizData.byResult[0] ? `${quizData.byResult[0].count} 次` : ''}
-                    />
-                    <StatCard
-                      title="手機用戶"
-                      value={`${Math.round(((quizData.byDevice.find(d => d.device === 'mobile')?.count ?? 0) / Math.max(quizData.total, 1)) * 100)}%`}
-                    />
-                    <StatCard
-                      title="電腦用戶"
-                      value={`${Math.round(((quizData.byDevice.find(d => d.device === 'desktop')?.count ?? 0) / Math.max(quizData.total, 1)) * 100)}%`}
-                    />
-                  </div>
-
-                  {/* Result breakdown bars */}
-                  <Card title="各結果人數分布">
-                    {quizData.byResult.length === 0 ? (
-                      <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
-                    ) : (
-                      <div className="p-5 space-y-3">
-                        {quizData.byResult.map((r) => {
-                          const pct = quizData.total > 0 ? (r.count / quizData.total) * 100 : 0;
-                          return (
-                            <div key={r.slug} className="flex items-center gap-3">
-                              <span className="text-xs w-32 shrink-0 text-white/60">{RESULT_EMOJI[r.slug]} {r.label}</span>
-                              <div className="flex-1 bg-white/5 rounded-full h-4 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: RESULT_COLORS[r.slug] || '#888' }} />
-                              </div>
-                              <span className="text-[11px] text-white/40 w-16 text-right shrink-0">{r.count} ({pct.toFixed(1)}%)</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </Card>
-
-                  {/* Bar chart */}
-                  <Card title="結果長條圖">
-                    {quizData.byResult.length === 0 ? (
-                      <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
-                    ) : (
-                      <div className="px-4 py-4">
-                        <ResponsiveContainer width="100%" height={200}>
-                          <BarChart data={quizData.byResult} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                            <XAxis dataKey="slug" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} tickFormatter={(v: string) => RESULT_EMOJI[v] ?? v} />
-                            <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
-                            <Tooltip
-                              contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }}
-                              labelStyle={{ color: '#d4a84b' }}
-                              itemStyle={{ color: 'rgba(255,255,255,0.7)' }}
-                              labelFormatter={(v: string) => quizData.byResult.find(r => r.slug === v)?.label ?? v}
-                            />
-                            <Bar dataKey="count" name="完成人數" radius={[4, 4, 0, 0]}>
-                              {quizData.byResult.map((r) => <Cell key={r.slug} fill={RESULT_COLORS[r.slug] || '#d4a84b'} />)}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    )}
-                  </Card>
-
-                  {/* Daily trend */}
-                  <Card title="每日完成趨勢（近 30 天）">
-                    {quizData.daily.length === 0 ? (
-                      <EmptyChart icon={<TrendingUp size={40} />} message="近 30 天無數據" />
-                    ) : (
-                      <div className="px-4 py-4">
-                        <ResponsiveContainer width="100%" height={180}>
-                          <BarChart data={quizData.daily} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                            <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
-                            <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
-                            <Tooltip contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
-                            <Bar dataKey="count" name="完成次數" fill="#d4a84b" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    )}
-                  </Card>
-                </div>
-              )}
             </div>
           </motion.div>
         </div>
@@ -3176,139 +3077,251 @@ const RESULT_EMOJI: Record<string, string> = {
   wave: '🌊', 'deep-sea': '🫧', moon: '🌙', 'dream-moon': '🌙',
 };
 
-function QuizAnalyticsTab() {
-  const [data, setData] = useState<QuizAnalytics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+/* ── Quiz character meta (used only in analytics) ── */
+const QUIZ_CHAR_META: Record<string, { soul: string; dim: string; tag: string; city: string; music: string; compatible: string }> = {
+  fire:         { soul: 'FIRE', dim: '自由', tag: '帶著能量的人',       city: '台中',   music: 'Rock / Blues / Rhythm Guitar',   compatible: '月光' },
+  fireworks:    { soul: 'FIRE', dim: '故事', tag: '帶著火花的創作者',   city: '高雄',   music: 'Fingerstyle / Jazz / R&B',         compatible: '深海' },
+  sun:          { soul: 'SUN',  dim: '自由', tag: '溫暖又有行動力的人', city: '台南',   music: 'Acoustic Pop / Bossa Nova',        compatible: '微光' },
+  glow:         { soul: 'SUN',  dim: '故事', tag: '細膩又善解人意的人', city: '桃園',   music: 'Indie Folk / Soft Rock',           compatible: '太陽' },
+  wave:         { soul: 'WAVE', dim: '自由', tag: '自由奔放的靈魂',     city: '宜蘭',   music: 'Surf / World / Reggae',            compatible: '深海' },
+  'deep-sea':   { soul: 'WAVE', dim: '故事', tag: '深沉神秘的觀察者',   city: '基隆',   music: 'Post-Rock / Ambient / Jazz',       compatible: '海浪' },
+  moon:         { soul: 'MOON', dim: '故事', tag: '浪漫感性的思考者',   city: '新竹',   music: 'Neo Soul / Ballad / Classical',    compatible: '火焰' },
+  'dream-moon': { soul: 'MOON', dim: '自由', tag: '夢幻創意的想像家',   city: '花蓮',   music: 'Dream Pop / Shoegaze / Lo-fi',     compatible: '煙火' },
+};
 
-  useEffect(() => {
-    quizService.getAnalytics()
-      .then((d) => { setData(d); setLoading(false); })
-      .catch(() => { setError(true); setLoading(false); });
-  }, []);
+const SOUL_GROUP: Record<string, { label: string; emoji: string; color: string; slugs: string[] }> = {
+  FIRE:  { label: '火焰系',   emoji: '🔥', color: '#E04040', slugs: ['fire', 'fireworks'] },
+  SUN:   { label: '太陽系',   emoji: '☀️', color: '#F5C842', slugs: ['sun', 'glow'] },
+  WAVE:  { label: '海浪系',   emoji: '🌊', color: '#40C0E0', slugs: ['wave', 'deep-sea'] },
+  MOON:  { label: '月光系',   emoji: '🌙', color: '#9080C0', slugs: ['moon', 'dream-moon'] },
+};
 
-  if (loading) return <Spinner />;
-  if (error || !data) return (
-    <div className="py-20 text-center text-white/30 text-sm">無法載入數據</div>
-  );
+function QuizFullPage({ data, onBack, onRefresh }: {
+  data: QuizAnalytics | null;
+  onBack: () => void;
+  onRefresh: () => void;
+}) {
+  const total = data?.total ?? 0;
 
-  const topResult = data.byResult[0];
+  // Soul group counts
+  const soulCounts = data ? Object.entries(SOUL_GROUP).map(([key, g]) => ({
+    ...g, key,
+    count: g.slugs.reduce((s, sl) => s + (data.byResult.find(r => r.slug === sl)?.count ?? 0), 0),
+  })) : [];
+
+  // Dimension counts
+  const freeCount  = data ? ['fire','sun','wave','dream-moon'].reduce((s, sl) => s + (data.byResult.find(r => r.slug === sl)?.count ?? 0), 0) : 0;
+  const storyCount = data ? ['fireworks','glow','deep-sea','moon'].reduce((s, sl) => s + (data.byResult.find(r => r.slug === sl)?.count ?? 0), 0) : 0;
+
+  const dailyAvg = data && data.daily.length > 0
+    ? (total / data.daily.length).toFixed(1)
+    : '—';
+
+  const tooltipStyle = { background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 };
 
   return (
-    <div className="space-y-8 max-w-5xl">
-      <div>
-        <h2 className="text-xl font-bold text-ayers-gold tracking-wide">吉他靈魂測驗 — 數據分析</h2>
-        <p className="text-xs text-white/30 mt-1">統計自測驗上線以來所有完成結果</p>
-      </div>
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="space-y-8">
 
-      {/* ─ KPI ─ */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard title="總完成次數" value={data.total.toString()} />
-        <StatCard
-          title="最多人的結果"
-          value={topResult ? (RESULT_EMOJI[topResult.slug] + ' ' + topResult.label.split(' ')[0]) : '—'}
-          sub={topResult ? `${topResult.count} 次` : ''}
-        />
-        <StatCard
-          title="手機用戶"
-          value={`${Math.round(((data.byDevice.find(d => d.device === 'mobile')?.count ?? 0) / Math.max(data.total, 1)) * 100)}%`}
-        />
-        <StatCard
-          title="電腦用戶"
-          value={`${Math.round(((data.byDevice.find(d => d.device === 'desktop')?.count ?? 0) / Math.max(data.total, 1)) * 100)}%`}
-        />
-      </div>
-
-      {/* ─ Result breakdown ─ */}
-      <Card title="各結果人數分布">
-        {data.byResult.length === 0 ? (
-          <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
-        ) : (
-          <div className="space-y-3 pt-2">
-            {data.byResult.map((r) => {
-              const pct = data.total > 0 ? (r.count / data.total) * 100 : 0;
-              return (
-                <div key={r.slug} className="flex items-center gap-3">
-                  <span className="text-sm w-36 shrink-0 text-white/70">{RESULT_EMOJI[r.slug]} {r.label}</span>
-                  <div className="flex-1 bg-white/5 rounded-full h-5 overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{ width: `${pct}%`, background: RESULT_COLORS[r.slug] || '#888' }}
-                    />
-                  </div>
-                  <span className="text-xs text-white/50 w-16 text-right shrink-0">
-                    {r.count} ({pct.toFixed(1)}%)
-                  </span>
-                </div>
-              );
-            })}
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-white/40 hover:text-white transition-colors text-xs">
+            <ChevronLeft size={14} /> 活動管理
+          </button>
+          <div className="w-px h-4 bg-white/10" />
+          <div>
+            <h2 className="text-xl font-bold text-ayers-gold tracking-wide">🎸 吉他靈魂測驗 — 數據分析</h2>
+            <p className="text-[11px] text-white/30 mt-0.5">統計所有測驗完成結果 · 共 8 種角色</p>
           </div>
-        )}
-      </Card>
-
-      {/* ─ Bar chart by result ─ */}
-      <Card title="結果長條圖">
-        {data.byResult.length === 0 ? (
-          <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
-        ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={data.byResult} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis
-                dataKey="slug"
-                tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }}
-                tickFormatter={(v: string) => RESULT_EMOJI[v] ?? v}
-              />
-              <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }}
-                labelStyle={{ color: '#d4a84b' }}
-                itemStyle={{ color: 'rgba(255,255,255,0.7)' }}
-                labelFormatter={(v: string) => data.byResult.find(r => r.slug === v)?.label ?? v}
-              />
-              <Bar dataKey="count" name="完成人數" radius={[4, 4, 0, 0]}>
-                {data.byResult.map((r) => (
-                  <Cell key={r.slug} fill={RESULT_COLORS[r.slug] || '#d4a84b'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      {/* ─ Daily trend ─ */}
-      <Card title="每日完成趨勢（近 30 天）">
-        {data.daily.length === 0 ? (
-          <EmptyChart icon={<TrendingUp size={40} />} message="近 30 天無數據" />
-        ) : (
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={data.daily} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
-              <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }}
-                labelStyle={{ color: '#d4a84b' }}
-                itemStyle={{ color: 'rgba(255,255,255,0.7)' }}
-              />
-              <Bar dataKey="count" name="完成次數" fill="#d4a84b" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      {/* ─ Device breakdown ─ */}
-      <Card title="裝置分布">
-        <div className="flex flex-wrap gap-4 pt-2">
-          {data.byDevice.map((d) => (
-            <div key={d.device} className="flex-1 min-w-[120px] rounded-xl p-4" style={{ background: CARD_BG }}>
-              <p className="text-2xl font-bold text-ayers-gold">{d.count}</p>
-              <p className="text-xs text-white/40 mt-1 capitalize">{d.device}</p>
-            </div>
-          ))}
         </div>
-      </Card>
-    </div>
+        <button onClick={onRefresh} className="flex items-center gap-1.5 text-white/30 hover:text-white transition-colors text-xs">
+          <RefreshCw size={13} /> 重新整理
+        </button>
+      </div>
+
+      {!data ? (
+        <div className="py-32 text-center"><GuitarSunLoader size={28} /></div>
+      ) : (
+        <>
+          {/* ── KPI row ── */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <StatCard title="總完成次數" value={total.toString()} />
+            <StatCard
+              title="最熱門角色"
+              value={data.byResult[0] ? RESULT_EMOJI[data.byResult[0].slug] + ' ' + data.byResult[0].label.split(' ')[0] : '—'}
+              sub={data.byResult[0] ? `${data.byResult[0].count} 次 (${total > 0 ? ((data.byResult[0].count/total)*100).toFixed(1) : 0}%)` : ''}
+            />
+            <StatCard title="每日平均" value={dailyAvg === '—' ? '—' : `${dailyAvg} 次`} sub="近 30 天" />
+            <StatCard
+              title="手機用戶"
+              value={`${Math.round(((data.byDevice.find(d => d.device === 'mobile')?.count ?? 0) / Math.max(total, 1)) * 100)}%`}
+            />
+            <StatCard
+              title="電腦用戶"
+              value={`${Math.round(((data.byDevice.find(d => d.device === 'desktop')?.count ?? 0) / Math.max(total, 1)) * 100)}%`}
+            />
+          </div>
+
+          {/* ── Soul type groups ── */}
+          <div>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-3">靈魂類型分布</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {soulCounts.map((g) => {
+                const pct = total > 0 ? (g.count / total) * 100 : 0;
+                return (
+                  <div key={g.key} className="rounded-2xl p-5 border border-white/5 relative overflow-hidden" style={{ background: CARD_BG }}>
+                    <div className="absolute inset-0 opacity-10 rounded-2xl" style={{ background: `radial-gradient(circle at top right, ${g.color}, transparent 70%)` }} />
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-2xl">{g.emoji}</span>
+                        <span className="text-xs font-bold" style={{ color: g.color }}>{pct.toFixed(1)}%</span>
+                      </div>
+                      <p className="text-2xl font-bold text-white">{g.count}</p>
+                      <p className="text-xs text-white/40 mt-1">{g.label}</p>
+                      <div className="mt-3 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: g.color }} />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Dimension: 自由 vs 故事 ── */}
+          <Card title="維度分析 — 自由型 vs 故事型">
+            <div className="p-5 space-y-4">
+              {[
+                { label: '🌊 自由型', count: freeCount, color: '#40C0E0', desc: '跟著感覺走、行動派' },
+                { label: '📖 故事型', count: storyCount, color: '#C080A0', desc: '有情感深度、記憶驅動' },
+              ].map((d) => {
+                const pct = total > 0 ? (d.count / total) * 100 : 0;
+                return (
+                  <div key={d.label}>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-sm text-white/70">{d.label} <span className="text-white/30 text-xs">· {d.desc}</span></span>
+                      <span className="text-xs text-white/50">{d.count} 人 ({pct.toFixed(1)}%)</span>
+                    </div>
+                    <div className="bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: d.color }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* ── All 8 results ranking ── */}
+          <Card title="8 種角色完整排行">
+            <div className="divide-y divide-white/5">
+              {data.byResult.length === 0 ? (
+                <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
+              ) : (
+                data.byResult.map((r, i) => {
+                  const pct = total > 0 ? (r.count / total) * 100 : 0;
+                  const meta = QUIZ_CHAR_META[r.slug];
+                  return (
+                    <div key={r.slug} className="flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors">
+                      <span className="text-lg font-bold w-6 text-center" style={{ color: i < 3 ? '#d4a84b' : 'rgba(255,255,255,0.15)' }}>
+                        {i + 1}
+                      </span>
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-base shrink-0"
+                        style={{ background: `${RESULT_COLORS[r.slug]}22`, border: `1.5px solid ${RESULT_COLORS[r.slug]}66` }}>
+                        {RESULT_EMOJI[r.slug]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-white/80">{r.label}</span>
+                          {meta && <span className="text-[10px] text-white/30 truncate">· {meta.tag}</span>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden max-w-[200px]">
+                            <div className="h-full rounded-full" style={{ width: `${pct}%`, background: RESULT_COLORS[r.slug] || '#888' }} />
+                          </div>
+                          {meta && <span className="text-[10px] text-white/25 hidden sm:block">{meta.city} · {meta.music}</span>}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold" style={{ color: RESULT_COLORS[r.slug] }}>{r.count}</p>
+                        <p className="text-[10px] text-white/30">{pct.toFixed(1)}%</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </Card>
+
+          {/* ── Charts row ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Bar chart */}
+            <Card title="結果長條圖">
+              {data.byResult.length === 0 ? (
+                <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
+              ) : (
+                <div className="px-4 py-4">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={data.byResult} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis dataKey="slug" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} tickFormatter={(v: string) => RESULT_EMOJI[v] ?? v} />
+                      <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} labelFormatter={(v: string) => data.byResult.find(r => r.slug === v)?.label ?? v} />
+                      <Bar dataKey="count" name="完成人數" radius={[4, 4, 0, 0]}>
+                        {data.byResult.map((r) => <Cell key={r.slug} fill={RESULT_COLORS[r.slug] || '#d4a84b'} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </Card>
+
+            {/* Device breakdown */}
+            <Card title="裝置分布">
+              {data.byDevice.length === 0 ? (
+                <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
+              ) : (
+                <div className="p-5 space-y-4">
+                  {data.byDevice.map((d) => {
+                    const pct = total > 0 ? (d.count / total) * 100 : 0;
+                    const icon = d.device === 'mobile' ? '📱' : d.device === 'tablet' ? '📟' : '💻';
+                    return (
+                      <div key={d.device}>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-sm text-white/70 capitalize">{icon} {d.device}</span>
+                          <span className="text-xs text-white/50">{d.count} ({pct.toFixed(1)}%)</span>
+                        </div>
+                        <div className="bg-white/5 rounded-full h-3 overflow-hidden">
+                          <div className="h-full rounded-full bg-ayers-gold/60" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          {/* ── Daily trend ── */}
+          <Card title="每日完成趨勢（近 30 天）">
+            {data.daily.length === 0 ? (
+              <EmptyChart icon={<TrendingUp size={40} />} message="近 30 天無數據" />
+            ) : (
+              <div className="px-4 py-4">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={data.daily} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
+                    <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                    <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+                    <Bar dataKey="count" name="完成次數" fill="#d4a84b" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
+        </>
+      )}
+    </motion.div>
   );
 }
 
