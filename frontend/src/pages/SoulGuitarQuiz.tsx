@@ -928,16 +928,17 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 角色圖 ─── */}
-        <motion.img
-          src={result.charImg}
-          alt={result.name}
-          className="mt-4 w-[60%] h-auto object-contain"
+        {/* ─── 角色圖 + 兩側文字 ─── */}
+        <motion.div
+          className="mt-4 w-full flex items-center justify-center gap-1"
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
           transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          draggable={false}
-        />
+        >
+          <img src={`${RF}/char-left.webp`} alt="" className="w-[18%] h-auto object-contain" draggable={false} />
+          <img src={result.charImg} alt={result.name} className="w-[55%] h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="w-[18%] h-auto object-contain" draggable={false} />
+        </motion.div>
 
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
         <motion.div
@@ -951,18 +952,18 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/personality-card.webp`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
         </motion.div>
 
-        {/* 你聽出來了嗎 — blur 解除 + scale */}
+        {/* 城市卡 — clipPath 揭露 */}
         <motion.div
-          className="mt-8 w-[85%]"
-          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true, margin: '-40px', root: scrollRef }}
-          transition={{ duration: 0.6 }}
+          className="mt-8 w-full overflow-hidden rounded-xl"
+          initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
+          whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
+          viewport={{ once: true, margin: '-50px', root: scrollRef }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 猜猜這是哪 + 城市卡 ─── */}
+        {/* ─── ↑↑ 猜猜這是哪 ─── */}
         <motion.div
           className="mt-5 w-[50%]"
           initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
@@ -971,16 +972,6 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           transition={{ duration: 0.5 }}
         >
           <img src={`${RF}/text-guess.webp`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
-        </motion.div>
-        {/* 城市卡 — clipPath 揭露 */}
-        <motion.div
-          className="mt-3 w-full overflow-hidden rounded-xl"
-          initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
-          whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
-          viewport={{ once: true, margin: '-50px', root: scrollRef }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* 這樣的你，會發出什麼樣的聲音？ — blur 解除 */}
@@ -1031,21 +1022,22 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/title-ayers.webp`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* 兩把吉他 — 左右各自從側邊滑入 */}
-        <div className="mt-5 w-full grid grid-cols-2 gap-4">
+        {/* 兩把吉他 — 標題 + 圖 + 按鈕，左右對稱對齊 */}
+        <div className="mt-5 w-full grid grid-cols-2 gap-4 items-stretch">
           {[1, 2].map(i => (
             <motion.div
               key={i}
-              className="flex flex-col items-center gap-3"
+              className="flex flex-col items-center justify-between gap-3"
               initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-40px', root: scrollRef }}
               transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
+              <img src={`${RF}/guitar-title-${i}.webp`} alt="" className="w-[70%] h-auto" draggable={false} />
               <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
               <motion.button
                 type="button"
-                className="w-[80%]"
+                className="w-[90%]"
                 whileTap={{ scale: 0.93 }}
               >
                 <img src={`${RF}/btn-unlock-${i}.webp`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
@@ -1053,6 +1045,17 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
             </motion.div>
           ))}
         </div>
+
+        {/* 你聽出來了嗎 — 吉他下方 */}
+        <motion.div
+          className="mt-8 w-[85%]"
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-40px', root: scrollRef }}
+          transition={{ duration: 0.6 }}
+        >
+          <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+        </motion.div>
 
         {/* ─── 靈魂顏色 — 光暈脈動 ─── */}
         <motion.div
