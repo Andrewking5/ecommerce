@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 
 /* ──────────────────────────────────────
@@ -481,6 +481,27 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
   );
 }
 
+/* ── 統一載入畫面（與測驗頁同款） ── */
+function ResultLoadingScreen() {
+  return (
+    <motion.div
+      className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-[#f5f0e8]"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <img src={`${BASE}/loading.webp`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
+      <motion.p
+        className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest"
+        style={{ fontFamily: QUIZ_FONT }}
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        正在為你準備結果⋯
+      </motion.p>
+    </motion.div>
+  );
+}
+
 /* ──────────────────────────────────────
    頁面進入點 — 讀 URL slug → 渲染結果
    ────────────────────────────────────── */
@@ -488,21 +509,36 @@ export default function SoulGuitarResult() {
   const { pathname } = useLocation();
   const slug = pathname.replace('/e/soul-guitar/', '').replace(/\/$/, '');
   const resultKey = SLUG_TO_KEY[slug];
+  const [isLoading, setIsLoading] = useState(true);
+
+  const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
+
+  useEffect(() => {
+    if (!folder) return;
+    const RF = `${BASE}/result/${folder}`;
+    const min = new Promise(r => setTimeout(r, 1500));
+    const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
+      f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}`; }),
+    );
+    Promise.all([min, ...assets]).then(() => setIsLoading(false));
+  }, [folder]);
 
   if (!resultKey || !RESULTS[resultKey]) {
     return <Navigate to="/e/soul-guitar" replace />;
   }
 
   const resultData = RESULTS[resultKey];
-  const folder = RESULT_FOLDER[resultKey];
 
   return (
     <div
       className="w-full min-h-dvh relative flex justify-center"
       style={{ background: `linear-gradient(180deg, ${resultData.themeColor}30 0%, #111 40%)` }}
     >
+      <AnimatePresence>
+        {isLoading && <ResultLoadingScreen key="result-loading" />}
+      </AnimatePresence>
       <div className="w-full max-w-[430px] relative min-h-dvh">
-        <FullResultPage resultKey={resultKey} folder={folder} />
+        <FullResultPage resultKey={resultKey} folder={RESULT_FOLDER[resultKey]} />
       </div>
     </div>
   );
