@@ -1057,27 +1057,6 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           ))}
         </div>
 
-        {/* ─── 靈魂顏色光暈 ─── */}
-        <motion.div
-          className="mt-10 w-20 h-20 rounded-full relative flex items-center justify-center"
-          initial={{ opacity: 0, scale: 0.85 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, root: scrollRef }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            style={{ background: result.themeColor }}
-            animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute -inset-6 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${result.themeColor}50 0%, transparent 70%)` }}
-            animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </motion.div>
 
         <motion.div
           className="mt-3 w-[85%]"
