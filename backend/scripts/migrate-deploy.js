@@ -13,6 +13,45 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Detect Prisma P3009 (failed migration in DB) and mark each failed
+ * migration as rolled-back so migrate deploy can re-run it.
+ * Safe because all our migration SQL uses IF NOT EXISTS.
+ */
+function resolveFailedMigrations() {
+  let output = '';
+  try {
+    execSync('npx prisma migrate status', {
+      env: process.env,
+      timeout: 30000,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  } catch (err) {
+    output = (err.stdout || '').toString() + (err.stderr || '').toString();
+  }
+
+  if (!output.includes('failed')) return;
+
+  // Extract migration names from lines like:
+  //   • 20260415000000_add_event_metadata   (failed)
+  const failedPattern = /[•*]\s+([\w]+)\s+.*failed/g;
+  let match;
+  while ((match = failedPattern.exec(output)) !== null) {
+    const name = match[1];
+    console.log(`⚠️  Resolving failed migration: ${name}`);
+    try {
+      execSync(`npx prisma migrate resolve --rolled-back "${name}"`, {
+        stdio: 'inherit',
+        env: process.env,
+        timeout: 30000,
+      });
+      console.log(`✅ Marked ${name} as rolled-back`);
+    } catch (resolveErr) {
+      console.warn(`⚠️  Could not resolve ${name}: ${resolveErr.message}`);
+    }
+  }
+}
+
 async function runMigration() {
   const databaseUrl = process.env.DATABASE_URL;
   
@@ -33,6 +72,12 @@ async function runMigration() {
   // Prisma 5.22.0+ 不再需要 PRISMA_MIGRATE_SKIP_GENERATE
   // 因为我们在构建阶段已经运行了 prisma generate
 
+  // P3009: resolve any previously failed migrations before deploying.
+  // This happens when a past deploy ran the SQL partially then crashed.
+  // Since our migration SQL is idempotent (uses IF NOT EXISTS), it is
+  // safe to mark it as rolled-back so Prisma will re-run it cleanly.
+  resolveFailedMigrations();
+
   let retryCount = 0;
   let success = false;
 
@@ -41,11 +86,10 @@ async function runMigration() {
     console.log(`🔄 Migration attempt ${retryCount}/${MAX_RETRIES}...`);
 
     try {
-      // Prisma 5.22.0+ 不再支持 --skip-generate，因为我们已经运行了 prisma generate
       execSync('npx prisma migrate deploy', {
         stdio: 'inherit',
         env: process.env,
-        timeout: 120000, // 120秒超时（迁移可能需要更长时间）
+        timeout: 120000,
       });
       console.log('✅ Migration deployed successfully');
       success = true;
@@ -57,13 +101,10 @@ async function runMigration() {
       } else {
         console.error(`❌ Migration failed after ${MAX_RETRIES} attempts`);
         console.warn('⚠️  Migration will be skipped. You can run it manually later.');
-        // 在构建阶段，如果设置了 SKIP_MIGRATION_ON_ERROR，不退出进程，让构建继续
-        // 否则正常退出（让调用者决定如何处理）
         if (process.env.SKIP_MIGRATION_ON_ERROR === 'true') {
           console.log('ℹ️  SKIP_MIGRATION_ON_ERROR=true, continuing build...');
           process.exit(0);
         }
-        // 默认情况下，迁移失败应该退出，但可以在 Build Command 中使用 || true 来忽略
         process.exit(1);
       }
     }
