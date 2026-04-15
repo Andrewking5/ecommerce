@@ -1089,11 +1089,8 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
-          {/* 抽獎說明文字 */}
-          <p className="text-center text-sm leading-relaxed" style={{ fontFamily: QUIZ_FONT, color: result.themeColor }}>
-            分享你的測驗結果，即可參與角色小卡組抽獎！<br />
-            分享完成記得回來填Email參加抽獎哦！
-          </p>
+          {/* 抽獎說明文字 (資産 1) */}
+          <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" className="w-[85%] h-auto" draggable={false} />
 
           {/* 分享 + 再測一次 並排 */}
           <div className="w-full flex items-center gap-3">
