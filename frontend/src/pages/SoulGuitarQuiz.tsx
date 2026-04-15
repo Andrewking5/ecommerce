@@ -1083,42 +1083,52 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* ─── 底部按鈕 ─── */}
         <motion.div
-          className="mt-10 w-full flex flex-col items-center gap-3"
+          className="mt-10 w-full flex flex-col items-center gap-4"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
-          {/* 分享按鈕 — 金色呼吸光暈 */}
-          <motion.button
-            type="button"
-            onClick={handleShare}
-            className="w-[70%] relative"
-            whileTap={{ scale: 0.95 }}
-          >
-            <motion.div
-              className="absolute -inset-1 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.3) 0%, transparent 70%)' }}
-              animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.97, 1.03, 0.97] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <img src={`${RF}/btn-share.webp`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
-            {copied && (
-              <motion.span
-                className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                style={{ fontFamily: QUIZ_FONT }}
-              >
-                已複製到剪貼簿
-              </motion.span>
-            )}
-          </motion.button>
-          <motion.button type="button" onClick={onRetry} className="w-[45%]" whileTap={{ scale: 0.93 }}>
-            <img src={`${RF}/btn-retry.webp`} alt="再測一次" className="w-full h-auto" draggable={false} />
-          </motion.button>
-          <Link to="/e/soul-guitar/info" className="w-[70%] active:scale-95 transition-transform">
+          {/* 抽獎說明文字 */}
+          <p className="text-center text-sm leading-relaxed" style={{ fontFamily: QUIZ_FONT, color: result.themeColor }}>
+            分享你的測驗結果，即可參與角色小卡組抽獎！<br />
+            分享完成記得回來填Email參加抽獎哦！
+          </p>
+
+          {/* 分享 + 再測一次 並排 */}
+          <div className="w-full flex items-center gap-3">
+            <motion.button
+              type="button"
+              onClick={handleShare}
+              className="flex-1 relative"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                className="absolute -inset-1 rounded-full pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.3) 0%, transparent 70%)' }}
+                animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.97, 1.03, 0.97] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <img src={`${RF}/btn-share.webp`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
+              {copied && (
+                <motion.span
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{ fontFamily: QUIZ_FONT }}
+                >
+                  已複製到剪貼簿
+                </motion.span>
+              )}
+            </motion.button>
+            <motion.button type="button" onClick={onRetry} className="flex-1" whileTap={{ scale: 0.93 }}>
+              <img src={`${RF}/btn-retry.webp`} alt="再測一次" className="w-full h-auto" draggable={false} />
+            </motion.button>
+          </div>
+
+          {/* 前往了解大賽 — 全寬 */}
+          <Link to="/e/soul-guitar/info" className="w-full active:scale-95 transition-transform">
             <img src={`${RF}/btn-contest.webp`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
           </Link>
         </motion.div>
