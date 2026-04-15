@@ -1090,7 +1090,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           transition={{ duration: 0.5 }}
         >
           {/* 抽獎說明文字 (資産 1) */}
-          <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" className="w-[85%] h-auto" draggable={false} />
+          <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" className="w-[65%] h-auto self-start" draggable={false} />
 
           {/* 分享 + 再測一次 並排 */}
           <div className="w-full flex items-center gap-3">
