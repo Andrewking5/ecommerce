@@ -500,7 +500,7 @@ function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: b
 
   return (
     <motion.div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#f5f0e8]" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-      <motion.img src={`${BASE}/loading.png`} alt="載入中" className="w-40 h-40 object-contain" animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} draggable={false} />
+      <img src={`${BASE}/loading.webp`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
       <motion.p className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest" style={{ fontFamily: QUIZ_FONT }} animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>正在為你準備測驗⋯</motion.p>
       <motion.p
         className="mt-4 text-[#2a2a2a]/40 text-xs flex items-center gap-1.5"
@@ -624,6 +624,39 @@ function QuestionView({
       {/* 底部彈性空間 */}
       <div className="flex-1 min-h-[16px] md:flex-1" />
     </div>
+  );
+}
+
+/* ── 結果 Loading 角色對應 ── */
+const RESULT_LOADING_CHAR: Record<string, string> = {
+  FIRE_自由: '火焰',
+  SUN_自由:  '太陽',
+  SUN_故事:  '微光',
+  WAVE_自由: '海浪',
+  WAVE_故事: '深海',
+  MOON_故事: '月亮',
+  MOON_自由: '夢月',
+};
+
+function ResultLoadingScreen({ resultKey, onDone }: { resultKey: string; onDone: () => void }) {
+  const char = RESULT_LOADING_CHAR[resultKey] || '火焰';
+  useEffect(() => {
+    const t = setTimeout(onDone, 3000);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <motion.div
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <img
+        src={`/images/events/quiz/loading-${char}.webp`}
+        alt="分析中"
+        className="w-full h-full object-contain"
+        draggable={false}
+      />
+    </motion.div>
   );
 }
 
@@ -885,6 +918,16 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/text-scroll.webp`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
         </motion.div>
 
+        {/* ─── 一個讓你被聽見的機會 ─── */}
+        <motion.div
+          className="mt-5 w-[90%]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 1 : 0 }}
+          transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
+        >
+          <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
         <motion.div
           className="mt-8 w-full"
@@ -1017,16 +1060,6 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/soul-color.webp`} alt={`靈魂顏色：${result.colorName}`} className="relative w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 一個讓你被聽見的機會 ─── */}
-        <motion.div
-          className="mt-10 w-[85%]"
-          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true, root: scrollRef }}
-          transition={{ duration: 0.5 }}
-        >
-          <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
-        </motion.div>
         <motion.div
           className="mt-3 w-[85%]"
           initial={{ opacity: 0, y: 15 }}
@@ -1104,7 +1137,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
    ────────────────────────────────────── */
 export default function SoulGuitarQuiz() {
   const isDesktop = useIsDesktop();
-  const [phase, setPhase] = useState<'cover' | 'loading' | 'quiz' | 'result'>('cover');
+  const [phase, setPhase] = useState<'cover' | 'loading' | 'quiz' | 'result-loading' | 'result'>('cover');
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [tapped, setTapped] = useState<number | null>(null);
@@ -1138,10 +1171,10 @@ export default function SoulGuitarQuiz() {
       if (currentQ < questions.length - 1) {
         setCurrentQ(currentQ + 1);
       } else {
-        // 最後一題 → 計算結果
+        // 最後一題 → 計算結果 → 播角色 loading → 顯示結果
         const key = calculateResult(a);
         setResultKey(key);
-        setPhase('result');
+        setPhase('result-loading');
       }
     }, 500);
   };
@@ -1157,6 +1190,19 @@ export default function SoulGuitarQuiz() {
   };
 
   const currentBg = phase === 'quiz' ? (isDesktop ? question.bgWide : question.bg) : `${BASE}/cover-bg.webp`;
+
+  /* 結果 loading：全螢幕顯示角色動畫 */
+  if (phase === 'result-loading') {
+    return (
+      <div className="w-full min-h-dvh relative flex justify-center bg-black">
+        <div className="w-full max-w-[430px] relative min-h-dvh">
+          <AnimatePresence>
+            <ResultLoadingScreen resultKey={resultKey} onDone={() => setPhase('result')} />
+          </AnimatePresence>
+        </div>
+      </div>
+    );
+  }
 
   /* 結果頁：獨立全螢幕滾動，不需要 16:9 容器 */
   if (phase === 'result') {
