@@ -985,32 +985,6 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 你會愛上的吉他音樂風格 ─── */}
-        <motion.div
-          className="mt-6 w-[75%]"
-          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true, root: scrollRef }}
-          transition={{ duration: 0.5 }}
-        >
-          <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
-        </motion.div>
-
-        {/* 音樂風格標籤 — 逐個 stagger 從右滑入 */}
-        <div className="mt-4 w-full flex flex-col gap-2.5">
-          {[1, 2, 3, 4].map(i => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-30px', root: scrollRef }}
-              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
-            </motion.div>
-          ))}
-        </div>
-
         {/* ─── 你可能會喜歡的 Ayers 吉他款式 ─── */}
         <motion.div
           className="mt-10 w-[80%]"
@@ -1057,21 +1031,52 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 靈魂顏色 — 光暈脈動 ─── */}
+        {/* ─── 你會愛上的吉他音樂風格 ─── */}
         <motion.div
-          className="mt-10 w-[55%] relative"
+          className="mt-8 w-[75%]"
+          initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+          viewport={{ once: true, root: scrollRef }}
+          transition={{ duration: 0.5 }}
+        >
+          <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* 音樂風格標籤 */}
+        <div className="mt-4 w-full flex flex-col gap-2.5">
+          {[1, 2, 3, 4].map(i => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-30px', root: scrollRef }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* ─── 靈魂顏色光暈 ─── */}
+        <motion.div
+          className="mt-10 w-20 h-20 rounded-full relative flex items-center justify-center"
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
-            className="absolute -inset-4 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${result.themeColor}30 0%, transparent 70%)` }}
-            animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
+            className="absolute inset-0 rounded-full"
+            style={{ background: result.themeColor }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <img src={`${RF}/soul-color.webp`} alt={`靈魂顏色：${result.colorName}`} className="relative w-full h-auto" draggable={false} />
+          <motion.div
+            className="absolute -inset-6 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${result.themeColor}50 0%, transparent 70%)` }}
+            animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
         </motion.div>
 
         <motion.div
