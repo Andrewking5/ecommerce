@@ -18,11 +18,11 @@ const SIX = ['#3b82f6', '#ef4444', '#facc15', '#f97316', '#1a1a1a', '#f5f5f5'];
 const SIX_NAMES = ['藍', '紅', '黃', '橘', '黑', '白'];
 
 const JUDGES = [
-  { name: '四分衛－虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp', link: 'https://www.instagram.com/quarterback_band/' },
-  { name: 'PiA 吳蓓雅', title: '創作歌手', photo: '/images/events/judges/pia.webp', link: 'https://www.instagram.com/piaxstudio/' },
-  { name: 'JOYCE 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.webp', link: 'https://www.instagram.com/joyce.ch0627/' },
-  { name: '林小歐', title: '職業樂手', photo: '/images/events/judges/linxiaoou.webp', link: 'https://www.facebook.com/novsherry/' },
-  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.webp', link: 'https://www.facebook.com/woodywoody2g/' },
+  { name: '四分衛－虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp', link: 'https://www.instagram.com/quarterback_band/', posClass: 'object-center' },
+  { name: 'PiA 吳蓓雅', title: '創作歌手', photo: '/images/events/judges/pia.webp', link: 'https://www.instagram.com/piaxstudio/', posClass: 'object-top' },
+  { name: 'JOYCE 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.webp', link: 'https://www.instagram.com/joyce.ch0627/', posClass: 'object-center' },
+  { name: '林小歐', title: '職業樂手', photo: '/images/events/judges/linxiaoou.webp', link: 'https://www.facebook.com/novsherry/', posClass: 'object-center' },
+  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.webp', link: 'https://www.facebook.com/woodywoody2g/', posClass: 'object-top' },
 ];
 
 function Strip() {
@@ -201,11 +201,11 @@ export default function SoulGuitarInfo() {
 
           {(() => {
             const STEPS = [
-              { n: 1, icon: '🎸', title: '心理測驗', desc: '完成心理測驗，測出你的吉他靈魂' },
-              { n: 2, icon: '🎬', title: '拍攝影片', desc: '穿著自行選定的指定顏色，拍攝參賽影片' },
-              { n: 3, icon: '📱', title: '上傳影片', desc: '上傳至 YouTube（必須）及 IG / FB（擇一）' },
-              { n: 4, icon: '📝', title: '填寫表單', desc: '填寫報名表單，完成報名' },
-              { n: 5, icon: '✉️', title: '收到 Email', desc: '收到報名成功 Email，即完成參賽' },
+              { n: 1, title: '心理測驗', desc: '完成心理測驗，測出你的吉他靈魂' },
+              { n: 2, title: '拍攝影片', desc: '穿著自行選定的指定顏色，拍攝參賽影片' },
+              { n: 3, title: '上傳影片', desc: '上傳至 YouTube（必須）及 IG / FB（擇一）' },
+              { n: 4, title: '填寫表單', desc: '填寫報名表單，完成報名' },
+              { n: 5, title: '收到 Email', desc: '收到報名成功 Email，即完成參賽' },
             ];
             return (
               <>
@@ -224,8 +224,6 @@ export default function SoulGuitarInfo() {
                         <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-lg mb-2 shadow-md group-hover:scale-110 transition-transform duration-300" style={{ background: `linear-gradient(135deg, ${GOLD}, #e8b86d)` }}>
                           {step.n}
                         </div>
-                        {/* 圖示 */}
-                        <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300">{step.icon}</div>
                         <p className="text-sm font-bold text-gray-800 mb-1">{step.title}</p>
                         <p className="text-[11px] text-gray-400 leading-relaxed">{step.desc}</p>
                       </motion.div>
@@ -275,7 +273,7 @@ export default function SoulGuitarInfo() {
                       </div>
                       {/* 右側：文字 */}
                       <div className="pb-6 pt-1.5">
-                        <p className="text-sm font-bold text-gray-800 mb-0.5">{step.icon} {step.title}</p>
+                        <p className="text-sm font-bold text-gray-800 mb-0.5">{step.title}</p>
                         <p className="text-xs text-gray-400 leading-relaxed">{step.desc}</p>
                       </div>
                     </motion.div>
@@ -298,7 +296,7 @@ export default function SoulGuitarInfo() {
               <a key={j.name} href={j.link} target="_blank" rel="noopener noreferrer" className="group block">
                 <div className="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 bg-gray-800">
                   <img src={j.photo} alt={j.name}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    className={`w-full h-full object-cover ${j.posClass} grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700`}
                     onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex'; }}
                   />
                   <div className="w-full h-full items-center justify-center bg-gray-800" style={{ display: 'none' }}>
@@ -441,7 +439,7 @@ export default function SoulGuitarInfo() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { icon: '🏅', title: '評審團優選', n: '5 位', prize: 'AYERS 與評審獎牌、吉他架與奧昇弦釘', note: '五位評審各自選出' },
-              { icon: '🐴', title: '海馬特別獎', n: '5 位', prize: '一年海馬91PU會員', note: '由海馬執行長王翰選出' },
+              { icon: '🐴', title: '海馬特別獎', n: '3 位', prize: '一年海馬91PU會員', note: '由海馬執行長王翰選出' },
             ].map((a) => (
               <div key={a.title} className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02] flex items-start gap-3">
                 <span className="text-xl">{a.icon}</span>
