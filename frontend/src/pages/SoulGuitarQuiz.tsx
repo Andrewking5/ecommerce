@@ -648,6 +648,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
   const RF = `${R}/${folder}`;
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setShowContent(true), 600);
@@ -830,6 +831,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
   /* ── 有素材的角色：完整圖片版結果頁 ── */
   return (
     <motion.div
+      ref={scrollRef}
       className="absolute inset-0 z-50 overflow-y-auto overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -848,14 +850,14 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
         {/* ─── Hero Card（全寬，可截圖分享） ─── */}
         <motion.div
           className="w-full relative"
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
         >
           <img
             src={`${RF}/hero-card.webp`}
             alt={result.name}
-            className="relative w-full h-auto"
+            className="w-full h-auto block"
             draggable={false}
           />
         </motion.div>
@@ -888,7 +890,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-8 w-full"
           initial={{ opacity: 0, y: 30, rotateX: 8 }}
           whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ once: true, margin: '-60px', root: scrollRef }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{ perspective: 800 }}
         >
@@ -900,7 +902,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-8 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true, margin: '-40px' }}
+          viewport={{ once: true, margin: '-40px', root: scrollRef }}
           transition={{ duration: 0.6 }}
         >
           <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
@@ -911,7 +913,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-5 w-[50%]"
           initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RF}/text-guess.webp`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
@@ -921,7 +923,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-3 w-full overflow-hidden rounded-xl"
           initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
           whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
-          viewport={{ once: true, margin: '-50px' }}
+          viewport={{ once: true, margin: '-50px', root: scrollRef }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
@@ -932,7 +934,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-10 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.6 }}
         >
           <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
@@ -943,7 +945,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-6 w-[75%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
@@ -956,7 +958,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               key={i}
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
+              viewport={{ once: true, margin: '-30px', root: scrollRef }}
               transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
             >
               <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
@@ -969,7 +971,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-10 w-[80%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RF}/title-ayers.webp`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
@@ -983,7 +985,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               className="flex flex-col items-center gap-3"
               initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
+              viewport={{ once: true, margin: '-40px', root: scrollRef }}
               transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
               <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
@@ -1003,7 +1005,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-10 w-[55%] relative"
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
@@ -1020,7 +1022,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-10 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
           <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
@@ -1029,7 +1031,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-3 w-[85%]"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
           <img src={`${RF}/text-contest-info.webp`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
@@ -1040,7 +1042,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-6 w-[85%] overflow-hidden rounded-xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.6 }}
         >
           <img src={`${RF}/poster.webp`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
@@ -1051,7 +1053,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           className="mt-10 w-full flex flex-col items-center gap-3"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, root: scrollRef }}
           transition={{ duration: 0.5 }}
         >
           {/* 分享按鈕 — 金色呼吸光暈 */}
