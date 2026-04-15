@@ -73,15 +73,18 @@ async function runMigration() {
     console.log(`🔄 Migration attempt ${retryCount}/${MAX_RETRIES}...`);
 
     try {
-      execSync('npx prisma migrate deploy', {
-        stdio: 'inherit',
+      const out = execSync('npx prisma migrate deploy', {
+        stdio: ['ignore', 'pipe', 'pipe'],
         env: process.env,
         timeout: 120000,
       });
+      if (out) process.stdout.write(out);
       console.log('✅ Migration deployed successfully');
       success = true;
     } catch (error) {
-      const errorOutput = (error.message || '') + (error.stderr ? error.stderr.toString() : '') + (error.stdout ? error.stdout.toString() : '');
+      if (error.stdout) process.stdout.write(error.stdout);
+      if (error.stderr) process.stderr.write(error.stderr);
+      const errorOutput = (error.stdout ? error.stdout.toString() : '') + (error.stderr ? error.stderr.toString() : '');
 
       // P3009: failed migration in DB — resolve and retry immediately (don't count as a retry)
       if (tryResolveP3009(errorOutput)) {
