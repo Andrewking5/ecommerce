@@ -928,6 +928,17 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
         </motion.div>
 
+        {/* ─── 角色圖 ─── */}
+        <motion.img
+          src={result.charImg}
+          alt={result.name}
+          className="mt-4 w-[60%] h-auto object-contain"
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          draggable={false}
+        />
+
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
         <motion.div
           className="mt-8 w-full"
