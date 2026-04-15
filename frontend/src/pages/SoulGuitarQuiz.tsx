@@ -836,20 +836,20 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      style={{
-        backgroundImage: `url(${RF}/bg.webp)`,
-        backgroundSize: '100% auto',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'top center',
-        backgroundColor: '#efbd6c',
-      }}
     >
-      {/* 內容 */}
-      <div className="relative z-10 flex flex-col items-center w-full pb-16">
+      {/* 背景放內容層，讓漸層自動撐滿整個長條頁面高度 */}
+      <div
+        className="relative z-10 flex flex-col items-center w-full pb-16"
+        style={{
+          backgroundImage: `url(${RF}/bg.webp)`,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
 
-        {/* ─── Hero Card（全寬，可截圖分享） ─── */}
+        {/* ─── Hero Card 80% 寬，置中 ─── */}
         <motion.div
-          className="w-full relative"
+          className="w-[80%] mx-auto relative"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -862,8 +862,8 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           />
         </motion.div>
 
-        {/* ─── 以下區塊加側邊 padding ─── */}
-        <div className="w-full px-5 flex flex-col items-center">
+        {/* ─── 以下內容縮 90%，wrapper 設 w-[90%] ─── */}
+        <div className="w-[90%] mx-auto flex flex-col items-center">
 
         {/* 長按儲存提示 — 輕微浮動 */}
         <motion.div
