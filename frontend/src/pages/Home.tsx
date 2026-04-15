@@ -299,15 +299,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* ── 測試連結（之後改）──────────────────────────────────────── */}
-      <Link
-        to="/e/soul-guitar"
-        className="fixed left-4 top-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/90 backdrop-blur-md text-white text-sm font-bold shadow-lg hover:bg-orange-600 transition-colors"
-      >
-        🔥 測試：火焰結果頁
-      </Link>
-
-      {/* Opening animation removed — Hero IS the first impression */}
+{/* Opening animation removed — Hero IS the first impression */}
 
       {/* ═══════════════════════════════════════════════════════════
           1. HERO — Full-screen Billboard Carousel
