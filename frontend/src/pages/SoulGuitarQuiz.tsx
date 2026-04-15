@@ -682,6 +682,8 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
+  const [dbg, setDbg] = useState({ charW: 82, leftW: 14, leftTop: 10, rightW: 14, rightTop: 20 });
 
   useEffect(() => {
     const t = setTimeout(() => setShowContent(true), 600);
@@ -935,9 +937,9 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
           transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={result.charImg} alt={result.name} className="relative z-0 w-[82%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-left.webp`} alt="" className="absolute z-10 left-0 top-[10%] w-[14%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="absolute z-10 right-0 top-[20%] w-[14%] h-auto object-contain" draggable={false} />
+          <img src={result.charImg} alt={result.name} style={{ width: `${dbg.charW}%` }} className="relative z-0 h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-left.webp`} alt="" style={{ width: `${dbg.leftW}%`, top: `${dbg.leftTop}%` }} className="absolute z-10 left-0 h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-right.webp`} alt={result.colorName} style={{ width: `${dbg.rightW}%`, top: `${dbg.rightTop}%` }} className="absolute z-10 right-0 h-auto object-contain" draggable={false} />
         </motion.div>
 
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
@@ -1135,6 +1137,24 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         </div>{/* end px-5 wrapper */}
       </div>
+
+      {/* ── Debug 調整面板（URL 加 ?debug 才顯示）── */}
+      {isDebug && (
+        <div className="fixed bottom-0 left-0 right-0 z-9999 bg-black/85 text-white text-xs p-3 flex flex-col gap-1.5 font-mono">
+          {([ ['charW', '角色大小', 40, 100], ['leftW', '左字大小', 5, 35], ['leftTop', '左字 Top%', 0, 80], ['rightW', '右字大小', 5, 35], ['rightTop', '右字 Top%', 0, 80] ] as [keyof typeof dbg, string, number, number][]).map(([key, label, min, max]) => (
+            <div key={key} className="flex items-center gap-2">
+              <span className="w-20 shrink-0">{label}</span>
+              <input type="range" min={min} max={max} value={dbg[key]} aria-label={label}
+                onChange={e => setDbg(prev => ({ ...prev, [key]: Number(e.target.value) }))}
+                className="flex-1" />
+              <span className="w-8 text-right">{dbg[key]}</span>
+            </div>
+          ))}
+          <div className="mt-1 text-yellow-300 break-all">
+            charW={dbg.charW} leftW={dbg.leftW} leftTop={dbg.leftTop} rightW={dbg.rightW} rightTop={dbg.rightTop}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
