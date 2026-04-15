@@ -167,7 +167,7 @@ export default function SoulGuitarInfo() {
       <section className="border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
-            { label: '比賽平台', value: 'YouTube · IG · FB' },
+            { label: '比賽平台', value: 'YouTube + IG 或 FB' },
             { label: '評審時間', value: '6/8 – 6/17' },
             { label: '得獎公佈', value: '6/29 21:00' },
             { label: '影片長度', value: '30 – 120 秒' },
