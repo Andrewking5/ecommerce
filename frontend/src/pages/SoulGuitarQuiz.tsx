@@ -849,7 +849,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* ─── Hero Card 80% 寬，置中 ─── */}
         <motion.div
-          className="w-[80%] mx-auto relative"
+          className="w-[80%] mx-auto relative mt-[10%]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
