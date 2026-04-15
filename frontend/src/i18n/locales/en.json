@@ -834,7 +834,8 @@
       "reviews": "Reviews",
       "coupons": "Coupons",
       "marketing": "Marketing",
-      "events": "Events"
+      "events": "Events",
+      "quizAnalytics": "Quiz Analytics"
     },
     "dashboard": {
       "title": "Dashboard",

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import quizService from '../services/quizService';
 
 /* ──────────────────────────────────────
    Soul Guitar — 結果頁
@@ -514,14 +515,18 @@ export default function SoulGuitarResult() {
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
   useEffect(() => {
-    if (!folder) return;
+    if (!folder || !resultKey) return;
+
+    // Track this result (fire-and-forget, won't break UX on failure)
+    quizService.trackResult(slug, resultKey);
+
     const RF = `${BASE}/result/${folder}`;
     const min = new Promise(r => setTimeout(r, 1500));
     const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
       f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}`; }),
     );
     Promise.all([min, ...assets]).then(() => setIsLoading(false));
-  }, [folder]);
+  }, [folder, resultKey, slug]);
 
   if (!resultKey || !RESULTS[resultKey]) {
     return <Navigate to="/e/soul-guitar" replace />;

@@ -691,3 +691,17 @@ model EventClick {
   @@index([eventId, createdAt])
   @@map("event_clicks")
 }
+
+// 心理測驗結果追蹤
+model QuizResult {
+  id        String   @id @default(cuid())
+  slug      String                           // URL slug: fire / fireworks / sun / glow / wave / deep-sea / moon / dream-moon
+  resultKey String                           // 計分 key: FIRE_自由、FIRE_故事 …
+  device    String?                          // mobile / desktop / tablet
+  createdAt DateTime @default(now())
+
+  @@index([slug])
+  @@index([resultKey])
+  @@index([createdAt])
+  @@map("quiz_results")
+}

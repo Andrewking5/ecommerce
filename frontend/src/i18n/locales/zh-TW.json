@@ -836,7 +836,8 @@
       "reviews": "評論管理",
       "coupons": "優惠券",
       "marketing": "行銷推廣",
-      "events": "活動管理"
+      "events": "活動管理",
+      "quizAnalytics": "測驗數據"
     },
     "dashboard": {
       "title": "儀表板",

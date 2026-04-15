@@ -56,6 +56,7 @@ import bannerRoutes from './routes/banners';
 import customConfigRoutes from './routes/customConfigs';
 import wishlistRoutes from './routes/wishlist';
 import eventRoutes from './routes/events';
+import quizRoutes from './routes/quiz';
 
 // 初始化 Prisma 客戶端
 // 自動為 DATABASE_URL 附加連線池參數（若尚未設定）
@@ -245,6 +246,7 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/custom-configs', customConfigRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/quiz', quizRoutes);
 
 // 根路由
 app.get('/', (req, res) => {

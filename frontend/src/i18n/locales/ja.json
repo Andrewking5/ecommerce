@@ -832,7 +832,8 @@
       "reviews": "レビュー管理",
       "coupons": "クーポン",
       "marketing": "マーケティング",
-      "events": "イベント"
+      "events": "イベント",
+      "quizAnalytics": "クイズ分析"
     },
     "dashboard": {
       "title": "ダッシュボード",
