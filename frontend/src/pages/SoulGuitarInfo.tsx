@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { X, ZoomIn, ExternalLink, Star, ChevronDown } from 'lucide-react';
 import SEO from '../components/SEO';
+import eventService from '../services/eventService';
 
 /* ═══════════════════════════════════════════════════
    2026 Ayers 靈魂吉他手大賽 — 活動簡章
@@ -59,23 +60,32 @@ function Countdown({ target }: { target: string }) {
   );
 }
 
+const DEFAULT_RULES = [
+  { short: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
+  { short: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
+  { short: '影片彈唱前需說明', full: '「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
+  { short: '影片 30~120 秒', full: '影片總時長需為 30 秒至 120 秒。' },
+  { short: '直式一鏡到底', full: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。' },
+  { short: '穿著指定顏色', full: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。' },
+  { short: '露臉 + 完整上半身', full: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。' },
+  { short: '自選一首中/英文曲', full: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。' },
+  { short: '禁止效果器 / Loop', full: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。' },
+  { short: '1~5 人，至少一把鋼弦吉他', full: '禁止對嘴代彈，如不符合以上規定將取消比賽資格。' },
+  { short: '影片須維持公開', full: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。' },
+  { short: '每支影片對應一份表單', full: '' },
+  { short: 'Ayers 主辦保有最終決策權', full: '' },
+];
+
 export default function SoulGuitarInfo() {
   const [posterOpen, setPosterOpen] = useState(false);
+  const [rules, setRules] = useState(DEFAULT_RULES);
 
-  const rules = [
-    { short: '影片上傳 YouTube + IG/FB', full: '並將影片標題命名為「參賽曲名_姓名_組別 #2026Ayers靈魂吉他手大賽」。IG / FB 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
-    { short: '影片開頭自我介紹', full: '「大家好我是（本名/藝名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂，（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
-    { short: '影片 30~120 秒', full: '影片總時長需為 30 秒至 120 秒。' },
-    { short: '直式一鏡到底', full: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。' },
-    { short: '穿著指定顏色', full: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。' },
-    { short: '露臉 + 完整上半身', full: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。' },
-    { short: '自選一首中/英文曲', full: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。' },
-    { short: '禁止效果器 / Loop', full: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。' },
-    { short: '1~5 人，至少一把鋼弦吉他', full: '禁止對嘴代彈，如不符合以上規定將取消比賽資格。' },
-    { short: '影片須維持公開', full: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。' },
-    { short: '每支影片對應一份表單', full: '' },
-    { short: 'Ayers 主辦保有最終決策權', full: '' },
-  ];
+  useEffect(() => {
+    eventService.getEventBySlug('soul-guitar/info').then((event) => {
+      const apiRules = event?.metadata?.rules;
+      if (Array.isArray(apiRules) && apiRules.length > 0) setRules(apiRules);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -211,51 +221,52 @@ export default function SoulGuitarInfo() {
         <h3 className="text-2xl font-bold text-center mb-2">評分標準</h3>
         <p className="text-center text-gray-400 text-sm mb-10">Scoring Criteria</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 彈唱組 */}
-          <div>
-            <h4 className="text-base sm:text-lg font-bold mb-4 sm:mb-5 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-blue-500" /> 彈唱組
+          <div className="rounded-2xl bg-gray-50 p-5 sm:p-6">
+            <h4 className="text-base sm:text-lg font-bold mb-4 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" /> 彈唱組
             </h4>
-            {[
-              { label: 'Vocal', desc: '音準、動態、聲音表現', pct: 35, color: '#3b82f6' },
-              { label: '吉他', desc: '內聲部編排、節奏感', pct: 30, color: '#f97316' },
-              { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15, color: '#ef4444' },
-              { label: '融合度', desc: 'Vocal 和吉他搭配', pct: 10, color: '#facc15' },
-              { label: '風格特色', desc: '畫面、服裝、場景', pct: 10, color: GOLD },
-            ].map((s) => (
-              <div key={s.label} className="mb-4">
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-sm font-bold">{s.label} <span className="font-normal text-gray-400 text-xs">— {s.desc}</span></span>
-                  <span className="text-sm font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+            <div className="space-y-2">
+              {[
+                { label: 'Vocal', desc: '音準、動態、聲音表現', pct: 35 },
+                { label: '吉他', desc: '內聲部編排、節奏感', pct: 30 },
+                { label: '融合度', desc: 'Vocal 和吉他搭配協調性', pct: 10 },
+                { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15 },
+                { label: '風格特色', desc: '畫面、服裝、場景', pct: 10 },
+              ].map((s) => (
+                <div key={s.label} className="flex items-center justify-between bg-white rounded-xl px-4 py-3">
+                  <div className="min-w-0 mr-3">
+                    <span className="text-sm font-semibold text-gray-800">{s.label}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">（{s.desc}）</span>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold text-blue-500 tabular-nums">{s.pct}%</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${s.pct}%` }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="h-full rounded-full" style={{ backgroundColor: s.color }} />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
           {/* 演奏組 */}
-          <div>
-            <h4 className="text-lg font-bold mb-5 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-orange-500" /> 演奏組
+          <div className="rounded-2xl bg-gray-50 p-5 sm:p-6">
+            <h4 className="text-base sm:text-lg font-bold mb-4 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-orange-500 shrink-0" /> 演奏組
             </h4>
-            {[
-              { label: '技巧', desc: '音色、精準度', pct: 40, color: '#f97316' },
-              { label: '音樂性', desc: '旋律、和聲、節奏', pct: 35, color: '#3b82f6' },
-              { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15, color: '#ef4444' },
-              { label: '風格特色', desc: '畫面、服裝、場景', pct: 10, color: GOLD },
-            ].map((s) => (
-              <div key={s.label} className="mb-4">
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-sm font-bold">{s.label} <span className="font-normal text-gray-400 text-xs">— {s.desc}</span></span>
-                  <span className="text-sm font-mono font-bold" style={{ color: s.color }}>{s.pct}%</span>
+            <div className="space-y-2">
+              {[
+                { label: '技巧', desc: '音色、精準度', pct: 40 },
+                { label: '音樂性', desc: '旋律、和聲、節奏呈現', pct: 35 },
+                { label: '影音呈現', desc: '錄音品質、影像品質', pct: 15 },
+                { label: '風格特色', desc: '畫面、服裝、場景', pct: 10 },
+              ].map((s) => (
+                <div key={s.label} className="flex items-center justify-between bg-white rounded-xl px-4 py-3">
+                  <div className="min-w-0 mr-3">
+                    <span className="text-sm font-semibold text-gray-800">{s.label}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">（{s.desc}）</span>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold text-orange-500 tabular-nums">{s.pct}%</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${s.pct}%` }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="h-full rounded-full" style={{ backgroundColor: s.color }} />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
         <p className="text-center text-xs text-gray-300 mt-6">
@@ -358,27 +369,76 @@ export default function SoulGuitarInfo() {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <h3 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8">影片格式</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          {/* 標題命名 */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* 演奏組 */}
           <div className="rounded-2xl bg-gray-50 p-4 sm:p-6">
-            <h4 className="text-xs sm:text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">影片標題命名</h4>
-            <div className="space-y-2">
-              <div className="text-xs sm:text-sm bg-white rounded-lg px-3 sm:px-4 py-3 border-l-4 border-blue-500 text-gray-700 break-all">
-                <span className="text-blue-600 font-bold">彈唱組：</span>曲名_姓名_彈唱組<br />
-                <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
+            <h4 className="text-xs sm:text-sm font-bold mb-4 text-gray-700">
+              <span className="text-orange-500">1.</span> 演奏組上傳規則
+            </h4>
+            <div className="space-y-3">
+              {/* YouTube */}
+              <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold tracking-wide">▶ YouTube</span>
+                  <span className="text-[10px] text-gray-400">必須上傳</span>
+                </div>
+                <p className="text-[11px] text-gray-500 mb-1.5">影片標題命名：</p>
+                <div className="font-mono text-xs sm:text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2 break-all border-l-4 border-red-400">
+                  參賽曲名_姓名_演奏組 <span className="text-orange-500 font-bold">#2026Ayers靈魂吉他手大賽</span>
+                </div>
               </div>
-              <div className="text-xs sm:text-sm bg-white rounded-lg px-3 sm:px-4 py-3 border-l-4 border-orange-500 text-gray-700 break-all">
-                <span className="text-orange-600 font-bold">演奏組：</span>曲名_姓名_演奏組<br />
-                <span className="text-yellow-600 font-bold">#2026Ayers靈魂吉他手大賽</span>
+              {/* IG / FB */}
+              <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wide">◆ IG / FB</span>
+                  <span className="text-[10px] text-gray-400">擇一上傳</span>
+                </div>
+                <p className="text-[11px] text-gray-500 mb-1.5">貼文須包含 Hashtag：</p>
+                <div className="font-mono text-xs sm:text-sm text-orange-500 font-bold bg-gray-50 rounded-lg px-3 py-2 break-all border-l-4 border-purple-400">
+                  #2026Ayers靈魂吉他手大賽
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 自我介紹 */}
+          {/* 彈唱組 */}
           <div className="rounded-2xl bg-gray-50 p-4 sm:p-6">
-            <h4 className="text-xs sm:text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">開頭自我介紹（必說）</h4>
+            <h4 className="text-xs sm:text-sm font-bold mb-4 text-gray-700">
+              <span className="text-blue-500">2.</span> 彈唱組上傳規則
+            </h4>
+            <div className="space-y-3">
+              {/* YouTube */}
+              <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold tracking-wide">▶ YouTube</span>
+                  <span className="text-[10px] text-gray-400">必須上傳</span>
+                </div>
+                <p className="text-[11px] text-gray-500 mb-1.5">影片標題命名：</p>
+                <div className="font-mono text-xs sm:text-sm text-gray-700 bg-gray-50 rounded-lg px-3 py-2 break-all border-l-4 border-red-400">
+                  參賽曲名_姓名_彈唱組 <span className="text-orange-500 font-bold">#2026Ayers靈魂吉他手大賽</span>
+                </div>
+              </div>
+              {/* IG / FB */}
+              <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wide">◆ IG / FB</span>
+                  <span className="text-[10px] text-gray-400">擇一上傳</span>
+                </div>
+                <p className="text-[11px] text-gray-500 mb-1.5">貼文須包含 Hashtag：</p>
+                <div className="font-mono text-xs sm:text-sm text-orange-500 font-bold bg-gray-50 rounded-lg px-3 py-2 break-all border-l-4 border-purple-400">
+                  #2026Ayers靈魂吉他手大賽
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 開頭說明 */}
+          <div className="rounded-2xl bg-gray-50 p-4 sm:p-6">
+            <h4 className="text-xs sm:text-sm font-bold mb-3 text-gray-600 uppercase tracking-wider">
+              <span style={{ color: GOLD }}>3.</span> 影片彈唱前需說明（必說）
+            </h4>
             <div className="bg-white rounded-lg px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 leading-relaxed border-l-4" style={{ borderColor: GOLD }}>
-              「大家好我是<b>（本名/藝名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
+              「大家好我是<b>（本名/藝名/團名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂<b>（⚠️需與身上顏色相同）</b>，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
             </div>
           </div>
         </div>

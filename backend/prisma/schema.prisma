@@ -656,6 +656,8 @@ model Event {
   uniqueVisitors Int      @default(0)          // 不重複訪客數
 
   isActive    Boolean     @default(true)
+  metadata    Json?                            // 活動自訂資料（如比賽規則）
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

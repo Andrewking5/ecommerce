@@ -5,7 +5,7 @@ import {
   Trash2, RefreshCw, Edit, AlertTriangle, CheckCircle, XCircle,
   Upload, Download, FileSpreadsheet, X, Image, ChevronUp, ChevronDown,
   Eye, EyeOff, Save, MessageSquare, Star, Ticket, Megaphone, CalendarDays,
-  MapPin, QrCode, Link, Copy, Check, ExternalLink,
+  MapPin, QrCode, Link, Copy, Check, ExternalLink, FileText, GripVertical,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from '@/src/lib/utils';
@@ -2340,6 +2340,9 @@ function EventsTab() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+  const [rulesEvent, setRulesEvent] = useState<EventType | null>(null);
+  const [rulesItems, setRulesItems] = useState<Array<{ short: string; full: string }>>([]);
+  const [rulesSaving, setRulesSaving] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -2442,6 +2445,35 @@ function EventsTab() {
     link.click();
   };
 
+  const handleOpenRules = (event: EventType) => {
+    setRulesEvent(event);
+    setRulesItems(event.metadata?.rules ? [...event.metadata.rules] : []);
+  };
+
+  const handleSaveRules = async () => {
+    if (!rulesEvent) return;
+    setRulesSaving(true);
+    try {
+      const res = await eventService.updateEvent(rulesEvent.id, { metadata: { rules: rulesItems } } as any);
+      if (res.success) {
+        setEvents((prev) => prev.map((e) => e.id === rulesEvent.id ? { ...e, metadata: { rules: rulesItems } } : e));
+        setRulesEvent(null);
+      } else {
+        alert(`儲存失敗：${res.error || '未知錯誤'}`);
+      }
+    } catch { alert('儲存失敗'); } finally { setRulesSaving(false); }
+  };
+
+  const handleMoveRule = (idx: number, dir: -1 | 1) => {
+    setRulesItems((prev) => {
+      const next = [...prev];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next;
+    });
+  };
+
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
 
   return (
@@ -2458,6 +2490,79 @@ function EventsTab() {
           </button>
         </div>
       </div>
+
+      {/* ── Rules Editor Modal ── */}
+      {rulesEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setRulesEvent(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl w-full max-w-2xl mx-4 flex flex-col max-h-[90vh]" style={{ background: CARD_BG }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">比賽規則編輯</h3>
+                <p className="text-[10px] text-white/30 mt-0.5">{rulesEvent.title}</p>
+              </div>
+              <button onClick={() => setRulesEvent(null)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
+            </div>
+
+            {/* Rules List */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+              {rulesItems.length === 0 && (
+                <p className="text-center text-white/20 text-xs py-8">尚無規則，點擊下方「新增規則」開始</p>
+              )}
+              {rulesItems.map((rule, idx) => (
+                <div key={idx} className="rounded-xl border border-white/8 bg-white/[0.03] p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-ayers-gold/10 text-ayers-gold text-[9px] font-bold flex items-center justify-center mt-1">{idx + 1}</span>
+                    <div className="flex-1 space-y-2 min-w-0">
+                      <input
+                        value={rule.short}
+                        onChange={(e) => setRulesItems((prev) => prev.map((r, i) => i === idx ? { ...r, short: e.target.value } : r))}
+                        placeholder="規則標題（粗體）"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-ayers-gold transition-all"
+                      />
+                      <input
+                        value={rule.full}
+                        onChange={(e) => setRulesItems((prev) => prev.map((r, i) => i === idx ? { ...r, full: e.target.value } : r))}
+                        placeholder="規則說明（選填，灰色補充文字）"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/50 focus:outline-none focus:border-ayers-gold transition-all"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 shrink-0">
+                      <button type="button" title="上移" onClick={() => handleMoveRule(idx, -1)} disabled={idx === 0} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronUp size={12} /></button>
+                      <button type="button" title="下移" onClick={() => handleMoveRule(idx, 1)} disabled={idx === rulesItems.length - 1} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronDown size={12} /></button>
+                      <button type="button" title="刪除" onClick={() => setRulesItems((prev) => prev.filter((_, i) => i !== idx))} className="p-1 rounded hover:bg-red-500/10 text-white/20 hover:text-red-400 transition-all"><Trash2 size={12} /></button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Add Rule */}
+              <button
+                onClick={() => setRulesItems((prev) => [...prev, { short: '', full: '' }])}
+                className="w-full py-2.5 rounded-xl border border-dashed border-white/10 text-white/30 hover:text-white hover:border-white/20 text-xs flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Plus size={12} /> 新增規則
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 shrink-0">
+              <p className="text-[10px] text-white/20">共 {rulesItems.length} 條規則</p>
+              <div className="flex gap-3">
+                <button onClick={() => setRulesEvent(null)} className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">取消</button>
+                <button onClick={handleSaveRules} disabled={rulesSaving}
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 disabled:opacity-40 transition-all">
+                  <Save size={12} /> {rulesSaving ? '儲存中...' : '儲存規則'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* ── QR Code Modal ── */}
       {viewingQr && (
@@ -2767,6 +2872,10 @@ function EventsTab() {
                     <button onClick={() => window.open(`/e/${event.slug}`, '_blank')} title="開啟活動頁面"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
                       <ExternalLink size={14} />
+                    </button>
+                    <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+                      <FileText size={14} />
                     </button>
                     <button onClick={() => setViewingQr(event)} title="QR Code"
                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">

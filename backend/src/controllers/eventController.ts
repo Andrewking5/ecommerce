@@ -49,7 +49,7 @@ export class EventController {
           id: true, title: true, slug: true, description: true,
           coverImage: true, location: true, startDate: true, endDate: true,
           status: true, couponCode: true, discountNote: true,
-          referralCode: true, landingUrl: true,
+          referralCode: true, landingUrl: true, metadata: true,
         },
       });
       if (!event) {
@@ -143,7 +143,7 @@ export class EventController {
         title, slug, description, coverImage, location,
         startDate, endDate, status,
         landingUrl, utmSource, utmMedium, utmCampaign,
-        couponCode, discountNote, isActive,
+        couponCode, discountNote, isActive, metadata,
       } = req.body;
 
       // Check slug uniqueness
@@ -177,6 +177,7 @@ export class EventController {
           couponCode: couponCode || null,
           discountNote: discountNote || null,
           isActive: isActive ?? true,
+          metadata: metadata ?? null,
         },
       });
 
@@ -195,7 +196,7 @@ export class EventController {
         title, slug, description, coverImage, location,
         startDate, endDate, status,
         landingUrl, utmSource, utmMedium, utmCampaign,
-        couponCode, discountNote, isActive,
+        couponCode, discountNote, isActive, metadata,
       } = req.body;
 
       const existing = await prisma.event.findUnique({ where: { id } });
@@ -231,6 +232,7 @@ export class EventController {
           ...(couponCode !== undefined && { couponCode }),
           ...(discountNote !== undefined && { discountNote }),
           ...(isActive !== undefined && { isActive }),
+          ...(metadata !== undefined && { metadata }),
         },
       });
 

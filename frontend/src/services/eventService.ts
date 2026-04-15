@@ -20,6 +20,7 @@ export interface Event {
   totalScans: number;
   uniqueVisitors: number;
   isActive: boolean;
+  metadata?: { rules?: Array<{ short: string; full: string }> } | null;
   createdAt: string;
   updatedAt: string;
   _count?: { clicks: number };

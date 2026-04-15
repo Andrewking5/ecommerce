@@ -24,6 +24,7 @@ const createEventSchema = Joi.object({
   couponCode: Joi.string().max(50).allow('', null),
   discountNote: Joi.string().max(300).allow('', null),
   isActive: Joi.boolean().default(true),
+  metadata: Joi.object().allow(null),
 });
 
 const updateEventSchema = Joi.object({
@@ -42,6 +43,7 @@ const updateEventSchema = Joi.object({
   couponCode: Joi.string().max(50).allow('', null),
   discountNote: Joi.string().max(300).allow('', null),
   isActive: Joi.boolean(),
+  metadata: Joi.object().allow(null),
 });
 
 // ─── Public Routes ───
