@@ -290,7 +290,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Soft Sun Taoyuan',
     incompatibleDesc: '你想快一點，他想慢慢感受。',
     colorName: '紅色',
-    charImg: `${BASE}/progress/char-1.png`,
+    charImg: `${BASE}/result/fire/char.webp`,
     themeColor: '#E04040',
     themeBg: 'linear-gradient(135deg, #FFE0D0 0%, #F08060 50%, #E04040 100%)',
   },
