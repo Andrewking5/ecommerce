@@ -45,6 +45,17 @@ export class QuizController {
     }
   }
 
+  /** DELETE /api/quiz/admin/results — wipe all quiz results (admin only) */
+  static async clearResults(req: Request, res: Response): Promise<void> {
+    try {
+      const { count } = await prisma.quizResult.deleteMany();
+      res.json({ success: true, deleted: count });
+    } catch (error) {
+      console.error('Failed to clear quiz results:', error);
+      res.status(500).json({ success: false, error: 'Failed to clear' });
+    }
+  }
+
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {

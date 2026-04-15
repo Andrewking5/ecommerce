@@ -10,4 +10,7 @@ router.post('/results', QuizController.trackResult);
 // Admin — fetch all analytics
 router.get('/admin/analytics', authenticateToken, requireAdmin, QuizController.getAnalytics);
 
+// Admin — clear all quiz results
+router.delete('/admin/results', authenticateToken, requireAdmin, QuizController.clearResults);
+
 export default router;

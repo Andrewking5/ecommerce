@@ -3101,6 +3101,17 @@ function QuizFullPage({ data, onBack, onRefresh }: {
   onBack: () => void;
   onRefresh: () => void;
 }) {
+  const [clearing, setClearing] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  const handleClear = async () => {
+    setClearing(true);
+    try {
+      await quizService.clearAll();
+      setConfirmClear(false);
+      onRefresh();
+    } catch { /* silent */ } finally { setClearing(false); }
+  };
   const total = data?.total ?? 0;
 
   // Soul group counts
@@ -3134,10 +3145,52 @@ function QuizFullPage({ data, onBack, onRefresh }: {
             <p className="text-[11px] text-white/30 mt-0.5">統計所有測驗完成結果 · 共 8 種角色</p>
           </div>
         </div>
-        <button onClick={onRefresh} className="flex items-center gap-1.5 text-white/30 hover:text-white transition-colors text-xs">
-          <RefreshCw size={13} /> 重新整理
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={onRefresh} className="flex items-center gap-1.5 text-white/30 hover:text-white transition-colors text-xs">
+            <RefreshCw size={13} /> 重新整理
+          </button>
+          <button
+            onClick={() => setConfirmClear(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400/70 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-all"
+          >
+            <Trash2 size={12} /> 清空測試資料
+          </button>
+        </div>
       </div>
+
+      {/* Confirm dialog */}
+      {confirmClear && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setConfirmClear(false)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+            className="rounded-2xl p-7 max-w-sm w-full mx-4 border border-red-500/20"
+            style={{ background: CARD_BG }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                <AlertTriangle size={18} className="text-red-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">確認清空所有測驗資料？</p>
+                <p className="text-xs text-white/40 mt-0.5">共 {data?.total ?? 0} 筆紀錄將永久刪除，無法復原</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmClear(false)} className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white/50 hover:text-white bg-white/5 hover:bg-white/10 transition-all">
+                取消
+              </button>
+              <button
+                onClick={handleClear}
+                disabled={clearing}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-red-500/80 hover:bg-red-500 disabled:opacity-50 transition-all"
+              >
+                {clearing ? '刪除中⋯' : '確認刪除'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {!data ? (
         <div className="py-32 text-center"><GuitarSunLoader size={28} /></div>

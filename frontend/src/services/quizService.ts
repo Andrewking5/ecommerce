@@ -20,6 +20,11 @@ const quizService = {
     const { data } = await api.get('/quiz/admin/analytics');
     return data.success ? data.data : null;
   },
+
+  async clearAll(): Promise<number> {
+    const { data } = await api.delete('/quiz/admin/results');
+    return data.success ? data.deleted : 0;
+  },
 };
 
 export default quizService;
