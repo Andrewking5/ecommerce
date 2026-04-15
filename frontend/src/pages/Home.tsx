@@ -302,7 +302,7 @@ export default function Home() {
       {/* ── 測試連結（之後改）──────────────────────────────────────── */}
       <Link
         to="/e/soul-guitar"
-        className="fixed left-4 bottom-8 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/90 backdrop-blur-md text-white text-sm font-bold shadow-lg hover:bg-orange-600 transition-colors"
+        className="fixed left-4 top-4 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/90 backdrop-blur-md text-white text-sm font-bold shadow-lg hover:bg-orange-600 transition-colors"
       >
         🔥 測試：火焰結果頁
       </Link>
