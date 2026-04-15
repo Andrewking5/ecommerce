@@ -2292,6 +2292,23 @@ function ReviewsTab() {
    EVENTS TAB
    ═══════════════════════════════════════════════════════ */
 
+// 活動簡章預設規則（當 DB 尚無資料時自動填入，讓管理者第一次開啟即可直接編輯儲存）
+const SOUL_GUITAR_INFO_DEFAULT_RULES = [
+  { short: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
+  { short: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
+  { short: '影片彈唱前需說明', full: '「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
+  { short: '影片 30~120 秒', full: '影片總時長需為 30 秒至 120 秒。' },
+  { short: '直式一鏡到底', full: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。' },
+  { short: '穿著指定顏色', full: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。' },
+  { short: '露臉 + 完整上半身', full: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。' },
+  { short: '自選一首中/英文曲', full: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。' },
+  { short: '禁止效果器 / Loop', full: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。' },
+  { short: '1~5 人，至少一把鋼弦吉他', full: '禁止對嘴代彈，如不符合以上規定將取消比賽資格。' },
+  { short: '影片須維持公開', full: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。' },
+  { short: '每支影片對應一份表單', full: '' },
+  { short: 'Ayers 主辦保有最終決策權', full: '' },
+];
+
 const EVENT_STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-white/10 text-white/50',
   ACTIVE: 'bg-green-500/10 text-green-500',
@@ -2447,7 +2464,14 @@ function EventsTab() {
 
   const handleOpenRules = (event: EventType) => {
     setRulesEvent(event);
-    setRulesItems(event.metadata?.rules ? [...event.metadata.rules] : []);
+    const saved = event.metadata?.rules;
+    if (Array.isArray(saved) && saved.length > 0) {
+      setRulesItems([...saved]);
+    } else if (event.slug === 'soul-guitar/info') {
+      setRulesItems([...SOUL_GUITAR_INFO_DEFAULT_RULES]);
+    } else {
+      setRulesItems([]);
+    }
   };
 
   const handleSaveRules = async () => {
