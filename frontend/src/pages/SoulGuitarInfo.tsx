@@ -145,7 +145,7 @@ export default function SoulGuitarInfo() {
 
               <CTA />
 
-              <p className="text-[11px] text-white/20 mt-4">報名上限 200 位 · 依 Google 表單收件時間 · 額滿為止</p>
+              <p className="text-sm font-bold text-orange-400 mt-4">報名上限 200 位 · 額滿為止</p>
             </motion.div>
 
             {/* 右：海報 */}
@@ -183,9 +183,67 @@ export default function SoulGuitarInfo() {
       {/* ═══════════ 大賽宗旨 ═══════════ */}
       <section className="max-w-3xl mx-auto px-6 lg:px-8 py-16 text-center">
         <h3 className="text-2xl font-bold text-gray-900 mb-4">大賽宗旨</h3>
+        <p className="text-lg text-gray-700 font-medium mb-4">拿起手中的吉他，展現你的靈魂性格。</p>
         <p className="text-gray-500 leading-relaxed">
-          在網路上有各式吉他彈唱演奏的短影音，音樂製作及推廣已經不像以往需要高成本、人力。怎麼樣在短影音吸引目光？Ayers 特此辦比賽號召世界各地琴友，讓各位靈魂吉他手們在網路相聚，展現你最獨特的風格。
+          在短影音時代，各式吉他彈唱與演奏內容蓬勃發展，音樂創作與推廣不如以往需要高成本與大量人力。<br />
+          現今吉他手除了精進琴藝與歌藝，更需要經營網路社群。<br />
+          Ayers 特此舉辦本次比賽，號召世界各地琴友在線上相聚，展現最獨特的風格。
         </p>
+      </section>
+
+      {/* ═══════════ 活動參賽流程 ═══════════ */}
+      <section className="bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <h3 className="text-xl sm:text-2xl font-bold text-center mb-2">活動參賽流程</h3>
+          <p className="text-center text-gray-400 text-sm mb-10">How to Join</p>
+
+          {/* 桌機：橫向流程 */}
+          <div className="hidden md:flex items-start gap-0">
+            {[
+              { n: 1, title: '心理測驗', desc: '完成心理測驗，測出你的吉他靈魂' },
+              { n: 2, title: '拍攝影片', desc: '穿著自行選定的指定顏色，拍攝參賽影片' },
+              { n: 3, title: '上傳影片', desc: '將影片上傳至指定平台（YouTube + IG / FB）' },
+              { n: 4, title: '填寫表單', desc: '填寫報名表單，完成報名' },
+              { n: 5, title: '收到 Email', desc: '收到報名成功 Email，即完成參賽' },
+            ].map((step, idx, arr) => (
+              <div key={step.n} className="flex items-start flex-1 min-w-0">
+                <div className="flex flex-col items-center text-center flex-1 min-w-0 px-2">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg mb-3 shrink-0" style={{ background: `linear-gradient(135deg, ${GOLD}, #e8b86d)` }}>
+                    {step.n}
+                  </div>
+                  <p className="text-sm font-bold text-gray-800 mb-1">{step.title}</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">{step.desc}</p>
+                </div>
+                {idx < arr.length - 1 && (
+                  <div className="shrink-0 mt-5 text-gray-300 text-xl select-none">›</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* 手機：直向流程 */}
+          <div className="flex md:hidden flex-col gap-0">
+            {[
+              { n: 1, title: '完成心理測驗，測出你的吉他靈魂' },
+              { n: 2, title: '拍攝參賽影片，穿著自行選定指定顏色' },
+              { n: 3, title: '將影片上傳至指定平台' },
+              { n: 4, title: '填寫報名表單完成報名' },
+              { n: 5, title: '收到報名成功 Email，即完成參賽' },
+            ].map((step, idx, arr) => (
+              <div key={step.n} className="flex items-start gap-4">
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0" style={{ background: `linear-gradient(135deg, ${GOLD}, #e8b86d)` }}>
+                    {step.n}
+                  </div>
+                  {idx < arr.length - 1 && (
+                    <div className="w-px flex-1 min-h-[32px] my-1" style={{ backgroundColor: GOLD + '40' }} />
+                  )}
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed pt-2 pb-6">{step.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ═══════════ 評審 — 大照片網格 ═══════════ */}
@@ -502,7 +560,7 @@ export default function SoulGuitarInfo() {
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3">準備好了嗎？</h3>
           <p className="text-white/40 mb-8">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
           <CTA className="justify-center" />
-          <p className="text-[10px] text-white/15 mt-6">報名上限 200 位 · 依 Google 表單收件時間 · 額滿為止</p>
+          <p className="text-sm font-bold text-orange-400 mt-6">報名上限 200 位 · 額滿為止</p>
 
           {/* 官方連結 */}
           <div className="mt-10 flex flex-wrap justify-center gap-3">
