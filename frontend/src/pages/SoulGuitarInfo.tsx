@@ -387,7 +387,7 @@ export default function SoulGuitarInfo() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {[
               { icon: '🏆', title: '最佳彈唱獎', guitar: 'A07c-30th Anniversary', type: '全單吉他', money: '48,800', bonus: '5,000', method: '五位評審共同評分', color: '#facc15' },
-              { icon: '🎸', title: '最佳演奏獎', guitar: 'A07c-30th-Engelmann Anniversary', type: '全單吉他（英格曼雲衫版）', money: '48,800', bonus: '5,000', method: '五位評審共同評分', color: '#f97316' },
+              { icon: '🎸', title: '最佳演奏獎', guitar: 'A07c-30th-Engelmann Anniversary', type: '全單吉他（英格曼雲杉版）', money: '48,800', bonus: '5,000', method: '五位評審共同評分', color: '#f97316' },
             ].map((a) => (
               <div key={a.title} className="relative rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300">
                 <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${a.color}, ${GOLD})` }} />
@@ -396,7 +396,6 @@ export default function SoulGuitarInfo() {
                     <span className="text-4xl">{a.icon}</span>
                     <div>
                       <h4 className="text-xl font-black">{a.title}</h4>
-                      <p className="text-[10px] uppercase tracking-wider" style={{ color: a.color }}>1st Prize</p>
                     </div>
                   </div>
                   <div className="space-y-2 mb-5">
