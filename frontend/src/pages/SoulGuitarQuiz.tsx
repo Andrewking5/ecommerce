@@ -930,14 +930,14 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* ─── 角色圖 + 兩側文字疊層 ─── */}
         <motion.div
-          className="mt-4 w-full relative flex justify-center"
+          className="mt-4 w-full relative flex justify-center overflow-hidden"
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
           transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <img src={result.charImg} alt={result.name} className="w-[75%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-left.webp`} alt="" className="absolute left-0 top-[15%] w-[22%] h-auto object-contain" draggable={false} />
-          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="absolute right-0 top-[25%] w-[22%] h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-left.webp`} alt="" className="absolute left-0 top-[10%] w-[20%] h-auto object-contain" draggable={false} />
+          <img src={`${RF}/char-right.webp`} alt={result.colorName} className="absolute right-0 top-[20%] w-[20%] h-auto object-contain" draggable={false} />
         </motion.div>
 
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
@@ -1007,9 +1007,9 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               viewport={{ once: true, margin: '-40px', root: scrollRef }}
               transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="relative w-full">
-                <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-auto" draggable={false} />
-                <img src={`${RF}/guitar-title-${i}.webp`} alt="" className="absolute top-2 left-1 w-[55%] h-auto" draggable={false} />
+              <div className="relative w-full h-[280px] overflow-hidden">
+                <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-full object-contain object-bottom" draggable={false} />
+                <img src={`${RF}/guitar-title-${i}.webp`} alt="" className="absolute top-2 left-1 w-[50%] h-auto" draggable={false} />
               </div>
               <motion.button
                 type="button"
