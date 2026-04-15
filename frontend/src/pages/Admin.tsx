@@ -50,7 +50,7 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-500/10 text-red-500',
 };
 
-type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons' | 'events' | 'quiz-analytics';
+type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons' | 'events';
 
 type SidebarItem =
   | { id: Tab; icon: React.ReactNode; labelKey: string; children?: never }
@@ -77,7 +77,6 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
       { id: 'events', labelKey: 'admin.sidebar.events' },
     ],
   },
-  { id: 'quiz-analytics', icon: <BarChart3 size={18} />, labelKey: 'admin.sidebar.quizAnalytics' },
 ];
 
 /* ─── Main ─── */
@@ -194,7 +193,6 @@ export default function Admin() {
         {activeTab === 'reviews' && <ReviewsTab />}
         {activeTab === 'coupons' && <CouponsTab />}
         {activeTab === 'events' && <EventsTab />}
-        {activeTab === 'quiz-analytics' && <QuizAnalyticsTab />}
       </main>
     </div>
   );
@@ -2357,6 +2355,8 @@ function EventsTab() {
   const [viewingQr, setViewingQr] = useState<EventType | null>(null);
   const [analytics, setAnalytics] = useState<EventAnalytics | null>(null);
   const [analyticsEvent, setAnalyticsEvent] = useState<EventType | null>(null);
+  const [quizData, setQuizData] = useState<QuizAnalytics | null>(null);
+  const [quizPanel, setQuizPanel] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -2441,6 +2441,16 @@ function EventsTab() {
   };
 
   const handleViewAnalytics = async (event: EventType) => {
+    // Soul Guitar quiz event → show full quiz analytics panel
+    if (event.slug.startsWith('soul-guitar')) {
+      setQuizPanel(true);
+      setQuizData(null);
+      try {
+        const data = await quizService.getAnalytics();
+        setQuizData(data);
+      } catch { /* silent */ }
+      return;
+    }
     setAnalyticsEvent(event);
     setAnalytics(null);
     try {
@@ -2635,6 +2645,118 @@ function EventsTab() {
               >
                 {copiedId === viewingQr.id ? <><Check size={12} /> 已複製</> : <><Copy size={12} /> 複製連結</>}
               </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── Quiz Analytics Full Panel ── */}
+      {quizPanel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setQuizPanel(false)}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto"
+            style={{ background: ESPRESSO_DARK }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between px-7 py-5 border-b border-white/5" style={{ background: ESPRESSO_DARK }}>
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">吉他靈魂測驗 — 數據分析</h3>
+                <p className="text-[11px] text-white/30 mt-0.5">統計自測驗上線以來所有完成結果</p>
+              </div>
+              <button onClick={() => setQuizPanel(false)} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
+            </div>
+            <div className="p-7">
+              {!quizData ? (
+                <div className="py-16 text-center"><GuitarSunLoader size={24} /></div>
+              ) : (
+                <div className="space-y-6">
+                  {/* KPI */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <StatCard title="總完成次數" value={quizData.total.toString()} />
+                    <StatCard
+                      title="最多人的結果"
+                      value={quizData.byResult[0] ? (RESULT_EMOJI[quizData.byResult[0].slug] + ' ' + quizData.byResult[0].label.split(' ')[0]) : '—'}
+                      sub={quizData.byResult[0] ? `${quizData.byResult[0].count} 次` : ''}
+                    />
+                    <StatCard
+                      title="手機用戶"
+                      value={`${Math.round(((quizData.byDevice.find(d => d.device === 'mobile')?.count ?? 0) / Math.max(quizData.total, 1)) * 100)}%`}
+                    />
+                    <StatCard
+                      title="電腦用戶"
+                      value={`${Math.round(((quizData.byDevice.find(d => d.device === 'desktop')?.count ?? 0) / Math.max(quizData.total, 1)) * 100)}%`}
+                    />
+                  </div>
+
+                  {/* Result breakdown bars */}
+                  <Card title="各結果人數分布">
+                    {quizData.byResult.length === 0 ? (
+                      <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
+                    ) : (
+                      <div className="p-5 space-y-3">
+                        {quizData.byResult.map((r) => {
+                          const pct = quizData.total > 0 ? (r.count / quizData.total) * 100 : 0;
+                          return (
+                            <div key={r.slug} className="flex items-center gap-3">
+                              <span className="text-xs w-32 shrink-0 text-white/60">{RESULT_EMOJI[r.slug]} {r.label}</span>
+                              <div className="flex-1 bg-white/5 rounded-full h-4 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: RESULT_COLORS[r.slug] || '#888' }} />
+                              </div>
+                              <span className="text-[11px] text-white/40 w-16 text-right shrink-0">{r.count} ({pct.toFixed(1)}%)</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* Bar chart */}
+                  <Card title="結果長條圖">
+                    {quizData.byResult.length === 0 ? (
+                      <EmptyChart icon={<BarChart3 size={40} />} message="尚無數據" />
+                    ) : (
+                      <div className="px-4 py-4">
+                        <ResponsiveContainer width="100%" height={200}>
+                          <BarChart data={quizData.byResult} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                            <XAxis dataKey="slug" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} tickFormatter={(v: string) => RESULT_EMOJI[v] ?? v} />
+                            <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                            <Tooltip
+                              contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }}
+                              labelStyle={{ color: '#d4a84b' }}
+                              itemStyle={{ color: 'rgba(255,255,255,0.7)' }}
+                              labelFormatter={(v: string) => quizData.byResult.find(r => r.slug === v)?.label ?? v}
+                            />
+                            <Bar dataKey="count" name="完成人數" radius={[4, 4, 0, 0]}>
+                              {quizData.byResult.map((r) => <Cell key={r.slug} fill={RESULT_COLORS[r.slug] || '#d4a84b'} />)}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* Daily trend */}
+                  <Card title="每日完成趨勢（近 30 天）">
+                    {quizData.daily.length === 0 ? (
+                      <EmptyChart icon={<TrendingUp size={40} />} message="近 30 天無數據" />
+                    ) : (
+                      <div className="px-4 py-4">
+                        <ResponsiveContainer width="100%" height={180}>
+                          <BarChart data={quizData.daily} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                            <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
+                            <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                            <Tooltip contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+                            <Bar dataKey="count" name="完成次數" fill="#d4a84b" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
