@@ -646,7 +646,6 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
   const folder = RESULT_FOLDER[resultKey] || 'fire';
   const R = `${BASE}/result`;
   const RF = `${R}/${folder}`;
-  const RS = `${R}/shared`;
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -835,10 +834,14 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
+      style={{
+        backgroundImage: `url(${RF}/bg.webp)`,
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top center',
+        backgroundColor: '#efbd6c',
+      }}
     >
-      {/* 背景 — 長條圖，跟內容同寬同步滾動 */}
-      <img src={`${RF}/bg.webp`} alt="" className="absolute top-0 left-0 w-full h-auto z-0" draggable={false} />
-
       {/* 內容 */}
       <div className="relative z-10 flex flex-col items-center w-full pb-16">
 
@@ -862,22 +865,22 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* 長按儲存提示 — 輕微浮動 */}
         <motion.div
-          className="mt-3 w-[70%]"
+          className="mt-3 w-[75%]"
           initial={{ opacity: 0 }}
           animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
           transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
         >
-          <img src={`${RS}/text-save.png`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-save.webp`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* 往下看提示 — 向下彈跳暗示 */}
         <motion.div
-          className="mt-8 w-[75%]"
+          className="mt-4 w-[80%]"
           initial={{ opacity: 0 }}
           animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
           transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
         >
-          <img src={`${RS}/text-scroll.png`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-scroll.webp`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* ─── 你的個人特質 — 像翻開檔案般入場 ─── */}
@@ -889,29 +892,29 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{ perspective: 800 }}
         >
-          <img src={`${RF}/personality-card.png`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
+          <img src={`${RF}/personality-card.webp`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
         </motion.div>
 
         {/* 你聽出來了嗎 — blur 解除 + scale */}
         <motion.div
-          className="mt-6 w-[80%]"
+          className="mt-8 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.6 }}
         >
-          <img src={`${RS}/text-heard.png`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* ─── 猜猜這是哪 + 城市卡 ─── */}
         <motion.div
-          className="mt-8 w-[50%]"
+          className="mt-5 w-[50%]"
           initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <img src={`${RS}/text-guess.png`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-guess.webp`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
         </motion.div>
         {/* 城市卡 — clipPath 揭露 */}
         <motion.div
@@ -926,13 +929,13 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
 
         {/* 這樣的你，會發出什麼樣的聲音？ — blur 解除 */}
         <motion.div
-          className="mt-10 w-[80%]"
+          className="mt-10 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <img src={`${RS}/text-sound.png`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* ─── 你會愛上的吉他音樂風格 ─── */}
@@ -943,7 +946,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <img src={`${RS}/title-music-style.png`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* 音樂風格標籤 — 逐個 stagger 從右滑入 */}
@@ -956,7 +959,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               viewport={{ once: true, margin: '-30px' }}
               transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
             >
-              <img src={`${RF}/tag-${i}.png`} alt="" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
             </motion.div>
           ))}
         </div>
@@ -969,7 +972,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <img src={`${RS}/title-ayers.png`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/title-ayers.webp`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
         </motion.div>
 
         {/* 兩把吉他 — 左右各自從側邊滑入 */}
@@ -989,7 +992,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
                 className="w-[80%]"
                 whileTap={{ scale: 0.93 }}
               >
-                <img src={`${RF}/btn-unlock-${i}.png`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
+                <img src={`${RF}/btn-unlock-${i}.webp`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
               </motion.button>
             </motion.div>
           ))}
@@ -1009,10 +1012,10 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
             animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <img src={`${RF}/soul-color.png`} alt={`靈魂顏色：${result.colorName}`} className="relative w-full h-auto" draggable={false} />
+          <img src={`${RF}/soul-color.webp`} alt={`靈魂顏色：${result.colorName}`} className="relative w-full h-auto" draggable={false} />
         </motion.div>
 
-        {/* ─── 比賽資訊 ─── */}
+        {/* ─── 一個讓你被聽見的機會 ─── */}
         <motion.div
           className="mt-10 w-[85%]"
           initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
@@ -1020,7 +1023,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <img src={`${RS}/text-chance.png`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
         </motion.div>
         <motion.div
           className="mt-3 w-[85%]"
@@ -1029,7 +1032,18 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <img src={`${RS}/text-contest-info.png`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+          <img src={`${RF}/text-contest-info.webp`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+        </motion.div>
+
+        {/* ─── 比賽海報 ─── */}
+        <motion.div
+          className="mt-6 w-[85%] overflow-hidden rounded-xl"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <img src={`${RF}/poster.webp`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
         </motion.div>
 
         {/* ─── 底部按鈕 ─── */}
@@ -1053,7 +1067,7 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
               animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.97, 1.03, 0.97] }}
               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <img src={`${RS}/btn-share.png`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
+            <img src={`${RF}/btn-share.webp`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
             {copied && (
               <motion.span
                 className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
@@ -1067,10 +1081,10 @@ function ResultPage({ resultKey, onRetry }: { resultKey: string; onRetry: () => 
             )}
           </motion.button>
           <motion.button type="button" onClick={onRetry} className="w-[45%]" whileTap={{ scale: 0.93 }}>
-            <img src={`${RS}/btn-retry.png`} alt="再測一次" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/btn-retry.webp`} alt="再測一次" className="w-full h-auto" draggable={false} />
           </motion.button>
           <Link to="/e/soul-guitar/info" className="w-[70%] active:scale-95 transition-transform">
-            <img src={`${RS}/btn-contest.png`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/btn-contest.webp`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
           </Link>
         </motion.div>
 
