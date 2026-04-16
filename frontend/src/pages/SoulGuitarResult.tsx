@@ -318,15 +318,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <div
-        className="relative z-10 flex flex-col items-center w-full pb-16"
-        style={{
-          backgroundImage: `url(${RF}/bg.webp)`,
-          backgroundSize: '100% auto',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'top center',
-        }}
-      >
+      <div className="relative z-10 flex flex-col items-center w-full pb-16">
 
         {/* ─── Hero Card（長按可儲存）─── */}
         <motion.div
@@ -853,10 +845,18 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
+  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp` : '';
+
   return (
     <div
       className="w-full min-h-dvh relative flex justify-center"
-      style={{ background: `linear-gradient(180deg, ${resultData.themeColor}30 0%, #111 40%)` }}
+      style={{
+        backgroundColor: resultData.themeColor + '18',
+        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top center',
+      }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
