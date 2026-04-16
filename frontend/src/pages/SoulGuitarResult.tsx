@@ -322,8 +322,9 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
         className="relative z-10 flex flex-col items-center w-full pb-16"
         style={{
           backgroundImage: `url(${RF}/bg.webp)`,
-          backgroundSize: '100% 100%',
+          backgroundSize: '100% auto',
           backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'top center',
         }}
       >
 
@@ -556,12 +557,20 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             />
 
             <div className="w-full flex items-center gap-3">
-              <motion.button type="button" onClick={handleShare} className="flex-1 relative" whileTap={{ scale: 0.95 }}>
+              <motion.button
+                type="button"
+                onClick={handleShare}
+                className="flex-1 relative"
+                whileTap={{ scale: 0.93 }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                {/* 外層光暈 — 較大範圍閃爍 */}
                 <motion.div
-                  className="absolute -inset-1 rounded-full pointer-events-none"
-                  style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.3) 0%, transparent 70%)' }}
-                  animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.97, 1.03, 0.97] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute -inset-3 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.45) 0%, transparent 65%)' }}
+                  animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.9, 1.1, 0.9] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <img src={`${RF}/btn-share.webp`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
                 {copied && (
