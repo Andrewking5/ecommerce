@@ -226,15 +226,35 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
   }, []);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/e/soul-guitar`;
-    const text = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的吉他靈魂 🎸`;
+    // 分享連結帶 ?s=1 讓收到的人能直接看到結果頁
+    const shareUrl = `${window.location.origin}/e/soul-guitar/${folder}?s=1`;
+    const shareText = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的 🎸`;
+
+    // 1. 嘗試帶圖分享（iOS Safari 15+ / Android Chrome 支援）
     if (navigator.share) {
-      try { await navigator.share({ title: text, url }); } catch {}
-    } else {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        const imgSrc = `${RF}/hero-card.webp`;
+        const blob = await fetch(imgSrc).then(r => r.blob());
+        const file = new File([blob], 'my-guitar-soul.webp', { type: blob.type });
+
+        if (navigator.canShare?.({ files: [file] })) {
+          // 帶圖片分享（LINE、IG Stories、訊息 app 可直接貼）
+          await navigator.share({ title: shareText, text: shareText, url: shareUrl, files: [file] });
+        } else {
+          // 不支援帶檔案 → 只分享文字+連結
+          await navigator.share({ title: shareText, text: shareText, url: shareUrl });
+        }
+        return;
+      } catch {
+        // 使用者取消或失敗 → 不做任何事
+        return;
+      }
     }
+
+    // 2. 桌機 fallback：複製連結
+    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
   const C = layout; // 短名
@@ -716,16 +736,14 @@ export default function SoulGuitarResult() {
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
-
-  // 直接開結果頁 URL（非做完測驗跳過來）→ 導回封面
-  if (resultKey && !(state as { fromQuiz?: boolean } | null)?.fromQuiz && !isEditMode) {
-    return <Navigate to="/e/soul-guitar" replace />;
-  }
+  const isSharedLink = new URLSearchParams(search).has('s'); // ?s=1 = 從分享連結來
+  const fromQuiz = !!(state as { fromQuiz?: boolean } | null)?.fromQuiz;
+  const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
   useEffect(() => {
-    if (!folder || !resultKey) return;
+    if (!folder || !resultKey || shouldRedirect) return;
 
     // Track this result (fire-and-forget, won't break UX on failure)
     quizService.trackResult(slug, resultKey);
@@ -739,11 +757,16 @@ export default function SoulGuitarResult() {
       f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}`; }),
     );
     Promise.all([min, ...assets]).then(() => setIsLoading(false));
-  }, [folder, resultKey, slug]);
+  }, [folder, resultKey, slug, shouldRedirect]);
 
   const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {
     setLayout(prev => ({ ...prev, ...patch }));
   }, []);
+
+  // 直接開結果頁 URL（非做完測驗、非分享連結）→ 導回封面（必須在所有 hooks 之後）
+  if (shouldRedirect) {
+    return <Navigate to="/e/soul-guitar" replace />;
+  }
 
   if (!resultKey || !RESULTS[resultKey]) {
     return <Navigate to="/e/soul-guitar" replace />;
