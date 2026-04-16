@@ -857,20 +857,18 @@ export default function SoulGuitarResult() {
   return (
     <div
       className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{ backgroundColor: resultData.themeColor + '18' }}
+      style={{
+        backgroundColor: resultData.themeColor,
+        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top center',
+      }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div
-        className="w-full max-w-[430px]"
-        style={{
-          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-          backgroundSize: '100% auto',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'top center',
-        }}
-      >
+      <div className="w-full max-w-[430px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
