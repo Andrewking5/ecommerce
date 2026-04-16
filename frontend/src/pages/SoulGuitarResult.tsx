@@ -9,7 +9,7 @@ import quizService, { type LayoutConfig, type AssetKey, DEFAULT_LAYOUT } from '.
    ────────────────────────────────────── */
 
 const BASE = '/images/events/quiz';
-const CACHE_V = '?v=3'; // cache bust — bump this whenever assets are replaced
+const CACHE_V = `?v=${__ASSET_V__}`; // auto-generated at build time — no manual bumping needed
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 /* ── URL slug ↔ result key 映射（直譯） ── */

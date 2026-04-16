@@ -5,6 +5,11 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    define: {
+      // Injected at build time — every new build gets a fresh asset version,
+      // busting any CDN / browser cache for images in /public.
+      __ASSET_V__: JSON.stringify(Date.now()),
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

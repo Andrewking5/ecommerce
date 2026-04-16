@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
    ────────────────────────────────────── */
 
 const BASE = '/images/events/quiz';
-const CACHE_V = '?v=2'; // cache bust
+const CACHE_V = `?v=${__ASSET_V__}`; // auto-generated at build time — no manual bumping needed
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 const V = CACHE_V;
