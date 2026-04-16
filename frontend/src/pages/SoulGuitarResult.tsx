@@ -40,55 +40,61 @@ const RESULT_FOLDER: Record<string, string> = {
 const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
+/* 白色吉他 blob — scroll flow 內，layout editor 控制 */
 function OrganizerFooter({ layout }: { layout: LayoutConfig }) {
   const blob = layout.footerBlob;
   return (
-    <div className="w-full">
-      {/* 白色吉他 blob — 由 layout editor 控制大小/位置 */}
-      <div className="flex justify-center">
-        <img
-          src={`${FOOTER_BASE}/${enc('資產 29.png')}`}
-          alt=""
-          draggable={false}
-          style={{
-            width: `${blob.w}%`,
-            height: 'auto',
-            display: 'block',
-            marginTop: `${blob.mt}px`,
-            translate: `${blob.x}px ${blob.y}px`,
-            position: 'relative',
-            zIndex: blob.z,
-          }}
-        />
-      </div>
+    <div className="w-full flex justify-center pb-16">
+      <img
+        src={`${FOOTER_BASE}/${enc('資產 29.png')}`}
+        alt=""
+        draggable={false}
+        style={{
+          width: `${blob.w}%`,
+          height: 'auto',
+          display: 'block',
+          marginTop: `${blob.mt}px`,
+          translate: `${blob.x}px ${blob.y}px`,
+          position: 'relative',
+          zIndex: blob.z,
+        }}
+      />
+    </div>
+  );
+}
 
-      {/* 橘色條固定在最底部，logos 疊在上面 */}
+/* 橘色布條 + logos — fixed 常駐螢幕底部，不隨頁面捲動 */
+function StickyStripe() {
+  return (
+    <div
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50"
+      style={{ fontFamily: QUIZ_FONT }}
+    >
+      {/* 資產 28 橘色布條 */}
       <div className="relative w-full">
         <img
           src={`${FOOTER_BASE}/${enc('資產 28.png')}`}
           alt=""
           className="w-full block"
-          style={{ height: '40px', objectFit: 'fill' }}
+          style={{ height: '56px', objectFit: 'fill' }}
           draggable={false}
         />
-        <div
-          className="absolute inset-0 flex items-center justify-around px-3 gap-1"
-          style={{ fontFamily: QUIZ_FONT }}
-        >
+        {/* logos 疊在布條上，使用原始比例（h-auto + max-h 限制） */}
+        <div className="absolute inset-0 flex items-center justify-around px-3 gap-x-2">
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-white/80 text-[9px] whitespace-nowrap">主辦方</span>
-            <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-6 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/ayers.png`}                              alt="Ayers"   className="max-h-8 w-auto" draggable={false} />
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-center max-w-[45%]">
             <span className="text-white/80 text-[9px] whitespace-nowrap">協辦</span>
-            <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}              alt="聲潮"    className="h-5 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                alt="91譜"    className="h-5 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-5 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}              alt="聲潮"    className="max-h-7 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                alt="91譜"    className="max-h-7 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="max-h-7 w-auto" draggable={false} />
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="text-white/80 text-[9px] whitespace-nowrap">贊助</span>
-            <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-5 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-5 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="max-h-7 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="max-h-7 w-auto" draggable={false} />
           </div>
         </div>
       </div>
@@ -257,19 +263,17 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
-function FullResultPage({ resultKey, folder, layout, onLayoutChange, hasNewBg }: {
+function FullResultPage({ resultKey, folder, layout, hasNewBg }: {
   resultKey: string;
   folder: string;
   layout: LayoutConfig;
-  onLayoutChange: (patch: Partial<LayoutConfig>) => void;
-  hasNewBg: boolean; // true = 使用拆分背景（需顯示 OrganizerFooter）
+  hasNewBg: boolean;
 }) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
 
@@ -930,14 +934,11 @@ export default function SoulGuitarResult() {
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div
-        className="w-full max-w-[430px]"
-      >
+      <div className="w-full max-w-[430px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
           layout={layout}
-          onLayoutChange={handleLayoutChange}
           hasNewBg={!!resultData.bgFile}
         />
       </div>
@@ -950,6 +951,8 @@ export default function SoulGuitarResult() {
           editKey={editKey}
         />
       )}
+      {/* 布條固定在螢幕底部，只在有主辦方素材的角色才顯示 */}
+      {!!resultData.bgFile && <StickyStripe />}
     </div>
   );
 }
