@@ -41,31 +41,49 @@ const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
 function OrganizerFooter() {
+  // 圖層由下往上：資產 29（白色 blob 背景）→ 資產 28（橘色條）→ logos
   return (
-    <div className="w-full relative mt-0">
-      {/* 漸層底條 */}
-      <img src={`${FOOTER_BASE}/${enc('資產 28.png')}`} alt="" className="w-full h-auto block" draggable={false} />
-      {/* Logo 群組 — 絕對定位貼在底條上 */}
-      <div className="absolute inset-0 flex items-center justify-around px-3 gap-1">
-        {/* 主辦方 */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>主辦方</span>
-          <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-5 w-auto" draggable={false} />
-        </div>
-        {/* 協辦 */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>協辦</span>
-          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" className="h-5 w-auto" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" className="h-5 w-auto" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-5 w-auto" draggable={false} />
-        </div>
-        {/* 贊助 */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>贊助</span>
-          <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-5 w-auto" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-5 w-auto" draggable={false} />
+    <div
+      className="w-full"
+      style={{
+        backgroundImage: `url(${FOOTER_BASE}/${enc('資產 29.png')})`,
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* 資產 28 橘色漸層條，高度固定讓 logos 看得見 */}
+      <div className="relative w-full">
+        <img
+          src={`${FOOTER_BASE}/${enc('資產 28.png')}`}
+          alt=""
+          className="w-full block"
+          style={{ height: '40px', objectFit: 'fill' }}
+          draggable={false}
+        />
+        {/* logos 疊在橘色條上 */}
+        <div
+          className="absolute inset-0 flex items-center justify-around px-3 gap-1"
+          style={{ fontFamily: QUIZ_FONT }}
+        >
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-white/80 text-[9px] whitespace-nowrap">主辦方</span>
+            <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-6 w-auto" draggable={false} />
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-white/80 text-[9px] whitespace-nowrap">協辦</span>
+            <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}              alt="聲潮"    className="h-5 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                alt="91譜"    className="h-5 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-5 w-auto" draggable={false} />
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-white/80 text-[9px] whitespace-nowrap">贊助</span>
+            <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-5 w-auto" draggable={false} />
+            <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-5 w-auto" draggable={false} />
+          </div>
         </div>
       </div>
+      {/* blob 下方留白，讓白色圓弧形狀完整顯示 */}
+      <div className="h-20" />
     </div>
   );
 }
