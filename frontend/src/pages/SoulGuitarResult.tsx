@@ -849,42 +849,36 @@ export default function SoulGuitarResult() {
   const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp${CACHE_V}` : '';
 
   return (
-    <>
-      {/* Background — fixed to viewport so it always covers the screen as user scrolls */}
-      <div
-        className="fixed inset-0 bg-cover bg-top pointer-events-none"
-        style={{
-          backgroundColor: resultData.themeColor,
-          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-          zIndex: 0,
-        }}
-      />
-
-      <div
-        className="relative w-full min-h-dvh flex flex-col items-center overflow-x-hidden"
-        style={{ zIndex: 1 }}
-      >
-        <AnimatePresence>
-          {isLoading && <ResultLoadingScreen key="result-loading" />}
-        </AnimatePresence>
-        <div className="w-full max-w-[430px]">
-          <FullResultPage
-            resultKey={resultKey}
-            folder={RESULT_FOLDER[resultKey]}
-            layout={layout}
-            onLayoutChange={handleLayoutChange}
-          />
-        </div>
-        {isEditMode && (
-          <LayoutEditor
-            slug={slug}
-            layout={layout}
-            onChange={handleLayoutChange}
-            onReset={() => setLayout(DEFAULT_LAYOUT)}
-            editKey={editKey}
-          />
-        )}
+    <div
+      className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
+      style={{
+        backgroundColor: resultData.themeColor,
+        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+        backgroundSize: '100% auto',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'top center',
+      }}
+    >
+      <AnimatePresence>
+        {isLoading && <ResultLoadingScreen key="result-loading" />}
+      </AnimatePresence>
+      <div className="w-full max-w-[430px]">
+        <FullResultPage
+          resultKey={resultKey}
+          folder={RESULT_FOLDER[resultKey]}
+          layout={layout}
+          onLayoutChange={handleLayoutChange}
+        />
       </div>
-    </>
+      {isEditMode && (
+        <LayoutEditor
+          slug={slug}
+          layout={layout}
+          onChange={handleLayoutChange}
+          onReset={() => setLayout(DEFAULT_LAYOUT)}
+          editKey={editKey}
+        />
+      )}
+    </div>
   );
 }
