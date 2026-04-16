@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import quizService, { type LayoutConfig, DEFAULT_LAYOUT } from '../services/quizService';
+import quizService, { type LayoutConfig, type AssetKey, DEFAULT_LAYOUT } from '../services/quizService';
 
 /* ──────────────────────────────────────
    Soul Guitar — 結果頁
@@ -194,11 +194,10 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
-function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange }: {
+function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
   resultKey: string;
   folder: string;
   layout: LayoutConfig;
-  isEditMode: boolean;
   onLayoutChange: (patch: Partial<LayoutConfig>) => void;
 }) {
   const RF = `${BASE}/result/${folder}`;
@@ -208,7 +207,18 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const L = layout;
+  // 取得某個素材的 flow 樣式（寬度 + 上邊距 + 位移 + 圖層）
+  const fs = (key: AssetKey, extra?: React.CSSProperties): React.CSSProperties => {
+    const c = layout[key];
+    return {
+      width: `${c.w}%`,
+      marginTop: `${c.mt}px`,
+      transform: `translate(${c.x}px, ${c.y}px)`,
+      zIndex: c.z,
+      position: 'relative',
+      ...extra,
+    };
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setShowContent(true), 600);
@@ -227,6 +237,8 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
     }
   };
 
+  const C = layout; // 短名
+
   return (
     <motion.div
       ref={scrollRef}
@@ -244,23 +256,22 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
         }}
       >
 
-        {/* ─── Hero Card ─── */}
+        {/* ─── Hero Card（長按可儲存）─── */}
         <motion.div
           className="mx-auto relative"
-          style={{ width: `${L.heroW}%`, marginTop: `${L.heroMt}%` }}
+          style={fs('heroCard')}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <img src={`${RF}/hero-card.webp`} alt={result.name} className="w-full h-auto block" draggable={false} />
+          <img src={`${RF}/hero-card.webp`} alt={result.name} className="w-full h-auto block" />
         </motion.div>
 
         <div className="w-[90%] mx-auto flex flex-col items-center">
 
           {/* 長按儲存提示 */}
           <motion.div
-            className="mt-3"
-            style={{ width: `${L.textSaveW}%` }}
+            style={fs('textSave')}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
             transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
@@ -270,8 +281,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 往下看提示 */}
           <motion.div
-            className="mt-4"
-            style={{ width: `${L.textScrollW}%` }}
+            style={fs('textScroll')}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
             transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
@@ -281,8 +291,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 一個讓你被聽見的機會 */}
           <motion.div
-            className="mt-5"
-            style={{ width: `${L.textChanceW}%` }}
+            style={fs('textChance')}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 1 : 0 }}
             transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
@@ -290,22 +299,40 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
             <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
           </motion.div>
 
-          {/* 角色圖 + 兩側文字 */}
+          {/* 角色圖 + 兩側裝飾 */}
           <motion.div
-            className="mt-4 w-full relative flex justify-center overflow-hidden"
+            className="w-full relative flex justify-center overflow-hidden"
+            style={{ marginTop: `${C.char.mt}px` }}
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img src={result.charImg} alt={result.name} style={{ width: `${L.charW}%` }} className="relative z-0 h-auto object-contain" draggable={false} />
-            <img src={`${RF}/char-left.webp`} alt="" style={{ width: `${L.leftW}%`, top: `${L.leftTop}%`, left: `${L.leftLeft}%` }} className="absolute z-10 h-auto object-contain" draggable={false} />
-            <img src={`${RF}/char-right.webp`} alt={result.colorName} style={{ width: `${L.rightW}%`, top: `${L.rightTop}%`, right: `${L.rightRight}%` }} className="absolute z-10 h-auto object-contain" draggable={false} />
+            <img
+              src={result.charImg}
+              alt={result.name}
+              style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
+              className="relative h-auto object-contain"
+              draggable={false}
+            />
+            <img
+              src={`${RF}/char-left.webp`}
+              alt=""
+              style={{ width: `${C.charLeft.w}%`, top: `${C.charLeft.mt}%`, left: `${C.charLeft.x}%`, zIndex: C.charLeft.z }}
+              className="absolute h-auto object-contain"
+              draggable={false}
+            />
+            <img
+              src={`${RF}/char-right.webp`}
+              alt={result.colorName}
+              style={{ width: `${C.charRight.w}%`, top: `${C.charRight.mt}%`, right: `${C.charRight.x}%`, zIndex: C.charRight.z }}
+              className="absolute h-auto object-contain"
+              draggable={false}
+            />
           </motion.div>
 
           {/* 你的個人特質 */}
           <motion.div
-            className="mt-8"
-            style={{ width: `${L.personalityW}%`, perspective: 800 }}
+            style={fs('personalityCard', { perspective: 800 })}
             initial={{ opacity: 0, y: 30, rotateX: 8 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true, margin: '-60px', root: scrollRef }}
@@ -316,8 +343,8 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 城市卡 */}
           <motion.div
-            className="mt-8 overflow-hidden rounded-xl"
-            style={{ width: `${L.cityW}%` }}
+            className="overflow-hidden rounded-xl"
+            style={fs('cityCard')}
             initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
             whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
             viewport={{ once: true, margin: '-50px', root: scrollRef }}
@@ -328,8 +355,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 猜猜這是哪 */}
           <motion.div
-            className="mt-5"
-            style={{ width: `${L.textGuessW}%` }}
+            style={fs('textGuess')}
             initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -340,8 +366,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 這樣的你，會發出什麼樣的聲音？ */}
           <motion.div
-            className="mt-10"
-            style={{ width: `${L.textSoundW}%` }}
+            style={fs('textSound')}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -352,8 +377,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 你可能會喜歡的 Ayers 吉他款式 */}
           <motion.div
-            className="mt-10"
-            style={{ width: `${L.titleAyersW}%` }}
+            style={fs('titleAyers')}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -386,8 +410,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 你聽出來了嗎 */}
           <motion.div
-            className="mt-8"
-            style={{ width: `${L.textHeardW}%` }}
+            style={fs('textHeard')}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, margin: '-40px', root: scrollRef }}
@@ -398,8 +421,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 你會愛上的吉他音樂風格 */}
           <motion.div
-            className="mt-8"
-            style={{ width: `${L.titleMusicW}%` }}
+            style={fs('titleMusic')}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -409,7 +431,7 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
           </motion.div>
 
           {/* 音樂風格標籤 */}
-          <div className="mt-4 flex flex-col gap-2.5" style={{ width: `${L.tagsW}%` }}>
+          <div className="flex flex-col gap-2.5" style={fs('tags')}>
             {[1, 2, 3, 4].map(i => (
               <motion.div
                 key={i}
@@ -423,9 +445,9 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
             ))}
           </div>
 
+          {/* 比賽資訊文字 */}
           <motion.div
-            className="mt-3"
-            style={{ width: `${L.textContestW}%` }}
+            style={fs('textContest')}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
@@ -436,8 +458,8 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 
           {/* 比賽海報 */}
           <motion.div
-            className="mt-6 overflow-hidden rounded-xl"
-            style={{ width: `${L.posterW}%` }}
+            className="overflow-hidden rounded-xl"
+            style={fs('poster')}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
@@ -454,7 +476,13 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
             viewport={{ once: true, root: scrollRef }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" style={{ width: `${L.charTypeW}%` }} className="h-auto self-start" draggable={false} />
+            <img
+              src={`${RF}/char-type.webp`}
+              alt="分享抽獎說明"
+              style={fs('charType', { display: 'block' })}
+              className="h-auto self-start"
+              draggable={false}
+            />
 
             <div className="w-full flex items-center gap-3">
               <motion.button type="button" onClick={handleShare} className="flex-1 relative" whileTap={{ scale: 0.95 }}>
@@ -496,14 +524,37 @@ function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange 
 }
 
 /* ── 版面編輯器（管理員用，?edit 啟用） ── */
-function EditorSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="text-amber-400 font-semibold text-[11px] border-b border-white/10 pb-1">{title}</div>
-      {children}
-    </div>
-  );
-}
+
+/** 每個素材的 meta：中文標籤 + slider 範圍 + 是否為絕對定位 */
+const ASSET_META: {
+  key: AssetKey;
+  label: string;
+  abs?: boolean; // charLeft / charRight 用絕對定位，mt=top%, x=side%
+  wMin?: number; wMax?: number;
+  mtMin?: number; mtMax?: number;
+  xMin?: number; xMax?: number;
+  yMin?: number; yMax?: number;
+  zMin?: number; zMax?: number;
+}[] = [
+  { key: 'heroCard',        label: 'Hero 結果卡',    wMin: 40, wMax: 120, mtMin: 0,   mtMax: 120, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+  { key: 'textSave',        label: '長按儲存提示',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textScroll',      label: '往下看提示',     wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textChance',      label: '機會文字',       wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'char',            label: '角色圖',         wMin: 30, wMax: 130, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'charLeft',        label: '左側裝飾',  abs: true, wMin: 5, wMax: 50, mtMin: 0, mtMax: 100, xMin: -20, xMax: 50, zMin: 0, zMax: 50 },
+  { key: 'charRight',       label: '右側裝飾',  abs: true, wMin: 5, wMax: 50, mtMin: 0, mtMax: 100, xMin: -20, xMax: 50, zMin: 0, zMax: 50 },
+  { key: 'personalityCard', label: '個人特質卡',     wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'cityCard',        label: '城市卡',         wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textGuess',       label: '猜猜這是哪',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textSound',       label: '發出什麼聲音',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'titleAyers',      label: 'Ayers 吉他標題', wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textHeard',       label: '你聽出來了嗎',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'titleMusic',      label: '音樂風格標題',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'tags',            label: '音樂風格標籤',   wMin: 40, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'textContest',     label: '比賽資訊文字',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'poster',          label: '比賽海報',       wMin: 40, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  { key: 'charType',        label: '角色型標籤',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+];
 
 function LayoutEditor({ slug, layout, onChange, onReset }: {
   slug: string;
@@ -511,107 +562,121 @@ function LayoutEditor({ slug, layout, onChange, onReset }: {
   onChange: (patch: Partial<LayoutConfig>) => void;
   onReset: () => void;
 }) {
-  const [open, setOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [expanded, setExpanded] = useState<AssetKey | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const L = layout;
 
-  const Slider = ({ label, prop, min, max }: { label: string; prop: keyof LayoutConfig; min: number; max: number }) => (
-    <div className="flex items-center gap-2 text-[11px]">
-      <span className="w-26 shrink-0 text-white/60 leading-none">{label}</span>
-      <input
-        type="range"
-        aria-label={label}
-        min={min}
-        max={max}
-        value={L[prop]}
-        onChange={e => onChange({ [prop]: Number(e.target.value) } as Partial<LayoutConfig>)}
-        className="flex-1 accent-amber-400 h-1"
-      />
-      <span className="w-7 text-right text-white/90 tabular-nums font-mono">{L[prop]}</span>
-    </div>
-  );
+  // 更新某素材的單一屬性
+  const update = (key: AssetKey, field: keyof typeof layout[AssetKey], value: number) => {
+    onChange({ [key]: { ...layout[key], [field]: value } } as Partial<LayoutConfig>);
+  };
 
   const handleSave = async () => {
     setSaving(true);
     try {
       await quizService.saveLayout(slug, layout);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
     }
   };
 
+  // 單一 slider 行
+  const Slider = ({ label, value, min, max, onChange: onCh }: {
+    label: string; value: number; min: number; max: number; onChange: (v: number) => void;
+  }) => (
+    <div className="flex items-center gap-1.5 text-[10px]">
+      <span className="w-14 shrink-0 text-white/50">{label}</span>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        value={value}
+        onChange={e => onCh(Number(e.target.value))}
+        className="flex-1 accent-amber-400"
+        style={{ height: '3px' }}
+      />
+      <span className="w-9 text-right text-white/80 tabular-nums font-mono">{value}</span>
+    </div>
+  );
+
   return (
     <div className="fixed right-0 top-0 h-full z-200 flex pointer-events-none">
-      {/* Toggle tab */}
+      {/* 收合按鈕 */}
       <button
         type="button"
         className="self-center pointer-events-auto bg-black/80 hover:bg-black text-white px-1 py-3 rounded-l-lg text-[10px] leading-none flex flex-col items-center gap-1 shadow-lg [writing-mode:vertical-rl]"
-        onClick={() => setOpen(p => !p)}
+        onClick={() => setPanelOpen(p => !p)}
       >
-        <span>{open ? '▶' : '◀'}</span>
-        <span className="rotate-180">編輯版面</span>
+        <span>{panelOpen ? '▶' : '◀'}</span>
+        <span className="rotate-180">版面</span>
       </button>
 
-      {/* Panel */}
-      {open && (
-        <div className="pointer-events-auto w-64 bg-black/90 backdrop-blur-sm text-white overflow-y-auto flex flex-col gap-3 p-3 shadow-2xl text-[11px]">
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-sm text-white">版面編輯器</span>
-            <button type="button" onClick={onReset} className="text-red-400 hover:text-red-300 text-[11px]">重置預設</button>
+      {panelOpen && (
+        <div className="pointer-events-auto w-60 bg-black/92 backdrop-blur-sm text-white overflow-y-auto flex flex-col shadow-2xl">
+
+          {/* 頂部固定 header */}
+          <div className="sticky top-0 z-10 bg-black/95 px-3 py-2 flex items-center justify-between border-b border-white/10">
+            <span className="font-bold text-xs">版面編輯器</span>
+            <button type="button" onClick={onReset} className="text-red-400 hover:text-red-300 text-[10px]">重置</button>
           </div>
 
-          <EditorSection title="Hero 卡">
-            <Slider label="寬度 %" prop="heroW" min={40} max={100} />
-            <Slider label="上邊距 %" prop="heroMt" min={0} max={30} />
-          </EditorSection>
+          {/* 素材列表 */}
+          <div className="flex flex-col">
+            {ASSET_META.map(({ key, label, abs, wMin = 10, wMax = 120, mtMin = 0, mtMax = 100, xMin = -20, xMax = 50, yMin = -60, yMax = 60, zMin = 0, zMax = 50 }) => {
+              const isOpen = expanded === key;
+              const c = layout[key];
+              return (
+                <div key={key} className="border-b border-white/5">
+                  {/* 素材列標題 */}
+                  <button
+                    type="button"
+                    onClick={() => setExpanded(isOpen ? null : key)}
+                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-white/5 text-left"
+                  >
+                    <span className={`text-[11px] ${isOpen ? 'text-amber-400' : 'text-white/80'}`}>{label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/30 text-[9px] font-mono">W{c.w} Z{c.z}</span>
+                      <span className="text-white/40 text-[10px]">{isOpen ? '▲' : '▼'}</span>
+                    </div>
+                  </button>
 
-          <EditorSection title="角色圖">
-            <Slider label="寬度 %" prop="charW" min={30} max={100} />
-          </EditorSection>
+                  {/* 展開的 sliders */}
+                  {isOpen && (
+                    <div className="px-3 pb-3 flex flex-col gap-2 bg-white/3">
+                      <Slider label="寬 W %" value={c.w} min={wMin} max={wMax} onChange={v => update(key, 'w', v)} />
+                      {abs ? (
+                        <>
+                          <Slider label="上 top%" value={c.mt} min={mtMin} max={mtMax} onChange={v => update(key, 'mt', v)} />
+                          <Slider label={key === 'charLeft' ? '左 left%' : '右 right%'} value={c.x} min={xMin} max={xMax} onChange={v => update(key, 'x', v)} />
+                        </>
+                      ) : (
+                        <>
+                          <Slider label="上距 mt px" value={c.mt} min={mtMin} max={mtMax} onChange={v => update(key, 'mt', v)} />
+                          <Slider label="← → x px" value={c.x} min={-150} max={150} onChange={v => update(key, 'x', v)} />
+                          <Slider label="↑ ↓ y px" value={c.y} min={yMin} max={yMax} onChange={v => update(key, 'y', v)} />
+                        </>
+                      )}
+                      <Slider label="圖層 Z" value={c.z} min={zMin} max={zMax} onChange={v => update(key, 'z', v)} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-          <EditorSection title="左側裝飾">
-            <Slider label="寬度 %" prop="leftW" min={5} max={40} />
-            <Slider label="上 %" prop="leftTop" min={0} max={80} />
-            <Slider label="左 %" prop="leftLeft" min={-10} max={20} />
-          </EditorSection>
-
-          <EditorSection title="右側裝飾">
-            <Slider label="寬度 %" prop="rightW" min={5} max={40} />
-            <Slider label="上 %" prop="rightTop" min={0} max={80} />
-            <Slider label="右 %" prop="rightRight" min={-10} max={20} />
-          </EditorSection>
-
-          <EditorSection title="文字元素">
-            <Slider label="儲存提示" prop="textSaveW" min={20} max={100} />
-            <Slider label="往下看" prop="textScrollW" min={20} max={100} />
-            <Slider label="機會文字" prop="textChanceW" min={20} max={100} />
-            <Slider label="猜猜這是哪" prop="textGuessW" min={20} max={100} />
-            <Slider label="發出什麼聲音" prop="textSoundW" min={20} max={100} />
-            <Slider label="聽出來了嗎" prop="textHeardW" min={20} max={100} />
-            <Slider label="角色型標籤" prop="charTypeW" min={20} max={100} />
-          </EditorSection>
-
-          <EditorSection title="卡片 / 圖塊">
-            <Slider label="個人特質卡" prop="personalityW" min={40} max={100} />
-            <Slider label="城市卡" prop="cityW" min={40} max={100} />
-            <Slider label="Ayers 標題" prop="titleAyersW" min={20} max={100} />
-            <Slider label="音樂風格標題" prop="titleMusicW" min={20} max={100} />
-            <Slider label="音樂風格標籤" prop="tagsW" min={40} max={100} />
-            <Slider label="比賽資訊文字" prop="textContestW" min={40} max={100} />
-            <Slider label="比賽海報" prop="posterW" min={40} max={100} />
-          </EditorSection>
-
-          <div className="flex gap-2 pt-1 pb-2">
+          {/* 底部固定儲存 */}
+          <div className="sticky bottom-0 bg-black/95 px-3 py-2 border-t border-white/10">
             <button
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold py-1.5 rounded text-xs transition-colors"
+              className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold py-2 rounded text-xs transition-colors"
             >
-              {saving ? '儲存中…' : saved ? '已儲存 ✓' : '儲存設定'}
+              {saving ? '儲存中…' : saved ? '已儲存 ✓' : '儲存到資料庫'}
             </button>
           </div>
         </div>
@@ -699,7 +764,6 @@ export default function SoulGuitarResult() {
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
           layout={layout}
-          isEditMode={isEditMode}
           onLayoutChange={handleLayoutChange}
         />
       </div>

@@ -1,32 +1,47 @@
 import api from './api';
 
-export interface LayoutConfig {
-  // Hero card
-  heroW: number; heroMt: number;
-  // Character animation
-  charW: number;
-  // Left decoration
-  leftW: number; leftTop: number; leftLeft: number;
-  // Right decoration
-  rightW: number; rightTop: number; rightRight: number;
-  // Text / card widths
-  textSaveW: number; textScrollW: number; textChanceW: number;
-  personalityW: number; cityW: number;
-  textGuessW: number; textSoundW: number; textHeardW: number;
-  titleAyersW: number; titleMusicW: number;
-  tagsW: number; textContestW: number; posterW: number; charTypeW: number;
+/** 每個素材的版面設定 */
+export interface AssetConfig {
+  w: number;   // 寬度 % (相對於容器)
+  mt: number;  // 上邊距 px（流式素材）或 top %（charLeft / charRight 絕對定位）
+  x: number;   // 左右偏移 px（流式素材）或 left/right %（charLeft / charRight）
+  y: number;   // 上下偏移 px（translateY，不影響排版）
+  z: number;   // z-index
 }
 
+export type AssetKey =
+  | 'heroCard'
+  | 'textSave' | 'textScroll' | 'textChance'
+  | 'char' | 'charLeft' | 'charRight'
+  | 'personalityCard' | 'cityCard' | 'textGuess'
+  | 'textSound' | 'titleAyers'
+  | 'textHeard' | 'titleMusic' | 'tags'
+  | 'textContest' | 'poster' | 'charType';
+
+export type LayoutConfig = Record<AssetKey, AssetConfig>;
+
+// 快捷建立 AssetConfig
+const a = (w: number, mt: number, x = 0, y = 0, z = 1): AssetConfig => ({ w, mt, x, y, z });
+
 export const DEFAULT_LAYOUT: LayoutConfig = {
-  heroW: 80, heroMt: 10,
-  charW: 76,
-  leftW: 15, leftTop: 21, leftLeft: 0,
-  rightW: 14, rightTop: 24, rightRight: 0,
-  textSaveW: 75, textScrollW: 80, textChanceW: 90,
-  personalityW: 100, cityW: 100,
-  textGuessW: 50, textSoundW: 85, textHeardW: 85,
-  titleAyersW: 80, titleMusicW: 75,
-  tagsW: 100, textContestW: 85, posterW: 85, charTypeW: 65,
+  heroCard:        a(80,  43),           // mt ≈ 10% of 430px
+  textSave:        a(75,  12),           // mt-3
+  textScroll:      a(80,  16),           // mt-4
+  textChance:      a(90,  20),           // mt-5
+  char:            a(76,  16, 0, 0, 0),  // mt-4; z=0（在裝飾圖下層）
+  charLeft:        a(15,  21, 0, 0, 10), // mt=top%, x=left%, z=10（絕對定位）
+  charRight:       a(14,  24, 0, 0, 10), // mt=top%, x=right%, z=10（絕對定位）
+  personalityCard: a(100, 32),           // mt-8
+  cityCard:        a(100, 32),           // mt-8
+  textGuess:       a(50,  20),           // mt-5
+  textSound:       a(85,  40),           // mt-10
+  titleAyers:      a(80,  40),           // mt-10
+  textHeard:       a(85,  32),           // mt-8
+  titleMusic:      a(75,  32),           // mt-8
+  tags:            a(100, 16),           // mt-4
+  textContest:     a(85,  12),           // mt-3
+  poster:          a(85,  24),           // mt-6
+  charType:        a(65,   0),           // 在 flex 容器內，mt 由容器控制
 };
 
 export interface QuizAnalytics {

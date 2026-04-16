@@ -372,7 +372,7 @@ function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: b
 /* ── 封面 ── */
 function CoverPage({ onStart, isDesktop }: { onStart: () => void; isDesktop: boolean }) {
   return (
-    <motion.div className="absolute inset-0 z-50 overflow-hidden" exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+    <motion.div className="absolute inset-0 z-50 overflow-hidden cursor-pointer" onClick={onStart} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
       {isDesktop ? (
         <img src={`${BASE}/cover-bg-wide.webp`} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
       ) : (
@@ -420,15 +420,16 @@ function QuestionView({
         </motion.button>
       )}
 
+      {/* 手機版：進度條固定在畫面頂部（top-12 讓回上一題按鈕不重疊） */}
+      <div className="md:hidden absolute top-12 left-5 right-5 z-20">
+        <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
+      </div>
+
       {/* 上半留白 */}
       <div className="flex-1 min-h-[40px] md:min-h-0 md:flex-none md:h-[20%]" />
 
       {/* 內容區 — 電腦版置中 */}
       <div className="px-5 md:px-0 md:mx-auto md:w-[40%] md:max-w-[480px]">
-        {/* 手機版：進度條在 Q 上方，氣泡浮在進度條上方（留白區） */}
-        <div className="md:hidden mb-1.5">
-          <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
-        </div>
 
         {/* Q 號碼 */}
         <motion.span
