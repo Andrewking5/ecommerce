@@ -645,12 +645,17 @@ function ResultLoadingScreen() {
    頁面進入點 — 讀 URL slug → 渲染結果
    ────────────────────────────────────── */
 export default function SoulGuitarResult() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, state } = useLocation();
   const slug = pathname.replace('/e/soul-guitar/', '').replace(/\/$/, '');
   const resultKey = SLUG_TO_KEY[slug];
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
+
+  // 直接開結果頁 URL（非做完測驗跳過來）→ 導回封面
+  if (resultKey && !(state as { fromQuiz?: boolean } | null)?.fromQuiz && !isEditMode) {
+    return <Navigate to="/e/soul-guitar" replace />;
+  }
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 

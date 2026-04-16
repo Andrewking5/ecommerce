@@ -523,7 +523,7 @@ export default function SoulGuitarQuiz() {
       } else {
         // 最後一題 → 計算結果 → 跳轉結果頁
         const key = calculateResult(a);
-        navigate(`/e/soul-guitar/${RESULT_SLUG[key] ?? 'fire'}`);
+        navigate(`/e/soul-guitar/${RESULT_SLUG[key] ?? 'fire'}`, { state: { fromQuiz: true } });
       }
     }, 500);
   };
