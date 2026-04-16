@@ -539,12 +539,21 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img
+            <motion.img
               src={`${RF}/char-type.webp`}
               alt="分享抽獎說明"
               style={fs('charType', { display: 'block' })}
               className="h-auto self-start"
               draggable={false}
+              animate={{
+                y: [0, -6, 0],
+                filter: [
+                  'drop-shadow(0 0 0px rgba(255,200,50,0))',
+                  'drop-shadow(0 0 8px rgba(255,200,50,0.9))',
+                  'drop-shadow(0 0 0px rgba(255,200,50,0))',
+                ],
+              }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
             />
 
             <div className="w-full flex items-center gap-3">
