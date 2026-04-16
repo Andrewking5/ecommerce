@@ -9,6 +9,7 @@ import quizService, { type LayoutConfig, type AssetKey, DEFAULT_LAYOUT } from '.
    ────────────────────────────────────── */
 
 const BASE = '/images/events/quiz';
+const CACHE_V = '?v=3'; // cache bust — bump this whenever assets are replaced
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 /* ── URL slug ↔ result key 映射（直譯） ── */
@@ -68,7 +69,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Soft Sun Taoyuan',
     incompatibleDesc: '你想快一點，他想慢慢感受。',
     colorName: '紅色',
-    charImg: `${BASE}/result/fire/char.webp`,
+    charImg: `${BASE}/result/fire/char.webp${CACHE_V}`,
     themeColor: '#E04040',
     themeBg: 'linear-gradient(135deg, #FFE0D0 0%, #F08060 50%, #E04040 100%)',
   },
@@ -85,7 +86,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Sunny Taipei',
     incompatibleDesc: '你喜歡重量，他偏向輕鬆明亮。',
     colorName: '紅色',
-    charImg: `${BASE}/result/fireworks/char.webp`,
+    charImg: `${BASE}/result/fireworks/char.webp${CACHE_V}`,
     themeColor: '#D05030',
     themeBg: 'linear-gradient(135deg, #FFE8D8 0%, #E88060 50%, #D05030 100%)',
   },
@@ -102,7 +103,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Deep Wave Jiufen',
     incompatibleDesc: '你喜歡輕盈往前，他比較容易停留在情緒裡。',
     colorName: '橘黃色',
-    charImg: `${BASE}/result/sun/char.webp`,
+    charImg: `${BASE}/result/sun/char.webp${CACHE_V}`,
     themeColor: '#FF9A3E',
     themeBg: 'linear-gradient(135deg, #FFF4CC 0%, #FFE4A0 50%, #FF9A3E 100%)',
   },
@@ -119,7 +120,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Fire Taichung',
     incompatibleDesc: '你喜歡慢慢醞釀，他習慣快速推進。',
     colorName: '橘黃色',
-    charImg: `${BASE}/result/glow/char.webp`,
+    charImg: `${BASE}/result/glow/char.webp${CACHE_V}`,
     themeColor: '#F0B860',
     themeBg: 'linear-gradient(135deg, #FFF8E8 0%, #FFE8B0 50%, #F0B860 100%)',
   },
@@ -136,7 +137,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Moon Hsinchu',
     incompatibleDesc: '你喜歡流動，他比較習慣停下來思考。',
     colorName: '藍色',
-    charImg: `${BASE}/result/wave/char.webp`,
+    charImg: `${BASE}/result/wave/char.webp${CACHE_V}`,
     themeColor: '#4A9EC5',
     themeBg: 'linear-gradient(135deg, #E0F2FE 0%, #7EC8E3 50%, #4A9EC5 100%)',
   },
@@ -153,7 +154,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Sunny Taipei',
     incompatibleDesc: '你喜歡慢慢感受，他比較習慣輕快往前。',
     colorName: '藍色',
-    charImg: `${BASE}/result/deep-sea/char.webp`,
+    charImg: `${BASE}/result/deep-sea/char.webp${CACHE_V}`,
     themeColor: '#2E6B8A',
     themeBg: 'linear-gradient(135deg, #C8E0EC 0%, #5A9AB5 50%, #2E6B8A 100%)',
   },
@@ -170,7 +171,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Wave Hualien',
     incompatibleDesc: '你需要沉澱，他習慣一直往前探索。',
     colorName: '黑色 / 白色',
-    charImg: `${BASE}/result/moon/char.webp`,
+    charImg: `${BASE}/result/moon/char.webp${CACHE_V}`,
     themeColor: '#6B6B9E',
     themeBg: 'linear-gradient(135deg, #E8E8F0 0%, #A0A0C8 50%, #6B6B9E 100%)',
   },
@@ -187,7 +188,7 @@ const RESULTS: Record<string, ResultInfo> = {
     incompatible: 'Wave Hualien',
     incompatibleDesc: '你喜歡沉浸，他比較喜歡往外探索。',
     colorName: '黑色 / 白色',
-    charImg: `${BASE}/result/dream-moon/char.webp`,
+    charImg: `${BASE}/result/dream-moon/char.webp${CACHE_V}`,
     themeColor: '#7B6BA0',
     themeBg: 'linear-gradient(135deg, #EDE8F5 0%, #B0A0D0 50%, #7B6BA0 100%)',
   },
@@ -210,12 +211,13 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
   const navigate = useNavigate();
 
   // 取得某個素材的 flow 樣式（寬度 + 上邊距 + 圖層）
+  // marginTop 用容器寬度的 % 而非 px，讓間距在所有手機上等比例縮放
   // x/y 使用 CSS `translate` 屬性，避免與 Framer Motion 的 transform 衝突
   const fs = (key: AssetKey, extra?: React.CSSProperties): React.CSSProperties => {
     const c = layout[key];
     return {
       width: `${c.w}%`,
-      marginTop: `${c.mt}px`,
+      marginTop: `${(c.mt / 430 * 100).toFixed(2)}%`,
       zIndex: c.z,
       position: 'relative',
       ...(c.x !== 0 || c.y !== 0 ? { translate: `${c.x}px ${c.y}px` } : {}),
@@ -259,7 +261,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
     // 1. 嘗試帶圖分享（iOS Safari 15+ / Android Chrome 支援）
     if (navigator.share) {
       try {
-        const imgSrc = `${RF}/hero-card.webp`;
+        const imgSrc = `${RF}/hero-card.webp${CACHE_V}`;
         const blob = await fetch(imgSrc).then(r => r.blob());
         const file = new File([blob], 'my-guitar-soul.webp', { type: blob.type });
 
@@ -327,7 +329,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <img src={`${RF}/hero-card.webp`} alt={result.name} className="w-full h-auto block" />
+          <img src={`${RF}/hero-card.webp${CACHE_V}`} alt={result.name} className="w-full h-auto block" />
         </motion.div>
 
         <div className="w-[90%] mx-auto flex flex-col items-center">
@@ -339,7 +341,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
             transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
           >
-            <img src={`${RF}/text-save.webp`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-save.webp${CACHE_V}`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 往下看提示 */}
@@ -349,7 +351,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
             transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
           >
-            <img src={`${RF}/text-scroll.webp`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-scroll.webp${CACHE_V}`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 一個讓你被聽見的機會 */}
@@ -359,7 +361,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             animate={{ opacity: showContent ? 1 : 0 }}
             transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
           >
-            <img src={`${RF}/text-chance.webp`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-chance.webp${CACHE_V}`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 角色圖 + 兩側裝飾 */}
@@ -378,7 +380,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
               draggable={false}
             />
             <img
-              src={`${RF}/char-right.webp`}
+              src={`${RF}/char-right.webp${CACHE_V}`}
               alt={result.colorName}
               style={{ width: `${C.charRight.w}%`, top: `${C.charRight.mt}%`, right: `${C.charRight.x}%`, zIndex: C.charRight.z }}
               className="absolute h-auto object-contain"
@@ -394,7 +396,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img src={`${RF}/personality-card.webp`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
+            <img src={`${RF}/personality-card.webp${CACHE_V}`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
           </motion.div>
 
           {/* 城市卡 */}
@@ -406,7 +408,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 猜猜這是哪 */}
@@ -417,7 +419,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/text-guess.webp`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 這樣的你，會發出什麼樣的聲音？ */}
@@ -428,7 +430,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 你可能會喜歡的 Ayers 吉他款式 */}
@@ -439,7 +441,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/title-ayers.webp`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 兩把吉他 */}
@@ -454,10 +456,10 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="relative w-full h-[280px] overflow-hidden">
-                  <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-full object-contain object-bottom" draggable={false} />
+                  <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-full object-contain object-bottom" draggable={false} />
                 </div>
                 <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
-                  <img src={`${RF}/btn-unlock-${i}.webp`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
+                  <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
                 </motion.button>
               </motion.div>
             ))}
@@ -471,7 +473,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 你會愛上的吉他音樂風格 */}
@@ -482,7 +484,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 音樂風格標籤 */}
@@ -495,7 +497,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               >
-                <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
+                <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" draggable={false} />
               </motion.div>
             ))}
           </div>
@@ -508,7 +510,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <img src={`${RF}/text-contest-info.webp`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
           </motion.div>
 
           {/* 比賽海報 */}
@@ -520,7 +522,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <img src={`${RF}/poster.webp`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
+            <img src={`${RF}/poster.webp${CACHE_V}`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
           </motion.div>
 
           {/* 底部按鈕 */}
@@ -532,7 +534,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             transition={{ duration: 0.5 }}
           >
             <motion.img
-              src={`${RF}/char-type.webp`}
+              src={`${RF}/char-type.webp${CACHE_V}`}
               alt="分享抽獎說明"
               style={fs('charType', { display: 'block' })}
               className="h-auto self-start"
@@ -557,7 +559,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                   animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.9, 1.1, 0.9] }}
                   transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
                 />
-                <img src={`${RF}/btn-share.webp`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
+                <img src={`${RF}/btn-share.webp${CACHE_V}`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
                 {copied && (
                   <motion.span
                     className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
@@ -571,12 +573,12 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 )}
               </motion.button>
               <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} className="flex-1" whileTap={{ scale: 0.93 }}>
-                <img src={`${RF}/btn-retry.webp`} alt="再測一次" className="w-full h-auto" draggable={false} />
+                <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" draggable={false} />
               </motion.button>
             </div>
 
             <Link to="/e/soul-guitar/info" className="w-full active:scale-95 transition-transform">
-              <img src={`${RF}/btn-contest.webp`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
             </Link>
           </motion.div>
 
@@ -776,7 +778,7 @@ function ResultLoadingScreen() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <img src={`${BASE}/loading.webp`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
+      <img src={`${BASE}/loading.webp${CACHE_V}`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
       <motion.p
         className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest"
         style={{ fontFamily: QUIZ_FONT }}
@@ -824,7 +826,7 @@ export default function SoulGuitarResult() {
 
     const RF = `${BASE}/result/${folder}`;
     const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
-      f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}`; }),
+      f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}${CACHE_V}`; }),
     );
     Promise.all(assets).then(() => setIsLoading(false));
   }, [folder, resultKey, slug, shouldRedirect]);
@@ -844,38 +846,45 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp` : '';
+  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp${CACHE_V}` : '';
 
   return (
-    <div
-      className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundColor: resultData.themeColor,
-        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'top center',
-      }}
-    >
-      <AnimatePresence>
-        {isLoading && <ResultLoadingScreen key="result-loading" />}
-      </AnimatePresence>
-      <div className="w-full max-w-[430px]">
-        <FullResultPage
-          resultKey={resultKey}
-          folder={RESULT_FOLDER[resultKey]}
-          layout={layout}
-          onLayoutChange={handleLayoutChange}
-        />
+    <>
+      {/* Background — fixed to viewport so it always covers the screen as user scrolls */}
+      <div
+        className="fixed inset-0 bg-cover bg-top pointer-events-none"
+        style={{
+          backgroundColor: resultData.themeColor,
+          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        className="relative w-full min-h-dvh flex flex-col items-center overflow-x-hidden"
+        style={{ zIndex: 1 }}
+      >
+        <AnimatePresence>
+          {isLoading && <ResultLoadingScreen key="result-loading" />}
+        </AnimatePresence>
+        <div className="w-full max-w-[430px]">
+          <FullResultPage
+            resultKey={resultKey}
+            folder={RESULT_FOLDER[resultKey]}
+            layout={layout}
+            onLayoutChange={handleLayoutChange}
+          />
+        </div>
+        {isEditMode && (
+          <LayoutEditor
+            slug={slug}
+            layout={layout}
+            onChange={handleLayoutChange}
+            onReset={() => setLayout(DEFAULT_LAYOUT)}
+            editKey={editKey}
+          />
+        )}
       </div>
-      {isEditMode && (
-        <LayoutEditor
-          slug={slug}
-          layout={layout}
-          onChange={handleLayoutChange}
-          onReset={() => setLayout(DEFAULT_LAYOUT)}
-          editKey={editKey}
-        />
-      )}
-    </div>
+    </>
   );
 }
