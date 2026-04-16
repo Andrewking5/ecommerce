@@ -207,15 +207,16 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // 取得某個素材的 flow 樣式（寬度 + 上邊距 + 位移 + 圖層）
+  // 取得某個素材的 flow 樣式（寬度 + 上邊距 + 圖層）
+  // x/y 使用 CSS `translate` 屬性，避免與 Framer Motion 的 transform 衝突
   const fs = (key: AssetKey, extra?: React.CSSProperties): React.CSSProperties => {
     const c = layout[key];
     return {
       width: `${c.w}%`,
       marginTop: `${c.mt}px`,
-      transform: `translate(${c.x}px, ${c.y}px)`,
       zIndex: c.z,
       position: 'relative',
+      ...(c.x !== 0 || c.y !== 0 ? { translate: `${c.x}px ${c.y}px` } : {}),
       ...extra,
     };
   };
@@ -352,9 +353,9 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
 
           {/* 你的個人特質 */}
           <motion.div
-            style={fs('personalityCard', { perspective: 800 })}
-            initial={{ opacity: 0, y: 30, rotateX: 8 }}
-            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            style={fs('personalityCard')}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px', root: scrollRef }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -365,10 +366,10 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           <motion.div
             className="overflow-hidden rounded-xl"
             style={fs('cityCard')}
-            initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
-            whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: '-50px', root: scrollRef }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
           </motion.div>
@@ -376,8 +377,8 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           {/* 猜猜這是哪 */}
           <motion.div
             style={fs('textGuess')}
-            initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
             transition={{ duration: 0.5 }}
           >
@@ -387,10 +388,10 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           {/* 這樣的你，會發出什麼樣的聲音？ */}
           <motion.div
             style={fs('textSound')}
-            initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
           </motion.div>
@@ -398,8 +399,8 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           {/* 你可能會喜歡的 Ayers 吉他款式 */}
           <motion.div
             style={fs('titleAyers')}
-            initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
             transition={{ duration: 0.5 }}
           >
@@ -431,10 +432,10 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           {/* 你聽出來了嗎 */}
           <motion.div
             style={fs('textHeard')}
-            initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px', root: scrollRef }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
           </motion.div>
@@ -442,8 +443,8 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           {/* 你會愛上的吉他音樂風格 */}
           <motion.div
             style={fs('titleMusic')}
-            initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
             transition={{ duration: 0.5 }}
           >
@@ -619,7 +620,19 @@ function LayoutEditor({ slug, layout, onChange, onReset }: {
         className="flex-1 accent-amber-400"
         style={{ height: '3px' }}
       />
-      <span className="w-9 text-right text-white/80 tabular-nums font-mono">{value}</span>
+      <input
+        type="number"
+        aria-label={`${label} 數值`}
+        value={value}
+        min={min}
+        max={max}
+        onChange={e => {
+          const v = Number(e.target.value);
+          if (!isNaN(v)) onCh(Math.min(max, Math.max(min, v)));
+        }}
+        className="w-11 text-right bg-white/10 text-white/90 tabular-nums font-mono rounded px-1 border-0 outline-none focus:bg-white/20 text-[10px]"
+        style={{ MozAppearance: 'textfield' }}
+      />
     </div>
   );
 
@@ -636,7 +649,7 @@ function LayoutEditor({ slug, layout, onChange, onReset }: {
       </button>
 
       {panelOpen && (
-        <div className="pointer-events-auto w-60 bg-black/92 backdrop-blur-sm text-white overflow-y-auto flex flex-col shadow-2xl">
+        <div className="pointer-events-auto w-72 bg-black/92 backdrop-blur-sm text-white overflow-y-auto flex flex-col shadow-2xl">
 
           {/* 頂部固定 header */}
           <div className="sticky top-0 z-10 bg-black/95 px-3 py-2 flex items-center justify-between border-b border-white/10">
