@@ -332,7 +332,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
           <img src={`${RF}/hero-card.webp${CACHE_V}`} alt={result.name} className="w-full h-auto block" />
         </motion.div>
 
-        <div className="w-[90%] mx-auto flex flex-col items-center">
+        <div className="w-full flex flex-col items-center">
 
           {/* 長按儲存提示 */}
           <motion.div
@@ -455,8 +455,8 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="relative w-full h-[280px] overflow-hidden">
-                  <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-full object-contain object-bottom" draggable={false} />
+                <div className="w-full">
+                  <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
                 </div>
                 <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
                   <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />

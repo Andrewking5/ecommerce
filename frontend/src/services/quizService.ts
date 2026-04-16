@@ -24,7 +24,7 @@ export type LayoutConfig = Record<AssetKey, AssetConfig>;
 const a = (w: number, mt: number, x = 0, y = 0, z = 1): AssetConfig => ({ w, mt, x, y, z });
 
 export const DEFAULT_LAYOUT: LayoutConfig = {
-  heroCard:        a(80,  43),           // mt ≈ 10% of 430px
+  heroCard:        a(100, 43),           // full width — assets are pre-sized by designer
   textSave:        a(75,  12),           // mt-3
   textScroll:      a(80,  16),           // mt-4
   textChance:      a(90,  20),           // mt-5
