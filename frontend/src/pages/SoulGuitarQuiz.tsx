@@ -498,6 +498,16 @@ export default function SoulGuitarQuiz() {
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
 
+  useEffect(() => {
+    return () => {
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current.currentTime = 0;
+        bgmRef.current = null;
+      }
+    };
+  }, []);
+
   const playBgm = () => {
     if (!bgmRef.current) {
       const audio = new Audio('/audio/quiz-bg.mp3');
