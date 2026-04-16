@@ -202,7 +202,7 @@ export default function SoulGuitarInfo() {
           {(() => {
             const STEPS = [
               { n: 1, title: '心理測驗', desc: '完成心理測驗，測出你的吉他靈魂' },
-              { n: 2, title: '拍攝影片', desc: '穿著自行選定的指定顏色，拍攝參賽影片' },
+              { n: 2, title: '拍攝影片', desc: '穿上你測驗結果對應的「靈魂顏色」服裝，拍攝你的參賽影片' },
               { n: 3, title: '上傳影片', desc: '上傳至 YouTube（必須）及 IG / FB（擇一）' },
               { n: 4, title: '填寫表單', desc: '填寫報名表單，完成報名' },
               { n: 5, title: '收到 Email', desc: '收到報名成功 Email，即完成參賽' },
