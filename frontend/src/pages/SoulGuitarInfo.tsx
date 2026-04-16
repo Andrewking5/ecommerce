@@ -14,8 +14,17 @@ const POSTER = '/images/events/soul-guitar-poster.webp';
 const GOLD = '#c5a059';
 const DARK = '#111827';
 
-const SIX = ['#3b82f6', '#ef4444', '#facc15', '#f97316', '#1a1a1a', '#f5f5f5'];
-const SIX_NAMES = ['藍', '紅', '黃', '橘', '黑', '白'];
+const SIX = ['#3b82f6', '#ef4444', '#facc15', '#f97316'];
+const SIX_NAMES = ['藍', '紅', '黃', '橘'];
+
+const SOUL_CARDS = [
+  { color: '#ef4444', colorName: '紅色', soul: '火焰吉他靈魂', tag: '帶著能量的人',       emoji: '🔥', path: 'fire'      },
+  { color: '#ef4444', colorName: '紅色', soul: '煙火吉他靈魂', tag: '帶著火花的創作者',    emoji: '✨', path: 'fireworks' },
+  { color: '#f97316', colorName: '橘色', soul: '太陽吉他靈魂', tag: '陽光型生活家',       emoji: '☀️', path: 'sun'       },
+  { color: '#facc15', colorName: '黃色', soul: '微光吉他靈魂', tag: '溫暖的傾聽者',       emoji: '🌅', path: 'glow'      },
+  { color: '#3b82f6', colorName: '藍色', soul: '海浪吉他靈魂', tag: '自由的探索者',       emoji: '🌊', path: 'wave'      },
+  { color: '#3b82f6', colorName: '藍色', soul: '深海吉他靈魂', tag: '海霧裡的觀察者',     emoji: '🌀', path: 'deep-sea'  },
+];
 
 const JUDGES = [
   { name: '四分衛－虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp', link: 'https://www.instagram.com/quarterback_band/', posClass: 'object-center' },
@@ -559,16 +568,40 @@ export default function SoulGuitarInfo() {
           </div>
 
           {/* 穿著顏色 */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-400 mb-3">指定穿著顏色：</p>
-            <div className="flex items-center gap-3 justify-center flex-wrap">
+          <div className="mt-6">
+            <p className="text-sm text-gray-400 mb-4 text-center">指定穿著顏色：</p>
+            {/* 色樣 */}
+            <div className="flex items-center gap-3 justify-center flex-wrap mb-6">
               {SIX.map((c, i) => (
                 <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="w-8 h-8 rounded-lg border" style={{ backgroundColor: c, borderColor: i >= 4 ? '#ccc' : c }} />
+                  <div className="w-8 h-8 rounded-lg border" style={{ backgroundColor: c, borderColor: c }} />
                   <span className="text-[10px] text-gray-400">{SIX_NAMES[i]}</span>
                 </div>
               ))}
             </div>
+            {/* 靈魂小卡 — 2行各3個 */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {SOUL_CARDS.map((card) => (
+                <a
+                  key={card.path}
+                  href="/e/soul-guitar"
+                  className="group relative rounded-2xl overflow-hidden border border-gray-100 bg-white hover:-translate-y-1 transition-transform duration-300 shadow-sm hover:shadow-md"
+                >
+                  {/* 色條 */}
+                  <div className="h-1.5" style={{ backgroundColor: card.color }} />
+                  <div className="p-3 sm:p-4">
+                    {/* 色標 */}
+                    <span className="inline-block text-[9px] font-bold px-2 py-0.5 rounded-full mb-2" style={{ backgroundColor: card.color + '18', color: card.color }}>
+                      {card.colorName}
+                    </span>
+                    <div className="text-2xl mb-1.5">{card.emoji}</div>
+                    <p className="text-[11px] sm:text-xs font-bold text-gray-800 leading-snug mb-0.5">{card.soul}</p>
+                    <p className="text-[9px] sm:text-[10px] text-gray-400">{card.tag}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-300 text-center mt-4">點擊卡片前往心理測驗，測出你的靈魂色彩</p>
           </div>
         </div>
       </section>
