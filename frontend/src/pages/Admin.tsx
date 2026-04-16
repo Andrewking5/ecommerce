@@ -2608,10 +2608,12 @@ function EventsTab() {
             <Users size={14} />
           </button>
         )}
-        <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-          <FileText size={14} />
-        </button>
+        {event.slug.includes('info') && (
+          <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+            <FileText size={14} />
+          </button>
+        )}
         <button onClick={() => setViewingQr(event)} title="QR Code"
           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
           <QrCode size={14} />
@@ -2620,10 +2622,12 @@ function EventsTab() {
           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
           {copiedId === event.id ? <Check size={14} className="text-green-400" /> : <Link size={14} />}
         </button>
-        <button onClick={() => handleViewAnalytics(event)} title="數據分析"
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-          <BarChart3 size={14} />
-        </button>
+        {!event.slug.includes('/') && (
+          <button onClick={() => handleViewAnalytics(event)} title="數據分析"
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+            <BarChart3 size={14} />
+          </button>
+        )}
         <button onClick={() => handleToggle(event.id)} title={event.isActive ? '隱藏' : '顯示'}
           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
           {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
