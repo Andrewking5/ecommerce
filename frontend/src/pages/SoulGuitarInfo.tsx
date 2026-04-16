@@ -598,35 +598,79 @@ export default function SoulGuitarInfo() {
             ))}
           </div>
 
-          {/* 穿著顏色 */}
-          <div className="mt-6">
-            <p className="text-sm text-gray-400 mb-4 text-center">指定穿著顏色：</p>
-            {/* 色樣 */}
-            <div className="flex items-center gap-3 justify-center flex-wrap mb-6">
-              {SIX.map((c, i) => (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="w-8 h-8 rounded-lg border" style={{ backgroundColor: c, borderColor: c }} />
-                  <span className="text-[10px] text-gray-400">{SIX_NAMES[i]}</span>
+          {/* 穿著顏色 — 靈魂 × 服裝對照 */}
+          <div className="mt-8">
+            <p className="text-sm font-bold text-gray-700 mb-1 text-center">測出靈魂後，請穿上對應的顏色參賽</p>
+            <p className="text-[11px] text-gray-400 text-center mb-6">服裝顏色需與影片開頭自述的靈魂顏色一致</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                {
+                  colors: [{ hex: '#ef4444', name: '紅色' }],
+                  note: null,
+                  souls: ['fire', 'fireworks'],
+                  soulNames: ['火焰魂', '煙火魂'],
+                  accent: '#ef4444',
+                  bg: '#fef2f2',
+                },
+                {
+                  colors: [{ hex: '#3b82f6', name: '藍色' }],
+                  note: null,
+                  souls: ['wave', 'deep-sea'],
+                  soulNames: ['海浪魂', '深海魂'],
+                  accent: '#3b82f6',
+                  bg: '#eff6ff',
+                },
+                {
+                  colors: [{ hex: '#f97316', name: '橘色' }, { hex: '#facc15', name: '黃色' }],
+                  note: '橘或黃，自選其一',
+                  souls: ['sun', 'glow'],
+                  soulNames: ['太陽魂', '微光魂'],
+                  accent: '#f97316',
+                  bg: '#fff7ed',
+                },
+                {
+                  colors: [{ hex: '#1a1a1a', name: '黑色' }, { hex: '#e5e5e5', name: '白色' }],
+                  note: '黑或白，自選其一',
+                  souls: ['moon', 'dream-moon'],
+                  soulNames: ['月光魂', '夢月魂'],
+                  accent: '#6B6B9E',
+                  bg: '#f5f5f7',
+                },
+              ].map((group) => (
+                <div key={group.souls[0]} className="rounded-2xl overflow-hidden border" style={{ borderColor: group.accent + '30', backgroundColor: group.bg }}>
+                  {/* 色條 header */}
+                  <div className="px-4 py-3 flex items-center justify-between" style={{ backgroundColor: group.accent + '12' }}>
+                    <div className="flex items-center gap-2">
+                      {group.colors.map((c) => (
+                        <div key={c.hex} className="flex items-center gap-1.5">
+                          <div className="w-5 h-5 rounded-full border-2 border-white/60 shadow-sm" style={{ backgroundColor: c.hex }} />
+                          <span className="text-xs font-bold" style={{ color: group.accent }}>{c.name}</span>
+                        </div>
+                      ))}
+                      {group.note && (
+                        <span className="text-[10px] text-gray-400 ml-1">（{group.note}）</span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-gray-400">↓ 對應靈魂</span>
+                  </div>
+                  {/* 兩張靈魂卡 */}
+                  <div className="grid grid-cols-2 gap-3 p-3">
+                    {group.souls.map((path, idx) => (
+                      <a key={path} href="/e/soul-guitar" className="group block rounded-xl overflow-hidden shadow hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+                        <img
+                          src={`/images/events/quiz/result/${path}/hero-card.webp`}
+                          alt={group.soulNames[idx]}
+                          className="w-full h-auto block group-hover:scale-[1.02] transition-transform duration-500"
+                        />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-            {/* 靈魂小卡 — 2行各4個，使用 hero-card 圖片 */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {SOUL_CARDS.map((card) => (
-                <a
-                  key={card.path}
-                  href="/e/soul-guitar"
-                  className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-                >
-                  <img
-                    src={`/images/events/quiz/result/${card.path}/hero-card.webp`}
-                    alt={card.soul}
-                    className="w-full h-auto block group-hover:scale-[1.03] transition-transform duration-500"
-                  />
-                </a>
-              ))}
-            </div>
-            <p className="text-[10px] text-gray-300 text-center mt-4">點擊卡片前往心理測驗，測出你的靈魂色彩</p>
+
+            <p className="text-[10px] text-gray-300 text-center mt-5">點擊卡片前往心理測驗，測出你的靈魂顏色</p>
           </div>
         </div>
       </section>
