@@ -29,11 +29,11 @@ const SOUL_CARDS = [
 ];
 
 const JUDGES = [
-  { name: '四分衛－虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp', link: 'https://www.instagram.com/quarterback_band/', posClass: 'object-center' },
-  { name: 'PiA 吳蓓雅', title: '創作歌手', photo: '/images/events/judges/pia.webp', link: 'https://www.instagram.com/piaxstudio/', posClass: 'object-top' },
-  { name: 'JOYCE 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.webp', link: 'https://www.instagram.com/joyce.ch0627/', posClass: 'object-center' },
-  { name: '林小歐', title: '職業樂手', photo: '/images/events/judges/linxiaoou.webp', link: 'https://www.facebook.com/novsherry/', posClass: 'object-center' },
-  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.webp', link: 'https://www.facebook.com/woodywoody2g/', posClass: 'object-top' },
+  { name: '四分衛－虎神', title: '四分衛樂團 吉他手/團長', photo: '/images/events/judges/hushen.webp?v=2', link: 'https://www.instagram.com/quarterback_band/', posClass: 'object-center' },
+  { name: 'PiA 吳蓓雅', title: '創作歌手', photo: '/images/events/judges/pia.webp?v=2', link: 'https://www.instagram.com/piaxstudio/', posClass: 'object-top' },
+  { name: 'JOYCE 就以斯', title: '創作歌手', photo: '/images/events/judges/joyce.webp?v=2', link: 'https://www.instagram.com/joyce.ch0627/', posClass: 'object-center' },
+  { name: '林小歐', title: '職業樂手', photo: '/images/events/judges/linxiaoou.webp?v=2', link: 'https://www.facebook.com/novsherry/', posClass: 'object-center' },
+  { name: '張仲麟', title: '指彈吉他演奏家', photo: '/images/events/judges/zhangzhonglin.webp?v=2', link: 'https://www.facebook.com/woodywoody2g/', posClass: 'object-top' },
 ];
 
 function Strip() {
