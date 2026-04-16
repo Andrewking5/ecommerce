@@ -625,31 +625,33 @@ export default function SoulGuitarInfo() {
       </section>
 
       {/* ═══════════ 主辦 / 協辦 / 贊助 ═══════════ */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        {/* 主辦 */}
-        <div className="mb-10">
-          <p className="text-[10px] text-gray-300 uppercase tracking-widest mb-4 text-center">主辦單位</p>
-          <div className="flex justify-center">
-            <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-10 object-contain" />
+      <section style={{ backgroundColor: DARK }}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          {/* 主辦 */}
+          <div className="mb-10">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4 text-center">主辦單位</p>
+            <div className="flex justify-center">
+              <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-10 object-contain" />
+            </div>
           </div>
-        </div>
 
-        {/* 協辦 */}
-        <div className="mb-10">
-          <p className="text-[10px] text-gray-300 uppercase tracking-widest mb-5 text-center">協辦單位</p>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <img src="/images/events/sponsors/cohost-91pu.png" alt="91譜" className="h-9 object-contain" />
-            <img src="/images/events/sponsors/cohost-soundtide.png" alt="聲潮" className="h-9 object-contain" />
-            <img src="/images/events/sponsors/cohost-born-for-guitar.png" alt="生為吉他人 死為吉他魂" className="h-9 object-contain" />
+          {/* 協辦 */}
+          <div className="mb-10">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-5 text-center">協辦單位</p>
+            <div className="flex flex-wrap items-center justify-center gap-8">
+              <img src="/images/events/sponsors/cohost-91pu.png" alt="91譜" className="h-9 object-contain" />
+              <img src="/images/events/sponsors/cohost-soundtide.png" alt="聲潮" className="h-9 object-contain" />
+              <img src="/images/events/sponsors/cohost-born-for-guitar.png" alt="生為吉他人 死為吉他魂" className="h-9 object-contain" />
+            </div>
           </div>
-        </div>
 
-        {/* 贊助 */}
-        <div>
-          <p className="text-[10px] text-gray-300 uppercase tracking-widest mb-5 text-center">贊助單位</p>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <img src="/images/events/sponsors/sponsor-aosen.png" alt="奧昇" className="h-9 object-contain" />
-            <img src="/images/events/sponsors/sponsor-yunsound.png" alt="雲聲" className="h-9 object-contain" />
+          {/* 贊助 */}
+          <div>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-5 text-center">贊助單位</p>
+            <div className="flex flex-wrap items-center justify-center gap-8">
+              <img src="/images/events/sponsors/sponsor-aosen.png" alt="奧昇" className="h-9 object-contain" />
+              <img src="/images/events/sponsors/sponsor-yunsound.png" alt="雲聲" className="h-9 object-contain" />
+            </div>
           </div>
         </div>
       </section>
