@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - link [ref=e7] [cursor=pointer]:
+          - /url: /zh-TW/
+          - img [ref=e8]
+        - generic [ref=e11]:
+          - link "系列" [ref=e12] [cursor=pointer]:
+            - /url: /zh-TW/collections
+          - link "3D 客製工坊" [ref=e13] [cursor=pointer]:
+            - /url: /zh-TW/customizer
+          - link "演奏家" [ref=e14] [cursor=pointer]:
+            - /url: /zh-TW/community
+          - link "門市據點" [ref=e15] [cursor=pointer]:
+            - /url: /zh-TW/store-locator
+          - link "關於我們" [ref=e16] [cursor=pointer]:
+            - /url: /zh-TW/about
+        - generic [ref=e17]:
+          - button "Switch language" [ref=e19]:
+            - img [ref=e20]
+            - generic [ref=e23]: 繁
+          - button "Toggle search" [ref=e24]:
+            - img [ref=e25]
+          - link [ref=e28] [cursor=pointer]:
+            - /url: /zh-TW/login
+            - img [ref=e29]
+          - link [ref=e32] [cursor=pointer]:
+            - /url: /zh-TW/checkout
+            - img [ref=e33]
+    - main [ref=e37]:
+      - img "Loading" [ref=e40]
+    - contentinfo [ref=e41]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - link [ref=e45] [cursor=pointer]:
+              - /url: /zh-TW/
+              - img [ref=e46]
+            - paragraph [ref=e49]: 自 1996 年以來，以熱情與精湛工藝打造頂級原聲吉他。感受我們聲學工程的共鳴力量。
+          - generic [ref=e50]:
+            - heading "快速連結" [level=4] [ref=e51]
+            - list [ref=e52]:
+              - listitem [ref=e53]:
+                - link "系列" [ref=e54] [cursor=pointer]:
+                  - /url: /zh-TW/collections
+              - listitem [ref=e55]:
+                - link "3D 客製工坊" [ref=e56] [cursor=pointer]:
+                  - /url: /zh-TW/customizer
+              - listitem [ref=e57]:
+                - link "演奏家" [ref=e58] [cursor=pointer]:
+                  - /url: /zh-TW/community
+              - listitem [ref=e59]:
+                - link "門市據點" [ref=e60] [cursor=pointer]:
+                  - /url: /zh-TW/store-locator
+          - generic [ref=e61]:
+            - heading "客戶服務" [level=4] [ref=e62]
+            - list [ref=e63]:
+              - listitem [ref=e64]:
+                - link "客服中心" [ref=e65] [cursor=pointer]:
+                  - /url: /zh-TW/support
+              - listitem [ref=e66]:
+                - link "保固服務" [ref=e67] [cursor=pointer]:
+                  - /url: /zh-TW/warranty
+              - listitem [ref=e68]:
+                - link "配送與退換貨" [ref=e69] [cursor=pointer]:
+                  - /url: /zh-TW/shipping
+              - listitem [ref=e70]:
+                - link "聯絡我們" [ref=e71] [cursor=pointer]:
+                  - /url: /zh-TW/contact
+          - generic [ref=e72]:
+            - heading "電子報" [level=4] [ref=e73]
+            - paragraph [ref=e74]: 訂閱以獲取獨家內容與優惠。
+            - generic [ref=e75]:
+              - textbox "電子郵件" [ref=e76]
+              - button "訂閱" [ref=e77]
+            - generic [ref=e78]:
+              - link "Facebook" [ref=e79] [cursor=pointer]:
+                - /url: https://www.facebook.com/AyersgtUluruuke
+                - img [ref=e80]
+              - link "LINE" [ref=e82] [cursor=pointer]:
+                - /url: https://line.me/R/ti/p/@868lgkhc
+                - img [ref=e83]
+              - link "Instagram" [ref=e85] [cursor=pointer]:
+                - /url: https://www.instagram.com/ayersguitar/
+                - img [ref=e86]
+              - link "YouTube" [ref=e89] [cursor=pointer]:
+                - /url: https://www.youtube.com/user/AyersGuitar
+                - img [ref=e90]
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: © 2026 愛樂詩音樂企業有限公司 Ayers Music Enterprise Co., Ltd. 保留所有權利。
+            - button "吉他調音器" [ref=e97]:
+              - img [ref=e98]
+          - generic [ref=e101]:
+            - link "隱私權政策" [ref=e102] [cursor=pointer]:
+              - /url: /zh-TW/privacy
+            - link "服務條款" [ref=e103] [cursor=pointer]:
+              - /url: /zh-TW/terms
+  - generic [ref=e106]:
+    - generic [ref=e107]: "[plugin:vite:import-analysis] Failed to resolve import \"react-qrcode-logo\" from \"src/pages/EventDetail.tsx\". Does the file exist?"
+    - generic [ref=e108]: C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/src/pages/EventDetail.tsx:6:23
+    - generic [ref=e109]: "6 | import { useParams } from \"react-router-dom\"; 7 | import { Calendar, MapPin, Tag, Share2, Download, Copy, Check } from \"lucide-react\"; 8 | import { QRCode } from \"react-qrcode-logo\"; | ^ 9 | import SEO from \"../components/SEO\"; 10 | import OptimizedImage from \"../components/OptimizedImage\";"
+    - generic [ref=e110]: at TransformPluginContext._formatLog (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42528:41) at TransformPluginContext.error (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42525:16) at normalizeUrl (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40504:23) at process.processTicksAndRejections (node:internal/process/task_queues:103:5) at async file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40623:37 at async Promise.all (index 6) at async TransformPluginContext.transform (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:40550:7) at async EnvironmentPluginContainer.transform (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:42323:18) at async loadAndTransform (file:///C:/Users/anpen/Desktop/ai/ecommerce-main/frontend/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:35739:27
+    - generic [ref=e111]:
+      - text: Click outside, press Esc key, or fix the code to dismiss.
+      - text: You can also disable this overlay by setting
+      - code [ref=e112]: server.hmr.overlay
+      - text: to
+      - code [ref=e113]: "false"
+      - text: in
+      - code [ref=e114]: vite.config.ts
+      - text: .

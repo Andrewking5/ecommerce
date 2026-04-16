@@ -1,0 +1,27 @@
+- generic [ref=e7]:
+  - generic [ref=e16]:
+    - img "載入中" [ref=e17]
+    - paragraph [ref=e18]: 正在為你準備測驗⋯
+    - paragraph [ref=e19]:
+      - generic [ref=e20]: 🔊
+      - text: 建議開啟聲音，體驗更佳
+  - generic [ref=e24]:
+    - generic [ref=e25]: Q1
+    - paragraph [ref=e26]: 如果今天突然有一整天的空閒，你最想？
+    - generic [ref=e27]:
+      - button "找一家舒服的小店坐著放鬆" [ref=e28] [cursor=pointer]:
+        - generic [ref=e29]: 找一家舒服的小店坐著放鬆
+      - button "隨便出門走走看看城市" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: 隨便出門走走看看城市
+      - button "待在房間聽歌或想事情" [ref=e32] [cursor=pointer]:
+        - generic [ref=e33]: 待在房間聽歌或想事情
+      - button "找朋友出去玩熱鬧一下" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]: 找朋友出去玩熱鬧一下
+    - generic [ref=e38]:
+      - img "火焰" [ref=e42]
+      - img "太陽" [ref=e46]
+      - img "煙火" [ref=e49]
+      - img "微光" [ref=e52]
+      - img "海浪" [ref=e55]
+      - img "深海" [ref=e58]
+      - img "月光" [ref=e61]

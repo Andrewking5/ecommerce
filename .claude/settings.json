@@ -19,7 +19,18 @@
       "Bash(npx vitest:*)",
       "Bash(node -e \"const p = require\\(''@testing-library/react/package.json''\\); console.log\\(''testing-library/react:'', p.version\\)\")",
       "Bash(node -e \"const p = require\\(''c:/Users/anpen/AI/web_design/E-commerce/node_modules/react-dom/package.json''\\); console.log\\(''root react-dom:'', p.version\\)\")",
-      "Bash(grep -r UserBehavior c:/Users/anpen/AI/web_design/E-commerce --include=*.ts --include=*.tsx)"
+      "Bash(grep -r UserBehavior c:/Users/anpen/AI/web_design/E-commerce --include=*.ts --include=*.tsx)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(node -e ':*)",
+      "Bash(ls -la /c/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/images/events/judges/*.webp /c/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/images/events/*.webp)",
+      "Bash(ffmpeg -i \"c:/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/audio/quiz-bg.wav\" -b:a 128k \"c:/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/audio/quiz-bg.mp3\" -y)",
+      "Bash(npx --yes ffmpeg-static)",
+      "Bash(ls /c/ffmpeg*/bin/ffmpeg.exe)",
+      "Bash(node -e \"const p=require\\('ffmpeg-static'\\); const {execSync}=require\\('child_process'\\); execSync\\(p+' -i \\\\\"c:/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/audio/quiz-bg.wav\\\\\" -b:a 128k \\\\\"c:/Users/anpen/Desktop/ai/ecommerce-main/frontend/public/audio/quiz-bg.mp3\\\\\" -y', {stdio:'inherit'}\\)\")",
+      "Bash(grep -n 'prisma\\\\.$queryRaw\\\\|prisma\\\\.raw\\\\|query\\\\s*=' /c/Users/anpen/Desktop/ai/ecommerce-main/backend/src '--include=*.ts' -r)",
+      "Bash(grep -n '$queryRaw' /c/Users/anpen/Desktop/ai/ecommerce-main/backend/src/controllers/productController.ts)"
     ]
   }
 }

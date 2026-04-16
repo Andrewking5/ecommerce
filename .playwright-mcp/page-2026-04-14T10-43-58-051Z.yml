@@ -1,0 +1,24 @@
+- generic [ref=e64]:
+  - button "上一題" [ref=e65]:
+    - img [ref=e66]
+    - generic [ref=e68]: 上一題
+  - generic [ref=e70]:
+    - generic [ref=e71]: Q2
+    - paragraph [ref=e72]: 如果有一首歌讓你反覆聽很多次，通常是因為？
+    - generic [ref=e73]:
+      - button "旋律很溫暖很好聽" [ref=e74] [cursor=pointer]:
+        - generic [ref=e75]: 旋律很溫暖很好聽
+      - button "整體感覺很自由很流動" [ref=e76] [cursor=pointer]:
+        - generic [ref=e77]: 整體感覺很自由很流動
+      - button "歌詞或氛圍很有情緒" [ref=e78] [cursor=pointer]:
+        - generic [ref=e79]: 歌詞或氛圍很有情緒
+      - button "節奏很強讓人很想跳舞" [ref=e80] [cursor=pointer]:
+        - generic [ref=e81]: 節奏很強讓人很想跳舞
+    - generic [ref=e84]:
+      - img "火焰" [ref=e88]
+      - img "太陽" [ref=e91]
+      - img "煙火" [ref=e95]
+      - img "微光" [ref=e98]
+      - img "海浪" [ref=e101]
+      - img "深海" [ref=e104]
+      - img "月光" [ref=e107]

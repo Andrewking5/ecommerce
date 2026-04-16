@@ -1,0 +1,24 @@
+- generic [ref=e59]:
+  - button "上一題" [ref=e60]:
+    - img [ref=e61]
+    - generic [ref=e63]: 上一題
+  - generic [ref=e65]:
+    - generic [ref=e66]: Q3
+    - paragraph [ref=e67]: 如果要去聽一場現場音樂，你比較想去？
+    - generic [ref=e68]:
+      - button "小咖啡店 acoustic 演出" [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]: 小咖啡店 acoustic 演出
+      - button "戶外音樂表演" [ref=e71] [cursor=pointer]:
+        - generic [ref=e72]: 戶外音樂表演
+      - button "深夜小酒吧" [ref=e73] [cursor=pointer]:
+        - generic [ref=e74]: 深夜小酒吧
+      - button "Live House 現場演出" [ref=e75] [cursor=pointer]:
+        - generic [ref=e76]: Live House 現場演出
+    - generic [ref=e79]:
+      - img "火焰" [ref=e83]
+      - img "太陽" [ref=e86]
+      - img "煙火" [ref=e89]
+      - img "微光" [ref=e93]
+      - img "海浪" [ref=e96]
+      - img "深海" [ref=e99]
+      - img "月光" [ref=e102]

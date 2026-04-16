@@ -1,0 +1,221 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e8]:
+        - generic [ref=e10]:
+          - heading "2026 Ayers靈魂吉他手大賽" [level=1] [ref=e12]
+          - paragraph [ref=e14]:
+            - generic [ref=e15]: 初賽收件時間：2026年4⺝22日 – 6⺝7日台灣時間23:59截止。
+            - generic [ref=e16]: 比賽評審時間：2026年6⺝8日 – 6⺝17日。
+            - text: 得獎公佈時間：2026年6⺝29日 台灣時間21:00發佈得獎名單
+        - generic [ref=e18]:
+          - generic [ref=e20]:
+            - link "登入 Google" [ref=e21] [cursor=pointer]:
+              - /url: https://accounts.google.com/Login?continue=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLSd2x41xcTuQzzfEdEnNTyAXtTsoQ7YmReWEjwNiCIxKUBNdGQ%2Fviewform%3Ffbzx%3D-1655887077953994620
+            - text: 即可儲存進度。
+            - button "瞭解詳情" [ref=e22] [cursor=pointer]
+          - generic [ref=e24]: "* 表示必填問題"
+      - list [ref=e25]:
+        - listitem [ref=e26]:
+          - generic [ref=e31]: 穿上你的靈魂顏色，展現屬於你的吉他歌曲！
+        - listitem [ref=e34]:
+          - generic [ref=e39]: "參賽者正確影像參考~臉部、左手、右手清晰以免評審誤判 Shooting guideline: The video should show your face, left-hand, and right-hand clearly for fair judgement."
+        - listitem [ref=e42]:
+          - generic [ref=e47]: "參賽者正確影像參考~臉部、左手、右手清晰以免評審誤判 Shooting guideline: The video should show your face, left-hand, and right-hand clearly for fair judgement."
+        - listitem [ref=e50]:
+          - generic [ref=e52]:
+            - heading "了解比賽規則" [level=3] [ref=e55]:
+              - generic [ref=e56]: 了解比賽規則
+            - radiogroup "了解比賽規則" [ref=e59]:
+              - generic [ref=e63]:
+                - radio "選項 1" [ref=e65] [cursor=pointer]
+                - generic [ref=e70]: 選項 1
+        - listitem [ref=e71]:
+          - generic [ref=e73]:
+            - generic [ref=e75]:
+              - heading "姓名 Name 將這個問題設為必填" [level=3] [ref=e76]:
+                - generic [ref=e77]: 姓名 Name
+                - generic "將這個問題設為必填" [ref=e78]: "*"
+              - generic [ref=e79]: 真實姓名 Real Name
+            - generic [ref=e84]:
+              - textbox "姓名 Name 將這個問題設為必填" [ref=e85]
+              - generic: 您的回答
+        - listitem [ref=e87]:
+          - generic [ref=e89]:
+            - heading "藝名／樂團名" [level=3] [ref=e92]:
+              - generic [ref=e93]: 藝名／樂團名
+            - generic [ref=e98]:
+              - textbox "藝名／樂團名" [ref=e99]
+              - generic: 您的回答
+        - listitem [ref=e101]:
+          - generic [ref=e103]:
+            - generic [ref=e105]:
+              - heading "手機號碼 Phone Number 將這個問題設為必填" [level=3] [ref=e106]:
+                - generic [ref=e107]: 手機號碼 Phone Number
+                - generic "將這個問題設為必填" [ref=e108]: "*"
+              - generic [ref=e109]: 外籍人士須加上國際區碼 International code is needed if its not a Taiwan number
+            - generic [ref=e114]:
+              - textbox "手機號碼 Phone Number 將這個問題設為必填" [ref=e115]
+              - generic: 您的回答
+        - listitem [ref=e117]:
+          - generic [ref=e119]:
+            - generic [ref=e121]:
+              - heading "電子信箱 E-mail 將這個問題設為必填" [level=3] [ref=e122]:
+                - generic [ref=e123]: 電子信箱 E-mail
+                - generic "將這個問題設為必填" [ref=e124]: "*"
+              - generic [ref=e125]: 比賽期間請隨時注意是否有重要通知 ，吉他折價券以此E-mail發送。 During the competition period, please check for any important notifications at all times. Guitar discount vouchers will be sent via this email.
+            - generic [ref=e130]:
+              - textbox "電子信箱 E-mail 將這個問題設為必填" [ref=e131]
+              - generic: 您的回答
+        - listitem [ref=e133]:
+          - generic [ref=e135]:
+            - generic [ref=e137]:
+              - heading "最常使用的帳號 Your ID from one of the following (Facebook, Instagram, LINE, What's App) 將這個問題設為必填" [level=3] [ref=e138]:
+                - generic [ref=e139]: 最常使用的帳號 Your ID from one of the following (Facebook, Instagram, LINE, What's App)
+                - generic "將這個問題設為必填" [ref=e140]: "*"
+              - generic [ref=e141]: "例如: \"臉書ID: ayersguitar\" 比賽期間請隨時注意是否有重要通知 ex: \"Facebook ID: ayersguitar\". During the contest period , please be aware of any important notification."
+            - generic [ref=e146]:
+              - textbox "最常使用的帳號 Your ID from one of the following (Facebook, Instagram, LINE, What's App) 將這個問題設為必填" [ref=e147]
+              - generic: 您的回答
+        - listitem [ref=e149]:
+          - generic [ref=e151]:
+            - heading "彈唱組 演奏組" [level=3] [ref=e154]:
+              - generic [ref=e155]: 彈唱組 演奏組
+            - radiogroup "彈唱組 演奏組" [ref=e158]:
+              - generic [ref=e159]:
+                - generic [ref=e162]:
+                  - radio "彈唱組" [ref=e164] [cursor=pointer]
+                  - generic [ref=e169]: 彈唱組
+                - generic [ref=e172]:
+                  - radio "演奏組" [ref=e174] [cursor=pointer]
+                  - generic [ref=e179]: 演奏組
+        - listitem [ref=e180]:
+          - generic [ref=e182]:
+            - heading "靈魂顏色" [level=3] [ref=e185]:
+              - generic [ref=e187]: 靈魂顏色
+            - radiogroup "靈魂顏色" [ref=e190]:
+              - generic [ref=e191]:
+                - generic [ref=e194]:
+                  - radio "紅色" [ref=e196] [cursor=pointer]
+                  - generic [ref=e201]: 紅色
+                - generic [ref=e204]:
+                  - radio "橘色" [ref=e206] [cursor=pointer]
+                  - generic [ref=e211]: 橘色
+                - generic [ref=e214]:
+                  - radio "黃色" [ref=e216] [cursor=pointer]
+                  - generic [ref=e221]: 黃色
+                - generic [ref=e224]:
+                  - radio "藍色" [ref=e226] [cursor=pointer]
+                  - generic [ref=e231]: 藍色
+                - generic [ref=e234]:
+                  - radio "黑色" [ref=e236] [cursor=pointer]
+                  - generic [ref=e241]: 黑色
+                - generic [ref=e244]:
+                  - radio "白色" [ref=e246] [cursor=pointer]
+                  - generic [ref=e251]: 白色
+        - listitem [ref=e252]:
+          - generic [ref=e254]:
+            - heading "Youtube影片網址。YouTube video link 將這個問題設為必填" [level=3] [ref=e257]:
+              - generic [ref=e258]: Youtube影片網址。YouTube video link
+              - generic "將這個問題設為必填" [ref=e259]: "*"
+            - generic [ref=e262]:
+              - generic: 您的回答
+              - textbox "Youtube影片網址。YouTube video link 將這個問題設為必填" [ref=e264]
+        - listitem [ref=e266]:
+          - generic [ref=e268]:
+            - heading "FB 或 IG影片網址。Facebook or Instagram video link. 將這個問題設為必填" [level=3] [ref=e271]:
+              - generic [ref=e272]: FB 或 IG影片網址。Facebook or Instagram video link.
+              - generic "將這個問題設為必填" [ref=e273]: "*"
+            - generic [ref=e276]:
+              - generic: 您的回答
+              - textbox "FB 或 IG影片網址。Facebook or Instagram video link. 將這個問題設為必填" [ref=e278]
+        - listitem [ref=e280]:
+          - generic [ref=e282]:
+            - heading "參賽者須自行確認參賽曲目之版權使用無虞，並同意主辦單位得使用參賽影片作為本活動相關宣傳及活動使用。 Participants must ensure that the copyright of their selected competition piece is properly cleared, and agree that the organizer may use the submitted video for promotional and event-related purposes. 將這個問題設為必填" [level=3] [ref=e285]:
+              - generic [ref=e286]:
+                - text: 參賽者須自行確認參賽曲目之版權使用無虞，並同意主辦單位得使用參賽影片作為本活動相關宣傳及活動使用。
+                - paragraph [ref=e287]: Participants must ensure that the copyright of their selected competition piece is properly cleared, and agree that the organizer may use the submitted video for promotional and event-related purposes.
+              - generic "將這個問題設為必填" [ref=e288]: "*"
+            - radiogroup "參賽者須自行確認參賽曲目之版權使用無虞，並同意主辦單位得使用參賽影片作為本活動相關宣傳及活動使用。 Participants must ensure that the copyright of their selected competition piece is properly cleared, and agree that the organizer may use the submitted video for promotional and event-related purposes. 將這個問題設為必填" [ref=e291]:
+              - generic [ref=e295]:
+                - radio "同意" [ref=e297] [cursor=pointer]
+                - generic [ref=e302]: 同意
+        - listitem [ref=e303]:
+          - generic [ref=e305]:
+            - heading [level=3] [ref=e308]:
+              - generic [ref=e309]:
+                - text: 是否了解參賽12點注意事項，參加比賽者同意本規定之效參賽規則
+                - text: "1. 演奏組參賽者須將影片上傳至 ①YouTube （必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。"
+                - text: "2. 彈唱組參賽者須將影片上傳至 ①YouTube （必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。"
+                - text: 3.影片彈唱前需說明：「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」
+                - text: 4.影片總時長需為30秒至120秒。
+                - text: 5.錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果、可在影片上字幕。
+                - text: 6.同一組別穿著顏色需相同(指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種)。
+                - text: 7.參賽者須清楚露臉、至少完整上半身得以看清楚出左、右手彈奏姿勢。
+                - text: 8.限定參賽者自選一首中文(本土語系)、英文或演奏曲目，改編曲及原創曲均可。
+                - text: 9.聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop錄音循環。
+                - text: 10.限1~5人參賽，至少出現一把鋼弦木吉他。禁止對嘴代彈，如不符合以上規定將取消比賽資格。
+                - text: 11.參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。
+                - text: 12.所有評斷Ayers主辦官方保有最終決策權。
+                - paragraph [ref=e310]:
+                  - strong [ref=e311]: Competition Rules
+                - paragraph [ref=e312]: "1.Participants in the Instrumental Category must upload their video to ① YouTube (required) and ② either Instagram or Facebook, and title the video as “Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition”. The Instagram or Facebook post must also include the hashtag #2026AyersSoulGuitaristCompetition."
+                - paragraph [ref=e313]: "2.Participants in the Singing & Playing Category must upload their video to ① YouTube (required) and ② either Instagram or Facebook, and title the video as “Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition”. The Instagram or Facebook post must also include the hashtag #2026AyersSoulGuitaristCompetition."
+                - paragraph
+                - paragraph
+                - paragraph [ref=e314]:
+                  - text: "3.Before performing in the video, participants must say:"
+                  - text: “Hello everyone, I am (real name/stage name/band name). Today I am participating in the 2026 Ayers Soul Guitarist Competition, registering for the (Instrumental Category/Singing & Playing Category). My soul is (xx) guitar soul (⚠️ must match the color worn). (One sentence you would like to share with everyone.) The competition piece is (Song Title) by (Composer/Artist).”
+                - paragraph [ref=e315]: 4.The total video duration must be between 30 seconds and 120 seconds.
+                - paragraph [ref=e316]: 5.The recording must be in vertical format with a fixed camera and filmed in one continuous take. Editing, compositing, camera movement, or transition effects are prohibited. Subtitles may be added to the video.
+                - paragraph [ref=e317]: "6.Participants within the same group must wear the same color (designated colors are: orange, yellow, blue, black, white, or red; choose one)."
+                - paragraph [ref=e318]: 7.Participants must clearly show their face, and at least the full upper body must be visible so that both left and right hand playing positions can be clearly seen.
+                - paragraph [ref=e319]: 8.Participants must select one piece in Chinese (local language), English, or instrumental. Arrangements and original compositions are both allowed.
+                - paragraph [ref=e320]: 9.For audio presentation, only the participant’s live vocal (if applicable) and the acoustic guitar sound played in the video may be included. Vocal harmony effects and loop recording are prohibited.
+                - paragraph [ref=e321]: 10.Each entry may have 1 to 5 participants, and at least one steel-string acoustic guitar must be present. Lip-syncing or ghost playing is prohibited. Failure to comply with the above rules will result in disqualification.
+                - paragraph [ref=e322]: 11.Submitted videos must remain public during the judging period. If the video is deleted or made private and cannot be evaluated, it will be considered as forfeiting eligibility.
+                - paragraph [ref=e323]: 12.All judging decisions are subject to the final determination of Ayers, the organizer.
+              - generic "將這個問題設為必填" [ref=e324]: "*"
+            - radiogroup [ref=e327]:
+              - generic [ref=e328]:
+                - generic [ref=e331]:
+                  - radio "是 yes" [ref=e333] [cursor=pointer]
+                  - generic [ref=e338]: 是 yes
+                - generic [ref=e341]:
+                  - radio "不了解. 請在下一題留言提出問題，我們盡快回覆你. Not exactly sure. (Feel free to ask any question at following space.)" [ref=e343] [cursor=pointer]
+                  - generic [ref=e348]: 不了解. 請在下一題留言提出問題，我們盡快回覆你. Not exactly sure. (Feel free to ask any question at following space.)
+        - listitem [ref=e349]:
+          - generic [ref=e351]:
+            - heading "想對我們說的話 Anything you want to let us know?" [level=3] [ref=e354]:
+              - generic [ref=e355]: 想對我們說的話 Anything you want to let us know?
+            - generic [ref=e360]:
+              - textbox "想對我們說的話 Anything you want to let us know?" [ref=e361]
+              - generic: 您的回答
+        - listitem [ref=e363]:
+          - generic [ref=e364]:
+            - heading "按下方提交按鈕送出報名表，我們會祭出ＥＭＡＩＬ，如未收到請向我們聯繫，恭喜你完成2026Ayers靈魂吉他手大賽報名。 Click the submit button below to send your registration form. Congratulations, you have successfully completed your registration for the 2026 Ayers Soul Guitarist Competition." [level=2] [ref=e365]:
+              - text: 按下方提交按鈕送出報名表，我們會祭出ＥＭＡＩＬ，如未收到請向我們聯繫，恭喜你完成
+              - generic [ref=e366]: 2026Ayers靈魂吉他手大賽報名。
+              - paragraph [ref=e367]: Click the submit button below to send your registration form. Congratulations, you have successfully completed your registration for the 2026 Ayers Soul Guitarist Competition.
+            - generic [ref=e368]: 報名完成
+      - generic [ref=e369]:
+        - generic [ref=e370]:
+          - button "Submit" [ref=e372] [cursor=pointer]:
+            - generic [ref=e375]: 提交
+          - button "清除表單" [ref=e377] [cursor=pointer]:
+            - generic [ref=e380]: 清除表單
+        - generic [ref=e381]: 請勿利用 Google 表單送出密碼。
+    - generic [ref=e382]:
+      - generic [ref=e383]:
+        - text: 這份表單是在 愛樂詩音樂企業有限公司 中建立。
+        - paragraph [ref=e384]:
+          - text: 這份表單很可疑嗎？
+          - link "報告" [ref=e385] [cursor=pointer]:
+            - /url: https://docs.google.com/forms/d/e/1FAIpQLSd2x41xcTuQzzfEdEnNTyAXtTsoQ7YmReWEjwNiCIxKUBNdGQ/abuse
+      - link "Google 表單" [ref=e387] [cursor=pointer]:
+        - /url: //www.google.com/forms/about/?utm_source=product&utm_medium=forms_logo&utm_campaign=forms
+        - img "Google" [ref=e388]
+        - text: 表單
+  - generic [ref=e392]:
+    - button "說明和意見回饋" [ref=e393] [cursor=pointer]
+    - tooltip [ref=e396]: 說明和意見回饋
