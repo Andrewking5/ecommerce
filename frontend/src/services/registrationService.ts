@@ -47,7 +47,7 @@ const registrationService = {
   },
 
   async submit(eventSlug: string, payload: RegistrationPayload): Promise<{ id: string }> {
-    const { data } = await api.post(`/registrations/${eventSlug}`, payload);
+    const { data } = await api.post(`/registrations/submit/${eventSlug}`, payload);
     if (!data.success) throw new Error(data.error || '報名失敗');
     return data.data;
   },

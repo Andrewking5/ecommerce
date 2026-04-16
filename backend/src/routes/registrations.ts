@@ -26,8 +26,9 @@ const settingsSchema = Joi.object({
 }).min(1);
 
 // ─── Public ───
-router.get('/status/:eventSlug',  RegistrationController.getStatus);
-router.post('/:eventSlug',        validateRequest(submitSchema), RegistrationController.submit);
+// Use wildcard to support slugs with slashes e.g. "soul-guitar/register"
+router.get('/status/*',  RegistrationController.getStatus);
+router.post('/submit/*', validateRequest(submitSchema), RegistrationController.submit);
 
 // ─── Admin ───
 router.get('/admin/:eventId',          authenticateToken, requireAdmin, RegistrationController.list);

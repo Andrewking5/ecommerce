@@ -7,7 +7,7 @@ export class RegistrationController {
   /** Check if registration is open + current count */
   static async getStatus(req: Request, res: Response): Promise<void> {
     try {
-      const { eventSlug } = req.params;
+      const eventSlug = req.params[0] || req.params.eventSlug;
       const event = await prisma.event.findUnique({
         where: { slug: eventSlug },
         select: { id: true, registrationOpen: true, registrationLimit: true, _count: { select: { registrations: true } } },
@@ -36,7 +36,7 @@ export class RegistrationController {
   /** Submit a new registration (public) */
   static async submit(req: Request, res: Response): Promise<void> {
     try {
-      const { eventSlug } = req.params;
+      const eventSlug = req.params[0] || req.params.eventSlug;
       const event = await prisma.event.findUnique({
         where: { slug: eventSlug },
         select: { id: true, registrationOpen: true, registrationLimit: true, _count: { select: { registrations: true } } },
