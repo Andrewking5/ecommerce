@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import quizService from '../services/quizService';
+import quizService, { type LayoutConfig, DEFAULT_LAYOUT } from '../services/quizService';
 
 /* ──────────────────────────────────────
    Soul Guitar — 結果頁
@@ -194,7 +194,13 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
-function FullResultPage({ resultKey, folder }: { resultKey: string; folder: string }) {
+function FullResultPage({ resultKey, folder, layout, isEditMode, onLayoutChange }: {
+  resultKey: string;
+  folder: string;
+  layout: LayoutConfig;
+  isEditMode: boolean;
+  onLayoutChange: (patch: Partial<LayoutConfig>) => void;
+}) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
   const [showContent, setShowContent] = useState(false);
@@ -202,12 +208,7 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // 確認後的數值（不再需要 debug panel）
-  const charW = 76;
-  const leftW = 15;
-  const leftTop = 21;
-  const rightW = 14;
-  const rightTop = 24;
+  const L = layout;
 
   useEffect(() => {
     const t = setTimeout(() => setShowContent(true), 600);
@@ -215,7 +216,7 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
   }, []);
 
   const handleShare = async () => {
-    const url = window.location.href;
+    const url = `${window.location.origin}/e/soul-guitar`;
     const text = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的吉他靈魂 🎸`;
     if (navigator.share) {
       try { await navigator.share({ title: text, url }); } catch {}
@@ -245,7 +246,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
         {/* ─── Hero Card ─── */}
         <motion.div
-          className="w-[80%] mx-auto relative mt-[10%]"
+          className="mx-auto relative"
+          style={{ width: `${L.heroW}%`, marginTop: `${L.heroMt}%` }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -257,7 +259,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 長按儲存提示 */}
           <motion.div
-            className="mt-3 w-[75%]"
+            className="mt-3"
+            style={{ width: `${L.textSaveW}%` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
             transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
@@ -267,7 +270,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 往下看提示 */}
           <motion.div
-            className="mt-4 w-[80%]"
+            className="mt-4"
+            style={{ width: `${L.textScrollW}%` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
             transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
@@ -277,7 +281,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 一個讓你被聽見的機會 */}
           <motion.div
-            className="mt-5 w-[90%]"
+            className="mt-5"
+            style={{ width: `${L.textChanceW}%` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: showContent ? 1 : 0 }}
             transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
@@ -292,26 +297,27 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
             animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img src={result.charImg} alt={result.name} style={{ width: `${charW}%` }} className="relative z-0 h-auto object-contain" draggable={false} />
-            <img src={`${RF}/char-left.webp`} alt="" style={{ width: `${leftW}%`, top: `${leftTop}%` }} className="absolute z-10 left-0 h-auto object-contain" draggable={false} />
-            <img src={`${RF}/char-right.webp`} alt={result.colorName} style={{ width: `${rightW}%`, top: `${rightTop}%` }} className="absolute z-10 right-0 h-auto object-contain" draggable={false} />
+            <img src={result.charImg} alt={result.name} style={{ width: `${L.charW}%` }} className="relative z-0 h-auto object-contain" draggable={false} />
+            <img src={`${RF}/char-left.webp`} alt="" style={{ width: `${L.leftW}%`, top: `${L.leftTop}%`, left: `${L.leftLeft}%` }} className="absolute z-10 h-auto object-contain" draggable={false} />
+            <img src={`${RF}/char-right.webp`} alt={result.colorName} style={{ width: `${L.rightW}%`, top: `${L.rightTop}%`, right: `${L.rightRight}%` }} className="absolute z-10 h-auto object-contain" draggable={false} />
           </motion.div>
 
           {/* 你的個人特質 */}
           <motion.div
-            className="mt-8 w-full"
+            className="mt-8"
+            style={{ width: `${L.personalityW}%`, perspective: 800 }}
             initial={{ opacity: 0, y: 30, rotateX: 8 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true, margin: '-60px', root: scrollRef }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            style={{ perspective: 800 }}
           >
             <img src={`${RF}/personality-card.webp`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
           </motion.div>
 
           {/* 城市卡 */}
           <motion.div
-            className="mt-8 w-full overflow-hidden rounded-xl"
+            className="mt-8 overflow-hidden rounded-xl"
+            style={{ width: `${L.cityW}%` }}
             initial={{ opacity: 0, clipPath: 'inset(10% 10% 10% 10% round 12px)' }}
             whileInView={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 12px)' }}
             viewport={{ once: true, margin: '-50px', root: scrollRef }}
@@ -322,7 +328,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 猜猜這是哪 */}
           <motion.div
-            className="mt-5 w-[50%]"
+            className="mt-5"
+            style={{ width: `${L.textGuessW}%` }}
             initial={{ opacity: 0, scale: 0.9, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -333,7 +340,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 這樣的你，會發出什麼樣的聲音？ */}
           <motion.div
-            className="mt-10 w-[85%]"
+            className="mt-10"
+            style={{ width: `${L.textSoundW}%` }}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -344,7 +352,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 你可能會喜歡的 Ayers 吉他款式 */}
           <motion.div
-            className="mt-10 w-[80%]"
+            className="mt-10"
+            style={{ width: `${L.titleAyersW}%` }}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -377,7 +386,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 你聽出來了嗎 */}
           <motion.div
-            className="mt-8 w-[85%]"
+            className="mt-8"
+            style={{ width: `${L.textHeardW}%` }}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, margin: '-40px', root: scrollRef }}
@@ -388,7 +398,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 你會愛上的吉他音樂風格 */}
           <motion.div
-            className="mt-8 w-[75%]"
+            className="mt-8"
+            style={{ width: `${L.titleMusicW}%` }}
             initial={{ opacity: 0, scale: 0.92, filter: 'blur(6px)' }}
             whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
             viewport={{ once: true, root: scrollRef }}
@@ -398,7 +409,7 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
           </motion.div>
 
           {/* 音樂風格標籤 */}
-          <div className="mt-4 w-full flex flex-col gap-2.5">
+          <div className="mt-4 flex flex-col gap-2.5" style={{ width: `${L.tagsW}%` }}>
             {[1, 2, 3, 4].map(i => (
               <motion.div
                 key={i}
@@ -413,7 +424,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
           </div>
 
           <motion.div
-            className="mt-3 w-[85%]"
+            className="mt-3"
+            style={{ width: `${L.textContestW}%` }}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
@@ -424,7 +436,8 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
 
           {/* 比賽海報 */}
           <motion.div
-            className="mt-6 w-[85%] overflow-hidden rounded-xl"
+            className="mt-6 overflow-hidden rounded-xl"
+            style={{ width: `${L.posterW}%` }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, root: scrollRef }}
@@ -441,7 +454,7 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
             viewport={{ once: true, root: scrollRef }}
             transition={{ duration: 0.5 }}
           >
-            <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" className="w-[65%] h-auto self-start" draggable={false} />
+            <img src={`${RF}/char-type.webp`} alt="分享抽獎說明" style={{ width: `${L.charTypeW}%` }} className="h-auto self-start" draggable={false} />
 
             <div className="w-full flex items-center gap-3">
               <motion.button type="button" onClick={handleShare} className="flex-1 relative" whileTap={{ scale: 0.95 }}>
@@ -482,6 +495,131 @@ function FullResultPage({ resultKey, folder }: { resultKey: string; folder: stri
   );
 }
 
+/* ── 版面編輯器（管理員用，?edit 啟用） ── */
+function EditorSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="text-amber-400 font-semibold text-[11px] border-b border-white/10 pb-1">{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function LayoutEditor({ slug, layout, onChange, onReset }: {
+  slug: string;
+  layout: LayoutConfig;
+  onChange: (patch: Partial<LayoutConfig>) => void;
+  onReset: () => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const L = layout;
+
+  const Slider = ({ label, prop, min, max }: { label: string; prop: keyof LayoutConfig; min: number; max: number }) => (
+    <div className="flex items-center gap-2 text-[11px]">
+      <span className="w-26 shrink-0 text-white/60 leading-none">{label}</span>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        value={L[prop]}
+        onChange={e => onChange({ [prop]: Number(e.target.value) } as Partial<LayoutConfig>)}
+        className="flex-1 accent-amber-400 h-1"
+      />
+      <span className="w-7 text-right text-white/90 tabular-nums font-mono">{L[prop]}</span>
+    </div>
+  );
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await quizService.saveLayout(slug, layout);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed right-0 top-0 h-full z-200 flex pointer-events-none">
+      {/* Toggle tab */}
+      <button
+        type="button"
+        className="self-center pointer-events-auto bg-black/80 hover:bg-black text-white px-1 py-3 rounded-l-lg text-[10px] leading-none flex flex-col items-center gap-1 shadow-lg [writing-mode:vertical-rl]"
+        onClick={() => setOpen(p => !p)}
+      >
+        <span>{open ? '▶' : '◀'}</span>
+        <span className="rotate-180">編輯版面</span>
+      </button>
+
+      {/* Panel */}
+      {open && (
+        <div className="pointer-events-auto w-64 bg-black/90 backdrop-blur-sm text-white overflow-y-auto flex flex-col gap-3 p-3 shadow-2xl text-[11px]">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-sm text-white">版面編輯器</span>
+            <button type="button" onClick={onReset} className="text-red-400 hover:text-red-300 text-[11px]">重置預設</button>
+          </div>
+
+          <EditorSection title="Hero 卡">
+            <Slider label="寬度 %" prop="heroW" min={40} max={100} />
+            <Slider label="上邊距 %" prop="heroMt" min={0} max={30} />
+          </EditorSection>
+
+          <EditorSection title="角色圖">
+            <Slider label="寬度 %" prop="charW" min={30} max={100} />
+          </EditorSection>
+
+          <EditorSection title="左側裝飾">
+            <Slider label="寬度 %" prop="leftW" min={5} max={40} />
+            <Slider label="上 %" prop="leftTop" min={0} max={80} />
+            <Slider label="左 %" prop="leftLeft" min={-10} max={20} />
+          </EditorSection>
+
+          <EditorSection title="右側裝飾">
+            <Slider label="寬度 %" prop="rightW" min={5} max={40} />
+            <Slider label="上 %" prop="rightTop" min={0} max={80} />
+            <Slider label="右 %" prop="rightRight" min={-10} max={20} />
+          </EditorSection>
+
+          <EditorSection title="文字元素">
+            <Slider label="儲存提示" prop="textSaveW" min={20} max={100} />
+            <Slider label="往下看" prop="textScrollW" min={20} max={100} />
+            <Slider label="機會文字" prop="textChanceW" min={20} max={100} />
+            <Slider label="猜猜這是哪" prop="textGuessW" min={20} max={100} />
+            <Slider label="發出什麼聲音" prop="textSoundW" min={20} max={100} />
+            <Slider label="聽出來了嗎" prop="textHeardW" min={20} max={100} />
+            <Slider label="角色型標籤" prop="charTypeW" min={20} max={100} />
+          </EditorSection>
+
+          <EditorSection title="卡片 / 圖塊">
+            <Slider label="個人特質卡" prop="personalityW" min={40} max={100} />
+            <Slider label="城市卡" prop="cityW" min={40} max={100} />
+            <Slider label="Ayers 標題" prop="titleAyersW" min={20} max={100} />
+            <Slider label="音樂風格標題" prop="titleMusicW" min={20} max={100} />
+            <Slider label="音樂風格標籤" prop="tagsW" min={40} max={100} />
+            <Slider label="比賽資訊文字" prop="textContestW" min={40} max={100} />
+            <Slider label="比賽海報" prop="posterW" min={40} max={100} />
+          </EditorSection>
+
+          <div className="flex gap-2 pt-1 pb-2">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold py-1.5 rounded text-xs transition-colors"
+            >
+              {saving ? '儲存中…' : saved ? '已儲存 ✓' : '儲存設定'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── 統一載入畫面（與測驗頁同款） ── */
 function ResultLoadingScreen() {
   return (
@@ -507,10 +645,12 @@ function ResultLoadingScreen() {
    頁面進入點 — 讀 URL slug → 渲染結果
    ────────────────────────────────────── */
 export default function SoulGuitarResult() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const slug = pathname.replace('/e/soul-guitar/', '').replace(/\/$/, '');
   const resultKey = SLUG_TO_KEY[slug];
   const [isLoading, setIsLoading] = useState(true);
+  const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
+  const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
@@ -520,6 +660,9 @@ export default function SoulGuitarResult() {
     // Track this result (fire-and-forget, won't break UX on failure)
     quizService.trackResult(slug, resultKey);
 
+    // Load saved layout from DB; fall back to DEFAULT_LAYOUT if none exists
+    quizService.getLayout(slug).then(cfg => { if (cfg) setLayout(cfg); });
+
     const RF = `${BASE}/result/${folder}`;
     const min = new Promise(r => setTimeout(r, 1500));
     const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
@@ -527,6 +670,10 @@ export default function SoulGuitarResult() {
     );
     Promise.all([min, ...assets]).then(() => setIsLoading(false));
   }, [folder, resultKey, slug]);
+
+  const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {
+    setLayout(prev => ({ ...prev, ...patch }));
+  }, []);
 
   if (!resultKey || !RESULTS[resultKey]) {
     return <Navigate to="/e/soul-guitar" replace />;
@@ -543,8 +690,22 @@ export default function SoulGuitarResult() {
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
       <div className="w-full max-w-[430px] relative min-h-dvh">
-        <FullResultPage resultKey={resultKey} folder={RESULT_FOLDER[resultKey]} />
+        <FullResultPage
+          resultKey={resultKey}
+          folder={RESULT_FOLDER[resultKey]}
+          layout={layout}
+          isEditMode={isEditMode}
+          onLayoutChange={handleLayoutChange}
+        />
       </div>
+      {isEditMode && (
+        <LayoutEditor
+          slug={slug}
+          layout={layout}
+          onChange={handleLayoutChange}
+          onReset={() => setLayout(DEFAULT_LAYOUT)}
+        />
+      )}
     </div>
   );
 }

@@ -692,6 +692,16 @@ model EventClick {
   @@map("event_clicks")
 }
 
+// 心理測驗結果頁版面設定
+model QuizLayout {
+  id        String   @id @default(cuid())
+  slug      String   @unique                 // 角色 slug
+  config    Json                             // LayoutConfig JSON
+  updatedAt DateTime @updatedAt
+
+  @@map("quiz_layouts")
+}
+
 // 心理測驗結果追蹤
 model QuizResult {
   id        String   @id @default(cuid())

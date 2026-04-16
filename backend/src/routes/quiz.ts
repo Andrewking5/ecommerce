@@ -7,6 +7,12 @@ const router = Router();
 // Public — record a quiz result
 router.post('/results', QuizController.trackResult);
 
+// Public — get layout config for a character
+router.get('/layout/:slug', QuizController.getLayout);
+
+// Admin — save layout config for a character
+router.put('/admin/layout/:slug', authenticateToken, requireAdmin, QuizController.saveLayout);
+
 // Admin — fetch all analytics
 router.get('/admin/analytics', authenticateToken, requireAdmin, QuizController.getAnalytics);
 

@@ -56,6 +56,39 @@ export class QuizController {
     }
   }
 
+  /** GET /api/quiz/layout/:slug — get layout config (public) */
+  static async getLayout(req: Request, res: Response): Promise<void> {
+    try {
+      const { slug } = req.params;
+      const row = await prisma.quizLayout.findUnique({ where: { slug } });
+      res.json({ success: true, data: row?.config ?? null });
+    } catch (error) {
+      console.error('Failed to get quiz layout:', error);
+      res.status(500).json({ success: false, error: 'Failed to get layout' });
+    }
+  }
+
+  /** PUT /api/quiz/admin/layout/:slug — save layout config (admin only) */
+  static async saveLayout(req: Request, res: Response): Promise<void> {
+    try {
+      const { slug } = req.params;
+      const config = req.body;
+      if (!slug || typeof config !== 'object') {
+        res.status(400).json({ success: false, error: 'Invalid data' });
+        return;
+      }
+      await prisma.quizLayout.upsert({
+        where: { slug },
+        update: { config },
+        create: { slug, config },
+      });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to save quiz layout:', error);
+      res.status(500).json({ success: false, error: 'Failed to save layout' });
+    }
+  }
+
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {
