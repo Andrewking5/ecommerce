@@ -342,7 +342,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
 /* ── Loading ── */
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
-    const min = new Promise((r) => setTimeout(r, 2000));
+    const min = new Promise((r) => setTimeout(r, 5000));
     const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(
       (src) => new Promise<void>((r) => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; }),
     );
@@ -524,7 +524,8 @@ export default function SoulGuitarQuiz() {
       } else {
         // 最後一題 → 計算結果 → 跳轉結果頁
         const key = calculateResult(a);
-        navigate(`/e/soul-guitar/${RESULT_SLUG[key] ?? 'fire'}`, { state: { fromQuiz: true } });
+        sessionStorage.setItem('soulGuitar_fromQuiz', '1');
+        navigate(`/e/soul-guitar/${RESULT_SLUG[key] ?? 'fire'}`);
       }
     }, 500);
   };

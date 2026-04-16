@@ -794,15 +794,17 @@ function ResultLoadingScreen() {
    頁面進入點 — 讀 URL slug → 渲染結果
    ────────────────────────────────────── */
 export default function SoulGuitarResult() {
-  const { pathname, search, state } = useLocation();
+  const { pathname, search } = useLocation();
   const slug = pathname.replace('/e/soul-guitar/', '').replace(/\/$/, '');
   const resultKey = SLUG_TO_KEY[slug];
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
   const isSharedLink = new URLSearchParams(search).has('s'); // ?s=1 = 從分享連結來
-  const fromQuiz = !!(state as { fromQuiz?: boolean } | null)?.fromQuiz;
+  const fromQuiz = sessionStorage.getItem('soulGuitar_fromQuiz') === '1';
   const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
+  // 讀完就清除，避免 back button 繞過 redirect
+  if (fromQuiz) sessionStorage.removeItem('soulGuitar_fromQuiz');
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
