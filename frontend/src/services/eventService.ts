@@ -22,7 +22,10 @@ export interface Event {
   isActive: boolean;
   registrationOpen: boolean;
   registrationLimit: number;
-  metadata?: { rules?: Array<{ short: string; full: string }> } | null;
+  metadata?: {
+    rules?: Array<{ short: string; full: string }>;
+    sponsors?: Record<string, string>;
+  } | null;
   createdAt: string;
   updatedAt: string;
   _count?: { clicks: number; registrations?: number };

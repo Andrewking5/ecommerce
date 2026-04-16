@@ -87,16 +87,45 @@ const DEFAULT_RULES = [
   { short: 'Ayers 主辦保有最終決策權', full: '' },
 ];
 
+const DEFAULT_SPONSORS: Record<string, string> = {
+  ayers: '', '91pu': '', soundtide: '', 'born-for-guitar': '', aosen: '', yunsound: '',
+};
+
 export default function SoulGuitarInfo() {
   const [posterOpen, setPosterOpen] = useState(false);
   const [rules, setRules] = useState(DEFAULT_RULES);
+  const [eventId, setEventId] = useState<string | null>(null);
+  const [eventMeta, setEventMeta] = useState<Record<string, unknown>>({});
+  const [sponsors, setSponsors] = useState<Record<string, string>>(DEFAULT_SPONSORS);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
+  const isEdit = window.location.search.includes('edit');
 
   useEffect(() => {
     eventService.getEventBySlug('soul-guitar/info').then((event) => {
+      if (!event) return;
+      setEventId(event.id);
+      setEventMeta((event.metadata as Record<string, unknown>) ?? {});
       const apiRules = event?.metadata?.rules;
       if (Array.isArray(apiRules) && apiRules.length > 0) setRules(apiRules);
+      const apiSponsors = event?.metadata?.sponsors;
+      if (apiSponsors) setSponsors(prev => ({ ...prev, ...apiSponsors }));
     }).catch(() => {});
   }, []);
+
+  async function saveSponsors() {
+    if (!eventId) return;
+    setSaving(true);
+    try {
+      await eventService.updateEvent(eventId, { metadata: { ...eventMeta, sponsors } });
+      setSaveMsg('儲存成功！');
+    } catch {
+      setSaveMsg('儲存失敗，請確認已登入管理員帳號。');
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveMsg(''), 4000);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -625,14 +654,42 @@ export default function SoulGuitarInfo() {
         <Strip />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 space-y-14">
 
+          {/* edit 模式提示列 */}
+          {isEdit && (
+            <div className="flex items-center justify-between gap-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-5 py-3">
+              <p className="text-xs text-yellow-300 font-medium">✏️ 編輯模式 — 直接修改下方文字後點「儲存」</p>
+              <div className="flex items-center gap-3 shrink-0">
+                {saveMsg && <span className="text-xs text-yellow-200">{saveMsg}</span>}
+                <button
+                  type="button"
+                  onClick={saveSponsors}
+                  disabled={saving}
+                  className="text-xs font-bold px-4 py-1.5 rounded-lg bg-yellow-500 text-black hover:bg-yellow-400 disabled:opacity-50 transition-colors"
+                >
+                  {saving ? '儲存中…' : '儲存'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 主辦 */}
           <div>
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">主辦單位</p>
             <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-6 sm:p-8">
               <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-12 object-contain shrink-0" />
-              <div className="text-center sm:text-left">
-                <p className="text-sm font-bold text-white mb-1">Ayers Guitars</p>
-                <p className="text-xs text-white/40 leading-relaxed">請填入 Ayers 的介紹文字。</p>
+              <div className="text-center sm:text-left w-full">
+                <p className="text-sm font-bold text-white mb-2">Ayers Guitars</p>
+                {isEdit ? (
+                  <textarea
+                    className="w-full text-xs bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white/80 leading-relaxed resize-none focus:outline-none focus:border-yellow-500/50"
+                    rows={3}
+                    placeholder="Ayers 的介紹文字…"
+                    value={sponsors.ayers}
+                    onChange={e => setSponsors(p => ({ ...p, ayers: e.target.value }))}
+                  />
+                ) : (
+                  <p className="text-xs text-white/40 leading-relaxed whitespace-pre-wrap">{sponsors.ayers || '—'}</p>
+                )}
               </div>
             </div>
           </div>
@@ -642,16 +699,24 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">協辦單位</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { img: '/images/events/sponsors/cohost-91pu.png',             alt: '91譜',           name: '91譜',           desc: '請填入 91譜 的介紹文字。' },
-                { img: '/images/events/sponsors/cohost-soundtide.png',         alt: '聲潮',           name: '聲潮',           desc: '請填入聲潮的介紹文字。' },
-                { img: '/images/events/sponsors/cohost-born-for-guitar.png',   alt: '生為吉他人',     name: '生為吉他人 死為吉他魂', desc: '請填入生為吉他人的介紹文字。' },
+                { img: '/images/events/sponsors/cohost-91pu.png',           alt: '91譜',       name: '91譜',                key: '91pu'            },
+                { img: '/images/events/sponsors/cohost-soundtide.png',       alt: '聲潮',       name: '聲潮',                key: 'soundtide'       },
+                { img: '/images/events/sponsors/cohost-born-for-guitar.png', alt: '生為吉他人', name: '生為吉他人 死為吉他魂', key: 'born-for-guitar' },
               ].map((u) => (
-                <div key={u.alt} className="flex flex-col items-center text-center gap-4 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
+                <div key={u.alt} className="flex flex-col items-center text-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
                   <img src={u.img} alt={u.alt} className="h-10 object-contain" />
-                  <div>
-                    <p className="text-xs font-bold text-white mb-1">{u.name}</p>
-                    <p className="text-[11px] text-white/35 leading-relaxed">{u.desc}</p>
-                  </div>
+                  <p className="text-xs font-bold text-white">{u.name}</p>
+                  {isEdit ? (
+                    <textarea
+                      className="w-full text-[11px] bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white/80 leading-relaxed resize-none focus:outline-none focus:border-yellow-500/50"
+                      rows={3}
+                      placeholder={`${u.name} 的介紹文字…`}
+                      value={sponsors[u.key] ?? ''}
+                      onChange={e => setSponsors(p => ({ ...p, [u.key]: e.target.value }))}
+                    />
+                  ) : (
+                    <p className="text-[11px] text-white/35 leading-relaxed whitespace-pre-wrap">{sponsors[u.key] || '—'}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -662,15 +727,23 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">贊助單位</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { img: '/images/events/sponsors/sponsor-aosen.png',   alt: '奧昇', name: '奧昇', desc: '請填入奧昇的介紹文字。' },
-                { img: '/images/events/sponsors/sponsor-yunsound.png', alt: '雲聲', name: '雲聲', desc: '請填入雲聲的介紹文字。' },
+                { img: '/images/events/sponsors/sponsor-aosen.png',    alt: '奧昇', name: '奧昇', key: 'aosen'    },
+                { img: '/images/events/sponsors/sponsor-yunsound.png',  alt: '雲聲', name: '雲聲', key: 'yunsound' },
               ].map((u) => (
-                <div key={u.alt} className="flex flex-col items-center text-center gap-4 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
+                <div key={u.alt} className="flex flex-col items-center text-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
                   <img src={u.img} alt={u.alt} className="h-10 object-contain" />
-                  <div>
-                    <p className="text-xs font-bold text-white mb-1">{u.name}</p>
-                    <p className="text-[11px] text-white/35 leading-relaxed">{u.desc}</p>
-                  </div>
+                  <p className="text-xs font-bold text-white">{u.name}</p>
+                  {isEdit ? (
+                    <textarea
+                      className="w-full text-[11px] bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white/80 leading-relaxed resize-none focus:outline-none focus:border-yellow-500/50"
+                      rows={3}
+                      placeholder={`${u.name} 的介紹文字…`}
+                      value={sponsors[u.key] ?? ''}
+                      onChange={e => setSponsors(p => ({ ...p, [u.key]: e.target.value }))}
+                    />
+                  ) : (
+                    <p className="text-[11px] text-white/35 leading-relaxed whitespace-pre-wrap">{sponsors[u.key] || '—'}</p>
+                  )}
                 </div>
               ))}
             </div>
