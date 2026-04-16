@@ -372,7 +372,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
 
           {/* 角色圖 + 兩側裝飾 */}
           <motion.div
-            className="w-full relative flex justify-center overflow-hidden"
+            className="w-full relative flex justify-center overflow-visible"
             style={{ marginTop: `${C.char.mt}px` }}
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
@@ -613,8 +613,8 @@ const ASSET_META: {
   { key: 'textScroll',      label: '往下看提示',     wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'textChance',      label: '機會文字',       wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'char',            label: '角色圖',         wMin: 30, wMax: 130, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'charLeft',        label: '左側裝飾',  abs: true, wMin: 5, wMax: 50, mtMin: 0, mtMax: 100, xMin: -20, xMax: 50, zMin: 0, zMax: 50 },
-  { key: 'charRight',       label: '右側裝飾',  abs: true, wMin: 5, wMax: 50, mtMin: 0, mtMax: 100, xMin: -20, xMax: 50, zMin: 0, zMax: 50 },
+  { key: 'charLeft',        label: '左側裝飾',  abs: true, wMin: 0, wMax: 80, mtMin: -20, mtMax: 120, xMin: -20, xMax: 60, zMin: 0, zMax: 50 },
+  { key: 'charRight',       label: '右側裝飾',  abs: true, wMin: 0, wMax: 80, mtMin: -20, mtMax: 120, xMin: -20, xMax: 60, zMin: 0, zMax: 50 },
   { key: 'personalityCard', label: '個人特質卡',     wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'cityCard',        label: '城市卡',         wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'textGuess',       label: '猜猜這是哪',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
