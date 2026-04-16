@@ -312,8 +312,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
     </motion.button>
 
     <motion.div
-      ref={scrollRef}
-      className="absolute inset-0 z-50 overflow-y-auto overflow-x-hidden"
+      className="w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -399,7 +398,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('personalityCard')}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px', root: scrollRef }}
+            viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <img src={`${RF}/personality-card.webp`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
@@ -411,7 +410,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('cityCard')}
             initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-50px', root: scrollRef }}
+            viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <img src={`${RF}/city-card.webp`} alt={result.city} className="w-full h-auto" draggable={false} />
@@ -422,7 +421,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('textGuess')}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/text-guess.webp`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
@@ -433,7 +432,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('textSound')}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/text-sound.webp`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
@@ -444,7 +443,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('titleAyers')}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/title-ayers.webp`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
@@ -458,7 +457,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 className="flex flex-col items-center justify-between gap-3"
                 initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-40px', root: scrollRef }}
+                viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="relative w-full h-[280px] overflow-hidden">
@@ -477,7 +476,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('textHeard')}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px', root: scrollRef }}
+            viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/text-heard.webp`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
@@ -488,7 +487,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('titleMusic')}
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <img src={`${RF}/title-music-style.webp`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
@@ -501,7 +500,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
                 key={i}
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-30px', root: scrollRef }}
+                viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               >
                 <img src={`${RF}/tag-${i}.webp`} alt="" className="w-full h-auto" draggable={false} />
@@ -514,7 +513,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('textContest')}
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
             <img src={`${RF}/text-contest-info.webp`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
@@ -526,7 +525,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             style={fs('poster')}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
             <img src={`${RF}/poster.webp`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
@@ -537,7 +536,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
             className="mt-10 w-full flex flex-col items-center gap-4"
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, root: scrollRef }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <img
@@ -857,19 +856,19 @@ export default function SoulGuitarResult() {
 
   return (
     <div
-      className="w-full min-h-dvh relative flex justify-center"
+      className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
       style={{
         backgroundColor: resultData.themeColor + '18',
         backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
         backgroundSize: '100% auto',
-        backgroundRepeat: 'no-repeat',
+        backgroundRepeat: 'repeat-y',
         backgroundPosition: 'top center',
       }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div className="w-full max-w-[430px] relative min-h-dvh">
+      <div className="w-full max-w-[430px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
