@@ -801,12 +801,16 @@ export default function SoulGuitarResult() {
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
   const isSharedLink = new URLSearchParams(search).has('s'); // ?s=1 = 從分享連結來
-  const fromQuiz = sessionStorage.getItem('soulGuitar_fromQuiz') === '1';
+  // useState 初始化只跑一次，避免 re-render 時 sessionStorage 已被清除導致誤 redirect
+  const [fromQuiz] = useState(() => sessionStorage.getItem('soulGuitar_fromQuiz') === '1');
   const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
-  // 讀完就清除，避免 back button 繞過 redirect
-  if (fromQuiz) sessionStorage.removeItem('soulGuitar_fromQuiz');
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
+
+  // 清除 sessionStorage flag（只跑一次，在 render 之後）
+  useEffect(() => {
+    sessionStorage.removeItem('soulGuitar_fromQuiz');
+  }, []);
 
   useEffect(() => {
     if (!folder || !resultKey || shouldRedirect) return;
