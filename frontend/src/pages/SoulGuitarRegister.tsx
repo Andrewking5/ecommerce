@@ -480,16 +480,46 @@ export default function SoulGuitarRegister() {
           {/* 規則確認 */}
           <Field>
             <Label required>是否了解參賽 12 點注意事項？</Label>
-            <div className="space-y-2 mt-1">
+            <p className="text-xs text-white/25 mb-3">
+              參加比賽者同意本規定之效力
+            </p>
+
+            {/* 規則內容 */}
+            <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-3 max-h-64 overflow-y-auto space-y-3 text-xs text-white/50 leading-relaxed">
+              {[
+                { zh: '演奏組參賽者須將影片上傳至 ①YouTube（必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Participants in the Instrumental Category must upload their video to ① YouTube (required) and ② Instagram or Facebook, titled "Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition". Posts must include the hashtag #2026AyersSoulGuitaristCompetition.' },
+                { zh: '彈唱組參賽者須將影片上傳至 ①YouTube（必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Participants in the Singing & Playing Category must upload their video to ① YouTube (required) and ② Instagram or Facebook, titled "Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition". Posts must include the hashtag #2026AyersSoulGuitaristCompetition.' },
+                { zh: '影片彈唱前需說明：「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」', en: 'Before performing, participants must say: "Hello everyone, I am (name/stage name/band). I am joining the 2026 Ayers Soul Guitarist Competition, registering for the (category). My soul is (xx) guitar soul (⚠️ must match the color worn). (One sentence for everyone.) The competition piece is (Song Title) by (Composer)."' },
+                { zh: '影片總時長需為 30 秒至 120 秒。', en: 'The total video duration must be between 30 and 120 seconds.' },
+                { zh: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果，可在影片上加字幕。', en: 'The recording must be vertical, fixed-camera, one continuous take. Editing, compositing, camera movement, and transitions are prohibited. Subtitles may be added.' },
+                { zh: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。', en: 'All participants in a group must wear the same designated color: orange, yellow, blue, black, white, or red.' },
+                { zh: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。', en: 'Participants must clearly show their face and full upper body so both hands are visible.' },
+                { zh: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。', en: 'Participants must choose one piece in Chinese, English, or instrumental. Arrangements and original compositions are allowed.' },
+                { zh: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。', en: 'Only the live vocals and acoustic guitar played on screen may appear in the audio. Vocal harmony effects and loop recording are prohibited.' },
+                { zh: '限 1~5 人參賽，至少出現一把鋼弦木吉他。禁止對嘴代彈，如不符合以上規定將取消比賽資格。', en: '1–5 participants per entry, with at least one steel-string acoustic guitar. Lip-syncing or ghost playing is prohibited. Non-compliance results in disqualification.' },
+                { zh: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。', en: 'Videos must remain public during the judging period. Videos made private or deleted will be considered as forfeited.' },
+                { zh: '所有評斷 Ayers 主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
+              ].map((r, i) => (
+                <div key={i} className="flex gap-2.5">
+                  <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5" style={{ backgroundColor: '#c5a05920', color: GOLD }}>{i + 1}</span>
+                  <div>
+                    <p className="text-white/60">{r.zh}</p>
+                    <p className="mt-0.5 text-white/25">{r.en}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
               <RadioOption
                 selected={form.rulesOk === RULES_YES}
                 onClick={() => set('rulesOk', RULES_YES)}
-                label="是 Yes"
+                label="是，我已了解並同意  Yes, I understand and agree"
               />
               <RadioOption
                 selected={form.rulesOk === RULES_NO}
                 onClick={() => set('rulesOk', RULES_NO)}
-                label="不了解 — 請在下方留言提問，我們盡快回覆"
+                label="不了解 — 請在下方留言提問，我們盡快回覆  Not sure — I'll ask below"
               />
             </div>
             {errors.rulesOk && <FieldError text="請選擇是否了解規則" />}
