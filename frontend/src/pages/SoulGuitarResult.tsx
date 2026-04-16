@@ -919,21 +919,19 @@ export default function SoulGuitarResult() {
   const bgUrl = folder ? `${BASE}/result/${folder}/${encodeURIComponent(bgFile)}${CACHE_V}` : '';
 
   return (
-    // 外層只設背景色，避免在寬螢幕上背景圖被撐到全視窗寬
     <div
       className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{ backgroundColor: resultData.themeColor }}
+      style={{
+        backgroundColor: resultData.themeColor,
+        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+        backgroundSize: '100% 100%',
+      }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      {/* 內層 430px 容器才掛背景圖，確保響應式不失真 */}
       <div
-        className="w-full max-w-[430px] min-h-dvh"
-        style={{
-          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-          backgroundSize: '100% 100%',
-        }}
+        className="w-full max-w-[430px]"
       >
         <FullResultPage
           resultKey={resultKey}
