@@ -614,7 +614,6 @@ const ASSET_META: {
   { key: 'textScroll',      label: '往下看提示',     wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'textChance',      label: '機會文字',       wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'char',            label: '角色圖',         wMin: 30, wMax: 130, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'charLeft',        label: '左側裝飾',  abs: true, wMin: 0, wMax: 80, mtMin: -20, mtMax: 120, xMin: -20, xMax: 60, zMin: 0, zMax: 50 },
   { key: 'charRight',       label: '右側裝飾',  abs: true, wMin: 0, wMax: 80, mtMin: -20, mtMax: 120, xMin: -20, xMax: 60, zMin: 0, zMax: 50 },
   { key: 'personalityCard', label: '個人特質卡',     wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
   { key: 'cityCard',        label: '城市卡',         wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
@@ -858,18 +857,20 @@ export default function SoulGuitarResult() {
   return (
     <div
       className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundColor: resultData.themeColor + '18',
-        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'top center',
-      }}
+      style={{ backgroundColor: resultData.themeColor + '18' }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div className="w-full max-w-[430px]">
+      <div
+        className="w-full max-w-[430px]"
+        style={{
+          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+          backgroundSize: '100% auto',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'top center',
+        }}
+      >
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
