@@ -814,6 +814,14 @@ export default function SoulGuitarResult() {
   const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 768px)').matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // 清除 sessionStorage flag（只跑一次，在 render 之後）
   useEffect(() => {
@@ -852,7 +860,8 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp` : '';
+  const bgFile = isDesktop ? 'bg.webp' : 'bg-mobile.webp';
+  const bgUrl = folder ? `${BASE}/result/${folder}/${bgFile}` : '';
 
   return (
     <div
