@@ -629,16 +629,18 @@ const ASSET_META: {
   { key: 'charType',        label: '角色型標籤',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
 ];
 
-function LayoutEditor({ slug, layout, onChange, onReset }: {
+function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
   slug: string;
   layout: LayoutConfig;
   onChange: (patch: Partial<LayoutConfig>) => void;
   onReset: () => void;
+  editKey: string;
 }) {
   const [panelOpen, setPanelOpen] = useState(true);
   const [expanded, setExpanded] = useState<AssetKey | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   // 更新某素材的單一屬性
   const update = (key: AssetKey, field: keyof typeof layout[AssetKey], value: number) => {
@@ -647,10 +649,14 @@ function LayoutEditor({ slug, layout, onChange, onReset }: {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(false);
     try {
-      await quizService.saveLayout(slug, layout);
+      await quizService.saveLayout(slug, layout, editKey || undefined);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setSaveError(true);
+      setTimeout(() => setSaveError(false), 3000);
     } finally {
       setSaving(false);
     }
@@ -761,7 +767,7 @@ function LayoutEditor({ slug, layout, onChange, onReset }: {
               disabled={saving}
               className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold py-2 rounded text-xs transition-colors"
             >
-              {saving ? '儲存中…' : saved ? '已儲存 ✓' : '儲存到資料庫'}
+              {saving ? '儲存中…' : saved ? '已儲存 ✓' : saveError ? '❌ 儲存失敗' : '儲存到資料庫'}
             </button>
           </div>
         </div>
@@ -800,7 +806,9 @@ export default function SoulGuitarResult() {
   const resultKey = SLUG_TO_KEY[slug];
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
-  const [isEditMode] = useState(() => new URLSearchParams(search).has('edit'));
+  const searchParams = new URLSearchParams(search);
+  const [isEditMode] = useState(() => searchParams.has('edit'));
+  const editKey = searchParams.get('edit') || '';
   const isSharedLink = new URLSearchParams(search).has('s'); // ?s=1 = 從分享連結來
   // useState 初始化只跑一次，避免 re-render 時 sessionStorage 已被清除導致誤 redirect
   const [fromQuiz] = useState(() => sessionStorage.getItem('soulGuitar_fromQuiz') === '1');
@@ -875,6 +883,7 @@ export default function SoulGuitarResult() {
           layout={layout}
           onChange={handleLayoutChange}
           onReset={() => setLayout(DEFAULT_LAYOUT)}
+          editKey={editKey}
         />
       )}
     </div>

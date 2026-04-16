@@ -77,8 +77,10 @@ const quizService = {
     } catch { return null; }
   },
 
-  async saveLayout(slug: string, config: LayoutConfig): Promise<void> {
-    await api.put(`/quiz/admin/layout/${slug}`, config);
+  async saveLayout(slug: string, config: LayoutConfig, editKey?: string): Promise<void> {
+    await api.put(`/quiz/admin/layout/${slug}`, config, {
+      headers: editKey ? { 'X-Quiz-Key': editKey } : {},
+    });
   },
 };
 

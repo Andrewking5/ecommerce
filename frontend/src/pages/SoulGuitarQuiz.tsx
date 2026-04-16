@@ -421,7 +421,7 @@ function QuestionView({
       )}
 
       {/* 手機版：進度條固定在畫面頂部 */}
-      <div className="md:hidden absolute top-[88px] left-5 right-5 z-20">
+      <div className="md:hidden absolute top-[148px] left-5 right-5 z-20">
         <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
       </div>
 
