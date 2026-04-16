@@ -288,7 +288,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
   return (
     <>
     {/* 結果頁背景音樂 */}
-    <audio ref={audioRef} src={`/audio/quiz/result/${folder}.mp3`} preload="auto" />
+    <audio ref={audioRef} src={`/audio/quiz/result/${folder}.mp3`} preload="none" />
 
     {/* 音樂開關按鈕（固定在右上角） */}
     <motion.button
@@ -537,14 +537,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
               style={fs('charType', { display: 'block' })}
               className="h-auto self-start"
               draggable={false}
-              animate={{
-                y: [0, -6, 0],
-                filter: [
-                  'drop-shadow(0 0 0px rgba(255,200,50,0))',
-                  'drop-shadow(0 0 8px rgba(255,200,50,0.9))',
-                  'drop-shadow(0 0 0px rgba(255,200,50,0))',
-                ],
-              }}
+              animate={{ y: [0, -6, 0] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
             />
 
@@ -830,11 +823,10 @@ export default function SoulGuitarResult() {
     quizService.getLayout(slug).then(cfg => { if (cfg) setLayout(cfg); });
 
     const RF = `${BASE}/result/${folder}`;
-    const min = new Promise(r => setTimeout(r, 1500));
     const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
       f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}`; }),
     );
-    Promise.all([min, ...assets]).then(() => setIsLoading(false));
+    Promise.all(assets).then(() => setIsLoading(false));
   }, [folder, resultKey, slug, shouldRedirect]);
 
   const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {

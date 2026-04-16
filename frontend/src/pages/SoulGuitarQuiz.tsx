@@ -548,7 +548,7 @@ export default function SoulGuitarQuiz() {
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden bg-black">
       {/* 模糊背景 — IG Story（手機版兩側） */}
       {!isDesktop && (
-        <div className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35] transition-all duration-500" style={{ backgroundImage: `url(${currentBg})` }} />
+        <div className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35]" style={{ backgroundImage: `url(${currentBg})` }} />
       )}
 
       {/* ===== 容器 ===== */}
