@@ -420,8 +420,8 @@ function QuestionView({
         </motion.button>
       )}
 
-      {/* 手機版：進度條固定在畫面頂部（top-12 讓回上一題按鈕不重疊） */}
-      <div className="md:hidden absolute top-12 left-5 right-5 z-20">
+      {/* 手機版：進度條固定在畫面頂部 */}
+      <div className="md:hidden absolute top-[88px] left-5 right-5 z-20">
         <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
       </div>
 
