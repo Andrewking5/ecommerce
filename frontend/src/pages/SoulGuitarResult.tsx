@@ -860,9 +860,7 @@ export default function SoulGuitarResult() {
       style={{
         backgroundColor: resultData.themeColor,
         backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: '100% auto',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'top center',
+        backgroundSize: '100% 100%',
       }}
     >
       <AnimatePresence>
