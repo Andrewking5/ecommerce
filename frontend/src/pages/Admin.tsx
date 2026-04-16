@@ -2386,8 +2386,14 @@ function EventsTab() {
   const handleToggle = async (id: string) => {
     try {
       const res = await eventService.toggleEvent(id);
-      if (res.success) setEvents((prev) => prev.map((e) => e.id === id ? { ...e, isActive: !e.isActive } : e));
-    } catch { /* silent */ }
+      if (res.success) {
+        setEvents((prev) => prev.map((e) => e.id === id ? { ...e, isActive: !e.isActive } : e));
+      } else {
+        alert(`切換失敗：${res.error || '未知錯誤'}`);
+      }
+    } catch (err: any) {
+      alert(`切換失敗：${err?.response?.data?.error || err?.message || '請稍後再試'}`);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -2628,8 +2634,10 @@ function EventsTab() {
             <BarChart3 size={14} />
           </button>
         )}
-        <button onClick={() => handleToggle(event.id)} title={event.isActive ? '隱藏' : '顯示'}
-          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
+        <button onClick={() => handleToggle(event.id)} title={event.isActive ? '點擊隱藏' : '點擊顯示'}
+          className={cn('p-2 rounded-lg transition-all', event.isActive
+            ? 'bg-white/5 hover:bg-white/10 text-white/40 hover:text-white'
+            : 'bg-red-500/10 text-red-400 hover:bg-red-500/20')}>
           {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
         </button>
         <button onClick={() => { setEditingEvent({ ...event }); setShowAdvanced(true); setSlugManuallyEdited(true); }} title="編輯"
