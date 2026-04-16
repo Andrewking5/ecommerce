@@ -108,7 +108,7 @@ export class EventController {
     try {
       const events = await prisma.event.findMany({
         orderBy: { createdAt: 'desc' },
-        include: { _count: { select: { clicks: true } } },
+        include: { _count: { select: { clicks: true, registrations: true } } },
       });
       res.json({ success: true, data: events });
     } catch (error) {
@@ -197,6 +197,7 @@ export class EventController {
         startDate, endDate, status,
         landingUrl, utmSource, utmMedium, utmCampaign,
         couponCode, discountNote, isActive, metadata,
+        registrationOpen, registrationLimit,
       } = req.body;
 
       const existing = await prisma.event.findUnique({ where: { id } });
@@ -233,6 +234,8 @@ export class EventController {
           ...(discountNote !== undefined && { discountNote }),
           ...(isActive !== undefined && { isActive }),
           ...(metadata !== undefined && { metadata }),
+          ...(registrationOpen !== undefined && { registrationOpen: Boolean(registrationOpen) }),
+          ...(registrationLimit !== undefined && { registrationLimit: Number(registrationLimit) }),
         },
       });
 

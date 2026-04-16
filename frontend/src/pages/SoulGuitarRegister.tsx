@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
 import SEO from '../components/SEO';
+import registrationService from '../services/registrationService';
 
 /* ═══════════════════════════════════════════════════
    2026 Ayers 靈魂吉他手大賽 — 報名頁
@@ -9,8 +10,7 @@ import SEO from '../components/SEO';
 
 const GOLD = '#c5a059';
 const DARK = '#111827';
-const FORM_ACTION =
-  'https://docs.google.com/forms/d/e/1FAIpQLSd2x41xcTuQzzfEdEnNTyAXtTsoQ7YmReWEjwNiCIxKUBNdGQ/formResponse';
+const EVENT_SLUG = 'soul-guitar/register';
 
 const SIX_COLORS = [
   { label: '紅色', hex: '#ef4444', entry: '紅色' },
@@ -108,6 +108,17 @@ export default function SoulGuitarRegister() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, boolean>>>({});
   const [status, setStatus] = useState<Status>('idle');
+  const [regOpen, setRegOpen] = useState<boolean | null>(null); // null = loading
+  const [regCount, setRegCount] = useState(0);
+  const [regLimit, setRegLimit] = useState(200);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    registrationService.getStatus(EVENT_SLUG).then((s) => {
+      if (s) { setRegOpen(s.open); setRegCount(s.count); setRegLimit(s.limit); }
+      else setRegOpen(false);
+    }).catch(() => setRegOpen(false));
+  }, []);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -133,40 +144,61 @@ export default function SoulGuitarRegister() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-
     setStatus('submitting');
-
-    const body = new URLSearchParams();
-    body.set('entry.821513272', form.name.trim());
-    body.set('entry.1314568535', form.stageName.trim());
-    body.set('entry.153322803', form.phone.trim());
-    body.set('entry.483382415', form.email.trim());
-    body.set('entry.922279364', form.socialId.trim());
-    body.set('entry.795549090', form.category);
-    body.set('entry.313613754', form.soulColor);
-    body.set('entry.1463819259', form.youtube.trim());
-    body.set('entry.1212008532', form.fbIg.trim());
-    body.set('entry.805467519', '同意');
-    body.set('entry.1896605527', form.rulesOk);
-    if (form.message.trim()) body.set('entry.1911087608', form.message.trim());
-    // Sentinel fields for radio/checkbox groups
-    body.set('entry.717307043_sentinel', '');
-    body.set('entry.795549090_sentinel', '');
-    body.set('entry.313613754_sentinel', '');
-    body.set('entry.805467519_sentinel', '');
-    body.set('entry.1896605527_sentinel', '');
-
+    setErrorMsg('');
     try {
-      await fetch(FORM_ACTION, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+      await registrationService.submit(EVENT_SLUG, {
+        name:      form.name.trim(),
+        stageName: form.stageName.trim() || undefined,
+        phone:     form.phone.trim(),
+        email:     form.email.trim(),
+        socialId:  form.socialId.trim(),
+        category:  form.category as '彈唱組' | '演奏組',
+        soulColor: form.soulColor,
+        youtube:   form.youtube.trim(),
+        fbIg:      form.fbIg.trim(),
+        rulesOk:   form.rulesOk === RULES_YES,
+        message:   form.message.trim() || undefined,
       });
       setStatus('success');
-    } catch {
+    } catch (err: any) {
+      setErrorMsg(err?.message || '送出失敗，請稍後再試。');
       setStatus('error');
     }
+  }
+
+  // ── 報名未開放 ──
+  if (regOpen === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: DARK }}>
+        <Loader2 size={28} className="animate-spin text-white/30" />
+      </div>
+    );
+  }
+
+  if (!regOpen) {
+    const isFull = regLimit > 0 && regCount >= regLimit;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 text-white" style={{ backgroundColor: DARK }}>
+        <Strip />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center text-center max-w-md py-20">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-white/5">
+            <Lock size={32} className="text-white/30" />
+          </div>
+          <h2 className="text-2xl font-black mb-3">{isFull ? '報名已額滿' : '報名尚未開放'}</h2>
+          <p className="text-white/40 text-sm mb-8">
+            {isFull
+              ? `本次比賽報名人數已達上限（${regLimit} 位），感謝大家踴躍報名！`
+              : '報名尚未開始，請關注 Ayers 官方粉絲專頁以取得最新消息。'}
+          </p>
+          <a href="/e/soul-guitar/info"
+            className="px-6 py-3 rounded-full text-sm font-bold border border-white/10 text-white/50 hover:bg-white/5 transition-colors">
+            查看活動簡章
+          </a>
+        </motion.div>
+      </div>
+    );
   }
 
   if (status === 'success') {
@@ -264,7 +296,7 @@ export default function SoulGuitarRegister() {
               className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 mb-6 text-sm text-red-400"
             >
               <AlertCircle size={16} className="shrink-0" />
-              送出失敗，請稍後再試或直接使用 Google 表單。
+              {errorMsg || '送出失敗，請稍後再試。'}
             </motion.div>
           )}
         </AnimatePresence>

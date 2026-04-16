@@ -654,6 +654,10 @@ model Event {
   totalScans    Int       @default(0)          // QR Code 掃描總次數
   uniqueVisitors Int      @default(0)          // 不重複訪客數
 
+  // 報名設定
+  registrationOpen  Boolean @default(false)   // 是否開放報名
+  registrationLimit Int     @default(200)     // 報名人數上限（0 = 無限制）
+
   isActive    Boolean     @default(true)
   metadata    Json?                            // 活動自訂資料（如比賽規則）
 
@@ -661,7 +665,8 @@ model Event {
   updatedAt   DateTime    @updatedAt
 
   // 關聯
-  clicks      EventClick[]
+  clicks        EventClick[]
+  registrations EventRegistration[]
 
   @@index([status])
   @@index([isActive])
@@ -669,6 +674,40 @@ model Event {
   @@index([referralCode])
   @@index([slug])
   @@map("events")
+}
+
+// 活動報名
+model EventRegistration {
+  id          String   @id @default(cuid())
+  eventId     String
+
+  // 個人資訊
+  name        String                           // 真實姓名
+  stageName   String?                          // 藝名／樂團名（選填）
+  phone       String                           // 手機號碼
+  email       String                           // 電子信箱
+  socialId    String                           // 最常使用的社群帳號
+
+  // 參賽資訊
+  category    String                           // 彈唱組 / 演奏組
+  soulColor   String                           // 靈魂顏色
+  youtube     String                           // YouTube 影片網址
+  fbIg        String                           // FB 或 IG 影片網址
+
+  // 同意條款
+  rulesOk     Boolean  @default(false)         // 是否了解比賽規則
+  message     String?  @db.Text               // 留言／問題（選填）
+
+  // 系統欄位
+  ip          String?                          // 防重複用
+  createdAt   DateTime @default(now())
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([email])
+  @@index([createdAt])
+  @@map("event_registrations")
 }
 
 // 活動點擊/掃描追蹤

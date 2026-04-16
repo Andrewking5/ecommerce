@@ -20,10 +20,12 @@ export interface Event {
   totalScans: number;
   uniqueVisitors: number;
   isActive: boolean;
+  registrationOpen: boolean;
+  registrationLimit: number;
   metadata?: { rules?: Array<{ short: string; full: string }> } | null;
   createdAt: string;
   updatedAt: string;
-  _count?: { clicks: number };
+  _count?: { clicks: number; registrations?: number };
 }
 
 export interface EventAnalytics {

@@ -25,6 +25,7 @@ import reviewService, { type Review } from '@/src/services/reviewService';
 import couponService, { type Coupon } from '@/src/services/couponService';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
 import quizService, { type QuizAnalytics } from '@/src/services/quizService';
+import registrationService, { type Registration } from '@/src/services/registrationService';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 import { QRCode } from 'react-qrcode-logo';
@@ -2363,6 +2364,13 @@ function EventsTab() {
   const [rulesEvent, setRulesEvent] = useState<EventType | null>(null);
   const [rulesItems, setRulesItems] = useState<Array<{ short: string; full: string }>>([]);
   const [rulesSaving, setRulesSaving] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  // Registration panel
+  const [regPanelEventId, setRegPanelEventId] = useState<string | null>(null);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [regTotal, setRegTotal] = useState(0);
+  const [regLoading, setRegLoading] = useState(false);
+  const [regSettingsSaving, setRegSettingsSaving] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -2513,6 +2521,38 @@ function EventsTab() {
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
 
+  const handleOpenRegPanel = async (eventId: string) => {
+    setRegPanelEventId(eventId);
+    setRegLoading(true);
+    setRegistrations([]);
+    try {
+      const { registrations: regs, total } = await registrationService.list(eventId);
+      setRegistrations(regs);
+      setRegTotal(total);
+    } catch { /* silent */ } finally { setRegLoading(false); }
+  };
+
+  const handleDeleteReg = async (id: string) => {
+    if (!window.confirm('確定要刪除這筆報名嗎？')) return;
+    try {
+      await registrationService.deleteOne(id);
+      setRegistrations((prev) => prev.filter((r) => r.id !== id));
+      setRegTotal((n) => n - 1);
+    } catch { alert('刪除失敗'); }
+  };
+
+  const handleRegSettings = async (eventId: string, open: boolean, limit: number) => {
+    setRegSettingsSaving(true);
+    try {
+      const res = await registrationService.updateSettings(eventId, { registrationOpen: open, registrationLimit: limit });
+      if (res.success) {
+        setEvents((prev) => prev.map((e) => e.id === eventId
+          ? { ...e, registrationOpen: open, registrationLimit: limit }
+          : e));
+      }
+    } catch { alert('設定儲存失敗'); } finally { setRegSettingsSaving(false); }
+  };
+
   if (quizFullPage) {
     return (
       <QuizFullPage
@@ -2525,6 +2565,80 @@ function EventsTab() {
       />
     );
   }
+
+  const renderEventRow = (event: EventType, sub = false) => (
+    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+      <div className="flex-grow min-w-0">
+        <div className="flex items-center gap-3 mb-2">
+          <h3 className="text-sm font-bold truncate cursor-pointer hover:text-ayers-gold transition-colors"
+            onClick={() => window.open(`/e/${event.slug}`, '_blank')}
+          >{event.title}</h3>
+          {sub && event.slug.includes('/') && (
+            <span className="text-[9px] px-1.5 py-0.5 rounded font-mono bg-white/5 text-white/25">
+              /{event.slug.split('/').slice(1).join('/')}
+            </span>
+          )}
+          <span className={cn('shrink-0 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest', EVENT_STATUS_COLORS[event.status])}>
+            {event.status}
+          </span>
+          {!event.isActive && <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold">隱藏</span>}
+        </div>
+        <div className="flex flex-wrap gap-4 text-[10px] text-white/40">
+          <span className="flex items-center gap-1"><CalendarDays size={10} /> {fmtDate(event.startDate)} — {fmtDate(event.endDate)}</span>
+          {event.location && <span className="flex items-center gap-1"><MapPin size={10} /> {event.location}</span>}
+          <span className="flex items-center gap-1"><QrCode size={10} /> 掃描 {event.totalScans} 次</span>
+          {event.couponCode && <span className="flex items-center gap-1"><Ticket size={10} /> {event.couponCode}</span>}
+          {event.slug.includes('register') && (
+            <span className={cn('flex items-center gap-1', event.registrationOpen ? 'text-green-400' : 'text-white/25')}>
+              <Users size={10} /> {event.registrationOpen ? `開放報名` : '報名關閉'}
+              {event.registrationLimit > 0 && ` · 上限 ${event.registrationLimit}`}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <button onClick={() => window.open(`/e/${event.slug}`, '_blank')} title="開啟活動頁面"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <ExternalLink size={14} />
+        </button>
+        {event.slug.includes('register') && (
+          <button onClick={() => handleOpenRegPanel(event.id)} title="報名管理"
+            className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all',
+              regPanelEventId === event.id ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}>
+            <Users size={14} />
+          </button>
+        )}
+        <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <FileText size={14} />
+        </button>
+        <button onClick={() => setViewingQr(event)} title="QR Code"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <QrCode size={14} />
+        </button>
+        <button onClick={() => handleCopyLink(event)} title="複製連結"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          {copiedId === event.id ? <Check size={14} className="text-green-400" /> : <Link size={14} />}
+        </button>
+        <button onClick={() => handleViewAnalytics(event)} title="數據分析"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <BarChart3 size={14} />
+        </button>
+        <button onClick={() => handleToggle(event.id)} title={event.isActive ? '隱藏' : '顯示'}
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
+          {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
+        </button>
+        <button onClick={() => { setEditingEvent({ ...event }); setShowAdvanced(true); setSlugManuallyEdited(true); }} title="編輯"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <Edit size={14} />
+        </button>
+        <button onClick={() => handleDelete(event.id)} title="刪除"
+          className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all">
+          <Trash2 size={14} />
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -2540,6 +2654,131 @@ function EventsTab() {
           </button>
         </div>
       </div>
+
+      {/* ── Registration Panel ── */}
+      {regPanelEventId && (() => {
+        const regEvent = events.find(e => e.id === regPanelEventId);
+        if (!regEvent) return null;
+        return (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={() => setRegPanelEventId(null)}>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+              className="rounded-t-2xl sm:rounded-2xl w-full max-w-4xl mx-0 sm:mx-4 flex flex-col"
+              style={{ background: CARD_BG, maxHeight: '90vh' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">報名管理</h3>
+                  <p className="text-[10px] text-white/30 mt-0.5">{regEvent.title} · 共 {regTotal} 筆</p>
+                </div>
+                <button onClick={() => setRegPanelEventId(null)} className="p-2 rounded-lg hover:bg-white/5 text-white/40 transition-colors"><X size={16} /></button>
+              </div>
+
+              {/* Settings bar */}
+              <div className="px-6 py-4 border-b border-white/5 flex flex-wrap items-center gap-4 shrink-0">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-white/50">報名狀態</span>
+                  <button
+                    onClick={() => handleRegSettings(regEvent.id, !regEvent.registrationOpen, regEvent.registrationLimit)}
+                    disabled={regSettingsSaving}
+                    className={cn('relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors',
+                      regEvent.registrationOpen ? 'bg-green-500' : 'bg-white/10')}
+                  >
+                    <span className={cn('pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+                      regEvent.registrationOpen ? 'translate-x-4' : 'translate-x-0')} />
+                  </button>
+                  <span className={cn('text-xs font-bold', regEvent.registrationOpen ? 'text-green-400' : 'text-white/30')}>
+                    {regEvent.registrationOpen ? '開放中' : '已關閉'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-white/50">上限</span>
+                  <input
+                    type="number" min={0} max={10000}
+                    defaultValue={regEvent.registrationLimit}
+                    onBlur={e => handleRegSettings(regEvent.id, regEvent.registrationOpen, Number(e.target.value))}
+                    className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-ayers-gold/40 text-center"
+                  />
+                  <span className="text-[10px] text-white/25">（0 = 無限制）</span>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <span className="text-xs text-white/30">{regTotal} / {regEvent.registrationLimit > 0 ? regEvent.registrationLimit : '∞'}</span>
+                  <a
+                    href={`${registrationService.exportUrl(regEvent.id)}?token=${localStorage.getItem('token') || ''}`}
+                    download
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/60 hover:text-white transition-all"
+                  >
+                    <Download size={12} /> 匯出 CSV
+                  </a>
+                </div>
+              </div>
+
+              {/* Registration list */}
+              <div className="overflow-y-auto flex-1">
+                {regLoading ? (
+                  <div className="py-12 flex justify-center"><Spinner /></div>
+                ) : registrations.length === 0 ? (
+                  <div className="py-12 text-center text-xs text-white/25 uppercase tracking-widest">尚無報名資料</div>
+                ) : (
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0" style={{ background: CARD_BG }}>
+                      <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                        <th className="px-4 py-3 text-left font-medium">#</th>
+                        <th className="px-4 py-3 text-left font-medium">姓名</th>
+                        <th className="px-4 py-3 text-left font-medium">Email</th>
+                        <th className="px-4 py-3 text-left font-medium">手機</th>
+                        <th className="px-4 py-3 text-left font-medium">組別</th>
+                        <th className="px-4 py-3 text-left font-medium">顏色</th>
+                        <th className="px-4 py-3 text-left font-medium">YouTube</th>
+                        <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                        <th className="px-4 py-3 text-left font-medium"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.04]">
+                      {registrations.map((r, i) => (
+                        <tr key={r.id} className="hover:bg-white/[0.02] transition-colors group">
+                          <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                          <td className="px-4 py-3">
+                            <p className="text-white/80 font-medium">{r.name}</p>
+                            {r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}
+                          </td>
+                          <td className="px-4 py-3 text-white/50">{r.email}</td>
+                          <td className="px-4 py-3 text-white/50">{r.phone}</td>
+                          <td className="px-4 py-3">
+                            <span className={cn('px-2 py-0.5 rounded-full text-[9px] font-bold',
+                              r.category === '彈唱組' ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400')}>
+                              {r.category}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-white/50">{r.soulColor}</td>
+                          <td className="px-4 py-3">
+                            <a href={r.youtube} target="_blank" rel="noreferrer"
+                              className="text-ayers-gold/60 hover:text-ayers-gold truncate block max-w-[120px] transition-colors">
+                              {r.youtube.replace('https://', '').slice(0, 28)}…
+                            </a>
+                          </td>
+                          <td className="px-4 py-3 text-white/30 whitespace-nowrap">
+                            {new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <button onClick={() => handleDeleteReg(r.id)}
+                              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all">
+                              <Trash2 size={12} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        );
+      })()}
 
       {/* ── Rules Editor Modal ── */}
       {rulesEvent && (
@@ -2892,72 +3131,70 @@ function EventsTab() {
           <CalendarDays size={40} className="mx-auto text-white/10 mb-3" />
           <p className="text-xs text-white/30 uppercase tracking-widest">尚無活動</p>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {events.map((event) => (
-            <Card key={event.id}>
-              <div className="p-5">
-                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                  {/* Info */}
-                  <div className="flex-grow min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-sm font-bold truncate cursor-pointer hover:text-ayers-gold transition-colors"
-                        onClick={() => window.open(`/e/${event.slug}`, '_blank')}
-                      >{event.title}</h3>
-                      <span className={cn('shrink-0 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest', EVENT_STATUS_COLORS[event.status])}>
-                        {event.status}
-                      </span>
-                      {!event.isActive && <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold">隱藏</span>}
+      ) : (() => {
+        // Group by first slug segment (e.g. "soul-guitar/info" → key "soul-guitar")
+        const groupMap = new Map<string, EventType[]>();
+        for (const e of events) {
+          const key = e.slug.split('/')[0];
+          if (!groupMap.has(key)) groupMap.set(key, []);
+          groupMap.get(key)!.push(e);
+        }
+        return (
+          <div className="space-y-4">
+            {[...groupMap.entries()].map(([parentKey, groupEvents]) => {
+              // Single event — render as plain card (no grouping chrome)
+              if (groupEvents.length === 1) {
+                const event = groupEvents[0];
+                return (
+                  <Card key={event.id}>
+                    <div className="p-5">{renderEventRow(event)}</div>
+                  </Card>
+                );
+              }
+              // Multiple sub-pages — render as collapsible group
+              const isCollapsed = collapsedGroups.has(parentKey);
+              const totalScans = groupEvents.reduce((s, e) => s + (e.totalScans || 0), 0);
+              const mainEvent = groupEvents.find(e => e.slug === parentKey);
+              const groupLabel = mainEvent?.title ?? parentKey;
+              return (
+                <div key={parentKey} className="rounded-2xl border border-white/5 overflow-hidden" style={{ background: CARD_BG }}>
+                  {/* Group header */}
+                  <button
+                    type="button"
+                    onClick={() => setCollapsedGroups(prev => {
+                      const next = new Set(prev);
+                      next.has(parentKey) ? next.delete(parentKey) : next.add(parentKey);
+                      return next;
+                    })}
+                    className="w-full flex items-center justify-between px-5 py-3 border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      {isCollapsed
+                        ? <ChevronRight size={13} className="text-white/30" />
+                        : <ChevronDown size={13} className="text-white/30" />}
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{groupLabel}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/5 text-white/25">{groupEvents.length} 頁</span>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-[10px] text-white/40">
-                      <span className="flex items-center gap-1"><CalendarDays size={10} /> {fmtDate(event.startDate)} — {fmtDate(event.endDate)}</span>
-                      {event.location && <span className="flex items-center gap-1"><MapPin size={10} /> {event.location}</span>}
-                      <span className="flex items-center gap-1"><QrCode size={10} /> 掃描 {event.totalScans} 次</span>
-                      {event.couponCode && <span className="flex items-center gap-1"><Ticket size={10} /> {event.couponCode}</span>}
+                    <span className="text-[10px] text-white/25 flex items-center gap-1">
+                      <QrCode size={10} /> 共掃描 {totalScans} 次
+                    </span>
+                  </button>
+                  {/* Sub-event rows */}
+                  {!isCollapsed && (
+                    <div className="divide-y divide-white/[0.04]">
+                      {groupEvents.map(event => (
+                        <div key={event.id} className="px-5 py-4">
+                          {renderEventRow(event, true)}
+                        </div>
+                      ))}
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button onClick={() => window.open(`/e/${event.slug}`, '_blank')} title="開啟活動頁面"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      <ExternalLink size={14} />
-                    </button>
-                    <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      <FileText size={14} />
-                    </button>
-                    <button onClick={() => setViewingQr(event)} title="QR Code"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      <QrCode size={14} />
-                    </button>
-                    <button onClick={() => handleCopyLink(event)} title="複製連結"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      {copiedId === event.id ? <Check size={14} className="text-green-400" /> : <Link size={14} />}
-                    </button>
-                    <button onClick={() => handleViewAnalytics(event)} title="數據分析"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      <BarChart3 size={14} />
-                    </button>
-                    <button onClick={() => handleToggle(event.id)} title={event.isActive ? '隱藏' : '顯示'}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all">
-                      {event.isActive ? <Eye size={14} /> : <EyeOff size={14} />}
-                    </button>
-                    <button onClick={() => { setEditingEvent({ ...event }); setShowAdvanced(true); setSlugManuallyEdited(true); }} title="編輯"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-                      <Edit size={14} />
-                    </button>
-                    <button onClick={() => handleDelete(event.id)} title="刪除"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all">
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+                  )}
                 </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        );
+      })()}
     </>
   );
 }

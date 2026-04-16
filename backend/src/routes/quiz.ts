@@ -22,8 +22,13 @@ router.post('/results', QuizController.trackResult);
 // Public — get layout config for a character
 router.get('/layout/:slug', QuizController.getLayout);
 
-// Layout editor — protected by X-Quiz-Key header
-router.put('/admin/layout/:slug', requireQuizKey, QuizController.saveLayout);
+// Layout editor — accepts either X-Quiz-Key OR admin JWT
+router.put('/admin/layout/:slug', (req, res, next) => {
+  const secret = process.env.QUIZ_EDIT_KEY;
+  if (secret && req.headers['x-quiz-key'] === secret) { next(); return; }
+  // Fall through to admin JWT check
+  authenticateToken(req, res, () => requireAdmin(req, res, next));
+}, QuizController.saveLayout);
 
 // Admin — fetch all analytics
 router.get('/admin/analytics', authenticateToken, requireAdmin, QuizController.getAnalytics);
