@@ -16,7 +16,8 @@ export type AssetKey =
   | 'personalityCard' | 'cityCard' | 'textGuess'
   | 'textSound' | 'titleAyers'
   | 'textHeard' | 'titleMusic' | 'tags'
-  | 'textContest' | 'poster' | 'charType';
+  | 'textContest' | 'poster' | 'charType'
+  | 'footerBlob';
 
 export type LayoutConfig = Record<AssetKey, AssetConfig>;
 
@@ -42,6 +43,7 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   textContest:     a(85,  12),           // mt-3
   poster:          a(85,  24),           // mt-6
   charType:        a(65,   0),           // 在 flex 容器內，mt 由容器控制
+  footerBlob:      a(100,  0),           // 底部吉他背景圖，預設全寬
 };
 
 export interface QuizAnalytics {

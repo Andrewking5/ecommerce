@@ -40,18 +40,29 @@ const RESULT_FOLDER: Record<string, string> = {
 const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
-function OrganizerFooter() {
-  // 圖層由下往上：資產 29（白色 blob 背景）→ 資產 28（橘色條）→ logos
+function OrganizerFooter({ layout }: { layout: LayoutConfig }) {
+  const blob = layout.footerBlob;
   return (
-    <div
-      className="w-full"
-      style={{
-        backgroundImage: `url(${FOOTER_BASE}/${enc('資產 29.png')})`,
-        backgroundSize: '100% 100%',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      {/* 資產 28 橘色漸層條，高度固定讓 logos 看得見 */}
+    <div className="w-full">
+      {/* 白色吉他 blob — 由 layout editor 控制大小/位置 */}
+      <div className="flex justify-center">
+        <img
+          src={`${FOOTER_BASE}/${enc('資產 29.png')}`}
+          alt=""
+          draggable={false}
+          style={{
+            width: `${blob.w}%`,
+            height: 'auto',
+            display: 'block',
+            marginTop: `${blob.mt}px`,
+            translate: `${blob.x}px ${blob.y}px`,
+            position: 'relative',
+            zIndex: blob.z,
+          }}
+        />
+      </div>
+
+      {/* 橘色條固定在最底部，logos 疊在上面 */}
       <div className="relative w-full">
         <img
           src={`${FOOTER_BASE}/${enc('資產 28.png')}`}
@@ -60,7 +71,6 @@ function OrganizerFooter() {
           style={{ height: '40px', objectFit: 'fill' }}
           draggable={false}
         />
-        {/* logos 疊在橘色條上 */}
         <div
           className="absolute inset-0 flex items-center justify-around px-3 gap-1"
           style={{ fontFamily: QUIZ_FONT }}
@@ -82,8 +92,6 @@ function OrganizerFooter() {
           </div>
         </div>
       </div>
-      {/* blob 下方留白，讓白色圓弧形狀完整顯示 */}
-      <div className="h-20" />
     </div>
   );
 }
@@ -643,7 +651,7 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange, hasNewBg }:
       </div>
 
       {/* 主辦方 footer — 只在有拆分背景的結果頁顯示 */}
-      {hasNewBg && <OrganizerFooter />}
+      {hasNewBg && <OrganizerFooter layout={layout} />}
 
     </motion.div>
     </>
@@ -656,30 +664,32 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange, hasNewBg }:
 const ASSET_META: {
   key: AssetKey;
   label: string;
-  abs?: boolean; // charLeft / charRight 用絕對定位，mt=top%, x=side%
+  abs?: boolean; // charRight 用絕對定位，mt=top%, x=side%
   wMin?: number; wMax?: number;
   mtMin?: number; mtMax?: number;
   xMin?: number; xMax?: number;
   yMin?: number; yMax?: number;
   zMin?: number; zMax?: number;
 }[] = [
-  { key: 'heroCard',        label: 'Hero 結果卡',    wMin: 40, wMax: 120, mtMin: 0,   mtMax: 120, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
-  { key: 'textSave',        label: '長按儲存提示',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textScroll',      label: '往下看提示',     wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textChance',      label: '機會文字',       wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'char',            label: '角色圖',         wMin: 30, wMax: 130, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'charRight',       label: '右側裝飾',  abs: true, wMin: 0, wMax: 80, mtMin: -20, mtMax: 120, xMin: -20, xMax: 60, zMin: 0, zMax: 50 },
-  { key: 'personalityCard', label: '個人特質卡',     wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'cityCard',        label: '城市卡',         wMin: 40, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textGuess',       label: '猜猜這是哪',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textSound',       label: '發出什麼聲音',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'titleAyers',      label: 'Ayers 吉他標題', wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textHeard',       label: '你聽出來了嗎',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'titleMusic',      label: '音樂風格標題',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 120, xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'tags',            label: '音樂風格標籤',   wMin: 40, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'textContest',     label: '比賽資訊文字',   wMin: 20, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'poster',          label: '比賽海報',       wMin: 40, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
-  { key: 'charType',        label: '角色型標籤',     wMin: 10, wMax: 120, mtMin: -40, mtMax: 80,  xMin: -100, xMax: 100, yMin: -60,  yMax: 60  },
+  // 所有範圍刻意放大，讓設計師可以自由移動 / 縮放
+  { key: 'heroCard',        label: 'Hero 結果卡',    wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textSave',        label: '長按儲存提示',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textScroll',      label: '往下看提示',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textChance',      label: '機會文字',       wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'char',            label: '角色圖',         wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'charRight',       label: '右側裝飾', abs: true, wMin: 0, wMax: 150, mtMin: -50, mtMax: 200, xMin: -50, xMax: 100, zMin: 0, zMax: 50 },
+  { key: 'personalityCard', label: '個人特質卡',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'cityCard',        label: '城市卡',         wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textGuess',       label: '猜猜這是哪',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textSound',       label: '發出什麼聲音',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'titleAyers',      label: 'Ayers 吉他標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textHeard',       label: '你聽出來了嗎',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'titleMusic',      label: '音樂風格標題',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'tags',            label: '音樂風格標籤',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'textContest',     label: '比賽資訊文字',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'poster',          label: '比賽海報',       wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'charType',        label: '角色型標籤',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  { key: 'footerBlob',      label: '底部吉他背景',   wMin: 0, wMax: 200, mtMin: -600, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300, zMin: 0, zMax: 50 },
 ];
 
 function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
@@ -909,18 +919,22 @@ export default function SoulGuitarResult() {
   const bgUrl = folder ? `${BASE}/result/${folder}/${encodeURIComponent(bgFile)}${CACHE_V}` : '';
 
   return (
+    // 外層只設背景色，避免在寬螢幕上背景圖被撐到全視窗寬
     <div
       className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundColor: resultData.themeColor,
-        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: '100% 100%',
-      }}
+      style={{ backgroundColor: resultData.themeColor }}
     >
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div className="w-full max-w-[430px]">
+      {/* 內層 430px 容器才掛背景圖，確保響應式不失真 */}
+      <div
+        className="w-full max-w-[430px] min-h-dvh"
+        style={{
+          backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
+          backgroundSize: '100% 100%',
+        }}
+      >
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
