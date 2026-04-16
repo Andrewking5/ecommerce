@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { X, ZoomIn, ExternalLink, Star, ChevronDown } from 'lucide-react';
+import { X, ZoomIn, Star } from 'lucide-react';
 import SEO from '../components/SEO';
 import eventService from '../services/eventService';
 
@@ -32,9 +32,9 @@ function Strip() {
 function CTA({ className = '' }: { className?: string }) {
   return (
     <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 ${className}`}>
-      <a href="https://forms.gle/Wat3juxXdQ6vXbAi9" target="_blank" rel="noopener noreferrer"
+      <a href="/e/soul-guitar/register"
         className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full text-sm font-bold text-white hover:brightness-110 transition-all shadow-lg shadow-orange-500/20" style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}>
-        立即報名 <ExternalLink size={12} className="opacity-60" />
+        立即報名
       </a>
       <a href="/e/soul-guitar" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold border-2 text-white/70 hover:bg-white/5 transition-colors" style={{ borderColor: GOLD + '50', color: GOLD }}>心理測驗</a>
     </div>

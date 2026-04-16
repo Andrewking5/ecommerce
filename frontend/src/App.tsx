@@ -76,6 +76,7 @@ const EventDetail = lazyWithRetry(() => import('./pages/EventDetail'));
 const SoulGuitarInfo = lazyWithRetry(() => import('./pages/SoulGuitarInfo'));
 const SoulGuitarQuiz = lazyWithRetry(() => import('./pages/SoulGuitarQuiz'));
 const SoulGuitarResult = lazyWithRetry(() => import('./pages/SoulGuitarResult'));
+const SoulGuitarRegister = lazyWithRetry(() => import('./pages/SoulGuitarRegister'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -137,8 +138,10 @@ function RootRedirect() {
 function EventLandingLayout() {
   const location = useLocation();
   const isSoulGuitarInfo = location.pathname === '/e/soul-guitar/info';
+  const isSoulGuitarRegister = location.pathname === '/e/soul-guitar/register';
   const isSoulGuitarQuiz = location.pathname === '/e/soul-guitar';
-  const isSoulGuitarResult = location.pathname.startsWith('/e/soul-guitar/') && !isSoulGuitarInfo;
+  const isSoulGuitarResult =
+    location.pathname.startsWith('/e/soul-guitar/') && !isSoulGuitarInfo && !isSoulGuitarRegister;
 
   useEffect(() => {
     if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
@@ -167,6 +170,15 @@ function EventLandingLayout() {
     return (
       <Suspense fallback={<PageLoader />}>
         <SoulGuitarInfo />
+      </Suspense>
+    );
+  }
+
+  // Soul Guitar register page — standalone, no site Navbar/Footer
+  if (isSoulGuitarRegister) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <SoulGuitarRegister />
       </Suspense>
     );
   }
