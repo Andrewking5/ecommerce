@@ -879,7 +879,7 @@ export default function SoulGuitarResult() {
         backgroundColor: resultData.themeColor + '18',
         backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
         backgroundSize: '100% auto',
-        backgroundRepeat: 'repeat-y',
+        backgroundRepeat: 'no-repeat',
         backgroundPosition: 'top center',
       }}
     >
