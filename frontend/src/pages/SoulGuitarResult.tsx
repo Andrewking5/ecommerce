@@ -378,13 +378,6 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
               draggable={false}
             />
             <img
-              src={`${RF}/char-left.webp`}
-              alt=""
-              style={{ width: `${C.charLeft.w}%`, top: `${C.charLeft.mt}%`, left: `${C.charLeft.x}%`, zIndex: C.charLeft.z }}
-              className="absolute h-auto object-contain"
-              draggable={false}
-            />
-            <img
               src={`${RF}/char-right.webp`}
               alt={result.colorName}
               style={{ width: `${C.charRight.w}%`, top: `${C.charRight.mt}%`, right: `${C.charRight.x}%`, zIndex: C.charRight.z }}
@@ -462,7 +455,6 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
               >
                 <div className="relative w-full h-[280px] overflow-hidden">
                   <img src={`${RF}/guitar-${i}.webp`} alt="Ayers 吉他" className="w-full h-full object-contain object-bottom" draggable={false} />
-                  <img src={`${RF}/guitar-title-${i}.webp`} alt="" className="absolute top-2 left-1 w-[50%] h-auto" draggable={false} />
                 </div>
                 <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
                   <img src={`${RF}/btn-unlock-${i}.webp`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
@@ -823,14 +815,6 @@ export default function SoulGuitarResult() {
   const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
 
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
-  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 768px)').matches);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // 清除 sessionStorage flag（只跑一次，在 render 之後）
   useEffect(() => {
@@ -869,8 +853,7 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgFile = isDesktop ? 'bg.webp' : 'bg-mobile.webp';
-  const bgUrl = folder ? `${BASE}/result/${folder}/${bgFile}` : '';
+  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp` : '';
 
   return (
     <div
@@ -878,7 +861,7 @@ export default function SoulGuitarResult() {
       style={{
         backgroundColor: resultData.themeColor + '18',
         backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: '100% auto',
+        backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'top center',
       }}
