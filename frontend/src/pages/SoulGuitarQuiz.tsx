@@ -15,13 +15,13 @@ const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 const V = CACHE_V;
 const questions = [
-  { id: 1, bg: `${BASE}/q1.webp${V}`, bgWide: `${BASE}/q1-wide.webp${V}`, questionText: '如果今天突然有一整天的空閒，你最想？', options: ['找一家舒服的小店坐著放鬆', '隨便出門走走看看城市', '待在房間聽歌或想事情', '找朋友出去玩熱鬧一下'] },
-  { id: 2, bg: `${BASE}/q2.webp${V}`, bgWide: `${BASE}/q2-wide.webp${V}`, questionText: '如果有一首歌讓你反覆聽很多次，通常是因為？', options: ['旋律很溫暖很好聽', '整體感覺很自由很流動', '歌詞或氛圍很有情緒', '節奏很強讓人很想跳舞'] },
-  { id: 3, bg: `${BASE}/q3.webp${V}`, bgWide: `${BASE}/q3-wide.webp${V}`, questionText: '如果要去聽一場現場音樂，你比較想去？', options: ['小咖啡店 acoustic 演出', '戶外音樂表演', '深夜小酒吧', 'Live House 現場演出'] },
-  { id: 4, bg: `${BASE}/q4.webp${V}`, bgWide: `${BASE}/q4-wide.webp${V}`, questionText: '如果你的生活是一種風景，它比較像？', options: ['和朋友在咖啡店聊天的午後', '海邊吹著風的海岸', '月光下安靜的夜晚', '充滿歡聲笑語居酒屋之夜'] },
-  { id: 5, bg: `${BASE}/q5.webp${V}`, bgWide: `${BASE}/q5-wide.webp${V}`, questionText: '當你聽音樂時，你比較常呈現什麼樣的狀態？', options: ['覺得心情變得很舒服', '開始想像很多畫面', '想到很多回憶', '跟著節奏點頭或動起來'] },
-  { id: 6, bg: `${BASE}/q6.webp${V}`, bgWide: `${BASE}/q6-wide.webp${V}`, questionText: '朋友們通常在什麼樣的場合最容易想到你？', options: ['需要有人陪著聊天、\n分享心事的時候', '突然想出門、\n說走就走的時候', '當想一個人靜靜待著、\n但又不想完全孤單的時候', '需要有人把氣氛炒熱、\n帶動大家的時候'] },
-  { id: 7, bg: `${BASE}/q7.webp${V}`, bgWide: `${BASE}/q7-wide.webp${V}`, questionText: '如果你走在街上突然聽到有人彈吉他，你通常會？', options: ['停下來聽一下，\n看看是不是熟悉的旋律', '邊走邊聽，\n覺得街道變得很有感覺', '站遠一點靜靜聽完整首，\n能低調就低調', '忍不住走近一點，想看\n清楚表演者演出當下的樣子'] },
+  { id: 1, bg: `${BASE}/q1.webp${V}`, bgWide: `${BASE}/q1-wide.webp${V}`, questionText: '如果今天突然有一整天的空閒，你最想？', options: ['找一家舒服的小店坐著，慢慢待一下午', '不特別安排路線，直接出門走走看看', '待在房間裡聽歌發呆，讓思緒慢慢飄遠', '約朋友出去，讓今天過得熱鬧一點'] },
+  { id: 2, bg: `${BASE}/q2.webp${V}`, bgWide: `${BASE}/q2-wide.webp${V}`, questionText: '如果有一首歌讓你反覆聽很多次，通常是因為？', options: ['它很溫暖，會讓你想到一些人或一些時刻', '它有種流動感，像把你帶去別的地方', '它裡面有一種很深的情緒，會讓你一直停留', '它很有個性，像有人把真實的自己直接唱了出來'] },
+  { id: 3, bg: `${BASE}/q3.webp${V}`, bgWide: `${BASE}/q3-wide.webp${V}`, questionText: '如果要去聽一場現場音樂，你比較想去？', options: ['小咖啡店 acoustic 演出，可以一邊喝飲料一邊慢慢聽歌', '戶外音樂表演，邊走邊聽也很自在', '深夜的小酒吧，安靜坐著聽完整場演出', 'Live House 現場演出，越有氣氛越吸引你'] },
+  { id: 4, bg: `${BASE}/q4.webp${V}`, bgWide: `${BASE}/q4-wide.webp${V}`, questionText: '如果你的生活是一種風景，它比較像？', options: ['和喜歡的人在熟悉的街區散步，節奏慢慢的', '海風裡的海岸線，走著走著就像想起很多畫面', '夜晚的窗邊，安靜但心裡有很多沒說完的感受', '燈光很亮、人聲很多、情緒也很滿的城市夜裡'] },
+  { id: 5, bg: `${BASE}/q5.webp${V}`, bgWide: `${BASE}/q5-wide.webp${V}`, questionText: '當你聽音樂時，你比較常？', options: ['覺得自己被輕輕接住，心情慢慢變得柔軟', '開始想像很多畫面，像腦海裡慢慢展開一段風景', '像掉進自己的想像世界裡，暫時離開眼前的一切', '很想跟著節奏動起來，或立刻把感覺表現出來'] },
+  { id: 6, bg: `${BASE}/q6.webp${V}`, bgWide: `${BASE}/q6-wide.webp${V}`, questionText: '朋友們通常在什麼樣的場合最容易想到你？', options: ['想找人安靜聊聊、被溫柔接住的時候', '突然想出門走走、換個地方透透氣的時候', '心裡有很多感受，想找一個懂那種情緒的人時', '有靈感、有衝動，想立刻找人一起做點什麼的時候'] },
+  { id: 7, bg: `${BASE}/q7.webp${V}`, bgWide: `${BASE}/q7-wide.webp${V}`, questionText: '如果你走在街上突然聽到有人彈吉他，你通常會？', options: ['停下來聽一下，讓那段旋律陪你一下', '邊走邊聽，覺得整條街都變得很有感覺', '站遠一點靜靜聽，像被那段聲音帶進另一個世界', '忍不住走近一點，想看他怎麼把情緒變成表演'] },
 ];
 
 const CHARACTER_NAMES = ['火焰', '太陽', '煙火', '微光', '海浪', '深海', '月光'];
@@ -114,13 +114,13 @@ type Dim = '自由' | '故事';
 // 每題 4 選項 → [Soul, Dimension]
 // Q4-A 是 SUN+自由，其餘 A 都是 SUN+故事
 const SCORING: [Soul, Dim][][] = [
-  /* Q1 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q2 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q3 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q4 */ [['SUN', '自由'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q5 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q6 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
-  /* Q7 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q1 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '自由'], ['FIRE', '自由']],
+  /* Q2 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '故事']],
+  /* Q3 */ [['SUN', '自由'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q4 */ [['SUN', '自由'], ['WAVE', '故事'], ['MOON', '故事'], ['FIRE', '自由']],
+  /* Q5 */ [['SUN', '故事'], ['WAVE', '故事'], ['MOON', '自由'], ['FIRE', '自由']],
+  /* Q6 */ [['SUN', '故事'], ['WAVE', '自由'], ['MOON', '故事'], ['FIRE', '故事']],
+  /* Q7 */ [['SUN', '自由'], ['WAVE', '故事'], ['MOON', '自由'], ['FIRE', '故事']],
 ];
 
 function calculateResult(ans: number[]): string {
