@@ -626,34 +626,62 @@ export default function SoulGuitarInfo() {
 
       {/* ═══════════ 主辦 / 協辦 / 贊助 ═══════════ */}
       <section style={{ backgroundColor: DARK }}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <Strip />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 space-y-14">
+
           {/* 主辦 */}
-          <div className="mb-10">
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4 text-center">主辦單位</p>
-            <div className="flex justify-center">
-              <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-10 object-contain" />
+          <div>
+            <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">主辦單位</p>
+            <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-6 sm:p-8">
+              <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-12 object-contain shrink-0" />
+              <div className="text-center sm:text-left">
+                <p className="text-sm font-bold text-white mb-1">Ayers Guitars</p>
+                <p className="text-xs text-white/40 leading-relaxed">請填入 Ayers 的介紹文字。</p>
+              </div>
             </div>
           </div>
 
           {/* 協辦 */}
-          <div className="mb-10">
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-5 text-center">協辦單位</p>
-            <div className="flex flex-wrap items-center justify-center gap-8">
-              <img src="/images/events/sponsors/cohost-91pu.png" alt="91譜" className="h-9 object-contain" />
-              <img src="/images/events/sponsors/cohost-soundtide.png" alt="聲潮" className="h-9 object-contain" />
-              <img src="/images/events/sponsors/cohost-born-for-guitar.png" alt="生為吉他人 死為吉他魂" className="h-9 object-contain" />
+          <div>
+            <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">協辦單位</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { img: '/images/events/sponsors/cohost-91pu.png',             alt: '91譜',           name: '91譜',           desc: '請填入 91譜 的介紹文字。' },
+                { img: '/images/events/sponsors/cohost-soundtide.png',         alt: '聲潮',           name: '聲潮',           desc: '請填入聲潮的介紹文字。' },
+                { img: '/images/events/sponsors/cohost-born-for-guitar.png',   alt: '生為吉他人',     name: '生為吉他人 死為吉他魂', desc: '請填入生為吉他人的介紹文字。' },
+              ].map((u) => (
+                <div key={u.alt} className="flex flex-col items-center text-center gap-4 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
+                  <img src={u.img} alt={u.alt} className="h-10 object-contain" />
+                  <div>
+                    <p className="text-xs font-bold text-white mb-1">{u.name}</p>
+                    <p className="text-[11px] text-white/35 leading-relaxed">{u.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* 贊助 */}
           <div>
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-5 text-center">贊助單位</p>
-            <div className="flex flex-wrap items-center justify-center gap-8">
-              <img src="/images/events/sponsors/sponsor-aosen.png" alt="奧昇" className="h-9 object-contain" />
-              <img src="/images/events/sponsors/sponsor-yunsound.png" alt="雲聲" className="h-9 object-contain" />
+            <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">贊助單位</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { img: '/images/events/sponsors/sponsor-aosen.png',   alt: '奧昇', name: '奧昇', desc: '請填入奧昇的介紹文字。' },
+                { img: '/images/events/sponsors/sponsor-yunsound.png', alt: '雲聲', name: '雲聲', desc: '請填入雲聲的介紹文字。' },
+              ].map((u) => (
+                <div key={u.alt} className="flex flex-col items-center text-center gap-4 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
+                  <img src={u.img} alt={u.alt} className="h-10 object-contain" />
+                  <div>
+                    <p className="text-xs font-bold text-white mb-1">{u.name}</p>
+                    <p className="text-[11px] text-white/35 leading-relaxed">{u.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+
         </div>
+        <Strip />
       </section>
 
       {/* ═══════════ CTA Footer ═══════════ */}
