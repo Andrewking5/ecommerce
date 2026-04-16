@@ -36,6 +36,40 @@ const RESULT_FOLDER: Record<string, string> = {
   MOON_自由:  'dream-moon',
 };
 
+/* ── 主辦方 footer（所有結果共用，素材放在 sun 資料夾直到統一整理） ── */
+const FOOTER_BASE = `${BASE}/result/sun`;
+const enc = (name: string) => encodeURIComponent(name);
+
+function OrganizerFooter() {
+  return (
+    <div className="w-full relative mt-0">
+      {/* 漸層底條 */}
+      <img src={`${FOOTER_BASE}/${enc('資產 28.png')}`} alt="" className="w-full h-auto block" draggable={false} />
+      {/* Logo 群組 — 絕對定位貼在底條上 */}
+      <div className="absolute inset-0 flex items-center justify-around px-3 gap-1">
+        {/* 主辦方 */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>主辦方</span>
+          <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-5 w-auto" draggable={false} />
+        </div>
+        {/* 協辦 */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>協辦</span>
+          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" className="h-5 w-auto" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" className="h-5 w-auto" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-5 w-auto" draggable={false} />
+        </div>
+        {/* 贊助 */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-white/80 text-[9px] whitespace-nowrap" style={{ fontFamily: QUIZ_FONT }}>贊助</span>
+          <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-5 w-auto" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-5 w-auto" draggable={false} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── 結果資料 ── */
 interface ResultInfo {
   name: string;
@@ -53,6 +87,7 @@ interface ResultInfo {
   charImg: string;
   themeColor: string;
   themeBg: string;
+  bgFile?: string; // 若有拆分背景圖，指定檔名；否則預設 bg.webp
 }
 
 const RESULTS: Record<string, ResultInfo> = {
@@ -106,6 +141,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/sun/char.webp${CACHE_V}`,
     themeColor: '#FF9A3E',
     themeBg: 'linear-gradient(135deg, #FFF4CC 0%, #FFE4A0 50%, #FF9A3E 100%)',
+    bgFile: '太陽.jpg',
   },
   SUN_故事: {
     name: 'Soft Sun Taoyuan',
@@ -195,11 +231,12 @@ const RESULTS: Record<string, ResultInfo> = {
 };
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
-function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
+function FullResultPage({ resultKey, folder, layout, onLayoutChange, hasNewBg }: {
   resultKey: string;
   folder: string;
   layout: LayoutConfig;
   onLayoutChange: (patch: Partial<LayoutConfig>) => void;
+  hasNewBg: boolean; // true = 使用拆分背景（需顯示 OrganizerFooter）
 }) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
@@ -586,6 +623,10 @@ function FullResultPage({ resultKey, folder, layout, onLayoutChange }: {
 
         </div>
       </div>
+
+      {/* 主辦方 footer — 只在有拆分背景的結果頁顯示 */}
+      {hasNewBg && <OrganizerFooter />}
+
     </motion.div>
     </>
   );
@@ -846,7 +887,8 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgUrl = folder ? `${BASE}/result/${folder}/bg.webp${CACHE_V}` : '';
+  const bgFile = resultData.bgFile ?? 'bg.webp';
+  const bgUrl = folder ? `${BASE}/result/${folder}/${encodeURIComponent(bgFile)}${CACHE_V}` : '';
 
   return (
     <div
@@ -866,6 +908,7 @@ export default function SoulGuitarResult() {
           folder={RESULT_FOLDER[resultKey]}
           layout={layout}
           onLayoutChange={handleLayoutChange}
+          hasNewBg={!!resultData.bgFile}
         />
       </div>
       {isEditMode && (
