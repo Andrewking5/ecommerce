@@ -746,7 +746,7 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">協辦單位</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { img: '/images/events/sponsors/cohost-91pu.png',           alt: '91譜',       name: '91譜',                key: '91pu',           logoClass: 'h-10 scale-[1.15]' },
+                { img: '/images/events/sponsors/cohost-91pu.png',           alt: '91譜',       name: '91譜',                key: '91pu',           logoClass: 'h-10 scale-[1.3]' },
                 { img: '/images/events/sponsors/cohost-soundtide.png',       alt: '聲潮',       name: '聲潮 SOUNDTIDE',       key: 'soundtide'       },
                 { img: '/images/events/sponsors/cohost-born-for-guitar.png', alt: '生為吉他人', name: '生為吉他人 死為吉他魂', key: 'born-for-guitar' },
               ].map((u) => (
