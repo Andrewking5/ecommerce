@@ -84,6 +84,18 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
   );
 }
 
+/* ── 吉他連結（每個結果型各兩把，順序對應 guitar-1 / guitar-2） ── */
+const GUITAR_LINKS: Record<string, [string, string]> = {
+  SUN_自由:  ['https://ayersguitars.com/products/2.html',  'https://ayersguitars.com/products/4.html'],
+  SUN_故事:  ['https://ayersguitars.com/products/3.html',  'https://ayersguitars.com/products/10.html'],
+  WAVE_自由: ['https://www.youtube.com/watch?v=NjKxuFTfe_4', 'https://ayersguitars.com/products/11.html'],
+  WAVE_故事: ['https://ayersguitars.com/products/1.html',  'https://ayersguitars.com/products/12.html'],
+  MOON_自由: ['https://ayersguitars.com/products/61.html', 'https://ayersguitars.com/products/58.html'],
+  MOON_故事: ['https://ayersguitars.com/products/21.html', 'https://ayersguitars.com/products/20.html'],
+  FIRE_自由: ['https://ayersguitars.com/products/32.html', 'https://ayersguitars.com/products/36.html'],
+  FIRE_故事: ['https://ayersguitars.com/products/35.html', 'https://ayersguitars.com/products/33.html'],
+};
+
 /* ── 結果資料 ── */
 interface ResultInfo {
   name: string;
@@ -341,6 +353,7 @@ function FullResultPage({ resultKey, folder, layout }: {
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const guitarLinks = GUITAR_LINKS[resultKey] ?? ['', ''];
   const C = layout; // 短名
 
   return (
@@ -517,9 +530,15 @@ function FullResultPage({ resultKey, folder, layout }: {
                   <div className="w-full">
                     <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
                   </div>
-                  <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
+                  <motion.a
+                    href={guitarLinks[i - 1]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-[90%]"
+                    whileTap={{ scale: 0.93 }}
+                  >
                     <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
-                  </motion.button>
+                  </motion.a>
                 </motion.div>
               ))}
             </div>
