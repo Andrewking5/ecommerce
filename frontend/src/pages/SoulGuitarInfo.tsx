@@ -746,12 +746,12 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">協辦單位</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { img: '/images/events/sponsors/cohost-91pu.png',           alt: '91譜',       name: '91譜',                key: '91pu'            },
-                { img: '/images/events/sponsors/cohost-soundtide.png',       alt: '聲潮',       name: '聲潮',                key: 'soundtide'       },
+                { img: '/images/events/sponsors/cohost-91pu.png',           alt: '91譜',       name: '91譜',                key: '91pu',           logoClass: 'h-10 scale-[1.15]' },
+                { img: '/images/events/sponsors/cohost-soundtide.png',       alt: '聲潮',       name: '聲潮 SOUNDTIDE',       key: 'soundtide'       },
                 { img: '/images/events/sponsors/cohost-born-for-guitar.png', alt: '生為吉他人', name: '生為吉他人 死為吉他魂', key: 'born-for-guitar' },
               ].map((u) => (
                 <div key={u.alt} className="flex flex-col items-center text-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
-                  <img src={u.img} alt={u.alt} className="h-10 object-contain" />
+                  <img src={u.img} alt={u.alt} className={`${(u as { logoClass?: string }).logoClass ?? 'h-10'} object-contain`} />
                   <p className="text-xs font-bold text-white">{u.name}</p>
                   {isEdit ? (
                     <textarea
@@ -774,8 +774,8 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-white/25 uppercase tracking-widest mb-8 text-center">贊助單位</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { img: '/images/events/sponsors/sponsor-aosen.png',    alt: '奧昇', name: '奧昇', key: 'aosen'    },
-                { img: '/images/events/sponsors/sponsor-yunsound.png',  alt: '雲聲', name: '雲聲', key: 'yunsound' },
+                { img: '/images/events/sponsors/sponsor-aosen.png',    alt: '奧昇裝置', name: '奧昇裝置 Awesome Device', key: 'aosen'    },
+                { img: '/images/events/sponsors/sponsor-yunsound.png',  alt: '雲聲',     name: '雲聲 CLOUDVOCAL',           key: 'yunsound' },
               ].map((u) => (
                 <div key={u.alt} className="flex flex-col items-center text-center gap-3 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-5">
                   <img src={u.img} alt={u.alt} className="h-10 object-contain" />
