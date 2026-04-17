@@ -14,28 +14,29 @@ const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
 /* ── URL slug ↔ result key 映射（直譯） ── */
 const SLUG_TO_KEY: Record<string, string> = {
-  'fire':       'FIRE_自由',   // 火焰
-  'fireworks':  'FIRE_故事',   // 煙火
-  'sun':        'SUN_自由',    // 太陽
-  'glow':       'SUN_故事',    // 微光
-  'wave':       'WAVE_自由',   // 海浪
-  'deep-sea':   'WAVE_故事',   // 深海
-  'moon':       'MOON_故事',   // 月亮
+  'fire': 'FIRE_自由',   // 火焰
+  'fireworks': 'FIRE_故事',   // 煙火
+  'sun': 'SUN_自由',    // 太陽
+  'glow': 'SUN_故事',    // 微光
+  'wave': 'WAVE_自由',   // 海浪
+  'deep-sea': 'WAVE_故事',   // 深海
+  'moon': 'MOON_故事',   // 月亮
   'dream-moon': 'MOON_自由',   // 夢月
 };
 
 /* ── 角色 → 素材資料夾 ── */
 const RESULT_FOLDER: Record<string, string> = {
-  FIRE_自由:  'fire',
-  FIRE_故事:  'fireworks',
-  SUN_自由:   'sun',
-  SUN_故事:   'glow',
-  WAVE_自由:  'wave',
-  WAVE_故事:  'deep-sea',
-  MOON_故事:  'moon',
-  MOON_自由:  'dream-moon',
+  FIRE_自由: 'fire',
+  FIRE_故事: 'fireworks',
+  SUN_自由: 'sun',
+  SUN_故事: 'glow',
+  WAVE_自由: 'wave',
+  WAVE_故事: 'deep-sea',
+  MOON_故事: 'moon',
+  MOON_自由: 'dream-moon',
 };
 
+// logos（ayers、協辦、贊助）是共用素材，統一放在 sun 資料夾，所有結果型共用
 const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
@@ -47,8 +48,8 @@ const enc = (name: string) => encodeURIComponent(name);
  * - 文字大小 clamp，手機~桌機都合理
  */
 function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
-  /* 布條高度：手機 52px，隨螢幕略增，桌機上限 68px */
-  const stripeH = 'clamp(52px, 7vw, 68px)';
+  /* 布條高度：12.09vw = 52px @ 430px，手機等比縮放，桌機封頂 72px */
+  const stripeH = 'clamp(0px, 12.09vw, 72px)';
   return (
     <div
       className="relative z-10 w-full"
@@ -69,8 +70,8 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
         </div>
         <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
           <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">協辦</span>
-          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}                  alt="聲潮"    className="h-full w-auto object-contain" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                    alt="91譜"    className="h-full w-auto object-contain" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" className="h-full w-auto object-contain" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" className="h-full w-auto object-contain" draggable={false} />
           <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-full w-auto object-contain" draggable={false} />
         </div>
         <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
@@ -305,7 +306,7 @@ function FullResultPage({ resultKey, folder, layout }: {
       audio.pause();
       setAudioPlaying(false);
     } else {
-      audio.play().then(() => setAudioPlaying(true)).catch(() => {});
+      audio.play().then(() => setAudioPlaying(true)).catch(() => { });
     }
   };
 
@@ -344,308 +345,308 @@ function FullResultPage({ resultKey, folder, layout }: {
 
   return (
     <>
-    {/* 結果頁背景音樂 */}
-    <audio ref={audioRef} src={`/audio/quiz/result/${folder}.mp3`} preload="none" />
+      {/* 結果頁背景音樂 */}
+      <audio ref={audioRef} src={`/audio/quiz/result/${folder}.mp3`} preload="none" />
 
-    {/* 音樂開關按鈕（固定在右上角） */}
-    <motion.button
-      type="button"
-      onClick={toggleAudio}
-      className="fixed top-4 right-4 z-110 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/60 transition-colors"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1 }}
-      aria-label={audioPlaying ? '關閉音樂' : '開啟音樂'}
-    >
-      {audioPlaying ? (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 opacity-50">
-          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-        </svg>
-      )}
-    </motion.button>
+      {/* 音樂開關按鈕（固定在右上角） */}
+      <motion.button
+        type="button"
+        onClick={toggleAudio}
+        className="fixed top-4 right-4 z-110 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/60 transition-colors"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        aria-label={audioPlaying ? '關閉音樂' : '開啟音樂'}
+      >
+        {audioPlaying ? (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 opacity-50">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+          </svg>
+        )}
+      </motion.button>
 
-    <motion.div
-      className="w-full"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="relative z-10 flex flex-col items-center w-full pb-16">
+      <motion.div
+        className="w-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="relative z-10 flex flex-col items-center w-full pb-[14.88%]">
 
-        {/* ─── Hero Card（長按可儲存）─── */}
-        <motion.div
-          className="mx-auto relative"
-          style={fs('heroCard')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <img src={`${RF}/hero-card.webp${CACHE_V}`} alt={result.name} className="w-full h-auto block" />
-        </motion.div>
-
-        <div className="w-full flex flex-col items-center">
-
-          {/* 長按儲存提示 */}
+          {/* ─── Hero Card（長按可儲存）─── */}
           <motion.div
-            style={fs('textSave')}
+            className="mx-auto relative"
+            style={fs('heroCard')}
             initial={{ opacity: 0 }}
-            animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
-            transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
           >
-            <img src={`${RF}/text-save.webp${CACHE_V}`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
+            <img src={`${RF}/hero-card.webp${CACHE_V}`} alt={result.name} className="w-full h-auto block" />
           </motion.div>
 
-          {/* 往下看提示 */}
-          <motion.div
-            style={fs('textScroll')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
-            transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
-          >
-            <img src={`${RF}/text-scroll.webp${CACHE_V}`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
-          </motion.div>
+          <div className="w-full flex flex-col items-center">
 
-          {/* 一個讓你被聽見的機會 */}
-          <motion.div
-            style={fs('textChance')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showContent ? 1 : 0 }}
-            transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
-          >
-            <img src={`${RF}/text-chance.webp${CACHE_V}`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
-          </motion.div>
+            {/* 長按儲存提示 */}
+            <motion.div
+              style={fs('textSave')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showContent ? 0.7 : 0, y: showContent ? [0, -3, 0] : 0 }}
+              transition={{ opacity: { duration: 0.5 }, y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
+            >
+              <img src={`${RF}/text-save.webp${CACHE_V}`} alt="長按上方結果圖儲存圖片" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          {/* 角色圖 + 兩側裝飾 */}
-          <motion.div
-            className="w-full relative flex justify-center overflow-visible"
-            style={{ marginTop: `${C.char.mt}px` }}
-            initial={{ scale: 0.8, y: 20 }}
-            animate={{ scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {/* showContent 後才掛載，避免 opacity:0 讓瀏覽器暫停 animated WebP */}
-            {showContent && (
+            {/* 往下看提示 */}
+            <motion.div
+              style={fs('textScroll')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showContent ? 1 : 0, y: showContent ? [0, 6, 0] : 10 }}
+              transition={{ opacity: { duration: 0.5, delay: 0.2 }, y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } }}
+            >
+              <img src={`${RF}/text-scroll.webp${CACHE_V}`} alt="往下看你的靈魂檔案" className="w-full h-auto" draggable={false} />
+            </motion.div>
+
+            {/* 一個讓你被聽見的機會 */}
+            <motion.div
+              style={fs('textChance')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showContent ? 1 : 0 }}
+              transition={{ opacity: { duration: 0.5, delay: 0.4 } }}
+            >
+              <img src={`${RF}/text-chance.webp${CACHE_V}`} alt="一個讓你被聽見的機會" className="w-full h-auto" draggable={false} />
+            </motion.div>
+
+            {/* 角色圖 + 兩側裝飾 */}
+            <motion.div
+              className="w-full relative flex justify-center overflow-visible"
+              style={{ marginTop: `${(C.char.mt / 430 * 100).toFixed(2)}%` }}
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* showContent 後才掛載，避免 opacity:0 讓瀏覽器暫停 animated WebP */}
+              {showContent && (
+                <img
+                  src={result.charImg}
+                  alt={result.name}
+                  style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
+                  className="relative h-auto object-contain"
+                  draggable={false}
+                />
+              )}
               <img
-                src={result.charImg}
-                alt={result.name}
-                style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
-                className="relative h-auto object-contain"
+                src={`${RF}/char-right.webp${CACHE_V}`}
+                alt={result.colorName}
+                style={{ width: `${C.charRight.w}%`, top: `${C.charRight.mt}%`, right: `${C.charRight.x}%`, zIndex: C.charRight.z }}
+                className="absolute h-auto object-contain"
                 draggable={false}
               />
-            )}
-            <img
-              src={`${RF}/char-right.webp${CACHE_V}`}
-              alt={result.colorName}
-              style={{ width: `${C.charRight.w}%`, top: `${C.charRight.mt}%`, right: `${C.charRight.x}%`, zIndex: C.charRight.z }}
-              className="absolute h-auto object-contain"
-              draggable={false}
-            />
-          </motion.div>
+            </motion.div>
 
-          {/* 你的個人特質 */}
-          <motion.div
-            style={fs('personalityCard')}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <img src={`${RF}/personality-card.webp${CACHE_V}`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
-          </motion.div>
+            {/* 你的個人特質 */}
+            <motion.div
+              style={fs('personalityCard')}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img src={`${RF}/personality-card.webp${CACHE_V}`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
+            </motion.div>
 
-          {/* 城市卡 */}
-          <motion.div
-            className="overflow-hidden rounded-xl"
-            style={fs('cityCard')}
-            initial={{ opacity: 0, scale: 0.97 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" draggable={false} />
-          </motion.div>
+            {/* 城市卡 */}
+            <motion.div
+              className="overflow-hidden rounded-xl"
+              style={fs('cityCard')}
+              initial={{ opacity: 0, scale: 0.97 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          {/* 猜猜這是哪 */}
-          <motion.div
-            style={fs('textGuess')}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
-          </motion.div>
+            {/* 猜猜這是哪 */}
+            <motion.div
+              style={fs('textGuess')}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          {/* 這樣的你，會發出什麼樣的聲音？ */}
-          <motion.div
-            style={fs('textSound')}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
-          </motion.div>
+            {/* 這樣的你，會發出什麼樣的聲音？ */}
+            <motion.div
+              style={fs('textSound')}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          {/* 你可能會喜歡的 Ayers 吉他款式 */}
-          <motion.div
-            style={fs('titleAyers')}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
-          </motion.div>
+            {/* 你可能會喜歡的 Ayers 吉他款式 */}
+            <motion.div
+              style={fs('titleAyers')}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          {/* 兩把吉他 */}
-          <div className="mt-5 w-full grid grid-cols-2 gap-4 items-stretch">
-            {[1, 2].map(i => (
-              <motion.div
-                key={i}
-                className="flex flex-col items-center justify-between gap-3"
-                initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div className="w-full">
-                  <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
-                </div>
-                <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
-                  <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
-                </motion.button>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* 你聽出來了嗎 */}
-          <motion.div
-            style={fs('textHeard')}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
-          </motion.div>
-
-          {/* 你會愛上的吉他音樂風格 */}
-          <motion.div
-            style={fs('titleMusic')}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
-          </motion.div>
-
-          {/* 音樂風格標籤 */}
-          <div className="flex flex-col gap-2.5" style={fs('tags')}>
-            {[1, 2, 3, 4].map(i => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" draggable={false} />
-              </motion.div>
-            ))}
-          </div>
-
-          {/* 比賽資訊文字 */}
-          <motion.div
-            style={fs('textContest')}
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-          >
-            <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
-          </motion.div>
-
-          {/* 比賽海報 */}
-          <motion.div
-            className="overflow-hidden rounded-xl"
-            style={fs('poster')}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <img src={`${RF}/poster.webp${CACHE_V}`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
-          </motion.div>
-
-          {/* 底部按鈕 */}
-          <motion.div
-            className="mt-10 w-full flex flex-col items-center gap-4"
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.img
-              src={`${RF}/char-type.webp${CACHE_V}`}
-              alt="分享抽獎說明"
-              style={fs('charType', { display: 'block' })}
-              className="h-auto self-start"
-              draggable={false}
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            <div className="w-full flex items-center gap-3">
-              <motion.button
-                type="button"
-                onClick={handleShare}
-                className="flex-1 relative"
-                whileTap={{ scale: 0.93 }}
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                {/* 外層光暈 — 較大範圍閃爍 */}
+            {/* 兩把吉他 */}
+            <div className="mt-[4.65%] w-full grid grid-cols-2 gap-[3.72%] items-stretch">
+              {[1, 2].map(i => (
                 <motion.div
-                  className="absolute -inset-3 rounded-full pointer-events-none"
-                  style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.45) 0%, transparent 65%)' }}
-                  animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.9, 1.1, 0.9] }}
-                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <img src={`${RF}/btn-share.webp${CACHE_V}`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
-                {copied && (
-                  <motion.span
-                    className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    style={{ fontFamily: QUIZ_FONT }}
-                  >
-                    已複製到剪貼簿
-                  </motion.span>
-                )}
-              </motion.button>
-              <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} className="flex-1" whileTap={{ scale: 0.93 }}>
-                <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" draggable={false} />
-              </motion.button>
+                  key={i}
+                  className="flex flex-col items-center justify-between gap-3"
+                  initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="w-full">
+                    <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
+                  </div>
+                  <motion.button type="button" className="w-[90%]" whileTap={{ scale: 0.93 }}>
+                    <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
+                  </motion.button>
+                </motion.div>
+              ))}
             </div>
 
-            <Link to="/e/soul-guitar/info" className="w-full active:scale-95 transition-transform">
-              <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
-            </Link>
-          </motion.div>
+            {/* 你聽出來了嗎 */}
+            <motion.div
+              style={fs('textHeard')}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5 }}
+            >
+              <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
-          <div className="h-8" />
+            {/* 你會愛上的吉他音樂風格 */}
+            <motion.div
+              style={fs('titleMusic')}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+            </motion.div>
 
+            {/* 音樂風格標籤 */}
+            <div className="flex flex-col gap-[3px]" style={fs('tags')}>
+              {[1, 2, 3, 4].map(i => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 40 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-30px' }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" draggable={false} />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* 比賽資訊文字 */}
+            <motion.div
+              style={fs('textContest')}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+            >
+              <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+            </motion.div>
+
+            {/* 比賽海報 */}
+            <motion.div
+              className="overflow-hidden rounded-xl"
+              style={fs('poster')}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <img src={`${RF}/poster.webp${CACHE_V}`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
+            </motion.div>
+
+            {/* 底部按鈕 */}
+            <motion.div
+              className="mt-[9.30%] w-full flex flex-col items-center gap-[3.72%]"
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.img
+                src={`${RF}/char-type.webp${CACHE_V}`}
+                alt="分享抽獎說明"
+                style={fs('charType', { display: 'block' })}
+                className="h-auto self-start"
+                draggable={false}
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              />
+
+              <div className="w-full flex items-center gap-[2.79%]">
+                <motion.button
+                  type="button"
+                  onClick={handleShare}
+                  className="flex-1 relative"
+                  whileTap={{ scale: 0.93 }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {/* 外層光暈 — 較大範圍閃爍 */}
+                  <motion.div
+                    className="absolute -inset-3 rounded-full pointer-events-none"
+                    style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.45) 0%, transparent 65%)' }}
+                    animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.9, 1.1, 0.9] }}
+                    transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <img src={`${RF}/btn-share.webp${CACHE_V}`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
+                  {copied && (
+                    <motion.span
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      style={{ fontFamily: QUIZ_FONT }}
+                    >
+                      已複製到剪貼簿
+                    </motion.span>
+                  )}
+                </motion.button>
+                <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} className="flex-1" whileTap={{ scale: 0.93 }}>
+                  <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" draggable={false} />
+                </motion.button>
+              </div>
+
+              <Link to="/e/soul-guitar/info" className="w-full active:scale-95 transition-transform">
+                <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
+              </Link>
+            </motion.div>
+
+            <div className="h-0 pb-[7.44%]" />
+
+          </div>
         </div>
-      </div>
 
-    </motion.div>
+      </motion.div>
     </>
   );
 }
@@ -663,26 +664,25 @@ const ASSET_META: {
   yMin?: number; yMax?: number;
   zMin?: number; zMax?: number;
 }[] = [
-  // 所有範圍刻意放大，讓設計師可以自由移動 / 縮放
-  { key: 'heroCard',        label: 'Hero 結果卡',    wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textSave',        label: '長按儲存提示',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textScroll',      label: '往下看提示',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textChance',      label: '機會文字',       wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'char',            label: '角色圖',         wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'charRight',       label: '右側裝飾', abs: true, wMin: 0, wMax: 150, mtMin: -50, mtMax: 200, xMin: -50, xMax: 100, zMin: 0, zMax: 50 },
-  { key: 'personalityCard', label: '個人特質卡',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'cityCard',        label: '城市卡',         wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textGuess',       label: '猜猜這是哪',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textSound',       label: '發出什麼聲音',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'titleAyers',      label: 'Ayers 吉他標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textHeard',       label: '你聽出來了嗎',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'titleMusic',      label: '音樂風格標題',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'tags',            label: '音樂風格標籤',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'textContest',     label: '比賽資訊文字',   wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'poster',          label: '比賽海報',       wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'charType',        label: '角色型標籤',     wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-  { key: 'footerBlob',      label: '底部吉他背景',   wMin: 0, wMax: 200, mtMin: -600, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300, zMin: 0, zMax: 50 },
-];
+    // 所有範圍刻意放大，讓設計師可以自由移動 / 縮放
+    { key: 'heroCard', label: 'Hero 結果卡', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textSave', label: '長按儲存提示', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textScroll', label: '往下看提示', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textChance', label: '機會文字', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'char', label: '角色圖', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'charRight', label: '右側裝飾', abs: true, wMin: 0, wMax: 150, mtMin: -50, mtMax: 200, xMin: -50, xMax: 100, zMin: 0, zMax: 50 },
+    { key: 'personalityCard', label: '個人特質卡', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'cityCard', label: '城市卡', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textGuess', label: '猜猜這是哪', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textSound', label: '發出什麼聲音', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'titleAyers', label: 'Ayers 吉他標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textHeard', label: '你聽出來了嗎', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'titleMusic', label: '音樂風格標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'tags', label: '音樂風格標籤', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'textContest', label: '比賽資訊文字', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'poster', label: '比賽海報', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'charType', label: '角色型標籤', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+  ];
 
 function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
   slug: string;
@@ -796,7 +796,7 @@ function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
                       {abs ? (
                         <>
                           <Slider label="上 top%" value={c.mt} min={mtMin} max={mtMax} onChange={v => update(key, 'mt', v)} />
-                          <Slider label={key === 'charLeft' ? '左 left%' : '右 right%'} value={c.x} min={xMin} max={xMax} onChange={v => update(key, 'x', v)} />
+                          <Slider label="右 right%" value={c.x} min={xMin} max={xMax} onChange={v => update(key, 'x', v)} />
                         </>
                       ) : (
                         <>
@@ -879,7 +879,12 @@ export default function SoulGuitarResult() {
     quizService.getLayout(slug).then(cfg => { if (cfg) setLayout(cfg); });
 
     const RF = `${BASE}/result/${folder}`;
-    const assets = ['bg.webp', 'hero-card.webp', 'char.webp'].map(
+    const filesToPreload = [
+      ...(RESULTS[resultKey].bgFile ? ['bg.webp'] : []),
+      'hero-card.webp',
+      'char.webp',
+    ];
+    const assets = filesToPreload.map(
       f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}${CACHE_V}`; }),
     );
     Promise.all(assets).then(() => setIsLoading(false));
@@ -904,35 +909,27 @@ export default function SoulGuitarResult() {
 
   return (
     <div
-      className="w-full relative flex flex-col items-center overflow-x-hidden"
-      style={{ backgroundColor: resultData.themeColor, minHeight: '100dvh' }}
+      className="w-full flex flex-col items-center overflow-x-hidden"
+      style={{
+        backgroundColor: resultData.themeColor,
+        ...(bgUrl ? {
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+        } : {}),
+      }}
     >
-      {/* w-full h-auto：寬固定為容器100%，高自動等比縮放
-          1920×7401 在430px容器 → 430×1658，完整顯示無裁切，無需靜態檔案 */}
-      {bgUrl && (
-        <img
-          src={bgUrl}
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-          className="absolute top-0 left-0 w-full h-auto pointer-events-none z-0"
-        />
-      )}
-
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
 
-      {/* z-10：內容層（手機 80% = 344px，電腦 120% = 516px） */}
-      <div className="relative z-10 w-full max-w-[344px] md:max-w-[430px] lg:max-w-[516px]">
+      <div className="relative z-10 w-full max-w-[375px] md:max-w-[430px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
           layout={layout}
         />
       </div>
-
-      {/* z-10：布條 + logos，頁面最底部 */}
       {!!stripeUrl && <OrganizerStripe stripeUrl={stripeUrl} />}
 
       {isEditMode && (

@@ -3,8 +3,8 @@ import api from './api';
 /** 每個素材的版面設定 */
 export interface AssetConfig {
   w: number;   // 寬度 % (相對於容器)
-  mt: number;  // 上邊距 px（流式素材）或 top %（charLeft / charRight 絕對定位）
-  x: number;   // 左右偏移 px（流式素材）或 left/right %（charLeft / charRight）
+  mt: number;  // 上邊距 px（流式素材）或 top %（charRight 絕對定位）
+  x: number;   // 左右偏移 px（流式素材）或 right %（charRight 絕對定位）
   y: number;   // 上下偏移 px（translateY，不影響排版）
   z: number;   // z-index
 }
@@ -12,12 +12,11 @@ export interface AssetConfig {
 export type AssetKey =
   | 'heroCard'
   | 'textSave' | 'textScroll' | 'textChance'
-  | 'char' | 'charLeft' | 'charRight'
+  | 'char' | 'charRight'
   | 'personalityCard' | 'cityCard' | 'textGuess'
   | 'textSound' | 'titleAyers'
   | 'textHeard' | 'titleMusic' | 'tags'
-  | 'textContest' | 'poster' | 'charType'
-  | 'footerBlob';
+  | 'textContest' | 'poster' | 'charType';
 
 export type LayoutConfig = Record<AssetKey, AssetConfig>;
 
@@ -30,7 +29,6 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   textScroll:      a(80,  16),           // mt-4
   textChance:      a(90,  20),           // mt-5
   char:            a(76,  16, 0, 0, 0),  // mt-4; z=0（在裝飾圖下層）
-  charLeft:        a(15,  21, 0, 0, 10), // mt=top%, x=left%, z=10（絕對定位）
   charRight:       a(14,  24, 0, 0, 10), // mt=top%, x=right%, z=10（絕對定位）
   personalityCard: a(100, 32),           // mt-8
   cityCard:        a(100, 32),           // mt-8
@@ -43,7 +41,6 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   textContest:     a(85,  12),           // mt-3
   poster:          a(85,  24),           // mt-6
   charType:        a(65,   0),           // 在 flex 容器內，mt 由容器控制
-  footerBlob:      a(100,  0),           // 底部吉他背景圖，預設全寬
 };
 
 export interface QuizAnalytics {
