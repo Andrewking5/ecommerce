@@ -36,66 +36,69 @@ const RESULT_FOLDER: Record<string, string> = {
   MOON_自由:  'dream-moon',
 };
 
-/* ── 主辦方 footer（所有結果共用，素材放在 sun 資料夾直到統一整理） ── */
 const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
-/* 白色吉他 blob — scroll flow 內，layout editor 控制 */
-function OrganizerFooter({ layout }: { layout: LayoutConfig }) {
-  const blob = layout.footerBlob;
+/**
+ * 響應式背景層（z-0，absolute inset-0）
+ * <picture> 自動切換手機版 / 桌機版背景
+ * object-fit: fill → 整張圖撐滿 container，不留空白
+ */
+function BackgroundLayer({ bgUrl, bgMobileUrl }: { bgUrl: string; bgMobileUrl?: string }) {
   return (
-    <div className="w-full flex justify-center pb-16">
-      <img
-        src={`${FOOTER_BASE}/${enc('資產 29.png')}`}
-        alt=""
-        draggable={false}
-        style={{
-          width: `${blob.w}%`,
-          height: 'auto',
-          display: 'block',
-          marginTop: `${blob.mt}px`,
-          translate: `${blob.x}px ${blob.y}px`,
-          position: 'relative',
-          zIndex: blob.z,
-        }}
-      />
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <picture className="absolute inset-0 w-full h-full">
+        {/* 桌機：≥ 1024px 用桌機版 */}
+        <source media="(min-width: 1024px)" srcSet={bgUrl} />
+        {/* 手機：用手機版（若無則 fallback 到桌機版） */}
+        <img
+          src={bgMobileUrl ?? bgUrl}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 w-full h-full object-cover object-top"
+        />
+      </picture>
     </div>
   );
 }
 
-/* 橘色布條 + logos — fixed 常駐螢幕底部，不隨頁面捲動 */
-function StickyStripe() {
+/**
+ * 布條 + logos — 專業響應式做法
+ * - 布條圖固定高度（不隨寬度無限放大），`object-fit: cover` 填滿
+ * - logos 高度跟著布條，`py` 控制上下留白
+ * - 文字大小 clamp，手機~桌機都合理
+ */
+function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
+  /* 布條高度：手機 52px，隨螢幕略增，桌機上限 68px */
+  const stripeH = 'clamp(52px, 7vw, 68px)';
   return (
     <div
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50"
-      style={{ fontFamily: QUIZ_FONT }}
+      className="relative z-10 w-full"
+      style={{ height: stripeH, fontFamily: QUIZ_FONT }}
     >
-      {/* 資產 28 橘色布條 */}
-      <div className="relative w-full">
-        <img
-          src={`${FOOTER_BASE}/${enc('資產 28.png')}`}
-          alt=""
-          className="w-full block"
-          style={{ height: '56px', objectFit: 'fill' }}
-          draggable={false}
-        />
-        {/* logos 疊在布條上，使用原始比例（h-auto + max-h 限制） */}
-        <div className="absolute inset-0 flex items-center justify-around px-3 gap-x-2">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-white/80 text-[9px] whitespace-nowrap">主辦方</span>
-            <img src={`${FOOTER_BASE}/ayers.png`}                              alt="Ayers"   className="max-h-8 w-auto" draggable={false} />
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-center max-w-[45%]">
-            <span className="text-white/80 text-[9px] whitespace-nowrap">協辦</span>
-            <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}              alt="聲潮"    className="max-h-7 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                alt="91譜"    className="max-h-7 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="max-h-7 w-auto" draggable={false} />
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-white/80 text-[9px] whitespace-nowrap">贊助</span>
-            <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="max-h-7 w-auto" draggable={false} />
-            <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="max-h-7 w-auto" draggable={false} />
-          </div>
+      {/* 布條背景圖 */}
+      <img
+        src={stripeUrl}
+        alt=""
+        draggable={false}
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      {/* logos 疊在布條上，置中，每個元素間距 10px */}
+      <div className="relative h-full flex items-center justify-center px-4 gap-[10px] overflow-hidden">
+        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">主辦方</span>
+          <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-full w-auto object-contain" draggable={false} />
+        </div>
+        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">協辦</span>
+          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}                  alt="聲潮"    className="h-full w-auto object-contain" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                    alt="91譜"    className="h-full w-auto object-contain" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-full w-auto object-contain" draggable={false} />
+        </div>
+        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">贊助</span>
+          <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-full w-auto object-contain" draggable={false} />
+          <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-full w-auto object-contain" draggable={false} />
         </div>
       </div>
     </div>
@@ -119,7 +122,9 @@ interface ResultInfo {
   charImg: string;
   themeColor: string;
   themeBg: string;
-  bgFile?: string; // 若有拆分背景圖，指定檔名；否則預設 bg.webp
+  bgFile?: string;       // 桌機背景（1920px 基準）
+  bgFileMobile?: string; // 手機背景（430px 基準，若無則同 bgFile）
+  stripeFile?: string;   // 布條背景圖（在各自資料夾內）
 }
 
 const RESULTS: Record<string, ResultInfo> = {
@@ -139,6 +144,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/fire/char.webp${CACHE_V}`,
     themeColor: '#E04040',
     themeBg: 'linear-gradient(135deg, #FFE0D0 0%, #F08060 50%, #E04040 100%)',
+    stripeFile: '資產 28.png',
   },
   FIRE_故事: {
     name: 'Spark Kaohsiung',
@@ -156,6 +162,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/fireworks/char.webp${CACHE_V}`,
     themeColor: '#D05030',
     themeBg: 'linear-gradient(135deg, #FFE8D8 0%, #E88060 50%, #D05030 100%)',
+    stripeFile: '資產 28.png',
   },
   SUN_自由: {
     name: 'Sunny Taipei',
@@ -173,7 +180,9 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/sun/char.webp${CACHE_V}`,
     themeColor: '#FF9A3E',
     themeBg: 'linear-gradient(135deg, #FFF4CC 0%, #FFE4A0 50%, #FF9A3E 100%)',
-    bgFile: '太陽.jpg',
+    bgFile: 'bg.webp',
+    bgFileMobile: 'bg-mobile.webp',
+    stripeFile: '資產 28.png',
   },
   SUN_故事: {
     name: 'Soft Sun Taoyuan',
@@ -191,6 +200,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/glow/char.webp${CACHE_V}`,
     themeColor: '#F0B860',
     themeBg: 'linear-gradient(135deg, #FFF8E8 0%, #FFE8B0 50%, #F0B860 100%)',
+    stripeFile: '資產 28.png',
   },
   WAVE_自由: {
     name: 'Wave Hualien',
@@ -208,6 +218,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/wave/char.webp${CACHE_V}`,
     themeColor: '#4A9EC5',
     themeBg: 'linear-gradient(135deg, #E0F2FE 0%, #7EC8E3 50%, #4A9EC5 100%)',
+    stripeFile: '資產 28.png',
   },
   WAVE_故事: {
     name: 'Deep Wave Jiufen',
@@ -225,6 +236,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/deep-sea/char.webp${CACHE_V}`,
     themeColor: '#2E6B8A',
     themeBg: 'linear-gradient(135deg, #C8E0EC 0%, #5A9AB5 50%, #2E6B8A 100%)',
+    stripeFile: '資產 28.png',
   },
   MOON_故事: {
     name: 'Moon Hsinchu',
@@ -242,6 +254,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/moon/char.webp${CACHE_V}`,
     themeColor: '#6B6B9E',
     themeBg: 'linear-gradient(135deg, #E8E8F0 0%, #A0A0C8 50%, #6B6B9E 100%)',
+    stripeFile: '資產 28.png',
   },
   MOON_自由: {
     name: 'Dream Moon Tainan',
@@ -259,15 +272,15 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/dream-moon/char.webp${CACHE_V}`,
     themeColor: '#7B6BA0',
     themeBg: 'linear-gradient(135deg, #EDE8F5 0%, #B0A0D0 50%, #7B6BA0 100%)',
+    stripeFile: '資產 28.png',
   },
 };
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
-function FullResultPage({ resultKey, folder, layout, hasNewBg }: {
+function FullResultPage({ resultKey, folder, layout }: {
   resultKey: string;
   folder: string;
   layout: LayoutConfig;
-  hasNewBg: boolean;
 }) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
@@ -654,9 +667,6 @@ function FullResultPage({ resultKey, folder, layout, hasNewBg }: {
         </div>
       </div>
 
-      {/* 主辦方 footer — 只在有拆分背景的結果頁顯示 */}
-      {hasNewBg && <OrganizerFooter layout={layout} />}
-
     </motion.div>
     </>
   );
@@ -742,8 +752,7 @@ function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
         max={max}
         value={value}
         onChange={e => onCh(Number(e.target.value))}
-        className="flex-1 accent-amber-400"
-        style={{ height: '3px' }}
+        className="flex-1 accent-amber-400 h-[3px]"
       />
       <input
         type="number"
@@ -921,27 +930,34 @@ export default function SoulGuitarResult() {
 
   const bgFile = resultData.bgFile ?? 'bg.webp';
   const bgUrl = folder ? `${BASE}/result/${folder}/${encodeURIComponent(bgFile)}${CACHE_V}` : '';
+  const stripeUrl = folder && resultData.stripeFile
+    ? `${BASE}/result/${folder}/${encodeURIComponent(resultData.stripeFile)}${CACHE_V}`
+    : null;
 
   return (
     <div
-      className="w-full min-h-dvh relative flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundColor: resultData.themeColor,
-        backgroundImage: bgUrl ? `url(${bgUrl})` : undefined,
-        backgroundSize: '100% 100%',
-      }}
+      className="w-full relative flex flex-col items-center overflow-x-hidden"
+      style={{ backgroundColor: resultData.themeColor, minHeight: '100dvh' }}
     >
+      {/* z-0：背景層（太陽.jpg object-cover + 資産29 底部置中） */}
+      {!!resultData.bgFile && <BackgroundLayer bgUrl={bgUrl} />}
+
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
-      <div className="w-full max-w-[430px]">
+
+      {/* z-10：內容層（手機 80% = 344px，電腦 120% = 516px） */}
+      <div className="relative z-10 w-full max-w-[344px] md:max-w-[430px] lg:max-w-[602px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
           layout={layout}
-          hasNewBg={!!resultData.bgFile}
         />
       </div>
+
+      {/* z-10：布條 + logos，頁面最底部 */}
+      {!!stripeUrl && <OrganizerStripe stripeUrl={stripeUrl} />}
+
       {isEditMode && (
         <LayoutEditor
           slug={slug}
@@ -951,8 +967,6 @@ export default function SoulGuitarResult() {
           editKey={editKey}
         />
       )}
-      {/* 布條固定在螢幕底部，只在有主辦方素材的角色才顯示 */}
-      {!!resultData.bgFile && <StickyStripe />}
     </div>
   );
 }
