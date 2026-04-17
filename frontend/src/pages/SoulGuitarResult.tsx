@@ -39,28 +39,6 @@ const RESULT_FOLDER: Record<string, string> = {
 const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
-/**
- * 響應式背景層（z-0，absolute inset-0）
- * <picture> 自動切換手機版 / 桌機版背景
- * object-fit: fill → 整張圖撐滿 container，不留空白
- */
-function BackgroundLayer({ bgUrl, bgMobileUrl }: { bgUrl: string; bgMobileUrl?: string }) {
-  return (
-    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-      <picture className="absolute inset-0 w-full h-full">
-        {/* 桌機：≥ 1024px 用桌機版 */}
-        <source media="(min-width: 1024px)" srcSet={bgUrl} />
-        {/* 手機：用手機版（若無則 fallback 到桌機版） */}
-        <img
-          src={bgMobileUrl ?? bgUrl}
-          alt=""
-          draggable={false}
-          className="absolute inset-0 w-full h-full object-cover object-top"
-        />
-      </picture>
-    </div>
-  );
-}
 
 /**
  * 布條 + logos — 專業響應式做法
@@ -84,19 +62,19 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
       {/* logos 疊在布條上，置中，每個元素間距 10px */}
-      <div className="relative h-full flex items-center justify-center px-4 gap-[10px] overflow-hidden">
-        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">主辦方</span>
+      <div className="relative h-full flex items-center justify-center px-3 gap-[6px] overflow-hidden">
+        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">主辦方</span>
           <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-full w-auto object-contain" draggable={false} />
         </div>
-        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">協辦</span>
+        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">協辦</span>
           <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`}                  alt="聲潮"    className="h-full w-auto object-contain" draggable={false} />
           <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`}                    alt="91譜"    className="h-full w-auto object-contain" draggable={false} />
           <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-full w-auto object-contain" draggable={false} />
         </div>
-        <div className="flex items-center gap-[10px] shrink-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(8px,1vw,11px)] whitespace-nowrap">贊助</span>
+        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
+          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">贊助</span>
           <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-full w-auto object-contain" draggable={false} />
           <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-full w-auto object-contain" draggable={false} />
         </div>
@@ -122,8 +100,7 @@ interface ResultInfo {
   charImg: string;
   themeColor: string;
   themeBg: string;
-  bgFile?: string;       // 桌機背景（1920px 基準）
-  bgFileMobile?: string; // 手機背景（430px 基準，若無則同 bgFile）
+  bgFile?: string;        // 背景圖（1920px 原圖，CSS 自動等比縮放至容器寬）
   stripeFile?: string;   // 布條背景圖（在各自資料夾內）
 }
 
@@ -181,7 +158,6 @@ const RESULTS: Record<string, ResultInfo> = {
     themeColor: '#FF9A3E',
     themeBg: 'linear-gradient(135deg, #FFF4CC 0%, #FFE4A0 50%, #FF9A3E 100%)',
     bgFile: 'bg.webp',
-    bgFileMobile: 'bg-mobile.webp',
     stripeFile: '資產 28.png',
   },
   SUN_故事: {
@@ -447,17 +423,20 @@ function FullResultPage({ resultKey, folder, layout }: {
           <motion.div
             className="w-full relative flex justify-center overflow-visible"
             style={{ marginTop: `${C.char.mt}px` }}
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: showContent ? 1 : 0, scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
+            initial={{ scale: 0.8, y: 20 }}
+            animate={{ scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
             transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img
-              src={result.charImg}
-              alt={result.name}
-              style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
-              className="relative h-auto object-contain"
-              draggable={false}
-            />
+            {/* showContent 後才掛載，避免 opacity:0 讓瀏覽器暫停 animated WebP */}
+            {showContent && (
+              <img
+                src={result.charImg}
+                alt={result.name}
+                style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
+                className="relative h-auto object-contain"
+                draggable={false}
+              />
+            )}
             <img
               src={`${RF}/char-right.webp${CACHE_V}`}
               alt={result.colorName}
@@ -916,8 +895,9 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgFile = resultData.bgFile ?? 'bg.webp';
-  const bgUrl = folder ? `${BASE}/result/${folder}/${encodeURIComponent(bgFile)}${CACHE_V}` : '';
+  const bgUrl = folder && resultData.bgFile
+    ? `${BASE}/result/${folder}/${encodeURIComponent(resultData.bgFile)}${CACHE_V}`
+    : '';
   const stripeUrl = folder && resultData.stripeFile
     ? `${BASE}/result/${folder}/${encodeURIComponent(resultData.stripeFile)}${CACHE_V}`
     : null;
@@ -927,15 +907,24 @@ export default function SoulGuitarResult() {
       className="w-full relative flex flex-col items-center overflow-x-hidden"
       style={{ backgroundColor: resultData.themeColor, minHeight: '100dvh' }}
     >
-      {/* z-0：背景層（太陽.jpg object-cover + 資産29 底部置中） */}
-      {!!resultData.bgFile && <BackgroundLayer bgUrl={bgUrl} />}
+      {/* w-full h-auto：寬固定為容器100%，高自動等比縮放
+          1920×7401 在430px容器 → 430×1658，完整顯示無裁切，無需靜態檔案 */}
+      {bgUrl && (
+        <img
+          src={bgUrl}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="absolute top-0 left-0 w-full h-auto pointer-events-none z-0"
+        />
+      )}
 
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
 
       {/* z-10：內容層（手機 80% = 344px，電腦 120% = 516px） */}
-      <div className="relative z-10 w-full max-w-[344px] md:max-w-[430px] lg:max-w-[602px]">
+      <div className="relative z-10 w-full max-w-[344px] md:max-w-[430px] lg:max-w-[516px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
