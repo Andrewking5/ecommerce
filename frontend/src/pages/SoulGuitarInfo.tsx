@@ -186,6 +186,9 @@ export default function SoulGuitarInfo() {
               <CTA />
 
               <p className="text-sm font-bold text-orange-400 mt-4">報名上限 200 位 · 額滿為止</p>
+              <p className="text-sm font-bold text-orange-400 mt-1">
+                即日起報名就送 AYERS 吉他折價券！
+              </p>
             </motion.div>
 
             {/* 右：海報 */}
@@ -805,6 +808,7 @@ export default function SoulGuitarInfo() {
           <p className="text-white/40 mb-8">展現你的靈魂性格，成為 2026 Ayers 靈魂吉他手</p>
           <CTA className="justify-center" />
           <p className="text-sm font-bold text-orange-400 mt-6">報名上限 200 位 · 額滿為止</p>
+          <p className="text-sm font-bold text-orange-400 mt-1">即日起報名就送 AYERS 吉他折價券！</p>
 
           {/* 官方連結 */}
           <div className="mt-10">

@@ -336,7 +336,7 @@ function FullResultPage({ resultKey, folder, layout }: {
   const handleShare = async () => {
     // 分享連結帶 ?s=1 讓收到的人能直接看到結果頁
     const shareUrl = `${window.location.origin}/e/soul-guitar/${folder}?s=1`;
-    const shareText = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的 🎸`;
+    const shareText = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的 🎸測驗完成再來報名「靈魂吉他手大賽」，總獎金高達20萬元！`;
 
     // 1. 嘗試帶圖分享（iOS Safari 15+ / Android Chrome 支援）
     if (navigator.share) {
