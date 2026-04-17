@@ -334,8 +334,7 @@ function FullResultPage({ resultKey, folder, layout }: {
   };
 
   const handleShare = async () => {
-    // 分享連結帶 ?s=1 讓收到的人能直接看到結果頁
-    const shareUrl = `${window.location.origin}/e/soul-guitar/${folder}?s=1`;
+    const shareUrl = `${window.location.origin}/e/soul-guitar/${folder}`;
     const shareText = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的 🎸測驗完成再來報名「靈魂吉他手大賽」，總獎金高達20萬元！`;
 
     // 1. 嘗試帶圖分享（iOS Safari 15+ / Android Chrome 支援）
@@ -885,20 +884,14 @@ export default function SoulGuitarResult() {
   const searchParams = new URLSearchParams(search);
   const [isEditMode] = useState(() => searchParams.has('edit'));
   const editKey = searchParams.get('edit') || '';
-  const isSharedLink = new URLSearchParams(search).has('s'); // ?s=1 = 從分享連結來
-  // useState 初始化只跑一次，避免 re-render 時 sessionStorage 已被清除導致誤 redirect
-  const [fromQuiz] = useState(() => sessionStorage.getItem('soulGuitar_fromQuiz') === '1');
-  const shouldRedirect = !!resultKey && !fromQuiz && !isEditMode && !isSharedLink;
-
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
-  // 清除 sessionStorage flag（只跑一次，在 render 之後）
   useEffect(() => {
     sessionStorage.removeItem('soulGuitar_fromQuiz');
   }, []);
 
   useEffect(() => {
-    if (!folder || !resultKey || shouldRedirect) return;
+    if (!folder || !resultKey) return;
 
     // Track this result (fire-and-forget, won't break UX on failure)
     quizService.trackResult(slug, resultKey);
@@ -911,16 +904,11 @@ export default function SoulGuitarResult() {
       f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}${CACHE_V}`; }),
     );
     Promise.all(assets).then(() => setIsLoading(false));
-  }, [folder, resultKey, slug, shouldRedirect]);
+  }, [folder, resultKey, slug]);
 
   const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {
     setLayout(prev => ({ ...prev, ...patch }));
   }, []);
-
-  // 直接開結果頁 URL（非做完測驗、非分享連結）→ 導回封面（必須在所有 hooks 之後）
-  if (shouldRedirect) {
-    return <Navigate to="/e/soul-guitar" replace />;
-  }
 
   if (!resultKey || !RESULTS[resultKey]) {
     return <Navigate to="/e/soul-guitar" replace />;
