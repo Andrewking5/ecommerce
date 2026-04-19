@@ -754,3 +754,17 @@ model QuizResult {
   @@index([createdAt])
   @@map("quiz_results")
 }
+
+// 心理測驗分享抽獎 email
+model QuizShareEmail {
+  id        String   @id @default(cuid())
+  email     String
+  slug      String                           // 分享的結果型 slug
+  resultKey String?                          // FIRE_自由 / SUN_自由 …
+  createdAt DateTime @default(now())
+
+  @@unique([email, slug])                    // 同一人同一結果型只能登記一次
+  @@index([slug])
+  @@index([createdAt])
+  @@map("quiz_share_emails")
+}

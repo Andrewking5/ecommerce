@@ -19,6 +19,12 @@ function requireQuizKey(req: Request, res: Response, next: NextFunction): void {
 // Public — record a quiz result
 router.post('/results', QuizController.trackResult);
 
+// Public — record share email for lottery
+router.post('/share-email', QuizController.trackShareEmail);
+
+// Admin — list / export share emails
+router.get('/admin/share-emails', authenticateToken, requireAdmin, QuizController.listShareEmails);
+
 // Public — get layout config for a character
 router.get('/layout/:slug', QuizController.getLayout);
 

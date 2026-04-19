@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
 
+const VALID_SHARE_SLUGS = new Set([
+  'fire', 'fireworks', 'sun', 'glow', 'wave', 'deep-sea', 'moon', 'dream-moon',
+]);
+
 const VALID_SLUGS = new Set([
   'fire', 'fireworks', 'sun', 'glow', 'wave', 'deep-sea', 'moon', 'dream-moon',
 ]);
@@ -42,6 +46,61 @@ export class QuizController {
     } catch (error) {
       console.error('Failed to track quiz result:', error);
       res.status(500).json({ success: false, error: 'Failed to track' });
+    }
+  }
+
+  /** POST /api/quiz/share-email — 分享後抽獎 email 登記（public） */
+  static async trackShareEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, slug, resultKey } = req.body as { email?: string; slug?: string; resultKey?: string };
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        res.status(400).json({ success: false, error: 'Invalid email' });
+        return;
+      }
+      if (!slug || !VALID_SHARE_SLUGS.has(slug)) {
+        res.status(400).json({ success: false, error: 'Invalid slug' });
+        return;
+      }
+
+      await prisma.quizShareEmail.upsert({
+        where: { email_slug: { email, slug } },
+        update: {},  // 已存在就不更新（不重複計算）
+        create: { email, slug, resultKey: resultKey || null },
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to track share email:', error);
+      res.status(500).json({ success: false, error: 'Failed to save' });
+    }
+  }
+
+  /** GET /api/quiz/admin/share-emails — 查看所有分享抽獎 email（admin only） */
+  static async listShareEmails(req: Request, res: Response): Promise<void> {
+    try {
+      const { slug, format } = req.query as { slug?: string; format?: string };
+
+      const rows = await prisma.quizShareEmail.findMany({
+        where: slug ? { slug } : undefined,
+        orderBy: { createdAt: 'desc' },
+        select: { email: true, slug: true, resultKey: true, createdAt: true },
+      });
+
+      if (format === 'csv') {
+        const csv = ['email,slug,resultKey,createdAt', ...rows.map((r: { email: string; slug: string; resultKey: string | null; createdAt: Date }) =>
+          `${r.email},${r.slug},${r.resultKey ?? ''},${r.createdAt.toISOString()}`
+        )].join('\n');
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="quiz-share-emails.csv"');
+        res.send(csv);
+        return;
+      }
+
+      res.json({ success: true, total: rows.length, data: rows });
+    } catch (error) {
+      console.error('Failed to list share emails:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch' });
     }
   }
 

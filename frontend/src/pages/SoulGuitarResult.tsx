@@ -355,6 +355,11 @@ function FullResultPage({ resultKey, folder, layout }: {
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailVal, setEmailVal] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailDone, setEmailDone] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
 
@@ -413,15 +418,14 @@ function FullResultPage({ resultKey, folder, layout }: {
         const file = new File([blob], 'my-guitar-soul.webp', { type: blob.type });
 
         if (navigator.canShare?.({ files: [file] })) {
-          // 帶圖片分享（LINE、IG Stories、訊息 app 可直接貼）
           await navigator.share({ title: shareText, text: shareText, url: shareUrl, files: [file] });
         } else {
-          // 不支援帶檔案 → 只分享文字+連結
           await navigator.share({ title: shareText, text: shareText, url: shareUrl });
         }
+        // resolve = 使用者選了分享目標
+        if (!localStorage.getItem('soulGuitar_shareEmail')) setShowEmailModal(true);
         return;
       } catch {
-        // 使用者取消或失敗 → 不做任何事
         return;
       }
     }
@@ -430,6 +434,30 @@ function FullResultPage({ resultKey, folder, layout }: {
     await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+    if (!localStorage.getItem('soulGuitar_shareEmail')) setShowEmailModal(true);
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      setEmailError('請輸入有效的 Email');
+      return;
+    }
+    setEmailLoading(true);
+    setEmailError('');
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      await fetch(`${apiUrl}/quiz/share-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailVal, slug: folder, resultKey }),
+      });
+      localStorage.setItem('soulGuitar_shareEmail', '1');
+      setEmailDone(true);
+    } catch {
+      setEmailError('送出失敗，請稍後再試');
+    } finally {
+      setEmailLoading(false);
+    }
   };
 
   const guitarLinks = GUITAR_LINKS[resultKey] ?? ['', ''];
@@ -745,6 +773,80 @@ function FullResultPage({ resultKey, folder, layout }: {
         </div>
 
       </motion.div>
+
+      {/* ── 分享後抽獎 Email bottom sheet ── */}
+      <AnimatePresence>
+        {showEmailModal && (
+          <>
+            {/* backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/50 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !emailLoading && setShowEmailModal(false)}
+            />
+            {/* sheet */}
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-white px-6 pt-6 pb-10"
+              style={{ fontFamily: QUIZ_FONT, maxWidth: 430, margin: '0 auto' }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            >
+              {/* 拖曳把手 */}
+              <div className="mx-auto mb-4 w-10 h-1 rounded-full bg-gray-200" />
+
+              {emailDone ? (
+                <div className="flex flex-col items-center gap-3 py-4">
+                  <div className="text-4xl">🎸</div>
+                  <p className="text-lg font-bold text-gray-800">報名成功！</p>
+                  <p className="text-sm text-gray-500 text-center">抽獎結果將寄送至您的 Email<br />祝您好運！</p>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailModal(false)}
+                    className="mt-4 w-full py-3 rounded-2xl text-white font-bold text-base"
+                    style={{ background: result.themeColor }}
+                  >
+                    關閉
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="text-lg font-bold text-gray-800 mb-1">分享完成 🎉</p>
+                  <p className="text-sm text-gray-500 mb-5">填寫 Email 參加角色小卡組抽獎</p>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={emailVal}
+                    onChange={e => { setEmailVal(e.target.value); setEmailError(''); }}
+                    onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
+                    className="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm outline-none focus:border-gray-400 mb-2"
+                  />
+                  {emailError && <p className="text-xs text-red-500 mb-2">{emailError}</p>}
+                  <button
+                    type="button"
+                    onClick={handleEmailSubmit}
+                    disabled={emailLoading}
+                    className="w-full py-3 rounded-2xl text-white font-bold text-base disabled:opacity-60 transition-opacity"
+                    style={{ background: result.themeColor }}
+                  >
+                    {emailLoading ? '送出中…' : '參加抽獎'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailModal(false)}
+                    className="mt-3 w-full py-2 text-sm text-gray-400"
+                  >
+                    下次再說
+                  </button>
+                </>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
@@ -1009,23 +1111,24 @@ export default function SoulGuitarResult() {
   return (
     <div
       className="w-full flex flex-col items-center overflow-x-hidden"
-      style={{
-        backgroundColor: resultData.themeColor,
-        ...(bgUrl ? {
-          backgroundImage: `url(${bgUrl})`,
-          backgroundSize: '100% 100%',
-          backgroundRepeat: 'no-repeat',
-        } : {
-          background: resultData.themeBg,
-        }),
-      }}
+      style={{ backgroundColor: resultData.themeColor }}
     >
       {resultKey === 'SUN_自由' && isNewDesign && <SunGrainOverlay />}
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
 
-      <div className="relative z-10 w-full max-w-[285px] md:max-w-[430px]">
+      <div
+        className="relative z-10 w-full max-w-[285px] md:max-w-[430px]"
+        style={bgUrl ? {
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+        } : {
+          background: resultData.themeBg,
+        }}
+      >
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
