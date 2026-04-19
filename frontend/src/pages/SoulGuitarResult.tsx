@@ -86,10 +86,10 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
 
 /* ── 吉他連結（每個結果型各兩把，順序對應 guitar-1 / guitar-2） ── */
 const GUITAR_LINKS: Record<string, [string, string]> = {
-  SUN_自由:  ['https://ayersguitars.com/products/2.html',  'https://ayersguitars.com/products/4.html'],
-  SUN_故事:  ['https://ayersguitars.com/products/3.html',  'https://ayersguitars.com/products/10.html'],
+  SUN_自由: ['https://ayersguitars.com/products/2.html', 'https://ayersguitars.com/products/4.html'],
+  SUN_故事: ['https://ayersguitars.com/products/3.html', 'https://ayersguitars.com/products/10.html'],
   WAVE_自由: ['https://www.youtube.com/watch?v=NjKxuFTfe_4', 'https://ayersguitars.com/products/11.html'],
-  WAVE_故事: ['https://ayersguitars.com/products/1.html',  'https://ayersguitars.com/products/12.html'],
+  WAVE_故事: ['https://ayersguitars.com/products/1.html', 'https://ayersguitars.com/products/12.html'],
   MOON_自由: ['https://ayersguitars.com/products/61.html', 'https://ayersguitars.com/products/58.html'],
   MOON_故事: ['https://ayersguitars.com/products/21.html', 'https://ayersguitars.com/products/20.html'],
   FIRE_自由: ['https://ayersguitars.com/products/32.html', 'https://ayersguitars.com/products/36.html'],
@@ -264,6 +264,79 @@ const RESULTS: Record<string, ResultInfo> = {
     stripeFile: '資產 28.png',
   },
 };
+
+/* ── SUN 型專屬：dot grid + 吉他弦 + 音孔 ── */
+const GUITAR_STRINGS = [
+  { y: 13, amp: 0.5, dur: 0.72, delay: 0,    sw: 0.5, op: 0.07 },
+  { y: 25, amp: 0.6, dur: 0.88, delay: 0.18, sw: 0.6, op: 0.08 },
+  { y: 38, amp: 0.7, dur: 0.95, delay: 0.08, sw: 0.7, op: 0.09 },
+  { y: 52, amp: 0.6, dur: 0.82, delay: 0.28, sw: 0.8, op: 0.10 },
+  { y: 65, amp: 0.5, dur: 0.91, delay: 0.14, sw: 0.9, op: 0.11 },
+  { y: 78, amp: 0.4, dur: 0.78, delay: 0.22, sw: 1.0, op: 0.12 },
+];
+
+const ROSETTE_RADII = [14, 24, 38, 52, 66, 80, 94];
+
+function SunGrainOverlay() {
+  return (
+    <>
+      <style>{`
+        @keyframes sunDotDrift { from { background-position: 0 0; } to { background-position: 6px 6px; } }
+        @keyframes sunDotDriftReverse { from { background-position: 0 0; } to { background-position: -10px 10px; } }
+      `}</style>
+
+      {/* 細點陣 */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1, backgroundImage: `repeating-radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1.5px)`, backgroundSize: '6px 6px', mixBlendMode: 'multiply', animation: 'sunDotDrift 5s linear infinite' }} />
+      {/* 粗點陣反向 */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1, backgroundImage: `repeating-radial-gradient(circle, rgba(0,0,0,0.05) 1.5px, transparent 2px)`, backgroundSize: '11px 11px', mixBlendMode: 'multiply', animation: 'sunDotDriftReverse 9s linear infinite' }} />
+
+      {/* 頂部金光脈動 */}
+      <motion.div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1, background: 'radial-gradient(ellipse at 50% 20%, rgba(255,210,80,0.28) 0%, transparent 60%)', mixBlendMode: 'overlay' }} animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
+
+      {/* 浮動光暈 orbs */}
+      <motion.div className="fixed pointer-events-none rounded-full" style={{ width: 300, height: 300, left: '-8%', top: '2%', background: 'rgba(231,188,0,0.22)', filter: 'blur(72px)', zIndex: 1, mixBlendMode: 'screen' }} animate={{ x: [0, 50, 15, 0], y: [0, 40, -25, 0] }} transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }} />
+      <motion.div className="fixed pointer-events-none rounded-full" style={{ width: 220, height: 220, right: '-6%', bottom: '18%', background: 'rgba(236,111,0,0.28)', filter: 'blur(60px)', zIndex: 1, mixBlendMode: 'screen' }} animate={{ x: [0, -35, 10, 0], y: [0, -45, 20, 0] }} transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut' }} />
+      <motion.div className="fixed pointer-events-none rounded-full" style={{ width: 160, height: 160, left: '25%', top: '45%', background: 'rgba(255,215,80,0.18)', filter: 'blur(50px)', zIndex: 1, mixBlendMode: 'screen' }} animate={{ x: [0, 25, -20, 0], y: [0, -30, 35, 0] }} transition={{ duration: 17, repeat: Infinity, ease: 'easeInOut' }} />
+
+      {/* 吉他弦 — 6 條微幅振動 */}
+      <svg className="fixed inset-0 w-full h-full pointer-events-none" style={{ zIndex: 2 }} viewBox="0 0 100 100" preserveAspectRatio="none">
+        {GUITAR_STRINGS.map((s, i) => (
+          <motion.path
+            key={i}
+            fill="none"
+            stroke="rgba(255,240,160,1)"
+            strokeOpacity={s.op}
+            strokeWidth={s.sw}
+            vectorEffect="non-scaling-stroke"
+            animate={{ d: [
+              `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
+              `M 0 ${s.y} Q 50 ${s.y + s.amp} 100 ${s.y}`,
+              `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
+            ]}}
+            transition={{ duration: s.dur, repeat: Infinity, ease: 'easeInOut', delay: s.delay }}
+          />
+        ))}
+      </svg>
+
+      {/* 音孔花紋 Rosette — 緩慢旋轉 */}
+      <div className="fixed pointer-events-none" style={{ top: '6%', left: '50%', transform: 'translateX(-50%)', zIndex: 2 }}>
+        <motion.svg viewBox="0 0 200 200" width="220" style={{ opacity: 0.09 }} animate={{ rotate: 360 }} transition={{ duration: 90, repeat: Infinity, ease: 'linear' }} xmlns="http://www.w3.org/2000/svg">
+          {ROSETTE_RADII.map(r => (
+            <circle key={r} cx="100" cy="100" r={r} fill="none" stroke="white" strokeWidth={r < 30 ? 1 : 0.6} />
+          ))}
+          {Array.from({ length: 24 }, (_, i) => {
+            const a = (i / 24) * Math.PI * 2;
+            return <line key={i} x1={100 + Math.cos(a) * 26} y1={100 + Math.sin(a) * 26} x2={100 + Math.cos(a) * 51} y2={100 + Math.sin(a) * 51} stroke="white" strokeWidth="0.5" />;
+          })}
+          {Array.from({ length: 12 }, (_, i) => {
+            const a = (i / 12) * Math.PI * 2;
+            return <circle key={`d${i}`} cx={100 + Math.cos(a) * 61} cy={100 + Math.sin(a) * 61} r="1.8" fill="white" fillOpacity="0.6" />;
+          })}
+        </motion.svg>
+      </div>
+    </>
+  );
+}
 
 /* ── 完整圖片結果頁（所有有素材的角色共用） ── */
 function FullResultPage({ resultKey, folder, layout }: {
@@ -881,6 +954,7 @@ export default function SoulGuitarResult() {
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const searchParams = new URLSearchParams(search);
   const [isEditMode] = useState(() => searchParams.has('edit'));
+  const isNewDesign = searchParams.has('1');
   const editKey = searchParams.get('edit') || '';
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
 
@@ -899,7 +973,7 @@ export default function SoulGuitarResult() {
 
     const RF = `${BASE}/result/${folder}`;
     const filesToPreload = [
-      ...(RESULTS[resultKey].bgFile ? ['bg.webp'] : []),
+      ...(RESULTS[resultKey].bgFile && !isNewDesign ? ['bg.webp'] : []),
       'hero-card.webp',
       'char.webp',
     ];
@@ -919,7 +993,7 @@ export default function SoulGuitarResult() {
 
   const resultData = RESULTS[resultKey];
 
-  const bgUrl = folder && resultData.bgFile
+  const bgUrl = folder && resultData.bgFile && !isNewDesign
     ? `${BASE}/result/${folder}/${encodeURIComponent(resultData.bgFile)}${CACHE_V}`
     : '';
   const stripeUrl = folder && resultData.stripeFile
@@ -935,14 +1009,17 @@ export default function SoulGuitarResult() {
           backgroundImage: `url(${bgUrl})`,
           backgroundSize: '100% 100%',
           backgroundRepeat: 'no-repeat',
-        } : {}),
+        } : {
+          background: resultData.themeBg,
+        }),
       }}
     >
+      {resultKey === 'SUN_自由' && isNewDesign && <SunGrainOverlay />}
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
 
-      <div className="relative z-10 w-full max-w-[375px] md:max-w-[430px]">
+      <div className="relative z-10 w-full max-w-[285px] md:max-w-[430px]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
