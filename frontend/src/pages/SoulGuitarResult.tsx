@@ -41,43 +41,47 @@ const FOOTER_BASE = `${BASE}/result/sun`;
 const enc = (name: string) => encodeURIComponent(name);
 
 
-/**
- * 布條 + logos — 專業響應式做法
- * - 布條圖固定高度（不隨寬度無限放大），`object-fit: cover` 填滿
- * - logos 高度跟著布條，`py` 控制上下留白
- * - 文字大小 clamp，手機~桌機都合理
- */
 function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
-  /* 布條高度：12.09vw = 52px @ 430px，手機等比縮放，桌機封頂 72px */
-  const stripeH = 'clamp(0px, 12.09vw, 72px)';
+  const stripeH = 'clamp(44px, 12.09vw, 72px)';
+  /* logo 高度直接 clamp，不依賴父層 padding 繼承 */
+  const logoH = 'clamp(20px, 5.5vw, 36px)';
+  const labelSize = 'clamp(7px, 1.1vw, 10px)';
+  const innerGap = 'clamp(4px, 1.2vw, 10px)';  // 組內 logo 間距
+  const sectionGap = 'clamp(10px, 3vw, 24px)';  // 主辦 | 協辦 | 贊助 之間
+
+  const Label = ({ children }: { children: string }) => (
+    <span className="text-white/60 whitespace-nowrap shrink-0" style={{ fontSize: labelSize }}>{children}</span>
+  );
+  const Logo = ({ src, alt }: { src: string; alt: string }) => (
+    <img src={src} alt={alt} style={{ height: logoH }} className="w-auto object-contain shrink-0" draggable={false} />
+  );
+  const Divider = () => (
+    <div className="shrink-0 bg-white/20" style={{ width: 1, height: logoH }} />
+  );
+
   return (
-    <div
-      className="relative z-10 w-full"
-      style={{ height: stripeH, fontFamily: QUIZ_FONT }}
-    >
-      {/* 布條背景圖 */}
-      <img
-        src={stripeUrl}
-        alt=""
-        draggable={false}
-        className="absolute inset-0 w-full h-full object-cover object-center"
-      />
-      {/* logos 疊在布條上，置中，每個元素間距 10px */}
-      <div className="relative h-full flex items-center justify-center px-3 gap-[6px] overflow-hidden">
-        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">主辦方</span>
-          <img src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" className="h-full w-auto object-contain" draggable={false} />
+    <div className="relative z-10 w-full" style={{ height: stripeH, fontFamily: QUIZ_FONT }}>
+      <img src={stripeUrl} alt="" draggable={false} className="absolute inset-0 w-full h-full object-cover object-center" />
+      <div
+        className="relative h-full flex items-center justify-center overflow-hidden"
+        style={{ gap: sectionGap, paddingInline: 12 }}
+      >
+        <div className="flex items-center" style={{ gap: innerGap }}>
+          <Label>主辦方</Label>
+          <Logo src={`${FOOTER_BASE}/ayers.png`} alt="Ayers" />
         </div>
-        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">協辦</span>
-          <img src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" className="h-full w-auto object-contain" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" className="h-full w-auto object-contain" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" className="h-full w-auto object-contain" draggable={false} />
+        <Divider />
+        <div className="flex items-center" style={{ gap: innerGap }}>
+          <Label>協辦</Label>
+          <Logo src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" />
+          <Logo src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" />
+          <Logo src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" />
         </div>
-        <div className="flex items-center gap-[6px] min-w-0 h-full py-2">
-          <span className="text-white/80 text-[clamp(7px,0.9vw,10px)] whitespace-nowrap">贊助</span>
-          <img src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" className="h-full w-auto object-contain" draggable={false} />
-          <img src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" className="h-full w-auto object-contain" draggable={false} />
+        <Divider />
+        <div className="flex items-center" style={{ gap: innerGap }}>
+          <Label>贊助</Label>
+          <Logo src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" />
+          <Logo src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" />
         </div>
       </div>
     </div>
@@ -86,14 +90,14 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
 
 /* ── 吉他連結（每個結果型各兩把，順序對應 guitar-1 / guitar-2） ── */
 const GUITAR_LINKS: Record<string, [string, string]> = {
-  SUN_自由: ['https://ayersguitars.com/products/2.html', 'https://ayersguitars.com/products/4.html'],
-  SUN_故事: ['https://ayersguitars.com/products/3.html', 'https://ayersguitars.com/products/10.html'],
-  WAVE_自由: ['https://www.youtube.com/watch?v=NjKxuFTfe_4', 'https://ayersguitars.com/products/11.html'],
-  WAVE_故事: ['https://ayersguitars.com/products/1.html', 'https://ayersguitars.com/products/12.html'],
-  MOON_自由: ['https://ayersguitars.com/products/61.html', 'https://ayersguitars.com/products/58.html'],
-  MOON_故事: ['https://ayersguitars.com/products/21.html', 'https://ayersguitars.com/products/20.html'],
-  FIRE_自由: ['https://ayersguitars.com/products/32.html', 'https://ayersguitars.com/products/36.html'],
-  FIRE_故事: ['https://ayersguitars.com/products/35.html', 'https://ayersguitars.com/products/33.html'],
+  SUN_自由: ['https://ayersguitars.com/products/4.html', 'https://ayersguitars.com/products/2.html'],
+  SUN_故事: ['https://ayersguitars.com/products/10.html', 'https://ayersguitars.com/products/3.html'],
+  WAVE_自由: ['https://ayersguitars.com/products/11.html', 'https://www.instagram.com/reel/DUsIVEIDuOS/?igsh=aW11cGN3OTR5Nmlo'],
+  WAVE_故事: ['https://ayersguitars.com/products/12.html', 'https://ayersguitars.com/products/1.html'],
+  MOON_自由: ['https://ayersguitars.com/products/58.html', 'https://ayersguitars.com/products/61.html'],
+  MOON_故事: ['https://ayersguitars.com/products/20.html', 'https://ayersguitars.com/products/21.html'],
+  FIRE_自由: ['https://ayersguitars.com/products/36.html', 'https://ayersguitars.com/products/32.html'],
+  FIRE_故事: ['https://ayersguitars.com/products/33.html', 'https://ayersguitars.com/products/35.html'],
 };
 
 /* ── 結果資料 ── */
