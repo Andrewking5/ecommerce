@@ -45,15 +45,15 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
   const stripeH = 'clamp(44px, 12.09vw, 72px)';
   /* logo 高度直接 clamp，不依賴父層 padding 繼承 */
   const logoH = 'clamp(20px, 5.5vw, 36px)';
-  const labelSize = 'clamp(7px, 1.1vw, 10px)';
+  const labelSize = 'clamp(9px, 1.6vw, 13px)';
   const innerGap = 'clamp(4px, 1.2vw, 10px)';  // 組內 logo 間距
   const sectionGap = 'clamp(10px, 3vw, 24px)';  // 主辦 | 協辦 | 贊助 之間
 
   const Label = ({ children }: { children: string }) => (
-    <span className="text-white/60 whitespace-nowrap shrink-0" style={{ fontSize: labelSize }}>{children}</span>
+    <span className="text-white/70 whitespace-nowrap shrink-0 font-bold" style={{ fontSize: labelSize }}>{children}</span>
   );
-  const Logo = ({ src, alt }: { src: string; alt: string }) => (
-    <img src={src} alt={alt} style={{ height: logoH }} className="w-auto object-contain shrink-0" draggable={false} />
+  const Logo = ({ src, alt, scale = 1 }: { src: string; alt: string; scale?: number }) => (
+    <img src={src} alt={alt} style={{ height: `calc(${logoH} * ${scale})` }} className="w-auto object-contain shrink-0" draggable={false} />
   );
   const Divider = () => (
     <div className="shrink-0 bg-white/20" style={{ width: 1, height: logoH }} />
@@ -74,13 +74,13 @@ function OrganizerStripe({ stripeUrl }: { stripeUrl: string }) {
         <div className="flex items-center" style={{ gap: innerGap }}>
           <Label>協辦</Label>
           <Logo src={`${FOOTER_BASE}/${enc('協辦 聲潮.png')}`} alt="聲潮" />
-          <Logo src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" />
-          <Logo src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" />
+          <Logo src={`${FOOTER_BASE}/${enc('協辦91譜.png')}`} alt="91譜" scale={1.5} />
+          <Logo src={`${FOOTER_BASE}/${enc('協辦 生為吉他人 死為吉他魂.png')}`} alt="生吉他魂" scale={0.8} />
         </div>
         <Divider />
         <div className="flex items-center" style={{ gap: innerGap }}>
           <Label>贊助</Label>
-          <Logo src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" />
+          <Logo src={`${FOOTER_BASE}/${enc('贊助 雲聲.png')}`} alt="雲聲" scale={0.85} />
           <Logo src={`${FOOTER_BASE}/${enc('贊助 奧昇.png')}`} alt="奧昇" />
         </div>
       </div>
@@ -271,7 +271,7 @@ const RESULTS: Record<string, ResultInfo> = {
 
 /* ── SUN 型專屬：dot grid + 吉他弦 + 音孔 ── */
 const GUITAR_STRINGS = [
-  { y: 13, amp: 0.5, dur: 0.72, delay: 0,    sw: 0.5, op: 0.07 },
+  { y: 13, amp: 0.5, dur: 0.72, delay: 0, sw: 0.5, op: 0.07 },
   { y: 25, amp: 0.6, dur: 0.88, delay: 0.18, sw: 0.6, op: 0.08 },
   { y: 38, amp: 0.7, dur: 0.95, delay: 0.08, sw: 0.7, op: 0.09 },
   { y: 52, amp: 0.6, dur: 0.82, delay: 0.28, sw: 0.8, op: 0.10 },
@@ -312,11 +312,13 @@ function SunGrainOverlay() {
             strokeOpacity={s.op}
             strokeWidth={s.sw}
             vectorEffect="non-scaling-stroke"
-            animate={{ d: [
-              `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
-              `M 0 ${s.y} Q 50 ${s.y + s.amp} 100 ${s.y}`,
-              `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
-            ]}}
+            animate={{
+              d: [
+                `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
+                `M 0 ${s.y} Q 50 ${s.y + s.amp} 100 ${s.y}`,
+                `M 0 ${s.y} Q 50 ${s.y - s.amp} 100 ${s.y}`,
+              ]
+            }}
             transition={{ duration: s.dur, repeat: Infinity, ease: 'easeInOut', delay: s.delay }}
           />
         ))}
