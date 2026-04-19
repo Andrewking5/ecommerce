@@ -732,7 +732,7 @@ function FullResultPage({ resultKey, folder, layout }: {
                 </motion.button>
               </div>
 
-              <Link to="/e/soul-guitar/info" className="w-full active:scale-95 transition-transform">
+              <Link to="/e/soul-guitar/info" className="w-full mt-[3.72%] active:scale-95 transition-transform">
                 <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
               </Link>
             </motion.div>
