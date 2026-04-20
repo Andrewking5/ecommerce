@@ -101,6 +101,8 @@ export default function SoulGuitarInfo() {
   const [saveMsg, setSaveMsg] = useState('');
   const isEdit = window.location.search.includes('edit');
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   useEffect(() => {
     eventService.getEventBySlug('soul-guitar/info').then((event) => {
       if (!event) return;

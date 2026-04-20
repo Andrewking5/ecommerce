@@ -385,13 +385,13 @@ function CoverPage({ onStart, isDesktop }: { onStart: () => void; isDesktop: boo
         transition={{ opacity: { duration: 0.6, delay: 0.5 }, y: { duration: 0.6, delay: 0.5 }, filter: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } }}
         whileTap={{ scale: 0.95 }}
       >
-        <img src={`${BASE}/cover-start-btn.png`} alt="解鎖你的吉他靈魂檔案" className="w-full h-auto" draggable={false} />
+        <img src={`${BASE}/cover-start-btn.png${V}`} alt="解鎖你的吉他靈魂檔案" className="w-full h-auto" draggable={false} />
       </motion.button>
       <div className="absolute z-10 bottom-0 left-0 right-0 h-9 overflow-hidden" style={{ background: 'linear-gradient(90deg, #c5a059 0%, #a0a068 35%, #6a9a8a 65%, #4a7a8a 100%)' }}>
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex items-center h-full w-[200%]" style={{ animation: 'marquee 15s linear infinite' }}>
-            <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
-            <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
+            <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png${V}`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
+            <div className="flex items-center justify-around w-1/2"><img src={`${BASE}/cover-marquee.png${V}`} alt="" className="h-4.5 w-auto" draggable={false} /></div>
           </div>
         </div>
       </div>
@@ -499,6 +499,7 @@ export default function SoulGuitarQuiz() {
   const isFirstQ = currentQ === 0;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     return () => {
       if (bgmRef.current) {
         bgmRef.current.pause();
