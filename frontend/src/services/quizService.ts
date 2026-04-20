@@ -108,6 +108,10 @@ const quizService = {
     return data.success ? { total: data.total, data: data.data } : { total: 0, data: [] };
   },
 
+  async deleteShareEmail(email: string, slug: string): Promise<void> {
+    await api.delete('/quiz/admin/share-emails', { data: { email, slug } });
+  },
+
   exportShareEmailsCsv(filename = 'quiz-share-emails.csv'): void {
     const url = `${(api.defaults.baseURL || '').replace(/\/$/, '')}/quiz/admin/share-emails?format=csv`;
     const a = document.createElement('a');

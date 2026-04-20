@@ -25,6 +25,9 @@ router.post('/share-email', QuizController.trackShareEmail);
 // Admin — list / export share emails
 router.get('/admin/share-emails', authenticateToken, requireAdmin, QuizController.listShareEmails);
 
+// Admin — delete a single share-email entry
+router.delete('/admin/share-emails', authenticateToken, requireAdmin, QuizController.deleteShareEmail);
+
 // Public — get layout config for a character
 router.get('/layout/:slug', QuizController.getLayout);
 

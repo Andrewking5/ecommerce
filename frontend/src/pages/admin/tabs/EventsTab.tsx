@@ -521,7 +521,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                       <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
                       <td className="px-4 py-3 text-white/40">{RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}</td>
                       <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                      <td className="px-4 py-3"><button onClick={() => handleDeleteShareEmail(r.email, r.slug)} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all"><Trash2 size={12} /></button></td>
+                      <td className="px-4 py-3"><button type="button" title="刪除" onClick={() => handleDeleteShareEmail(r.email, r.slug)} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all"><Trash2 size={12} /></button></td>
                     </tr>
                   ))}
                 </tbody>

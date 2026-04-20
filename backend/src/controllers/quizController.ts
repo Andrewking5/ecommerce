@@ -104,6 +104,22 @@ export class QuizController {
     }
   }
 
+  /** DELETE /api/quiz/admin/share-emails — delete a single share-email entry (admin only) */
+  static async deleteShareEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, slug } = req.body as { email?: string; slug?: string };
+      if (!email || !slug) {
+        res.status(400).json({ success: false, error: 'email and slug are required' });
+        return;
+      }
+      await prisma.quizShareEmail.delete({ where: { email_slug: { email, slug } } });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to delete share email:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete' });
+    }
+  }
+
   /** DELETE /api/quiz/admin/results — wipe all quiz results (admin only) */
   static async clearResults(req: Request, res: Response): Promise<void> {
     try {
