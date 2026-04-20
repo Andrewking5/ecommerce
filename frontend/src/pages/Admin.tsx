@@ -2729,10 +2729,10 @@ function EventsTab() {
                 </div>
                 <div className="ml-auto flex items-center gap-3">
                   <span className="text-xs text-white/30 tabular-nums">{regTotal} / {regEvent.registrationLimit > 0 ? regEvent.registrationLimit : '∞'}</span>
-                  <a href={`${registrationService.exportUrl(regEvent.id)}?token=${localStorage.getItem('token') || ''}`} download
+                  <button onClick={() => registrationService.exportCsv(regEvent.id, `registrations-${regEvent.id}.csv`)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
                     <Download size={11} /> 匯出 CSV
-                  </a>
+                  </button>
                 </div>
               </div>
 

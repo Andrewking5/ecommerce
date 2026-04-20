@@ -61,8 +61,14 @@ const registrationService = {
     return { registrations: data.data ?? [], total: data.total ?? 0 };
   },
 
-  exportUrl(eventId: string): string {
-    return `${api.defaults.baseURL}/registrations/admin/${eventId}/export`;
+  async exportCsv(eventId: string, filename: string): Promise<void> {
+    const res = await api.get(`/registrations/admin/${eventId}/export`, { responseType: 'blob' });
+    const url = URL.createObjectURL(res.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   },
 
   async deleteOne(id: string): Promise<void> {
