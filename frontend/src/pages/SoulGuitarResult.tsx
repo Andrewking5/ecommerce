@@ -361,7 +361,11 @@ function FullResultPage({ resultKey, folder, layout }: {
 }) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
-  const canPlayWebm = useRef((() => { const v = document.createElement('video'); return v.canPlayType('video/webm; codecs=vp9') !== ''; })());
+  const canPlayWebm = useRef((() => {
+    if (/iP(hone|ad|od)/i.test(navigator.userAgent)) return false;
+    const v = document.createElement('video');
+    return v.canPlayType('video/webm; codecs=vp9') === 'probably';
+  })());
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
@@ -1165,6 +1169,10 @@ export default function SoulGuitarResult() {
   }, []);
 
   if (!resultKey || !RESULTS[resultKey]) {
+    return <Navigate to="/e/soul-guitar" replace />;
+  }
+
+  if (!sessionStorage.getItem('soulGuitar_fromQuiz') && !isEditMode) {
     return <Navigate to="/e/soul-guitar" replace />;
   }
 
