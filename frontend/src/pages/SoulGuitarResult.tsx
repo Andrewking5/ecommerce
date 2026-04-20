@@ -1123,6 +1123,7 @@ export default function SoulGuitarResult() {
   const isNewDesign = searchParams.has('1');
   const editKey = searchParams.get('edit') || '';
   const folder = resultKey ? RESULT_FOLDER[resultKey] : null;
+  const cameFromQuiz = useRef(!searchParams.has('edit') && !!sessionStorage.getItem('soulGuitar_fromQuiz'));
 
   useEffect(() => {
     sessionStorage.removeItem('soulGuitar_fromQuiz');
@@ -1172,7 +1173,7 @@ export default function SoulGuitarResult() {
     return <Navigate to="/e/soul-guitar" replace />;
   }
 
-  if (!sessionStorage.getItem('soulGuitar_fromQuiz') && !isEditMode) {
+  if (!cameFromQuiz.current && !isEditMode) {
     return <Navigate to="/e/soul-guitar" replace />;
   }
 
