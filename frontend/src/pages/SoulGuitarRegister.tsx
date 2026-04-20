@@ -260,7 +260,7 @@ export default function SoulGuitarRegister() {
           </div>
           <h2 className="text-3xl font-black mb-3">報名成功！</h2>
           <p className="text-white/50 mb-2 leading-relaxed">
-            感謝你的報名，請留意信箱是否收到確認通知。
+            感謝你的報名，確認通知與專屬優惠券已寄送至您的信箱，請記得查收。
           </p>
           <p className="text-white/30 text-sm mb-10">
             比賽期間如有任何問題，歡迎透過 Facebook / LINE 聯繫我們。
@@ -563,7 +563,7 @@ export default function SoulGuitarRegister() {
 
           {/* 規則確認 */}
           <Field>
-            <Label required>是否了解參賽 12 點注意事項？</Label>
+            <Label required>是否了解參賽 13 點注意事項？</Label>
             <p className="text-xs text-white/25 mb-3">
               參加比賽者同意本規定之效力
             </p>
@@ -571,18 +571,19 @@ export default function SoulGuitarRegister() {
             {/* 規則內容 */}
             <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-3 max-h-64 overflow-y-auto space-y-3 text-xs text-white/50 leading-relaxed">
               {[
-                { zh: '演奏組參賽者須將影片上傳至 ①YouTube（必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Participants in the Instrumental Category must upload their video to ① YouTube (required) and ② Instagram or Facebook, titled "Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition". Posts must include the hashtag #2026AyersSoulGuitaristCompetition.' },
-                { zh: '彈唱組參賽者須將影片上傳至 ①YouTube（必須）及 ②Instagram / Facebook（擇一），並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Participants in the Singing & Playing Category must upload their video to ① YouTube (required) and ② Instagram or Facebook, titled "Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition". Posts must include the hashtag #2026AyersSoulGuitaristCompetition.' },
-                { zh: '影片彈唱前需說明：「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」', en: 'Before performing, participants must say: "Hello everyone, I am (name/stage name/band). I am joining the 2026 Ayers Soul Guitarist Competition, registering for the (category). My soul is (xx) guitar soul (⚠️ must match the color worn). (One sentence for everyone.) The competition piece is (Song Title) by (Composer)."' },
-                { zh: '影片總時長需為 30 秒至 120 秒。', en: 'The total video duration must be between 30 and 120 seconds.' },
-                { zh: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果，可在影片上加字幕。', en: 'The recording must be vertical, fixed-camera, one continuous take. Editing, compositing, camera movement, and transitions are prohibited. Subtitles may be added.' },
-                { zh: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。', en: 'All participants in a group must wear the same designated color: orange, yellow, blue, black, white, or red.' },
-                { zh: '參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。', en: 'Participants must clearly show their face and full upper body so both hands are visible.' },
-                { zh: '限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。', en: 'Participants must choose one piece in Chinese, English, or instrumental. Arrangements and original compositions are allowed.' },
-                { zh: '聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。', en: 'Only the live vocals and acoustic guitar played on screen may appear in the audio. Vocal harmony effects and loop recording are prohibited.' },
-                { zh: '限 1~5 人參賽，至少出現一把鋼弦木吉他。禁止對嘴代彈，如不符合以上規定將取消比賽資格。', en: '1–5 participants per entry, with at least one steel-string acoustic guitar. Lip-syncing or ghost playing is prohibited. Non-compliance results in disqualification.' },
-                { zh: '參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。', en: 'Videos must remain public during the judging period. Videos made private or deleted will be considered as forfeited.' },
-                { zh: '所有評斷 Ayers 主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
+                { zh: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Instrumental Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
+                { zh: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Singing & Playing Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
+                { zh: '影片彈唱前需說明　— 「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同，若不符將失去參賽資格，靈魂與顏色配對請參考下方卡片。），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」', en: 'Before performing, say on camera — "Hello everyone, I am (name/stage name/band). I am joining the 2026 Ayers Soul Guitarist Competition, registering for the (category). My soul is (xx) guitar soul (⚠️ must match the color worn; failure to match will result in disqualification — please refer to the cards below for soul-color pairings). (One sentence for everyone.) The competition piece is (Song Title) by (Composer)."' },
+                { zh: '若團體內測驗結果不一致，仍需統一穿著同一顏色。　— 同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。', en: 'If group members have different quiz results, they must still wear the same color. — All members of a group must wear the same designated color: orange, yellow, blue, black, white, or red.' },
+                { zh: '影片 30~120 秒　— 影片總時長需為 30 秒至 120 秒。', en: 'Video length 30–120 seconds — The total video duration must be between 30 and 120 seconds.' },
+                { zh: '直式一鏡到底　— 錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。', en: 'Vertical, single continuous take — The recording must be vertical, fixed-camera, one continuous take. Editing, compositing, camera movement, and transitions are prohibited.' },
+                { zh: '露臉 + 完整上半身　— 參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。', en: 'Face + full upper body visible — Participants must clearly show their face and at least their full upper body so both hands are visible while playing.' },
+                { zh: '自選一首中/英文曲　— 限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。', en: 'One chosen piece in Chinese or English — Participants must choose one piece in Chinese (including local languages), English, or instrumental. Arrangements and original compositions are allowed.' },
+                { zh: '禁止效果器 / Loop　— 聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。', en: 'No effects / loop — Only the participant\'s live vocals and the acoustic guitar played on screen may appear in the audio. Vocal harmony effects and loop recording are prohibited.' },
+                { zh: '1~5 人，至少一把鋼弦吉他　— 禁止對嘴代彈，如不符合以上規定將取消比賽資格。', en: '1–5 participants, at least one steel-string guitar — Lip-syncing or ghost playing is prohibited. Non-compliance with any of the above rules will result in disqualification.' },
+                { zh: '每人每組限參加一次。　— 各組別限報名一次，但可同時報名不同組別（如同一人可同時報名演奏組與彈唱組）。', en: 'One entry per person per category — Each category may only be entered once, but participants may enter multiple categories simultaneously (e.g., the same person may enter both Instrumental and Singing & Playing).' },
+                { zh: '影片須維持公開　— 參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。', en: 'Video must remain public — Videos must remain public throughout the judging period. Videos made private or deleted will be considered as forfeited.' },
+                { zh: '所有評斷Ayers主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
               ].map((r, i) => (
                 <div key={i} className="flex gap-2.5">
                   <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5" style={{ backgroundColor: '#c5a05920', color: GOLD }}>{i + 1}</span>
