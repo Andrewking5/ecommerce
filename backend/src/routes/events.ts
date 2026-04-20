@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken, requireAdmin, optionalAuth } from '../middleware/auth';
 import { EventController } from '../controllers/eventController';
 import { validateRequest } from '../middleware/validation';
 import Joi from 'joi';
@@ -52,7 +52,7 @@ const updateEventSchema = Joi.object({
 router.get('/', EventController.getActiveEvents);
 
 // Get event by slug (wildcard to support slugs with slashes like "2026/spring-show")
-router.get('/slug/*', EventController.getEventBySlug);
+router.get('/slug/*', optionalAuth, EventController.getEventBySlug);
 
 // Track QR code scan / referral click
 router.get('/r/:code', EventController.trackClick);

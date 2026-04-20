@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
+import { AuthRequest } from '../middleware/auth';
 import crypto from 'crypto';
 
 function generateReferralCode(): string {
@@ -38,7 +39,7 @@ export class EventController {
     }
   }
 
-  /** Get single event by slug (public) */
+  /** Get single event by slug (public, but test mode requires admin) */
   static async getEventBySlug(req: Request, res: Response): Promise<void> {
     try {
       // Express 4 wildcard: req.params[0] contains the matched path after /slug/
@@ -50,11 +51,19 @@ export class EventController {
           coverImage: true, location: true, startDate: true, endDate: true,
           status: true, couponCode: true, discountNote: true,
           referralCode: true, landingUrl: true, metadata: true,
+          isActive: true,
         },
       });
       if (!event) {
         res.status(404).json({ success: false, error: 'Event not found' });
         return;
+      }
+      if (!event.isActive) {
+        const role = (req as AuthRequest).user ? String((req as AuthRequest).user!.role).toUpperCase() : null;
+        if (role !== 'ADMIN') {
+          res.status(403).json({ success: false, error: 'TEST_MODE' });
+          return;
+        }
       }
       res.json({ success: true, data: event });
     } catch (error) {

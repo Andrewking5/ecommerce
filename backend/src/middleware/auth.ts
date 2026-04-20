@@ -76,6 +76,30 @@ export const authenticateToken = async (
   }
 };
 
+export const optionalAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const authReq = req as AuthRequest;
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { id: true, email: true, role: true, isActive: true },
+      });
+      if (user && user.isActive) {
+        authReq.user = { id: user.id, email: user.email, role: String(user.role) };
+      }
+    } catch {
+      // invalid token — proceed as unauthenticated
+    }
+  }
+  next();
+};
+
 export const requireAdmin = (
   req: Request,
   res: Response,
