@@ -12,6 +12,7 @@ const BASE = '/images/events/quiz';
 const CACHE_V = `?v=${__ASSET_V__}`; // auto-generated at build time — no manual bumping needed
 const QUIZ_FONT = '"Glow Sans TC", "Noto Sans TC", sans-serif';
 
+
 /* ── URL slug ↔ result key 映射（直譯） ── */
 const SLUG_TO_KEY: Record<string, string> = {
   'fire': 'FIRE_自由',   // 火焰
@@ -555,16 +556,16 @@ function FullResultPage({ resultKey, folder, layout }: {
               animate={{ scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
               transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              {/* showContent 後才掛載，避免 opacity:0 讓瀏覽器暫停 animated WebP */}
               {showContent && (
-                <img
-                  src={result.charImg}
-                  alt={result.name}
+                <video
+                  autoPlay loop muted playsInline
                   style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
                   className="relative h-auto object-contain"
-                  decoding="async"
-                  draggable={false}
-                />
+                >
+                  <source src={`${RF}/char.webm`} type="video/webm" />
+                  {/* Safari fallback — animated WebP supported on iOS 14+ */}
+                  <img src={result.charImg} alt={result.name} className="w-full h-auto object-contain" decoding="async" draggable={false} />
+                </video>
               )}
               <img
                 src={`${RF}/char-right.webp${CACHE_V}`}
@@ -1069,7 +1070,7 @@ function ResultLoadingScreen({ progress }: { progress: number }) {
     <motion.div
       className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-[#f5f0e8]"
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0 }}
     >
       <img src={`${BASE}/loading.webp${CACHE_V}`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
       <motion.p
@@ -1141,7 +1142,7 @@ export default function SoulGuitarResult() {
     // Progress is tracked individually so the user sees meaningful feedback.
     // NOTE: char.webp can be up to 63MB (animated WebP). Once converted to
     // mp4/webm by the designer the total payload drops ~90% and this is fast.
-    const filesToPreload = ['hero-card.webp', 'bg.webp', 'char.webp'];
+    const filesToPreload = ['hero-card.webp', 'bg.webp'];
     let loaded = 0;
     const assets = filesToPreload.map(f => {
       const img = new Image();
