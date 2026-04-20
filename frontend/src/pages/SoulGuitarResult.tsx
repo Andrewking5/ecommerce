@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import quizService, { type LayoutConfig, type AssetKey, DEFAULT_LAYOUT } from '../services/quizService';
+import api from '../services/api';
 
 /* ──────────────────────────────────────
    Soul Guitar — 結果頁
@@ -453,13 +454,7 @@ function FullResultPage({ resultKey, folder, layout }: {
     setEmailLoading(true);
     setEmailError('');
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-      const res = await fetch(`${apiUrl}/quiz/share-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailVal, slug: folder, resultKey }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await api.post('/quiz/share-email', { email: emailVal, slug: folder, resultKey });
       localStorage.setItem('soulGuitar_shareEmail', '1');
       setEmailDone(true);
     } catch {
