@@ -24,7 +24,7 @@ import api from '@/src/services/api';
 import reviewService, { type Review } from '@/src/services/reviewService';
 import couponService, { type Coupon } from '@/src/services/couponService';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
-import quizService, { type QuizAnalytics } from '@/src/services/quizService';
+import quizService, { type QuizAnalytics, type QuizShareEmail } from '@/src/services/quizService';
 import registrationService, { type Registration } from '@/src/services/registrationService';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -3421,6 +3421,16 @@ function QuizFullPage({ data, onBack, onRefresh }: {
 }) {
   const [clearing, setClearing] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
+  const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
+  const [shareEmailsLoading, setShareEmailsLoading] = useState(true);
+
+  useEffect(() => {
+    quizService.listShareEmails().then(({ total, data }) => {
+      setShareEmailsTotal(total);
+      setShareEmails(data);
+    }).catch(() => {/* silent */}).finally(() => setShareEmailsLoading(false));
+  }, []);
 
   const handleClear = async () => {
     setClearing(true);
@@ -3690,6 +3700,53 @@ function QuizFullPage({ data, onBack, onRefresh }: {
               </div>
             )}
           </Card>
+
+          {/* ── Share Email Lottery List ── */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/30">
+                抽獎名單 — 填寫 Email 報名者 · 共 {shareEmailsTotal} 筆
+              </h3>
+              <button
+                onClick={() => quizService.exportShareEmailsCsv()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all"
+              >
+                <Download size={11} /> 匯出 CSV
+              </button>
+            </div>
+            <div className="rounded-2xl overflow-hidden border border-white/5" style={{ background: CARD_BG }}>
+              {shareEmailsLoading ? (
+                <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
+              ) : shareEmails.length === 0 ? (
+                <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
+              ) : (
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
+                    <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                      <th className="px-4 py-3 text-left font-medium w-8">#</th>
+                      <th className="px-4 py-3 text-left font-medium">Email</th>
+                      <th className="px-4 py-3 text-left font-medium">靈魂類型</th>
+                      <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.04]">
+                    {shareEmails.map((r, i) => (
+                      <tr key={`${r.email}-${r.slug}`} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                        <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
+                        <td className="px-4 py-3 text-white/40">
+                          {RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">
+                          {new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
         </>
       )}
     </motion.div>

@@ -56,6 +56,13 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   btnContest:      a(100, 16),           // 前往比賽（mt-4 from gap）
 };
 
+export interface QuizShareEmail {
+  email: string;
+  slug: string;
+  resultKey: string | null;
+  createdAt: string;
+}
+
 export interface QuizAnalytics {
   total: number;
   byResult: { slug: string; label: string; count: number }[];
@@ -93,6 +100,20 @@ const quizService = {
     await api.put(`/quiz/admin/layout/${slug}`, config, {
       headers: editKey ? { 'X-Quiz-Key': editKey } : {},
     });
+  },
+
+  async listShareEmails(slug?: string): Promise<{ total: number; data: QuizShareEmail[] }> {
+    const params = slug ? `?slug=${slug}` : '';
+    const { data } = await api.get(`/quiz/admin/share-emails${params}`);
+    return data.success ? { total: data.total, data: data.data } : { total: 0, data: [] };
+  },
+
+  exportShareEmailsCsv(filename = 'quiz-share-emails.csv'): void {
+    const url = `${(api.defaults.baseURL || '').replace(/\/$/, '')}/quiz/admin/share-emails?format=csv`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
   },
 };
 
