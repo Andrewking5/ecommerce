@@ -357,7 +357,7 @@ const ProgressBar = memo(function ProgressBar({ current, bubbleAbove }: { curren
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
     const preload = (src: string) => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; });
-    const min = new Promise((r) => setTimeout(r, 1200));
+    const min = new Promise((r) => setTimeout(r, 3000));
     // 預載前兩題背景 + UI 素材；Q3 以後在答題時逐題預載
     const q1 = [questions[0].bg, questions[0].bgWide, questions[1].bg, questions[1].bgWide].map(preload);
     const btns = ['/btn-default.png', '/btn-selected.png'].map(f => preload(`${BASE}${f}`));
