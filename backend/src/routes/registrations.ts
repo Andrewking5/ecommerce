@@ -14,8 +14,8 @@ const submitSchema = Joi.object({
   socialId:  Joi.string().required().min(1).max(200),
   category:  Joi.string().valid('彈唱組', '演奏組').required(),
   soulColor: Joi.string().valid('紅色', '橘色', '黃色', '藍色', '黑色', '白色').required(),
-  youtube:   Joi.string().uri().required(),
-  fbIg:      Joi.string().uri().required(),
+  youtube:   Joi.string().required().min(5).max(500),
+  fbIg:      Joi.string().required().min(5).max(500),
   rulesOk:   Joi.boolean().required(),
   message:   Joi.string().max(2000).allow('', null),
 });

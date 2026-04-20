@@ -25,6 +25,16 @@ const RULES_YES = '是 yes';
 const RULES_NO =
   '不了解. 請在下一題留言提出問題，我們盡快回覆你. Not exactly sure. (Feel free to ask any question at following space.)';
 
+const SOCIAL_PLATFORMS = [
+  { id: 'LINE',      label: 'LINE',      placeholder: 'LINE ID 或電話' },
+  { id: 'Instagram', label: 'Instagram', placeholder: '@yourname' },
+  { id: 'Facebook',  label: 'Facebook',  placeholder: 'FB 名稱或網址' },
+  { id: 'WhatsApp',  label: 'WhatsApp',  placeholder: '+886 9xx xxx xxx' },
+  { id: 'WeChat',    label: 'WeChat',    placeholder: 'WeChat ID' },
+  { id: 'Telegram',  label: 'Telegram',  placeholder: '@username' },
+  { id: 'X',         label: 'X (Twitter)', placeholder: '@username' },
+];
+
 function Strip() {
   return (
     <div className="flex h-1.5">
@@ -40,6 +50,7 @@ interface FormState {
   stageName: string;
   phone: string;
   email: string;
+  socialPlatform: string;
   socialId: string;
   category: '' | '彈唱組' | '演奏組';
   soulColor: string;
@@ -55,6 +66,7 @@ const INITIAL: FormState = {
   stageName: '',
   phone: '',
   email: '',
+  socialPlatform: 'LINE',
   socialId: '',
   category: '',
   soulColor: '',
@@ -130,6 +142,7 @@ export default function SoulGuitarRegister() {
     if (!form.name.trim()) e.name = true;
     if (!form.phone.trim()) e.phone = true;
     if (!form.email.trim() || !form.email.includes('@')) e.email = true;
+    if (!form.socialPlatform) e.socialPlatform = true;
     if (!form.socialId.trim()) e.socialId = true;
     if (!form.category) e.category = true;
     if (!form.soulColor) e.soulColor = true;
@@ -152,7 +165,7 @@ export default function SoulGuitarRegister() {
         stageName: form.stageName.trim() || undefined,
         phone:     form.phone.trim(),
         email:     form.email.trim(),
-        socialId:  form.socialId.trim(),
+        socialId:  `${form.socialPlatform}: ${form.socialId.trim()}`,
         category:  form.category as '彈唱組' | '演奏組',
         soulColor: form.soulColor,
         youtube:   form.youtube.trim(),
@@ -162,7 +175,11 @@ export default function SoulGuitarRegister() {
       });
       setStatus('success');
     } catch (err: any) {
-      setErrorMsg(err?.message || '送出失敗，請稍後再試。');
+      const serverMsg =
+        err?.response?.data?.details?.[0] ||
+        err?.response?.data?.message ||
+        err?.response?.data?.error;
+      setErrorMsg(serverMsg || '送出失敗，請稍後再試。');
       setStatus('error');
     }
   }
@@ -363,15 +380,31 @@ export default function SoulGuitarRegister() {
           {/* 社群帳號 */}
           <Field>
             <Label required>最常使用的帳號</Label>
-            <p className="text-xs text-white/25 mb-2">
-              Facebook、Instagram、LINE 或 WhatsApp 其中之一
-              <br />
-              例如：「臉書ID: ayersguitar」
+            <p className="text-xs text-white/25 mb-3">
+              選擇平台後輸入你的 ID，比賽期間我們以此聯絡你
             </p>
+            {/* Platform pills */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {SOCIAL_PLATFORMS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => { set('socialPlatform', p.id); set('socialId', ''); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    form.socialPlatform === p.id
+                      ? 'border-[#c5a059] text-[#c5a059] bg-[#c5a059]/10'
+                      : 'border-white/15 text-white/40 hover:border-white/25 hover:text-white/60'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            {/* ID input */}
             <Input
               value={form.socialId}
               onChange={(v) => set('socialId', v)}
-              placeholder="例：IG: @yourname"
+              placeholder={SOCIAL_PLATFORMS.find((p) => p.id === form.socialPlatform)?.placeholder ?? '帳號 ID'}
               error={errors.socialId}
             />
             {errors.socialId && <FieldError />}
