@@ -553,6 +553,13 @@ export default function SoulGuitarQuiz() {
       const q = questions[nextNext];
       [q.bg, q.bgWide].forEach(src => { const img = new Image(); img.src = src; });
     }
+    // 最後一題：提前算出結果、預載角色圖，利用 500ms 動畫延遲搶先載入
+    if (currentQ === questions.length - 1) {
+      const key = calculateResult(a);
+      const slug = RESULT_SLUG[key] ?? 'fire';
+      const img = new Image();
+      img.src = `${BASE}/result/${slug}/char.webp${CACHE_V}`;
+    }
     setTimeout(() => {
       setTapped(null);
       if (currentQ < questions.length - 1) {
