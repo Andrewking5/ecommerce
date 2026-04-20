@@ -222,9 +222,9 @@ function useIdleLine(currentQ: number) {
 }
 
 /* ── 按鈕 ── */
-const QuizOption = memo(function QuizOption({ label, onClick, delay, active }: { label: string; onClick: () => void; delay: number; active: boolean }) {
+const QuizOption = memo(function QuizOption({ label, onClick, active }: { label: string; onClick: () => void; active: boolean }) {
   return (
-    <motion.button type="button" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay }} whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
+    <motion.button type="button" whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
       <img src={`${BASE}/btn-default.png`} alt="" className={`w-full h-auto transition-opacity duration-200 ${active ? 'opacity-0' : 'group-hover:opacity-0'}`} draggable={false} />
       <img src={`${BASE}/btn-selected.png`} alt="" className={`absolute inset-0 w-full h-auto transition-opacity duration-200 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} draggable={false} />
       <span className={`absolute inset-0 flex items-center justify-center text-[0.9rem] md:text-[1.1rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`} style={{ fontFamily: QUIZ_FONT }}>{label}</span>
@@ -346,8 +346,9 @@ const ProgressBar = memo(function ProgressBar({ current, bubbleAbove }: { curren
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
     const preload = (src: string) => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; });
-    const min = new Promise((r) => setTimeout(r, 5000));
-    const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(preload);
+    const min = new Promise((r) => setTimeout(r, 1200));
+    // 預載前兩題背景 + UI 素材；Q3 以後在答題時逐題預載
+    const q1 = [questions[0].bg, questions[0].bgWide, questions[1].bg, questions[1].bgWide].map(preload);
     const btns = ['/btn-default.png', '/btn-selected.png'].map(f => preload(`${BASE}${f}`));
     const progress = [
       ...Array.from({ length: 7 }, (_, i) => `${BASE}/progress/char-${i + 1}.png`),
@@ -355,12 +356,17 @@ function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: b
       `${BASE}/progress/dot-off.png`,
       `${BASE}/progress/line.png`,
     ].map(preload);
-    Promise.all([min, ...imgs, ...btns, ...progress]).then(onDone);
+    Promise.all([min, ...q1, ...btns, ...progress]).then(onDone);
   }, [onDone, isDesktop]);
 
   return (
     <motion.div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#f5f0e8]" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-      <img src={`${BASE}/loading.webp`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
+      {/* CSS spinner — 取代 2.5MB 動態 webp */}
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-full border-4 border-ayers-gold/20" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-ayers-gold animate-spin" />
+        <div className="absolute inset-2 rounded-full border-2 border-transparent border-t-ayers-gold/50 animate-spin [animation-duration:0.8s] [animation-direction:reverse]" />
+      </div>
       <motion.p className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest" style={{ fontFamily: QUIZ_FONT }} animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>正在為你準備測驗⋯</motion.p>
       <motion.p
         className="mt-4 text-[#2a2a2a]/40 text-xs flex items-center gap-1.5"
@@ -470,7 +476,7 @@ function QuestionView({
         {/* 選項按鈕 */}
         <div className="flex flex-col gap-1.5 md:gap-3">
           {question.options.map((opt, i) => (
-            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.05 + i * 0.06} active={tapped === i} />
+            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} active={tapped === i} />
           ))}
         </div>
 
@@ -533,6 +539,12 @@ export default function SoulGuitarQuiz() {
     if (tapped !== null) return;
     setTapped(i);
     const a = [...answers]; a[currentQ] = i; setAnswers(a);
+    // 預載下下題背景（下一題已由上一次選答時預載）
+    const nextNext = currentQ + 2;
+    if (nextNext < questions.length) {
+      const q = questions[nextNext];
+      [q.bg, q.bgWide].forEach(src => { const img = new Image(); img.src = src; });
+    }
     setTimeout(() => {
       setTapped(null);
       if (currentQ < questions.length - 1) {
@@ -594,7 +606,7 @@ export default function SoulGuitarQuiz() {
             {/* 底層背景 — 永遠可見，防止任何切換閃黑 */}
             <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
             {/* 新題只 fade-in，不需要 exit：圖片已預載，舊題直接移除，base img 擋住底層 */}
-            <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }} className="absolute inset-0">
+            <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="absolute inset-0">
               <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
               <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
             </motion.div>
