@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import eventService from '../services/eventService';
+import { useEventGate } from '../hooks/useEventGate';
 
 /* ──────────────────────────────────────
    Soul Guitar — 心理測驗
@@ -494,23 +494,11 @@ export default function SoulGuitarQuiz() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [tapped, setTapped] = useState<number | null>(null);
-  const [accessChecked, setAccessChecked] = useState(false);
-  const [testMode, setTestMode] = useState(false);
+  const { checking, blocked } = useEventGate('soul-guitar');
   const bgmRef = useRef<HTMLAudioElement | null>(null);
 
   const question = questions[currentQ];
   const isFirstQ = currentQ === 0;
-
-  useEffect(() => {
-    eventService.getEventBySlug('soul-guitar').then(() => {
-      setAccessChecked(true);
-    }).catch((err: any) => {
-      if (err?.response?.status === 403 && err?.response?.data?.error === 'TEST_MODE') {
-        setTestMode(true);
-      }
-      setAccessChecked(true);
-    });
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -559,9 +547,9 @@ export default function SoulGuitarQuiz() {
 
   const currentBg = phase === 'quiz' ? (isDesktop ? question.bgWide : question.bg) : `${BASE}/cover-bg.webp`;
 
-  if (!accessChecked) return null;
+  if (checking) return null;
 
-  if (testMode) return (
+  if (blocked) return (
     <div className="w-full min-h-dvh flex flex-col items-center justify-center bg-black gap-3">
       <p className="text-[10px] font-bold uppercase tracking-widest text-ayers-gold">測試模式</p>
       <p className="text-white/40 text-sm">此頁面尚未對外開放，僅限管理員預覽。</p>

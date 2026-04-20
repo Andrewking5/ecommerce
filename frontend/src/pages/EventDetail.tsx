@@ -8,6 +8,7 @@ import SEO from '../components/SEO';
 import OptimizedImage from '../components/OptimizedImage';
 import { GuitarSunLoader } from '../components/guitar';
 import eventService, { type Event } from '../services/eventService';
+import { useEventGate } from '../hooks/useEventGate';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -21,15 +22,15 @@ export default function EventDetail() {
   const { t } = useTranslation();
   const params = useParams();
   // Support both /e/some/slug (wildcard *) and /:lang/events/:slug
-  const slug = params['*'] || params.slug;
+  const slug = params['*'] || params.slug || '';
+  const { checking, blocked } = useEventGate(slug);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const [testMode, setTestMode] = useState(false);
   const [copied, setCopied] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug || checking || blocked) return;
     (async () => {
       try {
         const data = await eventService.getEventBySlug(slug);
@@ -37,13 +38,9 @@ export default function EventDetail() {
         if (data?.referralCode) {
           eventService.trackClick(data.referralCode).catch(() => {});
         }
-      } catch (err: any) {
-        if (err?.response?.status === 403 && err?.response?.data?.error === 'TEST_MODE') {
-          setTestMode(true);
-        }
-      } finally { setLoading(false); }
+      } catch { /* silent */ } finally { setLoading(false); }
     })();
-  }, [slug]);
+  }, [slug, checking, blocked]);
 
   const getQrUrl = () => {
     if (!event) return '';
@@ -93,16 +90,14 @@ export default function EventDetail() {
     );
   }
 
-  if (testMode) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-ayers-cream gap-4">
-        <div className="text-center space-y-3">
-          <p className="text-xs font-bold uppercase tracking-widest text-ayers-gold">測試模式</p>
-          <p className="text-ayers-ink/60 text-base">此活動目前尚未對外開放，僅限管理員預覽。</p>
-        </div>
-      </div>
-    );
-  }
+  if (checking) return null;
+
+  if (blocked) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-ayers-cream gap-4">
+      <p className="text-xs font-bold uppercase tracking-widest text-ayers-gold">測試模式</p>
+      <p className="text-ayers-ink/60 text-base">此活動目前尚未對外開放，僅限管理員預覽。</p>
+    </div>
+  );
 
   if (!event) {
     return (
