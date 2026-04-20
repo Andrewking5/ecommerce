@@ -24,6 +24,7 @@ const createEventSchema = Joi.object({
   couponCode: Joi.string().max(50).allow('', null),
   discountNote: Joi.string().max(300).allow('', null),
   isActive: Joi.boolean().default(true),
+  eventType: Joi.string().valid('MAIN', 'INFO', 'REGISTER', 'QUIZ', 'LANDING', 'OTHER').default('OTHER'),
   metadata: Joi.object().allow(null),
 });
 
@@ -43,6 +44,7 @@ const updateEventSchema = Joi.object({
   couponCode: Joi.string().max(50).allow('', null),
   discountNote: Joi.string().max(300).allow('', null),
   isActive: Joi.boolean(),
+  eventType: Joi.string().valid('MAIN', 'INFO', 'REGISTER', 'QUIZ', 'LANDING', 'OTHER'),
   metadata: Joi.object().allow(null),
 });
 

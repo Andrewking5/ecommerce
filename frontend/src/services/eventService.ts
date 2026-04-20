@@ -20,6 +20,7 @@ export interface Event {
   totalScans: number;
   uniqueVisitors: number;
   isActive: boolean;
+  eventType: 'MAIN' | 'INFO' | 'REGISTER' | 'QUIZ' | 'LANDING' | 'OTHER';
   registrationOpen: boolean;
   registrationLimit: number;
   metadata?: {

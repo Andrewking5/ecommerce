@@ -58,7 +58,7 @@ export class EventController {
         res.status(404).json({ success: false, error: 'Event not found' });
         return;
       }
-      if (!event.isActive) {
+      if (!event.isActive && event.status === 'DRAFT') {
         const role = (req as AuthRequest).user ? String((req as AuthRequest).user!.role).toUpperCase() : null;
         if (role !== 'ADMIN') {
           res.status(403).json({ success: false, error: 'TEST_MODE' });
@@ -152,7 +152,7 @@ export class EventController {
         title, slug, description, coverImage, location,
         startDate, endDate, status,
         landingUrl, utmSource, utmMedium, utmCampaign,
-        couponCode, discountNote, isActive, metadata,
+        couponCode, discountNote, isActive, eventType, metadata,
       } = req.body;
 
       // Check slug uniqueness
@@ -186,6 +186,7 @@ export class EventController {
           couponCode: couponCode || null,
           discountNote: discountNote || null,
           isActive: isActive ?? true,
+          eventType: eventType ?? 'OTHER',
           metadata: metadata ?? null,
         },
       });
@@ -205,7 +206,7 @@ export class EventController {
         title, slug, description, coverImage, location,
         startDate, endDate, status,
         landingUrl, utmSource, utmMedium, utmCampaign,
-        couponCode, discountNote, isActive, metadata,
+        couponCode, discountNote, isActive, eventType, metadata,
         registrationOpen, registrationLimit,
       } = req.body;
 
@@ -242,6 +243,7 @@ export class EventController {
           ...(couponCode !== undefined && { couponCode }),
           ...(discountNote !== undefined && { discountNote }),
           ...(isActive !== undefined && { isActive }),
+          ...(eventType !== undefined && { eventType }),
           ...(metadata !== undefined && { metadata }),
           ...(registrationOpen !== undefined && { registrationOpen: Boolean(registrationOpen) }),
           ...(registrationLimit !== undefined && { registrationLimit: Number(registrationLimit) }),

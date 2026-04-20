@@ -2318,11 +2318,15 @@ const EVENT_STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-500/10 text-red-500',
 };
 
+const EVENT_PAGE_TYPE_LABELS: Record<string, string> = {
+  MAIN: '主頁', INFO: '簡章', REGISTER: '報名', QUIZ: '測驗', LANDING: '落地頁', OTHER: '其他',
+};
+
 const EMPTY_EVENT: Partial<EventType> = {
   title: '', slug: '', description: '', coverImage: '', location: '',
   startDate: '', endDate: '', status: 'DRAFT',
   landingUrl: '', utmSource: '', utmMedium: 'qrcode', utmCampaign: '',
-  couponCode: '', discountNote: '', isActive: true,
+  couponCode: '', discountNote: '', isActive: true, eventType: 'OTHER',
 };
 
 /** Format Date to local datetime-local input value (avoids UTC shift from toISOString) */
@@ -2413,7 +2417,7 @@ function EventsTab() {
       'title', 'slug', 'description', 'coverImage', 'location',
       'startDate', 'endDate', 'status',
       'landingUrl', 'utmSource', 'utmMedium', 'utmCampaign',
-      'couponCode', 'discountNote', 'isActive',
+      'couponCode', 'discountNote', 'isActive', 'eventType',
     ];
     for (const key of allowedKeys) {
       if ((editingEvent as Record<string, unknown>)[key] !== undefined) {
@@ -2587,6 +2591,11 @@ function EventsTab() {
           <span className={cn('shrink-0 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest', EVENT_STATUS_COLORS[event.status])}>
             {event.status}
           </span>
+          {event.eventType && event.eventType !== 'OTHER' && (
+            <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-white/5 text-white/30 font-bold">
+              {EVENT_PAGE_TYPE_LABELS[event.eventType]}
+            </span>
+          )}
           {!event.isActive && <span className="shrink-0 text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold">隱藏</span>}
         </div>
         <div className="flex flex-wrap gap-4 text-[10px] text-white/40">
@@ -2607,14 +2616,14 @@ function EventsTab() {
           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
           <ExternalLink size={14} />
         </button>
-        {event.slug.includes('register') && (
+        {event.eventType === 'REGISTER' && (
           <button onClick={() => handleOpenRegPanel(event.id)} title="報名管理"
             className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all',
               regPanelEventId === event.id ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}>
             <Users size={14} />
           </button>
         )}
-        {event.slug.includes('info') && (
+        {event.eventType === 'INFO' && (
           <button onClick={() => handleOpenRules(event)} title="編輯比賽規則"
             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
             <FileText size={14} />
@@ -2628,12 +2637,10 @@ function EventsTab() {
           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
           {copiedId === event.id ? <Check size={14} className="text-green-400" /> : <Link size={14} />}
         </button>
-        {!event.slug.includes('/') && (
-          <button onClick={() => handleViewAnalytics(event)} title="數據分析"
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
-            <BarChart3 size={14} />
-          </button>
-        )}
+        <button onClick={() => handleViewAnalytics(event)} title="數據分析"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
+          <BarChart3 size={14} />
+        </button>
         <button onClick={() => handleToggle(event.id)} title={event.isActive ? '點擊隱藏' : '點擊顯示'}
           className={cn('p-2 rounded-lg transition-all', event.isActive
             ? 'bg-white/5 hover:bg-white/10 text-white/40 hover:text-white'
@@ -3061,6 +3068,15 @@ function EventsTab() {
                           <option value="ACTIVE" className="bg-[#1e160d]">啟用</option>
                           <option value="ENDED" className="bg-[#1e160d]">已結束</option>
                           <option value="CANCELLED" className="bg-[#1e160d]">已取消</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-white/40 mb-1.5">頁面類型</label>
+                        <select value={editingEvent.eventType || 'OTHER'} onChange={(e) => setEditingEvent(p => p ? { ...p, eventType: e.target.value as EventType['eventType'] } : p)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-ayers-gold transition-all">
+                          {Object.entries(EVENT_PAGE_TYPE_LABELS).map(([val, label]) => (
+                            <option key={val} value={val} className="bg-[#1e160d]">{label}</option>
+                          ))}
                         </select>
                       </div>
                       <div>

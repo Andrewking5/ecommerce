@@ -627,6 +627,15 @@ enum EventStatus {
   CANCELLED
 }
 
+enum EventPageType {
+  MAIN
+  INFO
+  REGISTER
+  QUIZ
+  LANDING
+  OTHER
+}
+
 // 活動模型
 model Event {
   id          String      @id @default(cuid())
@@ -658,7 +667,8 @@ model Event {
   registrationOpen  Boolean @default(false)   // 是否開放報名
   registrationLimit Int     @default(200)     // 報名人數上限（0 = 無限制）
 
-  isActive    Boolean     @default(true)
+  isActive    Boolean       @default(true)
+  eventType   EventPageType @default(OTHER)   // 頁面功能類型
   metadata    Json?                            // 活動自訂資料（如比賽規則）
 
   createdAt   DateTime    @default(now())
