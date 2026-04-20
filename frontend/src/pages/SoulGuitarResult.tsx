@@ -1111,24 +1111,24 @@ export default function SoulGuitarResult() {
   return (
     <div
       className="w-full flex flex-col items-center overflow-x-hidden"
-      style={{ backgroundColor: resultData.themeColor }}
+      style={{
+        backgroundColor: resultData.themeColor,
+        ...(bgUrl ? {
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: 'auto 100%',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+        } : {
+          background: resultData.themeBg,
+        }),
+      }}
     >
       {resultKey === 'SUN_自由' && isNewDesign && <SunGrainOverlay />}
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" />}
       </AnimatePresence>
 
-      <div
-        className="relative z-10 w-full max-w-[285px] md:max-w-[430px]"
-        style={bgUrl ? {
-          backgroundImage: `url(${bgUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          backgroundRepeat: 'no-repeat',
-        } : {
-          background: resultData.themeBg,
-        }}
-      >
+      <div className="relative z-10 w-full max-w-[285px] md:max-w-[50vw]">
         <FullResultPage
           resultKey={resultKey}
           folder={RESULT_FOLDER[resultKey]}
