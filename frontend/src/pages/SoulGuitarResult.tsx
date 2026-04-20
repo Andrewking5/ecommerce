@@ -1070,7 +1070,7 @@ function ResultLoadingScreen({ progress }: { progress: number }) {
     <motion.div
       className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-[#f5f0e8]"
       exit={{ opacity: 0 }}
-      transition={{ duration: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <img src={`${BASE}/loading.webp${CACHE_V}`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
       <motion.p
