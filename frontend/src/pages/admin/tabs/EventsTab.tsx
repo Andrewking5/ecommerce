@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import {
   Plus, Trash2, RefreshCw, Edit, Eye, EyeOff, CalendarDays, MapPin, QrCode, Link, Copy, Check,
-  ExternalLink, FileText, X, Save, ChevronDown, ChevronRight, ChevronLeft, Users, Download, AlertTriangle, BarChart3, TrendingUp,
+  ExternalLink, FileText, X, Save, ChevronDown, ChevronRight, ChevronLeft, Users, Download, AlertTriangle, BarChart3, TrendingUp, Mail,
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { cn } from '@/src/lib/utils';
@@ -99,23 +99,6 @@ function StatCard({ title, value, sub }: { title: string; value: string; sub?: s
 function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null; onBack: () => void; onRefresh: () => void }) {
   const [clearing, setClearing] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
-  const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
-  const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
-  const [shareEmailsLoading, setShareEmailsLoading] = useState(true);
-  const [shareEmailsError, setShareEmailsError] = useState('');
-
-  const fetchShareEmails = () => {
-    setShareEmailsLoading(true);
-    setShareEmailsError('');
-    quizService.listShareEmails().then(({ total, data }) => {
-      setShareEmailsTotal(total); setShareEmails(data);
-    }).catch((e) => {
-      console.error('[quiz share emails]', e);
-      setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗');
-    }).finally(() => setShareEmailsLoading(false));
-  };
-
-  useEffect(() => { fetchShareEmails(); }, []);
 
   const handleClear = async () => {
     setClearing(true);
@@ -304,44 +287,6 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
             )}
           </Card>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/30">抽獎名單 — 填寫 Email 報名者 · 共 {shareEmailsTotal} 筆</h3>
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={fetchShareEmails} className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 hover:text-white transition-colors" title="重新整理"><RefreshCw size={12} /></button>
-                <button type="button" onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
-                  <Download size={11} /> 匯出 CSV
-                </button>
-              </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-white/5" style={{ background: CARD_BG }}>
-              {shareEmailsLoading ? <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
-                : shareEmailsError ? <div className="py-10 text-center text-xs text-red-400/70">{shareEmailsError}</div>
-                : shareEmails.length === 0 ? <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
-                : (
-                  <table className="w-full text-xs">
-                    <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
-                      <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
-                        <th className="px-4 py-3 text-left font-medium w-8">#</th>
-                        <th className="px-4 py-3 text-left font-medium">Email</th>
-                        <th className="px-4 py-3 text-left font-medium">靈魂類型</th>
-                        <th className="px-4 py-3 text-left font-medium">報名時間</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.04]">
-                      {shareEmails.map((r, i) => (
-                        <tr key={`${r.email}-${r.slug}`} className="hover:bg-white/[0.02] transition-colors">
-                          <td className="px-4 py-3 text-white/25">{i + 1}</td>
-                          <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
-                          <td className="px-4 py-3 text-white/40">{RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}</td>
-                          <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-            </div>
-          </div>
         </>
       )}
     </motion.div>
@@ -374,6 +319,11 @@ export default function EventsTab() {
   const [regLoading, setRegLoading] = useState(false);
   const [regSettingsSaving, setRegSettingsSaving] = useState(false);
   const [regDetailId, setRegDetailId] = useState<string | null>(null);
+  const [quizEmailPanelOpen, setQuizEmailPanelOpen] = useState(false);
+  const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
+  const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
+  const [shareEmailsLoading, setShareEmailsLoading] = useState(false);
+  const [shareEmailsError, setShareEmailsError] = useState('');
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -483,6 +433,21 @@ export default function EventsTab() {
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
 
+  const fetchShareEmails = () => {
+    setShareEmailsLoading(true);
+    setShareEmailsError('');
+    quizService.listShareEmails().then(({ total, data }) => {
+      setShareEmailsTotal(total); setShareEmails(data);
+    }).catch((e) => {
+      setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗');
+    }).finally(() => setShareEmailsLoading(false));
+  };
+
+  const handleOpenQuizEmailPanel = () => {
+    setQuizEmailPanelOpen(true);
+    fetchShareEmails();
+  };
+
   const handleOpenRegPanel = async (eventId: string) => {
     setRegPanelEventId(eventId); setRegLoading(true); setRegistrations([]);
     try { const { registrations: regs, total } = await registrationService.list(eventId); setRegistrations(regs); setRegTotal(total); } catch { /* silent */ } finally { setRegLoading(false); }
@@ -531,6 +496,7 @@ export default function EventsTab() {
       <div className="flex items-center gap-2 shrink-0">
         <button onClick={() => window.open(`/e/${event.slug}`, '_blank')} title="開啟活動頁面" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><ExternalLink size={14} /></button>
         {event.eventType === 'REGISTER' && <button onClick={() => handleOpenRegPanel(event.id)} title="報名管理" className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all', regPanelEventId === event.id ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}><Users size={14} /></button>}
+        {event.eventType === 'QUIZ' && event.slug.startsWith('soul-guitar') && <button onClick={handleOpenQuizEmailPanel} title="抽獎 Email 管理" className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all', quizEmailPanelOpen ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}><Mail size={14} /></button>}
         {event.eventType === 'INFO' && <button onClick={() => handleOpenRules(event)} title="編輯比賽規則" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><FileText size={14} /></button>}
         <button onClick={() => setViewingQr(event)} title="QR Code" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><QrCode size={14} /></button>
         <button onClick={() => handleCopyLink(event)} title="複製連結" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
@@ -655,6 +621,54 @@ export default function EventsTab() {
           </div>
         );
       })()}
+
+      {/* ── Quiz Email Panel ── */}
+      {quizEmailPanelOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setQuizEmailPanelOpen(false)}>
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="rounded-t-2xl sm:rounded-2xl w-full max-w-2xl mx-0 sm:mx-4 flex flex-col" style={{ background: CARD_BG, maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">抽獎 Email 管理</h3>
+                <p className="text-[10px] text-white/30 mt-0.5">吉他靈魂測驗 · 共 {shareEmailsTotal} 筆</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button type="button" onClick={fetchShareEmails} className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 hover:text-white transition-colors" title="重新整理"><RefreshCw size={13} /></button>
+                <button type="button" onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
+                  <Download size={11} /> 匯出 CSV
+                </button>
+                <button type="button" aria-label="關閉" onClick={() => setQuizEmailPanelOpen(false)} className="p-2 rounded-lg hover:bg-white/5 text-white/40 transition-colors"><X size={16} /></button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {shareEmailsLoading ? <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
+                : shareEmailsError ? <div className="py-10 text-center text-xs text-red-400/70">{shareEmailsError}</div>
+                : shareEmails.length === 0 ? <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
+                : (
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
+                      <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                        <th className="px-4 py-3 text-left font-medium w-8">#</th>
+                        <th className="px-4 py-3 text-left font-medium">Email</th>
+                        <th className="px-4 py-3 text-left font-medium">靈魂類型</th>
+                        <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.04]">
+                      {shareEmails.map((r, i) => (
+                        <tr key={`${r.email}-${r.slug}`} className="hover:bg-white/[0.02] transition-colors">
+                          <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                          <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
+                          <td className="px-4 py-3 text-white/40">{RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}</td>
+                          <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* ── Rules Editor Modal ── */}
       {rulesEvent && (
