@@ -24,6 +24,7 @@ export default function EventDetail() {
   const slug = params['*'] || params.slug;
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testMode, setTestMode] = useState(false);
   const [copied, setCopied] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -33,11 +34,14 @@ export default function EventDetail() {
       try {
         const data = await eventService.getEventBySlug(slug);
         setEvent(data);
-        // Track visit if coming from QR scan (referral code in URL)
         if (data?.referralCode) {
           eventService.trackClick(data.referralCode).catch(() => {});
         }
-      } catch { /* silent */ } finally { setLoading(false); }
+      } catch (err: any) {
+        if (err?.response?.status === 403 && err?.response?.data?.error === 'TEST_MODE') {
+          setTestMode(true);
+        }
+      } finally { setLoading(false); }
     })();
   }, [slug]);
 
@@ -85,6 +89,17 @@ export default function EventDetail() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ayers-cream">
         <GuitarSunLoader size={48} />
+      </div>
+    );
+  }
+
+  if (testMode) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ayers-cream gap-4">
+        <div className="text-center space-y-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-ayers-gold">測試模式</p>
+          <p className="text-ayers-ink/60 text-base">此活動目前尚未對外開放，僅限管理員預覽。</p>
+        </div>
       </div>
     );
   }
