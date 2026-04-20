@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEventGate } from '../hooks/useEventGate';
+import SEO from '../components/SEO';
 
 /* ──────────────────────────────────────
    Soul Guitar — 心理測驗
@@ -587,6 +588,35 @@ export default function SoulGuitarQuiz() {
 
   return (
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden bg-black">
+      <SEO
+        title="Ayers 吉他靈魂測驗 — 測出你的音樂性格"
+        description="透過 8 個問題，找出你的吉他靈魂類型：火焰、太陽、海浪、月光⋯⋯立即測驗，再以影片參加 2026 Ayers 靈魂吉他手大賽，獎項總值超過 NT$200,000！"
+        ogImage="/images/events/soul-guitar-poster.webp"
+        ogType="website"
+        breadcrumbs={[
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: '活動', url: '/zh-TW/events' },
+          { name: '靈魂吉他手大賽', url: '/zh-TW/soul-guitar' },
+          { name: '心理測驗', url: '/zh-TW/soul-guitar/quiz' },
+        ]}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Quiz',
+          name: 'Ayers 吉他靈魂測驗',
+          description: '透過 8 個問題測出你的音樂性格，配對最適合你的吉他靈魂類型。共有火焰、煙火、太陽、微光、海浪、深海、月光、夢月八種結果。',
+          url: 'https://www.ayersguitars.com/zh-TW/soul-guitar/quiz',
+          author: { '@type': 'Organization', name: 'Ayers Guitars', url: 'https://www.ayersguitars.com' },
+          about: {
+            '@type': 'MusicComposition',
+            name: '音樂性格分析',
+          },
+          isPartOf: {
+            '@type': 'Event',
+            name: '2026 Ayers 靈魂吉他手大賽',
+            url: 'https://www.ayersguitars.com/zh-TW/soul-guitar',
+          },
+        }}
+      />
       {/* 模糊背景 — IG Story 手機版兩側
           使用 img crossfade 取代 backgroundImage style 切換，
           避免每題切換時觸發 CSS paint，改走 opacity compositor。
