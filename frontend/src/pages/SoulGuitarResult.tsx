@@ -553,15 +553,14 @@ function FullResultPage({ resultKey, folder, layout }: {
               transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               {showContent && (
-                <video
-                  autoPlay loop muted playsInline
+                <img
+                  src={result.charImg}
+                  alt={result.name}
                   style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
                   className="relative h-auto object-contain"
-                >
-                  <source src={`${RF}/char.webm`} type="video/webm" />
-                  {/* Safari fallback — animated WebP supported on iOS 14+ */}
-                  <img src={result.charImg} alt={result.name} className="w-full h-auto object-contain" decoding="async" draggable={false} />
-                </video>
+                  decoding="async"
+                  draggable={false}
+                />
               )}
               <img
                 src={`${RF}/char-right.webp${CACHE_V}`}
