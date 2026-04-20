@@ -54,7 +54,7 @@ const Community = lazyWithRetry(() => import('./pages/Community'));
 const StoreLocator = lazyWithRetry(() => import('./pages/StoreLocator'));
 const Support = lazyWithRetry(() => import('./pages/Support'));
 const Account = lazyWithRetry(() => import('./pages/Account'));
-const Admin = lazyWithRetry(() => import('./pages/Admin'));
+const Admin = lazyWithRetry(() => import('./pages/admin'));
 const Checkout = lazyWithRetry(() => import('./pages/Checkout'));
 const Technology = lazyWithRetry(() => import('./pages/Technology'));
 const Login = lazyWithRetry(() => import('./pages/Login'));
