@@ -2749,6 +2749,7 @@ function EventsTab() {
                         <th className="px-4 py-3 text-left font-medium">姓名</th>
                         <th className="px-4 py-3 text-left font-medium">Email</th>
                         <th className="px-4 py-3 text-left font-medium">手機</th>
+                        <th className="px-4 py-3 text-left font-medium">社群帳號</th>
                         <th className="px-4 py-3 text-left font-medium">組別</th>
                         <th className="px-4 py-3 text-left font-medium">顏色</th>
                         <th className="px-4 py-3 text-left font-medium">YouTube</th>
@@ -2766,6 +2767,7 @@ function EventsTab() {
                           </td>
                           <td className="px-4 py-3 text-white/50">{r.email}</td>
                           <td className="px-4 py-3 text-white/50">{r.phone}</td>
+                          <td className="px-4 py-3 text-white/50 max-w-[140px] truncate">{r.socialId || '—'}</td>
                           <td className="px-4 py-3">
                             <span className={cn('px-2 py-0.5 rounded-full text-[9px] font-bold',
                               r.category === '彈唱組' ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400')}>

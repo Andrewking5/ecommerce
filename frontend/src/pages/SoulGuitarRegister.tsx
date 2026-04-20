@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
 import SEO from '../components/SEO';
@@ -25,6 +25,26 @@ const RULES_YES = '是 yes';
 const RULES_NO =
   '不了解. 請在下一題留言提出問題，我們盡快回覆你. Not exactly sure. (Feel free to ask any question at following space.)';
 
+const COUNTRY_CODES = [
+  { code: '+886', flag: '🇹🇼', name: '台灣 Taiwan' },
+  { code: '+86',  flag: '🇨🇳', name: '中國 China' },
+  { code: '+852', flag: '🇭🇰', name: '香港 Hong Kong' },
+  { code: '+853', flag: '🇲🇴', name: '澳門 Macau' },
+  { code: '+65',  flag: '🇸🇬', name: '新加坡 Singapore' },
+  { code: '+60',  flag: '🇲🇾', name: '馬來西亞 Malaysia' },
+  { code: '+81',  flag: '🇯🇵', name: '日本 Japan' },
+  { code: '+82',  flag: '🇰🇷', name: '韓國 Korea' },
+  { code: '+1',   flag: '🇺🇸', name: '美國 USA / Canada' },
+  { code: '+44',  flag: '🇬🇧', name: '英國 UK' },
+  { code: '+61',  flag: '🇦🇺', name: '澳洲 Australia' },
+  { code: '+49',  flag: '🇩🇪', name: '德國 Germany' },
+  { code: '+33',  flag: '🇫🇷', name: '法國 France' },
+  { code: '+63',  flag: '🇵🇭', name: '菲律賓 Philippines' },
+  { code: '+66',  flag: '🇹🇭', name: '泰國 Thailand' },
+  { code: '+84',  flag: '🇻🇳', name: '越南 Vietnam' },
+  { code: '+62',  flag: '🇮🇩', name: '印尼 Indonesia' },
+];
+
 const SOCIAL_PLATFORMS = [
   { id: 'LINE',      label: 'LINE',      placeholder: 'LINE ID 或電話' },
   { id: 'Instagram', label: 'Instagram', placeholder: '@yourname' },
@@ -48,6 +68,7 @@ function Strip() {
 interface FormState {
   name: string;
   stageName: string;
+  countryCode: string;
   phone: string;
   email: string;
   socialPlatform: string;
@@ -64,6 +85,7 @@ interface FormState {
 const INITIAL: FormState = {
   name: '',
   stageName: '',
+  countryCode: '+886',
   phone: '',
   email: '',
   socialPlatform: 'LINE',
@@ -163,7 +185,7 @@ export default function SoulGuitarRegister() {
       await registrationService.submit(EVENT_SLUG, {
         name:      form.name.trim(),
         stageName: form.stageName.trim() || undefined,
-        phone:     form.phone.trim(),
+        phone:     `${form.countryCode} ${form.phone.trim()}`,
         email:     form.email.trim(),
         socialId:  `${form.socialPlatform}: ${form.socialId.trim()}`,
         category:  form.category as '彈唱組' | '演奏組',
@@ -348,14 +370,11 @@ export default function SoulGuitarRegister() {
           {/* 手機 */}
           <Field>
             <Label required>手機號碼 Phone Number</Label>
-            <p className="text-xs text-white/25 mb-2">
-              外籍人士須加上國際區碼 International code is needed if not a Taiwan number
-            </p>
-            <Input
+            <PhoneInput
+              countryCode={form.countryCode}
+              onCountryChange={(v) => set('countryCode', v)}
               value={form.phone}
               onChange={(v) => set('phone', v)}
-              placeholder="+886 9xx xxx xxx"
-              type="tel"
               error={errors.phone}
             />
             {errors.phone && <FieldError />}
@@ -661,6 +680,91 @@ function Field({ children }: { children: React.ReactNode }) {
 
 function FieldError({ text = '此欄位為必填' }: { text?: string }) {
   return <p className="mt-1.5 text-xs text-red-400">{text}</p>;
+}
+
+function PhoneInput({
+  countryCode,
+  onCountryChange,
+  value,
+  onChange,
+  error,
+}: {
+  countryCode: string;
+  onCountryChange: (v: string) => void;
+  value: string;
+  onChange: (v: string) => void;
+  error?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = COUNTRY_CODES.find((c) => c.code === countryCode) ?? COUNTRY_CODES[0];
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="flex gap-2" ref={ref}>
+      {/* Country dropdown trigger */}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className={`flex items-center gap-1.5 h-full px-3 py-3 rounded-xl border text-sm font-medium transition-all whitespace-nowrap ${
+            error
+              ? 'border-red-500/60 bg-white/6 text-white'
+              : 'border-white/10 bg-white/6 text-white hover:border-white/25'
+          }`}
+        >
+          <span className="text-base leading-none">{selected.flag}</span>
+          <span className="text-white/70">{selected.code}</span>
+          <svg className={`w-3 h-3 text-white/30 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {open && (
+          <div className="absolute z-50 top-full left-0 mt-1 w-56 rounded-xl border border-white/10 bg-[#1c2333] shadow-xl overflow-hidden">
+            <div className="max-h-60 overflow-y-auto py-1">
+              {COUNTRY_CODES.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => { onCountryChange(c.code); setOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors hover:bg-white/6 ${
+                    c.code === countryCode ? 'text-ayers-gold' : 'text-white/60'
+                  }`}
+                >
+                  <span className="text-base">{c.flag}</span>
+                  <span className="flex-1">{c.name}</span>
+                  <span className="text-white/30 text-xs">{c.code}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Number input */}
+      <input
+        type="tel"
+        inputMode="tel"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="912 345 678"
+        autoComplete="tel-national"
+        className={`flex-1 bg-white/6 border rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 transition-all ${
+          error
+            ? 'border-red-500/60 focus:ring-red-500/30'
+            : 'border-white/10 focus:border-white/30 focus:ring-white/10'
+        }`}
+      />
+    </div>
+  );
 }
 
 function RadioOption({
