@@ -243,16 +243,12 @@ export default function Home() {
 
   /* (carousel drag removed — featured merged into series) */
 
-  /* ── Page entrance ── */
-  const [entered, setEntered] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setEntered(true), 200); return () => clearTimeout(t); }, []);
-
   return (
     <motion.div
       className="bg-ayers-cream overflow-x-hidden"
       initial={{ opacity: 0 }}
-      animate={{ opacity: entered ? 1 : 0 }}
-      transition={{ duration: 0.6 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
     >
       <SEO
         title={t('home.seoTitle', '手工吉他品牌 — 台灣製造頂級原聲吉他')}
