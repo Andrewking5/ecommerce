@@ -57,7 +57,7 @@ export class RegistrationController {
         return;
       }
 
-      const { name, stageName, phone, email, socialId, category, soulColor, youtube, fbIg, rulesOk, message } = req.body;
+      const { name, stageName, phone, email, socialId, category, soulColor, youtube, fbIg, rulesOk, message, answers } = req.body;
 
       const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || null;
 
@@ -65,16 +65,17 @@ export class RegistrationController {
         data: {
           eventId: event.id,
           name: name.trim(),
-          stageName: stageName?.trim() || null,
           phone: phone.trim(),
           email: email.trim().toLowerCase(),
-          socialId: socialId.trim(),
-          category,
-          soulColor,
-          youtube: youtube.trim(),
-          fbIg: fbIg.trim(),
+          stageName: stageName?.trim() || null,
+          socialId: socialId?.trim() || null,
+          category: category || null,
+          soulColor: soulColor || null,
+          youtube: youtube?.trim() || null,
+          fbIg: fbIg?.trim() || null,
           rulesOk: !!rulesOk,
           message: message?.trim() || null,
+          answers: answers ?? null,
           ip,
         },
       });
@@ -109,7 +110,7 @@ export class RegistrationController {
     }
   }
 
-  /** Export registrations as CSV */
+  /** Export registrations as CSV (dynamic columns from answers) */
   static async exportCsv(req: Request, res: Response): Promise<void> {
     try {
       const { eventId } = req.params;
@@ -119,31 +120,45 @@ export class RegistrationController {
         orderBy: { createdAt: 'asc' },
       });
 
-      const headers = ['編號', '報名時間', '姓名', '藝名', '手機', 'Email', '社群帳號', '組別', '靈魂顏色', 'YouTube', 'FB/IG', '了解規則', '留言'];
-      const rows = registrations.map((r: typeof registrations[number], i: number) => [
-        i + 1,
-        new Date(r.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
-        r.name,
-        r.stageName || '',
-        r.phone,
-        r.email,
-        r.socialId,
-        r.category,
-        r.soulColor,
-        r.youtube,
-        r.fbIg,
-        r.rulesOk ? '是' : '否',
-        r.message || '',
-      ]);
+      // Collect all answer keys across all registrations
+      const answerKeys = Array.from(
+        new Set(
+          registrations.flatMap((r) =>
+            r.answers && typeof r.answers === 'object' ? Object.keys(r.answers as Record<string, unknown>) : []
+          )
+        )
+      );
+
+      // Fixed columns always shown
+      const fixedHeaders = ['編號', '報名時間', '姓名', '藝名', '手機', 'Email'];
+      // Soul Guitar columns only if any record has them
+      const hasSoulGuitarFields = registrations.some((r) => r.category || r.soulColor || r.youtube || r.fbIg);
+      const soulHeaders = hasSoulGuitarFields ? ['社群帳號', '組別', '靈魂顏色', 'YouTube', 'FB/IG', '了解規則'] : [];
+      const headers = [...fixedHeaders, ...soulHeaders, ...answerKeys, '留言'];
+
+      const rows = registrations.map((r, i) => {
+        const answers = (r.answers && typeof r.answers === 'object' ? r.answers : {}) as Record<string, unknown>;
+        return [
+          i + 1,
+          new Date(r.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+          r.name,
+          r.stageName || '',
+          r.phone,
+          r.email,
+          ...(hasSoulGuitarFields ? [r.socialId || '', r.category || '', r.soulColor || '', r.youtube || '', r.fbIg || '', r.rulesOk ? '是' : '否'] : []),
+          ...answerKeys.map((k) => String(answers[k] ?? '')),
+          r.message || '',
+        ];
+      });
 
       const csv = [headers, ...rows]
-        .map((row: (string | number | boolean)[]) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+        .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
         .join('\n');
 
       const slug = event?.slug ?? eventId;
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="registrations-${slug}-${Date.now()}.csv"`);
-      res.send('\uFEFF' + csv); // BOM for Excel
+      res.send('\uFEFF' + csv);
     } catch (error) {
       console.error('Failed to export registrations:', error);
       res.status(500).json({ success: false, error: 'Server error' });

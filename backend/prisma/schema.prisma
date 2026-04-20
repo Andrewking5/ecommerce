@@ -691,22 +691,25 @@ model EventRegistration {
   id          String   @id @default(cuid())
   eventId     String
 
-  // 個人資訊
+  // 基本資訊（所有活動必填）
   name        String                           // 真實姓名
-  stageName   String?                          // 藝名／樂團名（選填）
   phone       String                           // 手機號碼
   email       String                           // 電子信箱
-  socialId    String                           // 最常使用的社群帳號
 
-  // 參賽資訊
-  category    String                           // 彈唱組 / 演奏組
-  soulColor   String                           // 靈魂顏色
-  youtube     String                           // YouTube 影片網址
-  fbIg        String                           // FB 或 IG 影片網址
+  // Soul Guitar 專用欄位（選填，未來活動用 answers）
+  stageName   String?                          // 藝名／樂團名
+  socialId    String?                          // 最常使用的社群帳號
+  category    String?                          // 彈唱組 / 演奏組
+  soulColor   String?                          // 靈魂顏色
+  youtube     String?                          // YouTube 影片網址
+  fbIg        String?                          // FB 或 IG 影片網址
 
   // 同意條款
   rulesOk     Boolean  @default(false)         // 是否了解比賽規則
   message     String?  @db.Text               // 留言／問題（選填）
+
+  // 彈性欄位（未來新活動自訂資料）
+  answers     Json?                            // 各活動自訂答案 { key: value }
 
   // 系統欄位
   ip          String?                          // 防重複用

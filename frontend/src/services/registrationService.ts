@@ -4,16 +4,17 @@ export interface Registration {
   id: string;
   eventId: string;
   name: string;
-  stageName: string | null;
   phone: string;
   email: string;
-  socialId: string;
-  category: string;
-  soulColor: string;
-  youtube: string;
-  fbIg: string;
+  stageName: string | null;
+  socialId: string | null;
+  category: string | null;
+  soulColor: string | null;
+  youtube: string | null;
+  fbIg: string | null;
   rulesOk: boolean;
   message: string | null;
+  answers: Record<string, unknown> | null;
   createdAt: string;
 }
 
@@ -26,16 +27,17 @@ export interface RegistrationStatus {
 
 export interface RegistrationPayload {
   name: string;
-  stageName?: string;
   phone: string;
   email: string;
-  socialId: string;
-  category: '彈唱組' | '演奏組';
-  soulColor: string;
-  youtube: string;
-  fbIg: string;
-  rulesOk: boolean;
+  stageName?: string;
+  socialId?: string;
+  category?: string;
+  soulColor?: string;
+  youtube?: string;
+  fbIg?: string;
+  rulesOk?: boolean;
   message?: string;
+  answers?: Record<string, unknown>;
 }
 
 const registrationService = {

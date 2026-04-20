@@ -2375,6 +2375,7 @@ function EventsTab() {
   const [regTotal, setRegTotal] = useState(0);
   const [regLoading, setRegLoading] = useState(false);
   const [regSettingsSaving, setRegSettingsSaving] = useState(false);
+  const [regDetailId, setRegDetailId] = useState<string | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -2444,8 +2445,10 @@ function EventsTab() {
       } else {
         const res = await eventService.createEvent(payload);
         if (res.success) {
+          const slug = res.data?.slug || payload.slug;
           setEditingEvent(null);
           fetchEvents();
+          alert(`活動已建立！\n\n前端頁面 URL：${window.location.origin}/e/${slug}\n\n記得去設計對應的前端頁面。`);
         } else {
           alert(`新增失敗：${res.message || res.error || JSON.stringify(res.details || res)}`);
         }
@@ -2678,9 +2681,12 @@ function EventsTab() {
       {regPanelEventId && (() => {
         const regEvent = events.find(e => e.id === regPanelEventId);
         if (!regEvent) return null;
+        const detailReg = regDetailId ? registrations.find(r => r.id === regDetailId) : null;
+        const hasSoulFields = registrations.some(r => r.category || r.soulColor || r.youtube);
+        const answerKeys = Array.from(new Set(registrations.flatMap(r => r.answers ? Object.keys(r.answers) : [])));
         return (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
-            onClick={() => setRegPanelEventId(null)}>
+            onClick={() => { setRegPanelEventId(null); setRegDetailId(null); }}>
             <motion.div
               initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
               className="rounded-t-2xl sm:rounded-2xl w-full max-w-4xl mx-0 sm:mx-4 flex flex-col"
@@ -2693,11 +2699,11 @@ function EventsTab() {
                   <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">報名管理</h3>
                   <p className="text-[10px] text-white/30 mt-0.5">{regEvent.title} · 共 {regTotal} 筆</p>
                 </div>
-                <button onClick={() => setRegPanelEventId(null)} className="p-2 rounded-lg hover:bg-white/5 text-white/40 transition-colors"><X size={16} /></button>
+                <button onClick={() => { setRegPanelEventId(null); setRegDetailId(null); }} className="p-2 rounded-lg hover:bg-white/5 text-white/40 transition-colors"><X size={16} /></button>
               </div>
 
               {/* Settings bar */}
-              <div className="px-6 py-4 border-b border-white/5 flex flex-wrap items-center gap-4 shrink-0">
+              <div className="px-6 py-3 border-b border-white/5 flex flex-wrap items-center gap-4 shrink-0">
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-white/50">報名狀態</span>
                   <button
@@ -2714,86 +2720,131 @@ function EventsTab() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/50">上限</span>
-                  <input
-                    type="number" min={0} max={10000}
-                    defaultValue={regEvent.registrationLimit}
+                  <span className="text-xs text-white/50">人數上限</span>
+                  <input type="number" min={0} max={10000} defaultValue={regEvent.registrationLimit}
                     onBlur={e => handleRegSettings(regEvent.id, regEvent.registrationOpen, Number(e.target.value))}
                     className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-ayers-gold/40 text-center"
                   />
                   <span className="text-[10px] text-white/25">（0 = 無限制）</span>
                 </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <span className="text-xs text-white/30">{regTotal} / {regEvent.registrationLimit > 0 ? regEvent.registrationLimit : '∞'}</span>
-                  <a
-                    href={`${registrationService.exportUrl(regEvent.id)}?token=${localStorage.getItem('token') || ''}`}
-                    download
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/60 hover:text-white transition-all"
-                  >
-                    <Download size={12} /> 匯出 CSV
+                <div className="ml-auto flex items-center gap-3">
+                  <span className="text-xs text-white/30 tabular-nums">{regTotal} / {regEvent.registrationLimit > 0 ? regEvent.registrationLimit : '∞'}</span>
+                  <a href={`${registrationService.exportUrl(regEvent.id)}?token=${localStorage.getItem('token') || ''}`} download
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
+                    <Download size={11} /> 匯出 CSV
                   </a>
                 </div>
               </div>
 
-              {/* Registration list */}
-              <div className="overflow-y-auto flex-1">
-                {regLoading ? (
-                  <div className="py-12 flex justify-center"><Spinner /></div>
-                ) : registrations.length === 0 ? (
-                  <div className="py-12 text-center text-xs text-white/25 uppercase tracking-widest">尚無報名資料</div>
-                ) : (
-                  <table className="w-full text-xs">
-                    <thead className="sticky top-0" style={{ background: CARD_BG }}>
-                      <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
-                        <th className="px-4 py-3 text-left font-medium">#</th>
-                        <th className="px-4 py-3 text-left font-medium">姓名</th>
-                        <th className="px-4 py-3 text-left font-medium">Email</th>
-                        <th className="px-4 py-3 text-left font-medium">手機</th>
-                        <th className="px-4 py-3 text-left font-medium">社群帳號</th>
-                        <th className="px-4 py-3 text-left font-medium">組別</th>
-                        <th className="px-4 py-3 text-left font-medium">顏色</th>
-                        <th className="px-4 py-3 text-left font-medium">YouTube</th>
-                        <th className="px-4 py-3 text-left font-medium">報名時間</th>
-                        <th className="px-4 py-3 text-left font-medium"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.04]">
-                      {registrations.map((r, i) => (
-                        <tr key={r.id} className="hover:bg-white/[0.02] transition-colors group">
-                          <td className="px-4 py-3 text-white/25">{i + 1}</td>
-                          <td className="px-4 py-3">
-                            <p className="text-white/80 font-medium">{r.name}</p>
-                            {r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}
-                          </td>
-                          <td className="px-4 py-3 text-white/50">{r.email}</td>
-                          <td className="px-4 py-3 text-white/50">{r.phone}</td>
-                          <td className="px-4 py-3 text-white/50 max-w-[140px] truncate">{r.socialId || '—'}</td>
-                          <td className="px-4 py-3">
-                            <span className={cn('px-2 py-0.5 rounded-full text-[9px] font-bold',
-                              r.category === '彈唱組' ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400')}>
-                              {r.category}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-white/50">{r.soulColor}</td>
-                          <td className="px-4 py-3">
-                            <a href={r.youtube} target="_blank" rel="noreferrer"
-                              className="text-ayers-gold/60 hover:text-ayers-gold truncate block max-w-[120px] transition-colors">
-                              {r.youtube.replace('https://', '').slice(0, 28)}…
-                            </a>
-                          </td>
-                          <td className="px-4 py-3 text-white/30 whitespace-nowrap">
-                            {new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                          </td>
-                          <td className="px-4 py-3">
-                            <button onClick={() => handleDeleteReg(r.id)}
-                              className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all">
-                              <Trash2 size={12} />
-                            </button>
-                          </td>
+              {/* List + Detail side-by-side */}
+              <div className="flex flex-1 overflow-hidden">
+                {/* Registration list */}
+                <div className={cn('overflow-y-auto', detailReg ? 'w-1/2 border-r border-white/5' : 'w-full')}>
+                  {regLoading ? (
+                    <div className="py-12 flex justify-center"><Spinner /></div>
+                  ) : registrations.length === 0 ? (
+                    <div className="py-12 text-center text-xs text-white/25 uppercase tracking-widest">尚無報名資料</div>
+                  ) : (
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
+                        <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                          <th className="px-4 py-3 text-left font-medium w-8">#</th>
+                          <th className="px-4 py-3 text-left font-medium">姓名</th>
+                          <th className="px-4 py-3 text-left font-medium">Email</th>
+                          {!detailReg && <th className="px-4 py-3 text-left font-medium">手機</th>}
+                          <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                          <th className="px-4 py-3 w-16"></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-white/[0.04]">
+                        {registrations.map((r, i) => (
+                          <tr key={r.id}
+                            onClick={() => setRegDetailId(regDetailId === r.id ? null : r.id)}
+                            className={cn('transition-colors cursor-pointer group',
+                              regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
+                            <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                            <td className="px-4 py-3">
+                              <p className="text-white/80 font-medium">{r.name}</p>
+                              {r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}
+                            </td>
+                            <td className="px-4 py-3 text-white/50 max-w-[160px] truncate">{r.email}</td>
+                            {!detailReg && <td className="px-4 py-3 text-white/50">{r.phone}</td>}
+                            <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">
+                              {new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="px-4 py-3">
+                              <button onClick={e => { e.stopPropagation(); handleDeleteReg(r.id); }}
+                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all">
+                                <Trash2 size={12} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* Detail panel */}
+                {detailReg && (
+                  <div className="w-1/2 overflow-y-auto p-5 space-y-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">詳細資料</p>
+                      <button onClick={() => setRegDetailId(null)} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                    </div>
+                    {/* Fixed fields */}
+                    {[
+                      { label: '姓名', value: detailReg.name },
+                      { label: '藝名', value: detailReg.stageName },
+                      { label: '手機', value: detailReg.phone },
+                      { label: 'Email', value: detailReg.email },
+                    ].map(({ label, value }) => value ? (
+                      <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3">
+                        <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p>
+                        <p className="text-xs text-white/70">{value}</p>
+                      </div>
+                    ) : null)}
+                    {/* Soul Guitar fields */}
+                    {hasSoulFields && [
+                      { label: '社群帳號', value: detailReg.socialId },
+                      { label: '組別', value: detailReg.category },
+                      { label: '靈魂顏色', value: detailReg.soulColor },
+                    ].map(({ label, value }) => value ? (
+                      <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3">
+                        <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p>
+                        <p className="text-xs text-white/70">{value}</p>
+                      </div>
+                    ) : null)}
+                    {detailReg.youtube && (
+                      <div className="rounded-xl bg-white/[0.03] px-4 py-3">
+                        <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p>
+                        <a href={detailReg.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.youtube}</a>
+                      </div>
+                    )}
+                    {detailReg.fbIg && (
+                      <div className="rounded-xl bg-white/[0.03] px-4 py-3">
+                        <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p>
+                        <a href={detailReg.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.fbIg}</a>
+                      </div>
+                    )}
+                    {/* Dynamic answers */}
+                    {answerKeys.map(key => {
+                      const val = detailReg.answers?.[key];
+                      return val !== undefined && val !== null && val !== '' ? (
+                        <div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3">
+                          <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p>
+                          <p className="text-xs text-white/70">{String(val)}</p>
+                        </div>
+                      ) : null;
+                    })}
+                    {detailReg.message && (
+                      <div className="rounded-xl bg-white/[0.03] px-4 py-3">
+                        <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p>
+                        <p className="text-xs text-white/70 whitespace-pre-line">{detailReg.message}</p>
+                      </div>
+                    )}
+                    <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(detailReg.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                  </div>
                 )}
               </div>
             </motion.div>
