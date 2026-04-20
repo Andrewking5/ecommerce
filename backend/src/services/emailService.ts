@@ -1,12 +1,21 @@
-import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
+import path from 'path';
 
-// 初始化SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+function createTransporter() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      type: 'OAuth2',
+      user: process.env.GMAIL_USER,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+    },
+  });
 }
 
 export class EmailService {
-  private static fromEmail = process.env.FROM_EMAIL || 'noreply@example.com';
+  private static fromEmail = process.env.GMAIL_USER || 'noreply@example.com';
 
   /**
    * 发送订单确认邮件
@@ -321,40 +330,6 @@ export class EmailService {
   }
 
   /**
-   * 发送邮件的基础方法
-   */
-  private static async sendEmail({
-    to,
-    subject,
-    html,
-    text,
-  }: {
-    to: string;
-    subject: string;
-    html: string;
-    text?: string;
-  }): Promise<void> {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.warn('SendGrid API key not configured. Email not sent.');
-      return;
-    }
-
-    try {
-      await sgMail.send({
-        from: this.fromEmail,
-        to,
-        subject,
-        html,
-        text: text || subject,
-      });
-      console.log(`Email sent successfully to ${to}`);
-    } catch (error) {
-      console.error('Send email error:', error);
-      throw new Error('Failed to send email');
-    }
-  }
-
-  /**
    * Send contact form notification to admin
    */
   static async sendContactNotification(
@@ -388,5 +363,161 @@ export class EmailService {
     `;
     await this.sendEmail({ to, subject: 'We received your message — Ayers Guitars', html });
   }
-}
 
+  /** 靈魂吉他手大賽報名確認信 */
+  static async sendSoulGuitarRegistration(to: string, name: string): Promise<void> {
+    const couponPath = path.join(__dirname, '../assets/soul-guitar-coupon.png');
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.8; color: #1a1714; background: #fff; margin: 0; padding: 0; }
+          .container { max-width: 620px; margin: 0 auto; padding: 0; }
+          .header { background: #1a1714; padding: 32px 40px; text-align: center; }
+          .header img { width: 140px; }
+          .header h1 { color: #C8A96E; font-size: 20px; letter-spacing: 3px; margin: 12px 0 0; font-weight: 400; }
+          .content { padding: 36px 40px; background: #faf8f5; }
+          .divider { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+          .section-title { font-size: 13px; font-weight: 600; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+          .schedule { background: #fff; border-radius: 8px; padding: 20px 24px; margin: 16px 0; }
+          .schedule p { margin: 6px 0; }
+          .coupon-section { margin: 20px 0; text-align: center; }
+          .coupon-section img { max-width: 100%; border-radius: 8px; }
+          .footer { padding: 24px 40px; background: #1a1714; color: #aaa; font-size: 12px; }
+          .footer a { color: #C8A96E; text-decoration: none; }
+          .footer p { margin: 4px 0; }
+          .lang-divider { border: none; border-top: 2px solid #C8A96E; margin: 36px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>AYERS GUITARS</h1>
+          </div>
+          <div class="content">
+
+            <!-- 中文 -->
+            <p>親愛的 ${name} 您好：</p>
+            <p>感謝您報名參加【靈魂吉他手大賽】<br>我們已成功收到您的報名資料，期待欣賞您的精彩演出！</p>
+            <p>以下為本次賽事重要時程與資訊，請務必留意：</p>
+            <div class="schedule">
+              <p>▸ <strong>評審時間：</strong>6/08 – 6/17</p>
+              <p>▸ <strong>得獎公布：</strong>6/29（21:00）</p>
+            </div>
+            <p>請確認您的參賽影片符合規範，並於截止日前完成提交。<br>並請在三個工作天內確認是否有在靈魂吉他手大賽播放清單內。</p>
+
+            <hr class="divider">
+
+            <p class="section-title">參賽專屬優惠</p>
+            <p>感謝您的參與，我們特別隨信附上專屬折價券，歡迎於指定期間內使用。</p>
+            <div class="coupon-section">
+              <img src="cid:soul-guitar-coupon" alt="專屬折價券" />
+            </div>
+
+            <hr class="divider">
+
+            <p>再次感謝您的參與，<br>願您的音樂被世界聽見。</p>
+            <p><strong>Ayers Guitars 敬上</strong><br><em>Crafted by Masters with Heart and Soul.</em></p>
+
+            <hr class="lang-divider">
+
+            <!-- English -->
+            <p>Dear ${name},</p>
+            <p>Thank you for registering for the <strong>"Soul Guitarist Competition."</strong><br>We have successfully received your application and look forward to your performance!</p>
+            <p>Please take note of the important schedule and information below:</p>
+            <div class="schedule">
+              <p>▸ <strong>Judging Period:</strong> June 8 – June 17</p>
+              <p>▸ <strong>Winner Announcement:</strong> June 29 (21:00)</p>
+            </div>
+            <p>Please ensure your submission video meets all requirements and is uploaded before the deadline.<br>Kindly check within three working days whether your video has been added to the official playlist.</p>
+
+            <hr class="divider">
+
+            <p class="section-title">Participant Exclusive Offer</p>
+            <p>As a token of our appreciation, a special discount coupon is included in this email. Feel free to use it within the valid period.</p>
+
+            <hr class="divider">
+
+            <p>Thank you again for your participation.<br>May your music be heard by the world.</p>
+            <p><strong>Ayers Guitars</strong><br><em>Crafted by Masters with Heart and Soul.</em></p>
+
+          </div>
+          <div class="footer">
+            <p>LINE：<a href="https://lin.ee/sEzBRSW">https://lin.ee/sEzBRSW</a></p>
+            <p>Instagram：<a href="https://www.instagram.com/ayersguitartw/">@ayersguitartw</a></p>
+            <p>Facebook：<a href="https://www.facebook.com/AyersgtUluruuke">AyersgtUluruuke</a></p>
+            <p>Email：<a href="mailto:ayers@ayersguitars.com">ayers@ayersguitars.com</a></p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await this.sendEmailWithAttachments({
+      to,
+      subject: '【靈魂吉他手大賽】報名確認 / Soul Guitarist Competition – Registration Confirmed',
+      html,
+      attachments: [
+        {
+          filename: 'coupon.png',
+          path: couponPath,
+          cid: 'soul-guitar-coupon',
+        },
+      ],
+    });
+  }
+
+  /**
+   * 发送邮件的基础方法
+   */
+  private static async sendEmail({
+    to,
+    subject,
+    html,
+    text,
+  }: {
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+  }): Promise<void> {
+    return this.sendEmailWithAttachments({ to, subject, html, text });
+  }
+
+  private static async sendEmailWithAttachments({
+    to,
+    subject,
+    html,
+    text,
+    attachments,
+  }: {
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+    attachments?: Array<{ filename: string; path: string; cid: string }>;
+  }): Promise<void> {
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GMAIL_REFRESH_TOKEN) {
+      console.warn('Gmail OAuth2 credentials not configured. Email not sent.');
+      return;
+    }
+
+    try {
+      const transporter = createTransporter();
+      await transporter.sendMail({
+        from: `"Ayers Guitars" <${this.fromEmail}>`,
+        to,
+        subject,
+        html,
+        text: text || subject,
+        attachments,
+      });
+      console.log(`Email sent successfully to ${to}`);
+    } catch (error) {
+      console.error('Send email error:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+}

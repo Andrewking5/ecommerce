@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
+import { EmailService } from '../services/emailService';
 
 export class RegistrationController {
   // ─── Public ───
@@ -79,6 +80,11 @@ export class RegistrationController {
       });
 
       res.status(201).json({ success: true, data: { id: registration.id } });
+
+      // 非同步寄信，不阻塞 response
+      EmailService.sendSoulGuitarRegistration(registration.email, registration.name).catch((err) =>
+        console.error('Failed to send registration email:', err)
+      );
     } catch (error) {
       console.error('Failed to submit registration:', error);
       res.status(500).json({ success: false, error: 'Server error' });
