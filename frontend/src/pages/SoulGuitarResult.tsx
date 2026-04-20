@@ -138,6 +138,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/fire/char.webp${CACHE_V}`,
     themeColor: '#E04040',
     themeBg: 'linear-gradient(135deg, #FFE0D0 0%, #F08060 50%, #E04040 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   FIRE_故事: {
@@ -156,6 +157,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/fireworks/char.webp${CACHE_V}`,
     themeColor: '#D05030',
     themeBg: 'linear-gradient(135deg, #FFE8D8 0%, #E88060 50%, #D05030 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   SUN_自由: {
@@ -193,6 +195,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/glow/char.webp${CACHE_V}`,
     themeColor: '#F0B860',
     themeBg: 'linear-gradient(135deg, #FFF8E8 0%, #FFE8B0 50%, #F0B860 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   WAVE_自由: {
@@ -211,6 +214,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/wave/char.webp${CACHE_V}`,
     themeColor: '#4A9EC5',
     themeBg: 'linear-gradient(135deg, #E0F2FE 0%, #7EC8E3 50%, #4A9EC5 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   WAVE_故事: {
@@ -229,6 +233,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/deep-sea/char.webp${CACHE_V}`,
     themeColor: '#2E6B8A',
     themeBg: 'linear-gradient(135deg, #C8E0EC 0%, #5A9AB5 50%, #2E6B8A 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   MOON_故事: {
@@ -247,6 +252,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/moon/char.webp${CACHE_V}`,
     themeColor: '#6B6B9E',
     themeBg: 'linear-gradient(135deg, #E8E8F0 0%, #A0A0C8 50%, #6B6B9E 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
   MOON_自由: {
@@ -265,6 +271,7 @@ const RESULTS: Record<string, ResultInfo> = {
     charImg: `${BASE}/result/dream-moon/char.webp${CACHE_V}`,
     themeColor: '#7B6BA0',
     themeBg: 'linear-gradient(135deg, #EDE8F5 0%, #B0A0D0 50%, #7B6BA0 100%)',
+    bgFile: 'bg.webp',
     stripeFile: '資產 28.png',
   },
 };
