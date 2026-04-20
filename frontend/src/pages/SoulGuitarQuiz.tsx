@@ -361,12 +361,7 @@ function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: b
 
   return (
     <motion.div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#f5f0e8]" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-      {/* CSS spinner — 取代 2.5MB 動態 webp */}
-      <div className="relative w-16 h-16">
-        <div className="absolute inset-0 rounded-full border-4 border-ayers-gold/20" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-ayers-gold animate-spin" />
-        <div className="absolute inset-2 rounded-full border-2 border-transparent border-t-ayers-gold/50 animate-spin [animation-duration:0.8s] [animation-direction:reverse]" />
-      </div>
+      <img src={`${BASE}/loading.webp`} alt="載入中" className="w-40 h-40 object-contain" draggable={false} />
       <motion.p className="mt-6 text-[#2a2a2a]/60 text-sm tracking-widest" style={{ fontFamily: QUIZ_FONT }} animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>正在為你準備測驗⋯</motion.p>
       <motion.p
         className="mt-4 text-[#2a2a2a]/40 text-xs flex items-center gap-1.5"
