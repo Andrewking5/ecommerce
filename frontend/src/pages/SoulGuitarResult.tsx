@@ -361,6 +361,7 @@ function FullResultPage({ resultKey, folder, layout }: {
 }) {
   const RF = `${BASE}/result/${folder}`;
   const result = RESULTS[resultKey];
+  const canPlayWebm = useRef((() => { const v = document.createElement('video'); return v.canPlayType('video/webm; codecs=vp9') !== ''; })());
   const [showContent, setShowContent] = useState(false);
   const [copied, setCopied] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
@@ -554,16 +555,24 @@ function FullResultPage({ resultKey, folder, layout }: {
               animate={{ scale: showContent ? 1 : 0.8, y: showContent ? 0 : 20 }}
               transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              {showContent && (
+              {showContent && (canPlayWebm.current ? (
                 <video
                   autoPlay loop muted playsInline
                   style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
                   className="relative h-auto object-contain"
                 >
                   <source src={`${RF}/char.webm`} type="video/webm" />
-                  <img src={result.charImg} alt={result.name} className="w-full h-auto object-contain" decoding="async" draggable={false} />
                 </video>
-              )}
+              ) : (
+                <img
+                  src={result.charImg}
+                  alt={result.name}
+                  style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
+                  className="relative h-auto object-contain"
+                  decoding="async"
+                  draggable={false}
+                />
+              ))}
               <img
                 src={`${RF}/char-right.webp${CACHE_V}`}
                 alt={result.colorName}
