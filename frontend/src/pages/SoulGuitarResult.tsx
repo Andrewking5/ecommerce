@@ -553,14 +553,14 @@ function FullResultPage({ resultKey, folder, layout }: {
               transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               {showContent && (
-                <img
-                  src={result.charImg}
-                  alt={result.name}
+                <video
+                  autoPlay loop muted playsInline
                   style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
                   className="relative h-auto object-contain"
-                  decoding="async"
-                  draggable={false}
-                />
+                >
+                  <source src={`${RF}/char.webm`} type="video/webm" />
+                  <img src={result.charImg} alt={result.name} className="w-full h-auto object-contain" decoding="async" draggable={false} />
+                </video>
               )}
               <img
                 src={`${RF}/char-right.webp${CACHE_V}`}
