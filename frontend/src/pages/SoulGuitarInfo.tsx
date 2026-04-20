@@ -74,7 +74,7 @@ function Countdown({ target }: { target: string }) {
 const DEFAULT_RULES = [
   { short: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
   { short: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）', full: '並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。' },
-  { short: '影片彈唱前需說明', full: '「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
+  { short: '影片彈唱前需說明', full: '「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同，若不符將失去參賽資格，靈魂與顏色配對請參考下方卡片。），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」' },
   { short: '影片 30~120 秒', full: '影片總時長需為 30 秒至 120 秒。' },
   { short: '直式一鏡到底', full: '錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。' },
   { short: '穿著指定顏色', full: '同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。' },
@@ -230,7 +230,7 @@ export default function SoulGuitarInfo() {
         <h3 className="text-2xl font-bold text-gray-900 mb-4">大賽宗旨</h3>
         <p className="text-lg text-gray-700 font-medium mb-4">拿起手中的吉他，展現你的靈魂性格。</p>
         <p className="text-gray-500 leading-relaxed">
-          在短影音時代，各式吉他彈唱與演奏內容蓬勃發展，音樂創作與推廣不如以往需要高成本與大量人力。<br />
+          在短影音時代，各式吉他彈唱與演奏內容蓬勃發展，音樂創作與推廣不像以往需要高成本與大量人力。<br />
           現今吉他手除了精進琴藝與歌藝，更需要經營網路社群。<br />
           Ayers 特此舉辦本次比賽，號召世界各地琴友在線上相聚，展現最獨特的風格。
         </p>
@@ -579,7 +579,7 @@ export default function SoulGuitarInfo() {
               <span style={{ color: GOLD }}>3.</span> 影片彈唱前需說明（必說）
             </h4>
             <div className="bg-white rounded-lg px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 leading-relaxed border-l-4" style={{ borderColor: GOLD }}>
-              「大家好我是<b>（本名/藝名/團名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂<b>（⚠️需與身上顏色相同）</b>，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
+              「大家好我是<b>（本名/藝名/團名）</b>，今天來參加2026Ayers靈魂吉他手大賽，報名<b>（演奏組/彈唱組）</b>，我的靈魂是<b>（xx）</b>吉他魂<b>（⚠️需與身上顏色相同，若不符將失去參賽資格，靈魂與顏色配對請參考下方卡片。）</b>，<b>（想帶給大家的一句話）</b>。比賽曲目是<b>（創作者）</b>的<b>（歌名）</b>。」
             </div>
           </div>
         </div>
