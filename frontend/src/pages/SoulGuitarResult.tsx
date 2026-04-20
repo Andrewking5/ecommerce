@@ -562,6 +562,7 @@ function FullResultPage({ resultKey, folder, layout }: {
                   alt={result.name}
                   style={{ width: `${C.char.w}%`, transform: `translate(${C.char.x}px, ${C.char.y}px)`, zIndex: C.char.z }}
                   className="relative h-auto object-contain"
+                  decoding="async"
                   draggable={false}
                 />
               )}
@@ -597,49 +598,31 @@ function FullResultPage({ resultKey, folder, layout }: {
               <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
-            {/* 猜猜這是哪 */}
-            <motion.div
-              style={fs('textGuess')}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            {/* 猜猜這是哪 — 純文字標籤，不需要動畫 */}
+            <div style={fs('textGuess')}>
               <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
             {/* 這樣的你，會發出什麼樣的聲音？ */}
-            <motion.div
-              style={fs('textSound')}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <div style={fs('textSound')}>
               <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
             {/* 你可能會喜歡的 Ayers 吉他款式 */}
-            <motion.div
-              style={fs('titleAyers')}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <div style={fs('titleAyers')}>
               <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
-            {/* 兩把吉他 */}
+            {/* 兩把吉他 — 保留動畫，是頁面重點視覺 */}
             <div className="mt-[4.65%] w-full grid grid-cols-2 gap-[3.72%] items-stretch">
               {([1, 2] as const).map(i => (
                 <motion.div
                   key={i}
                   className="flex flex-col items-center justify-between gap-3"
-                  initial={{ opacity: 0, x: i === 1 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div style={fs(`guitar${i}` as AssetKey)}>
                     <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" loading="lazy" draggable={false} />
@@ -658,55 +641,30 @@ function FullResultPage({ resultKey, folder, layout }: {
             </div>
 
             {/* 你聽出來了嗎 */}
-            <motion.div
-              style={fs('textHeard')}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.5 }}
-            >
+            <div style={fs('textHeard')}>
               <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
             {/* 你會愛上的吉他音樂風格 */}
-            <motion.div
-              style={fs('titleMusic')}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
+            <div style={fs('titleMusic')}>
               <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
-            {/* 音樂風格標籤 */}
+            {/* 音樂風格標籤 — 靜態顯示，不需要 slide-in */}
             <div className="flex flex-col gap-[3px]">
               {([1, 2, 3, 4] as const).map(i => (
-                <motion.div
-                  key={i}
-                  style={fs(`tag${i}` as AssetKey)}
-                  initial={{ opacity: 0, x: 40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-30px' }}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                >
+                <div key={i} style={fs(`tag${i}` as AssetKey)}>
                   <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" loading="lazy" draggable={false} />
-                </motion.div>
+                </div>
               ))}
             </div>
 
             {/* 比賽資訊文字 */}
-            <motion.div
-              style={fs('textContest')}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
+            <div style={fs('textContest')}>
               <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" loading="lazy" draggable={false} />
-            </motion.div>
+            </div>
 
-            {/* 比賽海報 */}
+            {/* 比賽海報 — 保留動畫 */}
             <motion.div
               className="overflow-hidden rounded-xl"
               style={fs('poster')}
@@ -1165,19 +1123,14 @@ export default function SoulGuitarResult() {
     });
 
     const RF = `${BASE}/result/${folder}`;
-    const filesToPreload = [
-      ...(RESULTS[resultKey].bgFile && !isNewDesign ? ['bg.webp'] : []),
-      'hero-card.webp',
-      'char.webp',
-    ];
-    const assets = filesToPreload.map(f => {
-      const img = new Image();
-      img.src = `${RF}/${f}${CACHE_V}`;
-      // img.decode() waits for both network download AND GPU decode,
-      // preventing jank on first paint caused by late image decoding.
-      return (img.decode ? img.decode() : new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); })).catch(() => {});
-    });
-    Promise.all(assets).then(() => setIsLoading(false));
+    // Critical path: only hero-card.webp (~300KB, above-fold).
+    // bg.webp streams naturally from CSS background-image.
+    // char.webp is animated WebP up to 63MB — blocking on it would freeze the
+    // loading screen for seconds; let it stream in after content appears.
+    const heroImg = new Image();
+    heroImg.src = `${RF}/hero-card.webp${CACHE_V}`;
+    const heroReady = (heroImg.decode ? heroImg.decode() : new Promise<void>(res => { heroImg.onload = () => res(); heroImg.onerror = () => res(); })).catch(() => {});
+    heroReady.then(() => setIsLoading(false));
   }, [folder, resultKey, slug]);
 
   const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {
