@@ -156,7 +156,7 @@ export class UserController {
 
       const skip = (Number(page) - 1) * Number(limit);
 
-      const where: any = {};
+      const where: any = { isActive: true };
       if (role) {
         where.role = role;
       }
