@@ -48,6 +48,13 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return;
   }
 
+  // Skip CSRF for public quiz endpoints — cross-origin cookies unreliable on mobile/Safari,
+  // and these endpoints have no user session or financial data (just analytics + email collection)
+  if (req.path === '/quiz/results' || req.path === '/quiz/share-email') {
+    next();
+    return;
+  }
+
   // Validate CSRF token
   const headerToken = req.headers[CSRF_HEADER] as string;
   const cookieToken = req.cookies?.[CSRF_COOKIE];
