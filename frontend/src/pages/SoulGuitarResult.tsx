@@ -94,8 +94,8 @@ const GUITAR_LINKS: Record<string, [string, string]> = {
   SUN_故事: ['https://ayersguitars.com/products/10.html', 'https://ayersguitars.com/products/3.html'],
   WAVE_自由: ['https://ayersguitars.com/products/11.html', 'https://www.instagram.com/reel/DUsIVEIDuOS/?igsh=aW11cGN3OTR5Nmlo'],
   WAVE_故事: ['https://ayersguitars.com/products/12.html', 'https://ayersguitars.com/products/1.html'],
-  MOON_自由: ['https://ayersguitars.com/products/58.html', 'https://ayersguitars.com/products/61.html'],
-  MOON_故事: ['https://ayersguitars.com/products/20.html', 'https://ayersguitars.com/products/21.html'],
+  MOON_自由: ['https://ayersguitars.com/products/20.html', 'https://ayersguitars.com/products/21.html'],
+  MOON_故事: ['https://ayersguitars.com/products/58.html', 'https://ayersguitars.com/products/61.html'],
   FIRE_自由: ['https://ayersguitars.com/products/36.html', 'https://ayersguitars.com/products/32.html'],
   FIRE_故事: ['https://ayersguitars.com/products/33.html', 'https://ayersguitars.com/products/35.html'],
 };
@@ -1064,7 +1064,7 @@ function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
 }
 
 /* ── 統一載入畫面（與測驗頁同款） ── */
-function ResultLoadingScreen() {
+function ResultLoadingScreen({ progress }: { progress: number }) {
   return (
     <motion.div
       className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-[#f5f0e8]"
@@ -1080,6 +1080,19 @@ function ResultLoadingScreen() {
       >
         正在為你準備結果⋯
       </motion.p>
+
+      {/* 進度條 */}
+      <div className="mt-5 w-36 h-[3px] rounded-full bg-[#2a2a2a]/10 overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: 'linear-gradient(90deg, #c5a059, #6ba3b5)', willChange: 'width' }}
+          animate={{ width: `${progress}%` }}
+          transition={{ ease: 'easeOut', duration: 0.3 }}
+        />
+      </div>
+      <p className="mt-2 text-[#2a2a2a]/30 text-[11px]" style={{ fontFamily: QUIZ_FONT }}>
+        {progress < 100 ? `${progress}%` : '即將完成…'}
+      </p>
     </motion.div>
   );
 }
@@ -1092,6 +1105,7 @@ export default function SoulGuitarResult() {
   const slug = pathname.replace('/e/soul-guitar/', '').replace(/\/$/, '');
   const resultKey = SLUG_TO_KEY[slug];
   const [isLoading, setIsLoading] = useState(true);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [layout, setLayout] = useState<LayoutConfig>(DEFAULT_LAYOUT);
   const searchParams = new URLSearchParams(search);
   const [isEditMode] = useState(() => searchParams.has('edit'));
@@ -1123,14 +1137,20 @@ export default function SoulGuitarResult() {
     });
 
     const RF = `${BASE}/result/${folder}`;
-    // Critical path: only hero-card.webp (~300KB, above-fold).
-    // bg.webp streams naturally from CSS background-image.
-    // char.webp is animated WebP up to 63MB — blocking on it would freeze the
-    // loading screen for seconds; let it stream in after content appears.
-    const heroImg = new Image();
-    heroImg.src = `${RF}/hero-card.webp${CACHE_V}`;
-    const heroReady = (heroImg.decode ? heroImg.decode() : new Promise<void>(res => { heroImg.onload = () => res(); heroImg.onerror = () => res(); })).catch(() => {});
-    heroReady.then(() => setIsLoading(false));
+    // Preload all above-fold assets before dismissing the loading screen.
+    // Progress is tracked individually so the user sees meaningful feedback.
+    // NOTE: char.webp can be up to 63MB (animated WebP). Once converted to
+    // mp4/webm by the designer the total payload drops ~90% and this is fast.
+    const filesToPreload = ['hero-card.webp', 'bg.webp', 'char.webp'];
+    let loaded = 0;
+    const assets = filesToPreload.map(f => {
+      const img = new Image();
+      img.src = `${RF}/${f}${CACHE_V}`;
+      return (img.decode ? img.decode() : new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); }))
+        .catch(() => {})
+        .then(() => { loaded++; setLoadProgress(Math.round((loaded / filesToPreload.length) * 100)); });
+    });
+    Promise.allSettled(assets).then(() => setIsLoading(false));
   }, [folder, resultKey, slug]);
 
   const handleLayoutChange = useCallback((patch: Partial<LayoutConfig>) => {
@@ -1167,7 +1187,7 @@ export default function SoulGuitarResult() {
     >
       {resultKey === 'SUN_自由' && isNewDesign && <SunGrainOverlay />}
       <AnimatePresence>
-        {isLoading && <ResultLoadingScreen key="result-loading" />}
+        {isLoading && <ResultLoadingScreen key="result-loading" progress={loadProgress} />}
       </AnimatePresence>
 
       <div className="relative z-10 w-full max-w-[285px] md:max-w-[50vw]">
