@@ -569,23 +569,7 @@ export default function SoulGuitarQuiz() {
           className="absolute inset-0 scale-105 blur-md brightness-[0.35]"
           style={{ willChange: 'transform' }}
         >
-          {/* 靜態底層：防止換題瞬間閃黑 */}
           <img src={question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-          {/* crossfade 層：與主內容 fade 同步 */}
-          <AnimatePresence>
-            <motion.img
-              key={currentQ}
-              src={question.bg}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ willChange: 'opacity' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              draggable={false}
-            />
-          </AnimatePresence>
         </div>
       )}
 
@@ -607,14 +591,13 @@ export default function SoulGuitarQuiz() {
 
         {phase === 'quiz' && (
           <>
-            {/* 底層背景 — 防止切換時露出黑底 */}
+            {/* 底層背景 — 永遠可見，防止任何切換閃黑 */}
             <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-            <AnimatePresence>
-              <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0">
-                <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-                <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
-              </motion.div>
-            </AnimatePresence>
+            {/* 新題只 fade-in，不需要 exit：圖片已預載，舊題直接移除，base img 擋住底層 */}
+            <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }} className="absolute inset-0">
+              <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+              <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
+            </motion.div>
           </>
         )}
       </div>
