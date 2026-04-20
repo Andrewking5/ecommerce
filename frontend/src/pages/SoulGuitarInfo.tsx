@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { X, ZoomIn, Star } from 'lucide-react';
 import SEO from '../components/SEO';
 import eventService from '../services/eventService';
+import { useEventGate } from '../hooks/useEventGate';
 
 /* ═══════════════════════════════════════════════════
    2026 Ayers 靈魂吉他手大賽 — 活動簡章
@@ -92,6 +93,7 @@ const DEFAULT_SPONSORS: Record<string, string> = {
 };
 
 export default function SoulGuitarInfo() {
+  const { checking, blocked } = useEventGate('soul-guitar/info');
   const [posterOpen, setPosterOpen] = useState(false);
   const [rules, setRules] = useState(DEFAULT_RULES);
   const [eventId, setEventId] = useState<string | null>(null);
@@ -104,6 +106,7 @@ export default function SoulGuitarInfo() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
+    if (blocked) return;
     eventService.getEventBySlug('soul-guitar/info').then((event) => {
       if (!event) return;
       setEventId(event.id);
@@ -113,7 +116,10 @@ export default function SoulGuitarInfo() {
       const apiSponsors = event?.metadata?.sponsors;
       if (apiSponsors) setSponsors(prev => ({ ...prev, ...apiSponsors }));
     }).catch(() => {});
-  }, []);
+  }, [blocked]);
+
+  if (checking) return null;
+  if (blocked) return null;
 
   async function saveSponsors() {
     if (!eventId) return;
