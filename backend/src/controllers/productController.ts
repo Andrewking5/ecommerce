@@ -5,6 +5,7 @@ import { CacheService, CACHE_KEYS } from '../services/cacheService';
 import { asyncHandler, sendErrorResponse, handlePrismaError } from '../utils/errorHandler';
 import { normalizeImages, normalizeStock, resolveCategoryId, checkProductNameExists } from '../utils/productHelpers';
 import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export class ProductController {
   // 獲取商品列表
@@ -162,7 +163,9 @@ export class ProductController {
       ]);
 
       // 建立查詢結果的快速索引
-      const ratingMap = new Map(reviewAggregates.map((r: any) => [r.productId, { avg: r._avg.rating || 0, count: r._count.rating }]));
+      const ratingMap = new Map<string, { avg: number; count: number }>(
+        reviewAggregates.map((r: any): [string, { avg: number; count: number }] => [r.productId, { avg: r._avg?.rating ?? 0, count: r._count?.rating ?? 0 }])
+      );
       const variantStockMap = new Map(variantStocks.map((v: any) => [v.productId, v._sum.stock || 0]));
 
       const productsWithRating = products.map((product: any) => {
@@ -200,7 +203,7 @@ export class ProductController {
       return;
     } catch (error: any) {
       // 处理 Prisma 错误
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error instanceof PrismaClientKnownRequestError) {
         const appError = handlePrismaError(error);
         sendErrorResponse(res, appError, req);
         return;
@@ -314,7 +317,7 @@ export class ProductController {
       });
       
       // 处理 Prisma 错误
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error instanceof PrismaClientKnownRequestError) {
         const appError = handlePrismaError(error);
         sendErrorResponse(res, appError, req);
         return;
@@ -424,7 +427,7 @@ export class ProductController {
       // 2. If not enough, fill with popular products (most ordered)
       if (sameCategory.length < limit) {
         const remaining = limit - sameCategory.length;
-        const excludeIds = [id, ...sameCategory.map((p) => p.id)];
+        const excludeIds = [id, ...sameCategory.map((p: { id: string }) => p.id)];
 
         const popular = await prisma.product.findMany({
           where: {
@@ -553,7 +556,7 @@ export class ProductController {
       });
       
       // 处理 Prisma 唯一约束错误
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           // 唯一约束违反（通常是商品名称）
           // 确保错误信息是中文，不使用国际化key
@@ -719,7 +722,7 @@ export class ProductController {
           console.error(`Failed to create product at index ${i + 1}:`, error);
           
           // 处理 Prisma 唯一约束错误
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error instanceof PrismaClientKnownRequestError) {
             if (error.code === 'P2002') {
               // 唯一约束违反（通常是商品名称）
               const field = (error.meta as any)?.target?.[0] || 'field';

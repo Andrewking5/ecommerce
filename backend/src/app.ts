@@ -130,6 +130,7 @@ app.use(cors({
     const isLocalNetwork = process.env.NODE_ENV !== 'production' && /^https?:\/\/(192\.168\.|172\.(1[6-9]|2\d|3[01])\.|10\.|127\.)/.test(origin);
 
     if (isAllowed || isLocalNetwork) {
+      // 傳入具體 origin 而非 true，確保 credentials: true 時 Access-Control-Allow-Origin 不會被設為 *
       callback(null, true);
     } else {
       console.warn('⚠️ CORS blocked:', origin);
@@ -138,7 +139,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token', 'X-Quiz-Key'],
   exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
 }));
 

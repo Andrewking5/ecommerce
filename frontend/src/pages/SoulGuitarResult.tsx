@@ -625,7 +625,7 @@ function FullResultPage({ resultKey, folder, layout }: {
 
             {/* 兩把吉他 */}
             <div className="mt-[4.65%] w-full grid grid-cols-2 gap-[3.72%] items-stretch">
-              {[1, 2].map(i => (
+              {([1, 2] as const).map(i => (
                 <motion.div
                   key={i}
                   className="flex flex-col items-center justify-between gap-3"
@@ -634,14 +634,14 @@ function FullResultPage({ resultKey, folder, layout }: {
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="w-full">
+                  <div style={fs(`guitar${i}` as AssetKey)}>
                     <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
                   </div>
                   <motion.a
                     href={guitarLinks[i - 1]}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-[90%]"
+                    style={fs(`btnUnlock${i}` as AssetKey)}
                     whileTap={{ scale: 0.93 }}
                   >
                     <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
@@ -673,10 +673,11 @@ function FullResultPage({ resultKey, folder, layout }: {
             </motion.div>
 
             {/* 音樂風格標籤 */}
-            <div className="flex flex-col gap-[3px]" style={fs('tags')}>
-              {[1, 2, 3, 4].map(i => (
+            <div className="flex flex-col gap-[3px]">
+              {([1, 2, 3, 4] as const).map(i => (
                 <motion.div
                   key={i}
+                  style={fs(`tag${i}` as AssetKey)}
                   initial={{ opacity: 0, x: 40 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: '-30px' }}
@@ -732,7 +733,8 @@ function FullResultPage({ resultKey, folder, layout }: {
                 <motion.button
                   type="button"
                   onClick={handleShare}
-                  className="flex-1 relative"
+                  style={fs('btnShare')}
+                  className="relative shrink-0"
                   whileTap={{ scale: 0.93 }}
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
@@ -757,12 +759,12 @@ function FullResultPage({ resultKey, folder, layout }: {
                     </motion.span>
                   )}
                 </motion.button>
-                <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} className="flex-1" whileTap={{ scale: 0.93 }}>
+                <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} style={fs('btnRetry')} className="shrink-0" whileTap={{ scale: 0.93 }}>
                   <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" draggable={false} />
                 </motion.button>
               </div>
 
-              <Link to="/e/soul-guitar/info" className="w-full mt-[3.72%] active:scale-95 transition-transform">
+              <Link to="/e/soul-guitar/info" style={fs('btnContest')} className="active:scale-95 transition-transform">
                 <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
               </Link>
             </motion.div>
@@ -876,12 +878,22 @@ const ASSET_META: {
     { key: 'textGuess', label: '猜猜這是哪', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
     { key: 'textSound', label: '發出什麼聲音', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
     { key: 'titleAyers', label: 'Ayers 吉他標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'guitar1', label: '吉他圖 1', wMin: 0, wMax: 150, mtMin: -100, mtMax: 200, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+    { key: 'guitar2', label: '吉他圖 2', wMin: 0, wMax: 150, mtMin: -100, mtMax: 200, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+    { key: 'btnUnlock1', label: '解鎖按鈕 1', wMin: 0, wMax: 150, mtMin: -50, mtMax: 100, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+    { key: 'btnUnlock2', label: '解鎖按鈕 2', wMin: 0, wMax: 150, mtMin: -50, mtMax: 100, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
     { key: 'textHeard', label: '你聽出來了嗎', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
     { key: 'titleMusic', label: '音樂風格標題', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
-    { key: 'tags', label: '音樂風格標籤', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'tag1', label: '標籤 1', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -100, yMax: 100 },
+    { key: 'tag2', label: '標籤 2', wMin: 0, wMax: 200, mtMin: -50, mtMax: 100, xMin: -300, xMax: 300, yMin: -100, yMax: 100 },
+    { key: 'tag3', label: '標籤 3', wMin: 0, wMax: 200, mtMin: -50, mtMax: 100, xMin: -300, xMax: 300, yMin: -100, yMax: 100 },
+    { key: 'tag4', label: '標籤 4', wMin: 0, wMax: 200, mtMin: -50, mtMax: 100, xMin: -300, xMax: 300, yMin: -100, yMax: 100 },
     { key: 'textContest', label: '比賽資訊文字', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
     { key: 'poster', label: '比賽海報', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
     { key: 'charType', label: '角色型標籤', wMin: 0, wMax: 200, mtMin: -300, mtMax: 600, xMin: -300, xMax: 300, yMin: -300, yMax: 300 },
+    { key: 'btnShare', label: '分享按鈕', wMin: 0, wMax: 100, mtMin: -50, mtMax: 100, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+    { key: 'btnRetry', label: '再測一次', wMin: 0, wMax: 100, mtMin: -50, mtMax: 100, xMin: -100, xMax: 100, yMin: -100, yMax: 100 },
+    { key: 'btnContest', label: '前往比賽', wMin: 0, wMax: 200, mtMin: -100, mtMax: 200, xMin: -200, xMax: 200, yMin: -100, yMax: 100 },
   ];
 
 function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
@@ -1077,7 +1089,17 @@ export default function SoulGuitarResult() {
     quizService.trackResult(slug, resultKey);
 
     // Load saved layout from DB; fall back to DEFAULT_LAYOUT if none exists
-    quizService.getLayout(slug).then(cfg => { if (cfg) setLayout(cfg); });
+    quizService.getLayout(slug).then(cfg => {
+      if (cfg) {
+        const merged = { ...DEFAULT_LAYOUT };
+        for (const key of Object.keys(DEFAULT_LAYOUT) as AssetKey[]) {
+          if (cfg[key] != null && typeof cfg[key] === 'object') {
+            merged[key] = { ...DEFAULT_LAYOUT[key], ...cfg[key] };
+          }
+        }
+        setLayout(merged);
+      }
+    });
 
     const RF = `${BASE}/result/${folder}`;
     const filesToPreload = [

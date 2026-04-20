@@ -15,8 +15,11 @@ export type AssetKey =
   | 'char' | 'charRight'
   | 'personalityCard' | 'cityCard' | 'textGuess'
   | 'textSound' | 'titleAyers'
-  | 'textHeard' | 'titleMusic' | 'tags'
-  | 'textContest' | 'poster' | 'charType';
+  | 'guitar1' | 'guitar2' | 'btnUnlock1' | 'btnUnlock2'
+  | 'textHeard' | 'titleMusic'
+  | 'tag1' | 'tag2' | 'tag3' | 'tag4'
+  | 'textContest' | 'poster' | 'charType'
+  | 'btnShare' | 'btnRetry' | 'btnContest';
 
 export type LayoutConfig = Record<AssetKey, AssetConfig>;
 
@@ -35,12 +38,22 @@ export const DEFAULT_LAYOUT: LayoutConfig = {
   textGuess:       a(50,  20),           // mt-5
   textSound:       a(85,  40),           // mt-10
   titleAyers:      a(80,  40),           // mt-10
+  guitar1:         a(100,  0),           // 吉他圖1（grid cell 內 full width）
+  guitar2:         a(100,  0),           // 吉他圖2
+  btnUnlock1:      a(90,   8),           // 解鎖按鈕1
+  btnUnlock2:      a(90,   8),           // 解鎖按鈕2
   textHeard:       a(85,  32),           // mt-8
   titleMusic:      a(75,  32),           // mt-8
-  tags:            a(100, 16),           // mt-4
+  tag1:            a(100, 16),           // 標籤1（含 titleMusic→tags 間距）
+  tag2:            a(100,  0),
+  tag3:            a(100,  0),
+  tag4:            a(100,  0),
   textContest:     a(85,  12),           // mt-3
   poster:          a(85,  24),           // mt-6
   charType:        a(65,   0),           // 在 flex 容器內，mt 由容器控制
+  btnShare:        a(49,   0),           // 分享按鈕（flex row 內約 49%）
+  btnRetry:        a(49,   0),           // 再測一次
+  btnContest:      a(100, 16),           // 前往比賽（mt-4 from gap）
 };
 
 export interface QuizAnalytics {

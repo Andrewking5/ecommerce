@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export interface ApiError extends Error {
   statusCode?: number;
@@ -154,7 +155,7 @@ export function sendErrorResponse(
     appError = error;
   }
   // 如果是 Prisma 错误，转换
-  else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  else if (error instanceof PrismaClientKnownRequestError) {
     appError = handlePrismaError(error);
   }
   // 如果是 JWT 错误，转换
