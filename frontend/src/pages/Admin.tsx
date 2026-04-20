@@ -3429,7 +3429,7 @@ function QuizFullPage({ data, onBack, onRefresh }: {
     quizService.listShareEmails().then(({ total, data }) => {
       setShareEmailsTotal(total);
       setShareEmails(data);
-    }).catch(() => {/* silent */}).finally(() => setShareEmailsLoading(false));
+    }).catch((e) => console.error('[quiz share emails]', e)).finally(() => setShareEmailsLoading(false));
   }, []);
 
   const handleClear = async () => {

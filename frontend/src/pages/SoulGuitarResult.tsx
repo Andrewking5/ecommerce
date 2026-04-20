@@ -454,11 +454,12 @@ function FullResultPage({ resultKey, folder, layout }: {
     setEmailError('');
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-      await fetch(`${apiUrl}/quiz/share-email`, {
+      const res = await fetch(`${apiUrl}/quiz/share-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailVal, slug: folder, resultKey }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       localStorage.setItem('soulGuitar_shareEmail', '1');
       setEmailDone(true);
     } catch {
