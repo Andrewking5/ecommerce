@@ -582,7 +582,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-              <img src={`${RF}/personality-card.webp${CACHE_V}`} alt="你的個人特質" className="w-full h-auto rounded-xl" draggable={false} />
+              <img src={`${RF}/personality-card.webp${CACHE_V}`} alt="你的個人特質" className="w-full h-auto rounded-xl" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 城市卡 */}
@@ -594,7 +594,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-              <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/city-card.webp${CACHE_V}`} alt={result.city} className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 猜猜這是哪 */}
@@ -605,7 +605,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/text-guess.webp${CACHE_V}`} alt="猜猜這是哪" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 這樣的你，會發出什麼樣的聲音？ */}
@@ -616,7 +616,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/text-sound.webp${CACHE_V}`} alt="這樣的你，會發出什麼樣的聲音" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 你可能會喜歡的 Ayers 吉他款式 */}
@@ -627,7 +627,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/title-ayers.webp${CACHE_V}`} alt="你可能會喜歡的Ayers吉他款式" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 兩把吉他 */}
@@ -642,7 +642,7 @@ function FullResultPage({ resultKey, folder, layout }: {
                   transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div style={fs(`guitar${i}` as AssetKey)}>
-                    <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" draggable={false} />
+                    <img src={`${RF}/guitar-${i}.webp${CACHE_V}`} alt="Ayers 吉他" className="w-full h-auto object-contain" loading="lazy" draggable={false} />
                   </div>
                   <motion.a
                     href={guitarLinks[i - 1]}
@@ -651,7 +651,7 @@ function FullResultPage({ resultKey, folder, layout }: {
                     style={fs(`btnUnlock${i}` as AssetKey)}
                     whileTap={{ scale: 0.93 }}
                   >
-                    <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" draggable={false} />
+                    <img src={`${RF}/btn-unlock-${i}.webp${CACHE_V}`} alt="解鎖它的音色" className="w-full h-auto" loading="lazy" draggable={false} />
                   </motion.a>
                 </motion.div>
               ))}
@@ -665,7 +665,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.5 }}
             >
-              <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/text-heard.webp${CACHE_V}`} alt="你聽出來了嗎" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 你會愛上的吉他音樂風格 */}
@@ -676,7 +676,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/title-music-style.webp${CACHE_V}`} alt="你會愛上的吉他音樂風格" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 音樂風格標籤 */}
@@ -690,7 +690,7 @@ function FullResultPage({ resultKey, folder, layout }: {
                   viewport={{ once: true, margin: '-30px' }}
                   transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" draggable={false} />
+                  <img src={`${RF}/tag-${i}.webp${CACHE_V}`} alt="" className="w-full h-auto" loading="lazy" draggable={false} />
                 </motion.div>
               ))}
             </div>
@@ -703,7 +703,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.15 }}
             >
-              <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" draggable={false} />
+              <img src={`${RF}/text-contest-info.webp${CACHE_V}`} alt="比賽資訊" className="w-full h-auto" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 比賽海報 */}
@@ -715,7 +715,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <img src={`${RF}/poster.webp${CACHE_V}`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" draggable={false} />
+              <img src={`${RF}/poster.webp${CACHE_V}`} alt="靈魂吉他手大賽海報" className="w-full h-auto rounded-xl" loading="lazy" draggable={false} />
             </motion.div>
 
             {/* 底部按鈕 */}
@@ -729,7 +729,7 @@ function FullResultPage({ resultKey, folder, layout }: {
               <motion.img
                 src={`${RF}/char-type.webp${CACHE_V}`}
                 alt="分享抽獎說明"
-                style={fs('charType', { display: 'block' })}
+                style={fs('charType', { display: 'block', willChange: 'transform' })}
                 className="h-auto self-start"
                 draggable={false}
                 animate={{ y: [0, -6, 0] }}
@@ -743,17 +743,15 @@ function FullResultPage({ resultKey, folder, layout }: {
                   style={fs('btnShare')}
                   className="relative shrink-0"
                   whileTap={{ scale: 0.93 }}
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  {/* 外層光暈 — 較大範圍閃爍 */}
+                  {/* 外層光暈 — opacity only，GPU compositor 直接處理，不佔 main thread */}
                   <motion.div
                     className="absolute -inset-3 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.45) 0%, transparent 65%)' }}
-                    animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.9, 1.1, 0.9] }}
-                    transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ background: 'radial-gradient(ellipse at center, rgba(218,165,50,0.45) 0%, transparent 65%)', willChange: 'opacity' }}
+                    animate={{ opacity: [0.25, 0.85, 0.25] }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                   />
-                  <img src={`${RF}/btn-share.webp${CACHE_V}`} alt="分享你的測驗結果" className="relative w-full h-auto" draggable={false} />
+                  <img src={`${RF}/btn-share.webp${CACHE_V}`} alt="分享你的測驗結果" className="relative w-full h-auto" loading="lazy" draggable={false} />
                   {copied && (
                     <motion.span
                       className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full whitespace-nowrap"
@@ -767,12 +765,12 @@ function FullResultPage({ resultKey, folder, layout }: {
                   )}
                 </motion.button>
                 <motion.button type="button" onClick={() => navigate('/e/soul-guitar')} style={fs('btnRetry')} className="shrink-0" whileTap={{ scale: 0.93 }}>
-                  <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" draggable={false} />
+                  <img src={`${RF}/btn-retry.webp${CACHE_V}`} alt="再測一次" className="w-full h-auto" loading="lazy" draggable={false} />
                 </motion.button>
               </div>
 
               <Link to="/e/soul-guitar/info" style={fs('btnContest')} className="active:scale-95 transition-transform">
-                <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" draggable={false} />
+                <img src={`${RF}/btn-contest.webp${CACHE_V}`} alt="前往了解靈魂吉他手大賽" className="w-full h-auto" loading="lazy" draggable={false} />
               </Link>
             </motion.div>
 
@@ -1172,9 +1170,13 @@ export default function SoulGuitarResult() {
       'hero-card.webp',
       'char.webp',
     ];
-    const assets = filesToPreload.map(
-      f => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${RF}/${f}${CACHE_V}`; }),
-    );
+    const assets = filesToPreload.map(f => {
+      const img = new Image();
+      img.src = `${RF}/${f}${CACHE_V}`;
+      // img.decode() waits for both network download AND GPU decode,
+      // preventing jank on first paint caused by late image decoding.
+      return (img.decode ? img.decode() : new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); })).catch(() => {});
+    });
     Promise.all(assets).then(() => setIsLoading(false));
   }, [folder, resultKey, slug]);
 

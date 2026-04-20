@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -222,7 +222,7 @@ function useIdleLine(currentQ: number) {
 }
 
 /* ── 按鈕 ── */
-function QuizOption({ label, onClick, delay, active }: { label: string; onClick: () => void; delay: number; active: boolean }) {
+const QuizOption = memo(function QuizOption({ label, onClick, delay, active }: { label: string; onClick: () => void; delay: number; active: boolean }) {
   return (
     <motion.button type="button" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay }} whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
       <img src={`${BASE}/btn-default.png`} alt="" className={`w-full h-auto transition-opacity duration-200 ${active ? 'opacity-0' : 'group-hover:opacity-0'}`} draggable={false} />
@@ -230,10 +230,11 @@ function QuizOption({ label, onClick, delay, active }: { label: string; onClick:
       <span className={`absolute inset-0 flex items-center justify-center text-[0.9rem] md:text-[1.1rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`} style={{ fontFamily: QUIZ_FONT }}>{label}</span>
     </motion.button>
   );
-}
+});
 
 /* ── 進度條（含角色氣泡） ── */
-function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idleLine: string | null; bubbleAbove?: boolean }) {
+const ProgressBar = memo(function ProgressBar({ current, bubbleAbove }: { current: number; bubbleAbove?: boolean }) {
+  const idleLine = useIdleLine(current);
   const progress = (current / (CHARACTER_NAMES.length - 1)) * 100;
   const isTalking = idleLine !== null;
 
@@ -295,11 +296,11 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
             <div key={i} className="relative z-10 flex flex-col items-center">
               {/* 角色圖示 */}
               <motion.div
-                className="relative"
+                className={`relative ${isFuture ? 'grayscale' : ''}`}
+                style={{ willChange: 'transform' }}
                 animate={{
                   scale: isCurrent ? 1.3 : 1,
                   opacity: isFuture ? 0.25 : 1,
-                  filter: isFuture ? 'grayscale(100%)' : 'grayscale(0%)',
                   ...(isCurrent && isTalking ? { rotate: [0, -8, 8, -5, 5, 0] } : { rotate: 0 }),
                 }}
                 transition={isCurrent && isTalking
@@ -316,7 +317,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 {isCurrent && (
                   <motion.div
                     className="absolute -inset-1 rounded-full"
-                    style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.3) 0%, transparent 70%)' }}
+                    style={{ background: 'radial-gradient(circle, rgba(197,160,89,0.3) 0%, transparent 70%)', willChange: 'transform, opacity' }}
                     animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.8, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   />
@@ -328,6 +329,7 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
                 alt=""
                 className="w-2.5 h-2.5 md:w-3 md:h-3 mt-1 object-contain"
                 draggable={false}
+                style={{ willChange: isCurrent ? 'transform' : 'auto' }}
                 animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
                 transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0, ease: 'easeInOut' }}
               />
@@ -338,19 +340,22 @@ function ProgressBar({ current, idleLine, bubbleAbove }: { current: number; idle
       </div>
     </div>
   );
-}
+});
 
 /* ── Loading ── */
 function LoadingScreen({ onDone, isDesktop }: { onDone: () => void; isDesktop: boolean }) {
   useEffect(() => {
+    const preload = (src: string) => new Promise<void>(r => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; });
     const min = new Promise((r) => setTimeout(r, 5000));
-    const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(
-      (src) => new Promise<void>((r) => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = src; }),
-    );
-    const btns = ['/btn-default.png', '/btn-selected.png'].map(
-      (f) => new Promise<void>((r) => { const img = new Image(); img.onload = () => r(); img.onerror = () => r(); img.src = `${BASE}${f}`; }),
-    );
-    Promise.all([min, ...imgs, ...btns]).then(onDone);
+    const imgs = questions.flatMap((q) => [q.bg, q.bgWide]).map(preload);
+    const btns = ['/btn-default.png', '/btn-selected.png'].map(f => preload(`${BASE}${f}`));
+    const progress = [
+      ...Array.from({ length: 7 }, (_, i) => `${BASE}/progress/char-${i + 1}.png`),
+      `${BASE}/progress/dot-on.png`,
+      `${BASE}/progress/dot-off.png`,
+      `${BASE}/progress/line.png`,
+    ].map(preload);
+    Promise.all([min, ...imgs, ...btns, ...progress]).then(onDone);
   }, [onDone, isDesktop]);
 
   return (
@@ -408,8 +413,6 @@ function QuestionView({
   question: typeof questions[0]; currentQ: number; isFirstQ: boolean;
   tapped: number | null; onSelect: (i: number) => void; onPrev: () => void;
 }) {
-  const idleLine = useIdleLine(currentQ);
-
   return (
     <div className="relative z-10 flex flex-col h-full">
       {/* 上一題 */}
@@ -423,7 +426,7 @@ function QuestionView({
 
       {/* 手機版：進度條固定在畫面頂部 */}
       <div className="md:hidden absolute top-[148px] left-5 right-5 z-20">
-        <ProgressBar current={currentQ} idleLine={idleLine} bubbleAbove />
+        <ProgressBar current={currentQ} bubbleAbove />
       </div>
 
       {/* 上半留白 */}
@@ -473,7 +476,7 @@ function QuestionView({
 
         {/* 電腦版：進度條在選項下方，氣泡在進度條下方 */}
         <div className="hidden md:block mt-6 pb-12">
-          <ProgressBar current={currentQ} idleLine={idleLine} />
+          <ProgressBar current={currentQ} />
         </div>
       </div>
 
@@ -545,7 +548,6 @@ export default function SoulGuitarQuiz() {
 
   const handlePrev = () => { if (currentQ > 0) setCurrentQ(currentQ - 1); };
 
-  const currentBg = phase === 'quiz' ? (isDesktop ? question.bgWide : question.bg) : `${BASE}/cover-bg.webp`;
 
   if (checking) return null;
 
@@ -558,9 +560,33 @@ export default function SoulGuitarQuiz() {
 
   return (
     <div className="w-full min-h-dvh flex items-center justify-center relative overflow-hidden bg-black">
-      {/* 模糊背景 — IG Story（手機版兩側） */}
-      {!isDesktop && (
-        <div className="absolute inset-0 bg-cover bg-center blur-lg scale-105 brightness-[0.35]" style={{ backgroundImage: `url(${currentBg})` }} />
+      {/* 模糊背景 — IG Story 手機版兩側
+          使用 img crossfade 取代 backgroundImage style 切換，
+          避免每題切換時觸發 CSS paint，改走 opacity compositor。
+          只在 quiz phase 掛載（cover/loading 都有 z-50 全遮，不需要）。 */}
+      {!isDesktop && phase === 'quiz' && (
+        <div
+          className="absolute inset-0 scale-105 blur-md brightness-[0.35]"
+          style={{ willChange: 'transform' }}
+        >
+          {/* 靜態底層：防止換題瞬間閃黑 */}
+          <img src={question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+          {/* crossfade 層：與主內容 fade 同步 */}
+          <AnimatePresence>
+            <motion.img
+              key={currentQ}
+              src={question.bg}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ willChange: 'opacity' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              draggable={false}
+            />
+          </AnimatePresence>
+        </div>
       )}
 
       {/* ===== 容器 ===== */}
@@ -584,7 +610,7 @@ export default function SoulGuitarQuiz() {
             {/* 底層背景 — 防止切換時露出黑底 */}
             <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
             <AnimatePresence>
-              <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0">
+              <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="absolute inset-0" style={{ willChange: 'opacity' }}>
                 <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
                 <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
               </motion.div>

@@ -103,10 +103,15 @@ api.interceptors.response.use(
 
       try {
         // Refresh token sent automatically via HttpOnly cookie (withCredentials: true)
+        // Must include CSRF token — bare axios bypasses the request interceptor
+        if (!csrfToken) await fetchCsrfToken();
         const response = await axios.post(
           `${API_URL}/auth/refresh`,
           {},
-          { withCredentials: true }
+          {
+            withCredentials: true,
+            headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+          }
         );
 
         const { accessToken } = response.data;
