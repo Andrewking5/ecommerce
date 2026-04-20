@@ -22,8 +22,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distDir = path.resolve(__dirname, '../dist');
 
-const DOMAIN = 'https://www.ayersguitars.com';
+const DOMAIN = 'https://ayers.vercel.app';
 const POSTER = `${DOMAIN}/images/events/soul-guitar-poster.webp`;
+const RESULT_IMG = (folder: string) =>
+  `${DOMAIN}/images/events/quiz/result/${folder}/hero-card.webp`;
 
 interface EventMeta {
   /** URL path without leading slash, e.g. "e/soul-guitar/info" */
@@ -51,6 +53,55 @@ const EVENTS: EventMeta[] = [
     title: '2026 Ayers 靈魂吉他手大賽 | 立即報名',
     description: '報名上限 200 位，額滿為止！拿起手中那一把吉他，展現你的靈魂性格。獎項總價值超過 NT$200,000！',
     image: POSTER,
+  },
+  // ── 結果頁（8種）──
+  {
+    urlPath: 'e/soul-guitar/result/fire',
+    title: '我的吉他靈魂是「火焰吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你是一個很有行動力的人，想到什麼就會立刻去做。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('fire'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/fireworks',
+    title: '我的吉他靈魂是「煙火吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你有很多想法，也很容易把感受變成表達。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('fireworks'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/sun',
+    title: '我的吉他靈魂是「太陽吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你給人的感覺自然、輕鬆，很容易讓人放下防備。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('sun'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/glow',
+    title: '我的吉他靈魂是「微光吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你細膩、溫柔，也很懂得理解別人的感受。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('glow'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/wave',
+    title: '我的吉他靈魂是「海浪吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你喜歡空間、變化和自由感，不太喜歡被固定模式困住。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('wave'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/deep-sea',
+    title: '我的吉他靈魂是「深海吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你是一個很有內在世界的人，很會觀察，也很容易注意到細節與情緒。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('deep-sea'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/moon',
+    title: '我的吉他靈魂是「月光吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你是一個很習慣向內思考的人，習慣先觀察、先思考，再慢慢表達自己。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('moon'),
+  },
+  {
+    urlPath: 'e/soul-guitar/result/dream-moon',
+    title: '我的吉他靈魂是「夢月吉他靈魂」！| 2026 Ayers 靈魂吉他手大賽',
+    description: '你感受力很強，也很容易被一段旋律或一個畫面打動。快來測測你的吉他靈魂！',
+    image: RESULT_IMG('dream-moon'),
   },
 ];
 
