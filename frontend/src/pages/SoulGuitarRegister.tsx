@@ -750,19 +750,33 @@ function PhoneInput({
       </div>
 
       {/* Number input */}
-      <input
-        type="tel"
-        inputMode="tel"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="912 345 678"
-        autoComplete="tel-national"
-        className={`flex-1 bg-white/6 border rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 transition-all ${
-          error
-            ? 'border-red-500/60 focus:ring-red-500/30'
-            : 'border-white/10 focus:border-white/30 focus:ring-white/10'
-        }`}
-      />
+      <div className="flex-1 flex flex-col gap-1.5">
+        <input
+          type="tel"
+          inputMode="tel"
+          value={value}
+          onChange={(e) => {
+            let v = e.target.value.trim();
+            if (v.startsWith(countryCode)) v = v.slice(countryCode.length).trimStart();
+            if (v.startsWith('0')) v = v.slice(1);
+            onChange(v);
+          }}
+          placeholder="912 345 678"
+          autoComplete="tel-national"
+          className={`w-full bg-white/6 border rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:ring-2 transition-all ${
+            error
+              ? 'border-red-500/60 focus:ring-red-500/30'
+              : 'border-white/10 focus:border-white/30 focus:ring-white/10'
+          }`}
+        />
+        {value ? (
+          <p className="text-[11px] pl-1 text-white/35 tracking-wide">
+            完整號碼：<span className="text-white/55 font-mono">{countryCode} {value}</span>
+          </p>
+        ) : (
+          <p className="text-[11px] text-white/20 pl-1">不需要加 0，例：912 345 678</p>
+        )}
+      </div>
     </div>
   );
 }
