@@ -137,7 +137,97 @@ export default function SoulGuitarInfo() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      <SEO title="2026 Ayers 靈魂吉他手大賽 | 活動簡章" description="拿起手中那一把吉他，展現你的靈魂性格。獎項總價值超過 NT$200,000！" />
+      <SEO
+        title="2026 Ayers 靈魂吉他手大賽 | 活動簡章"
+        description="拿起手中那一把吉他，展現你的靈魂性格。獎項總價值超過 NT$200,000！報名截止 2026/05/31，立即測出你的吉他靈魂！"
+        ogImage="/images/events/soul-guitar-poster.webp"
+        ogType="event"
+        breadcrumbs={[
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: '活動', url: '/zh-TW/events' },
+          { name: '2026 靈魂吉他手大賽', url: '/zh-TW/soul-guitar' },
+        ]}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Event',
+            name: '2026 Ayers 靈魂吉他手大賽',
+            description: '拿起手中那一把吉他，展現你的靈魂性格。Ayers Guitars 首屆靈魂吉他手大賽，獎項總價值超過 NT$200,000。',
+            startDate: '2026-04-01',
+            endDate: '2026-07-31',
+            eventStatus: 'https://schema.org/EventScheduled',
+            eventAttendanceMode: 'https://schema.org/MixedEventAttendanceMode',
+            image: 'https://www.ayersguitars.com/images/events/soul-guitar-poster.webp',
+            url: 'https://www.ayersguitars.com/zh-TW/soul-guitar',
+            organizer: {
+              '@type': 'Organization',
+              name: 'Ayers Guitars',
+              url: 'https://www.ayersguitars.com',
+            },
+            performer: [
+              { '@type': 'Person', name: '四分衛－虎神', url: 'https://www.instagram.com/quarterback_band/' },
+              { '@type': 'Person', name: 'PiA 吳蓓雅', url: 'https://www.instagram.com/piaxstudio/' },
+              { '@type': 'Person', name: 'JOYCE 就以斯', url: 'https://www.instagram.com/joyce.ch0627/' },
+              { '@type': 'Person', name: '林小歐', url: 'https://www.instagram.com/novsherry' },
+              { '@type': 'Person', name: '張仲麟', url: 'https://www.instagram.com/chang.chung.lin' },
+            ],
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'TWD',
+              availability: 'https://schema.org/InStock',
+              validFrom: '2026-04-01',
+              url: 'https://www.ayersguitars.com/zh-TW/soul-guitar/register',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: '2026 Ayers 靈魂吉他手大賽的獎項是什麼？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '獎項總價值超過 NT$200,000，包含 Ayers 頂級手工吉他及多項音樂相關大獎。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '如何報名 2026 靈魂吉他手大賽？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '先完成靈魂吉他手測驗，測出你的吉他靈魂類型，再至報名頁面填寫資料並上傳演奏影片即可。報名截止日為 2026/05/31。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '靈魂吉他手大賽的評審是誰？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '評審陣容包含四分衛樂團吉他手虎神、創作歌手 PiA 吳蓓雅、創作歌手 JOYCE 就以斯、職業樂手林小歐，以及指彈吉他演奏家張仲麟。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '什麼是 Ayers 吉他靈魂測驗？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers 靈魂吉他測驗透過幾個簡單問題，分析你的音樂個性，配對出最符合你的吉他靈魂類型，共有火焰、煙火、太陽、微光、海浪、深海、月光、夢月等八種靈魂類型。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他是哪裡製造的？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers Guitars 自 1996 年起在越南設廠，由台灣品牌主導設計，結合國際製琴師顧問團隊，手工打造每一把吉他。',
+                },
+              },
+            ],
+          },
+        ]}
+      />
 
       {/* Lightbox */}
       <AnimatePresence>
@@ -448,15 +538,15 @@ export default function SoulGuitarInfo() {
                     </div>
                   </div>
                   <div className="space-y-2 mb-5">
-                    <p className="text-sm text-white/60">AYERS {a.type}</p>
-                    <p className="text-xs text-white/30">{a.guitar}</p>
+                    <p className="text-sm text-orange-400">AYERS {a.type}</p>
+                    <p className="text-xs text-orange-400/60">{a.guitar}</p>
                   </div>
                   <div className="flex flex-wrap items-end gap-x-1.5 gap-y-1">
-                    <span className="text-[10px] text-white/25">NT$</span>
+                    <span className="text-[10px] text-orange-400/50">NT$</span>
                     <span className="text-2xl sm:text-3xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
-                    <span className="text-xs sm:text-sm text-white/30">+ 獎金 NT${a.bonus}</span>
+                    <span className="text-xs sm:text-sm text-orange-400/70">+ 獎金 NT${a.bonus}</span>
                   </div>
-                  <p className="text-[10px] text-white/20 mt-3">{a.method}</p>
+                  <p className="text-[10px] text-orange-400/50 mt-3">{a.method}</p>
                 </div>
               </div>
             ))}
@@ -474,13 +564,13 @@ export default function SoulGuitarInfo() {
                 <div className="p-5 bg-white/[0.03] border border-t-0 border-white/[0.06] rounded-b-2xl">
                   <span className="text-2xl block mb-2">{a.icon}</span>
                   <h4 className="text-base font-bold mb-2">{a.title}</h4>
-                  <p className="text-xs text-white/40 mb-0.5">AYERS {a.guitar}</p>
-                  {a.extra && <p className="text-[10px] text-white/25">{a.extra}</p>}
+                  <p className="text-xs text-orange-400/80 mb-0.5">AYERS {a.guitar}</p>
+                  {a.extra && <p className="text-[10px] text-orange-400/60">{a.extra}</p>}
                   <div className="flex items-end gap-1 mt-3 mb-1">
-                    <span className="text-[9px] text-white/20">NT$</span>
+                    <span className="text-[9px] text-orange-400/50">NT$</span>
                     <span className="text-xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
                   </div>
-                  <p className="text-[9px] text-white/15">{a.method}</p>
+                  <p className="text-[9px] text-orange-400/50">{a.method}</p>
                 </div>
               </div>
             ))}
@@ -499,8 +589,8 @@ export default function SoulGuitarInfo() {
                     <h4 className="text-sm font-bold">{a.title}</h4>
                     <span className="text-[8px] px-1.5 py-0.5 rounded-full border border-white/10 text-white/30">{a.n}</span>
                   </div>
-                  <p className="text-xs text-white/35">{a.prize}</p>
-                  <p className="text-[10px] text-white/15 mt-0.5">{a.note}</p>
+                  <p className="text-xs text-orange-400/80">{a.prize}</p>
+                  <p className="text-[10px] text-orange-400/50 mt-0.5">{a.note}</p>
                 </div>
               </div>
             ))}
