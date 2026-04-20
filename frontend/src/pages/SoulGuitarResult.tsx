@@ -908,10 +908,33 @@ function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importError, setImportError] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   // 更新某素材的單一屬性
   const update = (key: AssetKey, field: keyof typeof layout[AssetKey], value: number) => {
     onChange({ [key]: { ...layout[key], [field]: value } } as Partial<LayoutConfig>);
+  };
+
+  const handleExport = () => {
+    navigator.clipboard.writeText(JSON.stringify(layout, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleImport = () => {
+    try {
+      const parsed = JSON.parse(importText);
+      onChange(parsed as Partial<LayoutConfig>);
+      setImportText('');
+      setShowImport(false);
+      setImportError(false);
+    } catch {
+      setImportError(true);
+      setTimeout(() => setImportError(false), 2500);
+    }
   };
 
   const handleSave = async () => {
@@ -1025,8 +1048,43 @@ function LayoutEditor({ slug, layout, onChange, onReset, editKey }: {
             })}
           </div>
 
-          {/* 底部固定儲存 */}
-          <div className="sticky bottom-0 bg-black/95 px-3 py-2 border-t border-white/10">
+          {/* 底部固定區 */}
+          <div className="sticky bottom-0 bg-black/95 px-3 py-2 border-t border-white/10 flex flex-col gap-2">
+            {/* 匯出 / 匯入 */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleExport}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white/80 py-1.5 rounded text-[10px] transition-colors"
+              >
+                {copied ? '已複製 ✓' : '匯出 JSON'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowImport(p => !p)}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white/80 py-1.5 rounded text-[10px] transition-colors"
+              >
+                匯入 JSON
+              </button>
+            </div>
+            {showImport && (
+              <div className="flex flex-col gap-1.5">
+                <textarea
+                  value={importText}
+                  onChange={e => setImportText(e.target.value)}
+                  placeholder='貼上 JSON…'
+                  className="w-full h-24 bg-white/10 text-white/80 text-[9px] font-mono p-1.5 rounded border-0 outline-none resize-none focus:bg-white/15 placeholder-white/30"
+                />
+                <button
+                  type="button"
+                  onClick={handleImport}
+                  className="w-full bg-sky-600 hover:bg-sky-500 text-white py-1.5 rounded text-[10px] transition-colors"
+                >
+                  {importError ? '❌ JSON 格式錯誤' : '套用'}
+                </button>
+              </div>
+            )}
+            {/* 儲存 */}
             <button
               type="button"
               onClick={handleSave}
