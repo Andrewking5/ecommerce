@@ -419,21 +419,21 @@ function CoverPage({ onStart, isDesktop }: { onStart: () => void; isDesktop: boo
 
 /* ── 題目頁面（通用：手機＋電腦共用邏輯） ── */
 function QuestionView({
-  question, currentQ, isFirstQ, tapped,
+  question, currentQ, isFirstQ, tapped, prevAnswer,
   onSelect, onPrev,
 }: {
   question: typeof questions[0]; currentQ: number; isFirstQ: boolean;
-  tapped: number | null; onSelect: (i: number) => void; onPrev: () => void;
+  tapped: number | null; prevAnswer: number | undefined; onSelect: (i: number) => void; onPrev: () => void;
 }) {
   return (
     <div className="relative z-10 flex flex-col h-full">
-      {/* 上一題 */}
+      {/* 上一題 — 不加自己的 fade，父層 motion.div 已處理淡入 */}
       {!isFirstQ && (
-        <motion.button type="button" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={onPrev}
+        <button type="button" onClick={onPrev}
           className="absolute top-4 left-4 z-20 flex items-center gap-0.5 rounded-full bg-white/40 backdrop-blur-sm pl-1 pr-2.5 py-1 text-[#2a2a2a]/70 hover:bg-white/60 hover:text-[#2a2a2a] transition-all md:top-6 md:left-6 md:pl-2 md:pr-3.5 md:py-1.5">
           <ChevronLeft size={14} className="md:w-4 md:h-4" />
           <span className="text-[10px] md:text-xs" style={{ fontFamily: QUIZ_FONT }}>上一題</span>
-        </motion.button>
+        </button>
       )}
 
       {/* 手機版：進度條固定在畫面頂部 */}
@@ -482,7 +482,9 @@ function QuestionView({
         {/* 選項按鈕 */}
         <div className={`flex flex-col gap-1.5 md:gap-3 ${tapped !== null ? 'pointer-events-none' : ''}`}>
           {question.options.map((opt, i) => (
-            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.1 + i * 0.07} active={tapped === i} dimmed={tapped !== null && tapped !== i} />
+            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={0.1 + i * 0.07}
+              active={tapped !== null ? tapped === i : prevAnswer === i}
+              dimmed={tapped !== null && tapped !== i} />
           ))}
         </div>
 
@@ -612,9 +614,13 @@ export default function SoulGuitarQuiz() {
             {/* 底層背景 — 永遠可見，防止任何切換閃黑 */}
             <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
             {/* 新題只 fade-in，不需要 exit：圖片已預載，舊題直接移除，base img 擋住底層 */}
-            <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="absolute inset-0">
+            <motion.div key={currentQ} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="absolute inset-0"
+              onPanEnd={(_, info) => {
+                if (info.offset.x > 80 && Math.abs(info.offset.y) < 60) handlePrev();
+              }}
+            >
               <img src={isDesktop ? question.bgWide : question.bg} alt="" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-              <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} onSelect={handleSelect} onPrev={handlePrev} />
+              <QuestionView question={question} currentQ={currentQ} isFirstQ={isFirstQ} tapped={tapped} prevAnswer={answers[currentQ]} onSelect={handleSelect} onPrev={handlePrev} />
             </motion.div>
           </>
         )}
