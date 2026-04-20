@@ -1153,8 +1153,8 @@ export default function SoulGuitarResult() {
     // Track this result (fire-and-forget, won't break UX on failure)
     quizService.trackResult(slug, resultKey);
 
-    // Load saved layout from DB; fall back to DEFAULT_LAYOUT if none exists
-    quizService.getLayout(slug).then(cfg => {
+    // All result types share the same layout; always load from 'sun'
+    quizService.getLayout('sun').then(cfg => {
       if (cfg) {
         const merged = { ...DEFAULT_LAYOUT };
         for (const key of Object.keys(DEFAULT_LAYOUT) as AssetKey[]) {
@@ -1226,7 +1226,7 @@ export default function SoulGuitarResult() {
 
       {isEditMode && (
         <LayoutEditor
-          slug={slug}
+          slug="sun"
           layout={layout}
           onChange={handleLayoutChange}
           onReset={() => setLayout(DEFAULT_LAYOUT)}
