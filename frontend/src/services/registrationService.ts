@@ -79,6 +79,12 @@ const registrationService = {
     const { data } = await api.patch(`/registrations/admin/${eventId}/settings`, settings);
     return data;
   },
+
+  // TODO: TEMP TEST — delete this method when email is confirmed working
+  async testEmail(email: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    const { data } = await api.post('/registrations/admin/test-email', { email });
+    return data;
+  },
 };
 
 export default registrationService;

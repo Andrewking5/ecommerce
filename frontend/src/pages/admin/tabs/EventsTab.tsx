@@ -82,6 +82,10 @@ const SOUL_GROUP: Record<string, { label: string; emoji: string; color: string; 
   MOON:  { label: '月光系', emoji: '🌙', color: '#9080C0', slugs: ['moon', 'dream-moon'] },
 };
 
+/* ─── Types ─── */
+
+type QuizTab = 'analytics' | 'registrations' | 'emails';
+
 /* ─── StatCard ─── */
 
 function StatCard({ title, value, sub }: { title: string; value: string; sub?: string }) {
@@ -96,13 +100,84 @@ function StatCard({ title, value, sub }: { title: string; value: string; sub?: s
 
 /* ─── QuizFullPage ─── */
 
-function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null; onBack: () => void; onRefresh: () => void }) {
+function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics', onUpdateEvents }: {
+  data: QuizAnalytics | null; onBack: () => void; onRefresh: () => void;
+  events: EventType[]; initialTab?: QuizTab; onUpdateEvents?: (fn: (prev: EventType[]) => EventType[]) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<QuizTab>(initialTab);
   const [clearing, setClearing] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [regTotal, setRegTotal] = useState(0);
+  const [regLoading, setRegLoading] = useState(false);
+  const [regDetailId, setRegDetailId] = useState<string | null>(null);
+  const [regSettingsSaving, setRegSettingsSaving] = useState(false);
+  const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
+  const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
+  const [shareEmailsLoading, setShareEmailsLoading] = useState(false);
+  const [shareEmailsError, setShareEmailsError] = useState('');
+  const [pageStats, setPageStats] = useState<Record<string, EventAnalytics | null>>({});
+
+  const registerEvent = events.find(e => e.slug === 'soul-guitar/register');
+  const soulEvents = events.filter(e => e.slug.startsWith('soul-guitar'));
+
+  useEffect(() => {
+    if (activeTab !== 'registrations' || !registerEvent) return;
+    setRegLoading(true);
+    registrationService.list(registerEvent.id)
+      .then(({ registrations: regs, total }) => { setRegistrations(regs); setRegTotal(total); })
+      .catch(() => {})
+      .finally(() => setRegLoading(false));
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'emails') return;
+    setShareEmailsLoading(true); setShareEmailsError('');
+    quizService.listShareEmails()
+      .then(({ total, data }) => { setShareEmailsTotal(total); setShareEmails(data); })
+      .catch((e) => setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗'))
+      .finally(() => setShareEmailsLoading(false));
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'analytics' || soulEvents.length === 0) return;
+    soulEvents.forEach(ev => {
+      if (pageStats[ev.id] !== undefined) return;
+      setPageStats(prev => ({ ...prev, [ev.id]: null }));
+      eventService.getEventAnalytics(ev.id).then(a => setPageStats(prev => ({ ...prev, [ev.id]: a }))).catch(() => {});
+    });
+  }, [activeTab, soulEvents.length]);
 
   const handleClear = async () => {
     setClearing(true);
     try { await quizService.clearAll(); setConfirmClear(false); onRefresh(); } catch { /* silent */ } finally { setClearing(false); }
+  };
+
+  const handleDeleteReg = async (id: string) => {
+    if (!window.confirm('確定要刪除這筆報名嗎？')) return;
+    try { await registrationService.deleteOne(id); setRegistrations(prev => prev.filter(r => r.id !== id)); setRegTotal(n => n - 1); } catch { alert('刪除失敗'); }
+  };
+
+  const handleDeleteShareEmail = async (email: string, slug: string) => {
+    if (!window.confirm(`確定要刪除 ${email} 嗎？`)) return;
+    try { await quizService.deleteShareEmail(email, slug); setShareEmails(prev => prev.filter(r => !(r.email === email && r.slug === slug))); setShareEmailsTotal(n => n - 1); } catch { alert('刪除失敗'); }
+  };
+
+  const handleRegSettings = async (open: boolean, limit: number) => {
+    if (!registerEvent) return;
+    setRegSettingsSaving(true);
+    try {
+      const res = await registrationService.updateSettings(registerEvent.id, { registrationOpen: open, registrationLimit: limit });
+      if (res.success) onUpdateEvents?.(prev => prev.map(e => e.id === registerEvent.id ? { ...e, registrationOpen: open, registrationLimit: limit } : e));
+    } catch { alert('設定儲存失敗'); } finally { setRegSettingsSaving(false); }
+  };
+
+  const handleRefreshEmails = () => {
+    setShareEmailsLoading(true); setShareEmailsError('');
+    quizService.listShareEmails()
+      .then(({ total, data }) => { setShareEmailsTotal(total); setShareEmails(data); })
+      .catch(e => setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗'))
+      .finally(() => setShareEmailsLoading(false));
   };
 
   const total = data?.total ?? 0;
@@ -133,6 +208,17 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
         </div>
       </div>
 
+      {/* ── Tab bar ── */}
+      <div className="flex border-b border-white/5 -mt-4">
+        {([['analytics', '📊 測驗分析'], ['registrations', '👥 報名名單'], ['emails', '📧 抽獎 Email']] as [QuizTab, string][]).map(([tab, label]) => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className={cn('px-5 py-3 text-[11px] font-bold uppercase tracking-widest transition-colors border-b-2 -mb-px',
+              activeTab === tab ? 'text-ayers-gold border-ayers-gold' : 'text-white/30 hover:text-white/60 border-transparent')}>
+            {label}
+          </button>
+        ))}
+      </div>
+
       {confirmClear && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setConfirmClear(false)}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl p-7 max-w-sm w-full mx-4 border border-red-500/20" style={{ background: CARD_BG }} onClick={(e) => e.stopPropagation()}>
@@ -151,7 +237,7 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
         </div>
       )}
 
-      {!data ? <div className="py-32 text-center"><GuitarSunLoader size={28} /></div> : (
+      {activeTab === 'analytics' && (!data ? <div className="py-32 text-center"><GuitarSunLoader size={28} /></div> : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             <StatCard title="總完成次數" value={total.toString()} />
@@ -287,7 +373,161 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
             )}
           </Card>
 
+          <Card title="頁面流量 — 各子頁面點擊數">
+            <div className="divide-y divide-white/5">
+              {soulEvents.length === 0 ? <EmptyChart icon={<BarChart3 size={40} />} message="無頁面資料" /> : soulEvents.map(ev => {
+                const st = pageStats[ev.id];
+                return (
+                  <div key={ev.id} className="flex items-center gap-4 px-5 py-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-white/70 font-medium truncate">{ev.title}</p>
+                      <p className="text-[10px] text-white/30 font-mono">/e/{ev.slug}</p>
+                    </div>
+                    {st === null ? <Spinner /> : st === undefined ? <span className="text-[10px] text-white/20">—</span> : (
+                      <div className="flex items-center gap-5 shrink-0 text-right">
+                        <div><p className="text-sm font-bold text-ayers-gold">{st.totalScans}</p><p className="text-[9px] text-white/25">掃描</p></div>
+                        <div><p className="text-sm font-bold text-white/70">{st.totalClicks}</p><p className="text-[9px] text-white/25">點擊</p></div>
+                        <div><p className="text-sm font-bold text-white/40">{st.uniqueVisitors}</p><p className="text-[9px] text-white/25">不重複</p></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
         </>
+      ))}
+
+      {/* ── Registrations tab ── */}
+      {activeTab === 'registrations' && (
+        <div className="space-y-4">
+          {!registerEvent ? <div className="py-16 text-center text-xs text-white/25 uppercase tracking-widest">找不到報名活動</div> : (
+            <>
+              <div className="flex flex-wrap items-center gap-4 px-1">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-white/50">報名狀態</span>
+                  <button onClick={() => handleRegSettings(!registerEvent.registrationOpen, registerEvent.registrationLimit)} disabled={regSettingsSaving}
+                    className={cn('relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors', registerEvent.registrationOpen ? 'bg-green-500' : 'bg-white/10')}>
+                    <span className={cn('pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transition-transform', registerEvent.registrationOpen ? 'translate-x-4' : 'translate-x-0')} />
+                  </button>
+                  <span className={cn('text-xs font-bold', registerEvent.registrationOpen ? 'text-green-400' : 'text-white/30')}>{registerEvent.registrationOpen ? '開放中' : '已關閉'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-white/50">人數上限</span>
+                  <input type="number" min={0} max={10000} defaultValue={registerEvent.registrationLimit}
+                    onBlur={e => handleRegSettings(registerEvent.registrationOpen, Number(e.target.value))}
+                    className="w-20 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-ayers-gold/40 text-center" />
+                  <span className="text-[10px] text-white/25">（0 = 無限制）</span>
+                </div>
+                <div className="ml-auto flex items-center gap-3">
+                  <span className="text-xs text-white/30 tabular-nums">{regTotal} / {registerEvent.registrationLimit > 0 ? registerEvent.registrationLimit : '∞'}</span>
+                  <button onClick={() => registrationService.exportCsv(registerEvent.id, `registrations-${registerEvent.id}.csv`)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
+                    <Download size={11} /> 匯出 CSV
+                  </button>
+                </div>
+              </div>
+              <Card>
+                {regLoading ? <div className="py-12 flex justify-center"><Spinner /></div>
+                  : registrations.length === 0 ? <div className="py-12 text-center text-xs text-white/25 uppercase tracking-widest">尚無報名資料</div>
+                  : (
+                    <div className="flex overflow-hidden">
+                      <div className={cn('overflow-x-auto', regDetailId ? 'w-1/2 border-r border-white/5' : 'w-full')}>
+                        <table className="w-full text-xs">
+                          <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
+                            <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                              <th className="px-4 py-3 text-left font-medium w-8">#</th>
+                              <th className="px-4 py-3 text-left font-medium">姓名</th>
+                              <th className="px-4 py-3 text-left font-medium">Email</th>
+                              {!regDetailId && <th className="px-4 py-3 text-left font-medium">手機</th>}
+                              <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                              <th className="px-4 py-3 w-16"></th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/[0.04]">
+                            {registrations.map((r, i) => (
+                              <tr key={r.id} onClick={() => setRegDetailId(regDetailId === r.id ? null : r.id)} className={cn('transition-colors cursor-pointer group', regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
+                                <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                                <td className="px-4 py-3"><p className="text-white/80 font-medium">{r.name}</p>{r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}</td>
+                                <td className="px-4 py-3 text-white/50 max-w-[160px] truncate">{r.email}</td>
+                                {!regDetailId && <td className="px-4 py-3 text-white/50">{r.phone}</td>}
+                                <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                                <td className="px-4 py-3"><button onClick={e => { e.stopPropagation(); handleDeleteReg(r.id); }} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all"><Trash2 size={12} /></button></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {regDetailId && (() => {
+                        const dr = registrations.find(r => r.id === regDetailId);
+                        if (!dr) return null;
+                        const hasSoulFields = registrations.some(r => r.category || r.soulColor || r.youtube);
+                        const answerKeys = Array.from(new Set(registrations.flatMap(r => r.answers ? Object.keys(r.answers) : [])));
+                        return (
+                          <div className="w-1/2 overflow-y-auto p-5 space-y-3 max-h-[600px]">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">詳細資料</p>
+                              <button onClick={() => setRegDetailId(null)} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                            </div>
+                            {[{ label: '姓名', value: dr.name }, { label: '藝名', value: dr.stageName }, { label: '手機', value: dr.phone }, { label: 'Email', value: dr.email }].map(({ label, value }) => value ? (
+                              <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                            ) : null)}
+                            {hasSoulFields && [{ label: '社群帳號', value: dr.socialId }, { label: '組別', value: dr.category }, { label: '靈魂顏色', value: dr.soulColor }].map(({ label, value }) => value ? (
+                              <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                            ) : null)}
+                            {dr.youtube && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p><a href={dr.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.youtube}</a></div>}
+                            {dr.fbIg && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p><a href={dr.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.fbIg}</a></div>}
+                            {answerKeys.map(key => { const val = dr.answers?.[key]; return val !== undefined && val !== null && val !== '' ? (<div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p><p className="text-xs text-white/70">{String(val)}</p></div>) : null; })}
+                            {dr.message && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p><p className="text-xs text-white/70 whitespace-pre-line">{dr.message}</p></div>}
+                            <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(dr.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+              </Card>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Emails tab ── */}
+      {activeTab === 'emails' && (
+        <Card title={`抽獎 Email · 共 ${shareEmailsTotal} 筆`} action={
+          <div className="flex items-center gap-2">
+            <button onClick={handleRefreshEmails} className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 hover:text-white transition-colors" title="重新整理"><RefreshCw size={13} /></button>
+            <button onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all"><Download size={11} /> 匯出 CSV</button>
+          </div>
+        }>
+          {shareEmailsLoading ? <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
+            : shareEmailsError ? <div className="py-10 text-center text-xs text-red-400/70">{shareEmailsError}</div>
+            : shareEmails.length === 0 ? <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
+            : (
+              <table className="w-full text-xs">
+                <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
+                  <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
+                    <th className="px-4 py-3 text-left font-medium w-8">#</th>
+                    <th className="px-4 py-3 text-left font-medium">Email</th>
+                    <th className="px-4 py-3 text-left font-medium">靈魂類型</th>
+                    <th className="px-4 py-3 text-left font-medium">報名時間</th>
+                    <th className="px-4 py-3 w-8"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.04]">
+                  {shareEmails.map((r, i) => (
+                    <tr key={`${r.email}-${r.slug}`} className="group hover:bg-white/[0.02] transition-colors">
+                      <td className="px-4 py-3 text-white/25">{i + 1}</td>
+                      <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
+                      <td className="px-4 py-3 text-white/40">{RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}</td>
+                      <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
+                      <td className="px-4 py-3"><button onClick={() => handleDeleteShareEmail(r.email, r.slug)} className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/10 text-white/30 hover:text-red-400 transition-all"><Trash2 size={12} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+        </Card>
       )}
     </motion.div>
   );
@@ -306,6 +546,7 @@ export default function EventsTab() {
   const [analyticsEvent, setAnalyticsEvent] = useState<EventType | null>(null);
   const [quizData, setQuizData] = useState<QuizAnalytics | null>(null);
   const [quizFullPage, setQuizFullPage] = useState(false);
+  const [quizInitialTab, setQuizInitialTab] = useState<QuizTab>('analytics');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
@@ -319,11 +560,6 @@ export default function EventsTab() {
   const [regLoading, setRegLoading] = useState(false);
   const [regSettingsSaving, setRegSettingsSaving] = useState(false);
   const [regDetailId, setRegDetailId] = useState<string | null>(null);
-  const [quizEmailPanelOpen, setQuizEmailPanelOpen] = useState(false);
-  const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
-  const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
-  const [shareEmailsLoading, setShareEmailsLoading] = useState(false);
-  const [shareEmailsError, setShareEmailsError] = useState('');
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -378,12 +614,13 @@ export default function EventsTab() {
     } finally { setSaving(false); }
   };
 
+  const openSoulGuitarPage = (tab: QuizTab = 'analytics') => {
+    setQuizInitialTab(tab); setQuizFullPage(true); setQuizData(null);
+    quizService.getAnalytics().then(setQuizData).catch(() => {});
+  };
+
   const handleViewAnalytics = async (event: EventType) => {
-    if (event.slug.startsWith('soul-guitar')) {
-      setQuizFullPage(true); setQuizData(null);
-      try { setQuizData(await quizService.getAnalytics()); } catch { /* silent */ }
-      return;
-    }
+    if (event.slug.startsWith('soul-guitar')) { openSoulGuitarPage('analytics'); return; }
     setAnalyticsEvent(event); setAnalytics(null);
     try { setAnalytics(await eventService.getEventAnalytics(event.id)); } catch { /* silent */ }
   };
@@ -433,21 +670,6 @@ export default function EventsTab() {
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
 
-  const fetchShareEmails = () => {
-    setShareEmailsLoading(true);
-    setShareEmailsError('');
-    quizService.listShareEmails().then(({ total, data }) => {
-      setShareEmailsTotal(total); setShareEmails(data);
-    }).catch((e) => {
-      setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗');
-    }).finally(() => setShareEmailsLoading(false));
-  };
-
-  const handleOpenQuizEmailPanel = () => {
-    setQuizEmailPanelOpen(true);
-    fetchShareEmails();
-  };
-
   const handleOpenRegPanel = async (eventId: string) => {
     setRegPanelEventId(eventId); setRegLoading(true); setRegistrations([]);
     try { const { registrations: regs, total } = await registrationService.list(eventId); setRegistrations(regs); setRegTotal(total); } catch { /* silent */ } finally { setRegLoading(false); }
@@ -467,7 +689,7 @@ export default function EventsTab() {
   };
 
   if (quizFullPage) {
-    return <QuizFullPage data={quizData} onBack={() => setQuizFullPage(false)} onRefresh={async () => { setQuizData(null); try { setQuizData(await quizService.getAnalytics()); } catch { /* silent */ } }} />;
+    return <QuizFullPage data={quizData} onBack={() => setQuizFullPage(false)} onRefresh={async () => { setQuizData(null); quizService.getAnalytics().then(setQuizData).catch(() => {}); }} events={events} initialTab={quizInitialTab} onUpdateEvents={setEvents} />;
   }
 
   const renderEventRow = (event: EventType, sub = false) => (
@@ -495,8 +717,12 @@ export default function EventsTab() {
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <button onClick={() => window.open(`/e/${event.slug}`, '_blank')} title="開啟活動頁面" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><ExternalLink size={14} /></button>
-        {event.eventType === 'REGISTER' && <button onClick={() => handleOpenRegPanel(event.id)} title="報名管理" className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all', regPanelEventId === event.id ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}><Users size={14} /></button>}
-        {event.eventType === 'QUIZ' && event.slug.startsWith('soul-guitar') && <button onClick={handleOpenQuizEmailPanel} title="抽獎 Email 管理" className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all', quizEmailPanelOpen ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}><Mail size={14} /></button>}
+        {event.eventType === 'REGISTER' && (
+          event.slug.startsWith('soul-guitar')
+            ? <button onClick={() => openSoulGuitarPage('registrations')} title="報名管理" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><Users size={14} /></button>
+            : <button onClick={() => handleOpenRegPanel(event.id)} title="報名管理" className={cn('p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all', regPanelEventId === event.id ? 'text-ayers-gold' : 'text-white/40 hover:text-ayers-gold')}><Users size={14} /></button>
+        )}
+        {event.eventType === 'QUIZ' && event.slug.startsWith('soul-guitar') && <button onClick={() => openSoulGuitarPage('emails')} title="抽獎 Email 管理" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><Mail size={14} /></button>}
         {event.eventType === 'INFO' && <button onClick={() => handleOpenRules(event)} title="編輯比賽規則" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><FileText size={14} /></button>}
         <button onClick={() => setViewingQr(event)} title="QR Code" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><QrCode size={14} /></button>
         <button onClick={() => handleCopyLink(event)} title="複製連結" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
@@ -621,54 +847,6 @@ export default function EventsTab() {
           </div>
         );
       })()}
-
-      {/* ── Quiz Email Panel ── */}
-      {quizEmailPanelOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setQuizEmailPanelOpen(false)}>
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="rounded-t-2xl sm:rounded-2xl w-full max-w-2xl mx-0 sm:mx-4 flex flex-col" style={{ background: CARD_BG, maxHeight: '90vh' }} onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">抽獎 Email 管理</h3>
-                <p className="text-[10px] text-white/30 mt-0.5">吉他靈魂測驗 · 共 {shareEmailsTotal} 筆</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button type="button" onClick={fetchShareEmails} className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 hover:text-white transition-colors" title="重新整理"><RefreshCw size={13} /></button>
-                <button type="button" onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
-                  <Download size={11} /> 匯出 CSV
-                </button>
-                <button type="button" aria-label="關閉" onClick={() => setQuizEmailPanelOpen(false)} className="p-2 rounded-lg hover:bg-white/5 text-white/40 transition-colors"><X size={16} /></button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {shareEmailsLoading ? <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
-                : shareEmailsError ? <div className="py-10 text-center text-xs text-red-400/70">{shareEmailsError}</div>
-                : shareEmails.length === 0 ? <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
-                : (
-                  <table className="w-full text-xs">
-                    <thead className="sticky top-0 z-10" style={{ background: CARD_BG }}>
-                      <tr className="text-[10px] text-white/30 uppercase tracking-widest border-b border-white/5">
-                        <th className="px-4 py-3 text-left font-medium w-8">#</th>
-                        <th className="px-4 py-3 text-left font-medium">Email</th>
-                        <th className="px-4 py-3 text-left font-medium">靈魂類型</th>
-                        <th className="px-4 py-3 text-left font-medium">報名時間</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.04]">
-                      {shareEmails.map((r, i) => (
-                        <tr key={`${r.email}-${r.slug}`} className="hover:bg-white/[0.02] transition-colors">
-                          <td className="px-4 py-3 text-white/25">{i + 1}</td>
-                          <td className="px-4 py-3 text-white/70 font-medium">{r.email}</td>
-                          <td className="px-4 py-3 text-white/40">{RESULT_EMOJI[r.resultKey ?? r.slug] ?? ''} {r.resultKey ? (QUIZ_CHAR_META[r.resultKey]?.soul ?? r.resultKey) : '—'}</td>
-                          <td className="px-4 py-3 text-white/30 whitespace-nowrap text-[10px]">{new Date(r.createdAt).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-            </div>
-          </motion.div>
-        </div>
-      )}
 
       {/* ── Rules Editor Modal ── */}
       {rulesEvent && (

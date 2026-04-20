@@ -35,6 +35,8 @@ router.get('/status/*',  RegistrationController.getStatus);
 router.post('/submit/*', validateRequest(submitSchema), RegistrationController.submit);
 
 // ─── Admin ───
+// TODO: TEMP TEST — delete this route when email is confirmed working
+router.post('/admin/test-email',       authenticateToken, requireAdmin, RegistrationController.testEmail);
 router.get('/admin/:eventId',          authenticateToken, requireAdmin, RegistrationController.list);
 router.get('/admin/:eventId/export',   authenticateToken, requireAdmin, RegistrationController.exportCsv);
 router.delete('/admin/:id',            authenticateToken, requireAdmin, RegistrationController.deleteOne);

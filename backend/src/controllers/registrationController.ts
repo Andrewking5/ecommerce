@@ -182,6 +182,23 @@ export class RegistrationController {
     }
   }
 
+  // TODO: TEMP TEST — delete this method when email is confirmed working
+  /** Send a test registration email to verify email service */
+  static async testEmail(req: Request, res: Response): Promise<void> {
+    const to = (req.body.email as string) || process.env.GMAIL_USER || '';
+    if (!to) {
+      res.status(400).json({ success: false, error: 'No target email' });
+      return;
+    }
+    try {
+      await EmailService.sendSoulGuitarRegistration(to, '測試 Test');
+      res.json({ success: true, message: `Email sent to ${to}` });
+    } catch (err: any) {
+      console.error('Test email error:', err);
+      res.status(500).json({ success: false, error: err?.message || String(err) });
+    }
+  }
+
   /** Update registration settings on an event (open/limit) */
   static async updateSettings(req: Request, res: Response): Promise<void> {
     try {
