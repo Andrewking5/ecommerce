@@ -222,9 +222,9 @@ function useIdleLine(currentQ: number) {
 }
 
 /* ── 按鈕 ── */
-const QuizOption = memo(function QuizOption({ label, onClick, active }: { label: string; onClick: () => void; active: boolean }) {
+const QuizOption = memo(function QuizOption({ label, onClick, delay, active }: { label: string; onClick: () => void; delay: number; active: boolean }) {
   return (
-    <motion.button type="button" whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
+    <motion.button type="button" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2, delay }} whileTap={{ scale: 0.96 }} onClick={onClick} className="w-full cursor-pointer group relative">
       <img src={`${BASE}/btn-default.png`} alt="" className={`w-full h-auto transition-opacity duration-200 ${active ? 'opacity-0' : 'group-hover:opacity-0'}`} draggable={false} />
       <img src={`${BASE}/btn-selected.png`} alt="" className={`absolute inset-0 w-full h-auto transition-opacity duration-200 ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} draggable={false} />
       <span className={`absolute inset-0 flex items-center justify-center text-[0.9rem] md:text-[1.1rem] leading-snug transition-colors duration-200 whitespace-pre-line text-center px-4 ${active ? 'text-white' : 'text-[#2a2a2a] group-hover:text-white'}`} style={{ fontFamily: QUIZ_FONT }}>{label}</span>
@@ -476,7 +476,7 @@ function QuestionView({
         {/* 選項按鈕 */}
         <div className="flex flex-col gap-1.5 md:gap-3">
           {question.options.map((opt, i) => (
-            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} active={tapped === i} />
+            <QuizOption key={`${currentQ}-${i}`} label={opt} onClick={() => onSelect(i)} delay={i * 0.07} active={tapped === i} />
           ))}
         </div>
 
