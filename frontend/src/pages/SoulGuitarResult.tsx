@@ -432,7 +432,7 @@ function FullResultPage({ resultKey, folder, layout }: {
           await navigator.share({ title: shareText, text: shareText, url: shareUrl });
         }
         // resolve = 使用者選了分享目標
-        if (!localStorage.getItem('soulGuitar_shareEmail')) setShowEmailModal(true);
+        if (!localStorage.getItem('soulGuitar_shareEmail_v2')) setShowEmailModal(true);
         return;
       } catch {
         return;
@@ -443,7 +443,7 @@ function FullResultPage({ resultKey, folder, layout }: {
     await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
-    if (!localStorage.getItem('soulGuitar_shareEmail')) setShowEmailModal(true);
+    if (!localStorage.getItem('soulGuitar_shareEmail_v2')) setShowEmailModal(true);
   };
 
   const handleEmailSubmit = async () => {
@@ -455,7 +455,7 @@ function FullResultPage({ resultKey, folder, layout }: {
     setEmailError('');
     try {
       await api.post('/quiz/share-email', { email: emailVal, slug: folder, resultKey });
-      localStorage.setItem('soulGuitar_shareEmail', '1');
+      localStorage.setItem('soulGuitar_shareEmail_v2', '1');
       setEmailDone(true);
     } catch {
       setEmailError('送出失敗，請稍後再試');

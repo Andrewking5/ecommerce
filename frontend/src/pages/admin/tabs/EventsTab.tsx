@@ -102,12 +102,20 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
   const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
   const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
   const [shareEmailsLoading, setShareEmailsLoading] = useState(true);
+  const [shareEmailsError, setShareEmailsError] = useState('');
 
-  useEffect(() => {
+  const fetchShareEmails = () => {
+    setShareEmailsLoading(true);
+    setShareEmailsError('');
     quizService.listShareEmails().then(({ total, data }) => {
       setShareEmailsTotal(total); setShareEmails(data);
-    }).catch((e) => console.error('[quiz share emails]', e)).finally(() => setShareEmailsLoading(false));
-  }, []);
+    }).catch((e) => {
+      console.error('[quiz share emails]', e);
+      setShareEmailsError(e?.response?.data?.message || e?.message || '讀取失敗');
+    }).finally(() => setShareEmailsLoading(false));
+  };
+
+  useEffect(() => { fetchShareEmails(); }, []);
 
   const handleClear = async () => {
     setClearing(true);
@@ -299,12 +307,16 @@ function QuizFullPage({ data, onBack, onRefresh }: { data: QuizAnalytics | null;
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/30">抽獎名單 — 填寫 Email 報名者 · 共 {shareEmailsTotal} 筆</h3>
-              <button onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
-                <Download size={11} /> 匯出 CSV
-              </button>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={fetchShareEmails} className="p-1.5 rounded-lg hover:bg-white/5 text-white/30 hover:text-white transition-colors" title="重新整理"><RefreshCw size={12} /></button>
+                <button type="button" onClick={() => quizService.exportShareEmailsCsv()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ayers-gold/10 hover:bg-ayers-gold/20 text-[10px] text-ayers-gold font-bold uppercase tracking-widest transition-all">
+                  <Download size={11} /> 匯出 CSV
+                </button>
+              </div>
             </div>
             <div className="rounded-2xl overflow-hidden border border-white/5" style={{ background: CARD_BG }}>
               {shareEmailsLoading ? <div className="py-12 flex justify-center"><GuitarSunLoader size={24} /></div>
+                : shareEmailsError ? <div className="py-10 text-center text-xs text-red-400/70">{shareEmailsError}</div>
                 : shareEmails.length === 0 ? <div className="py-10 text-center text-xs text-white/25 uppercase tracking-widest">尚無抽獎報名資料</div>
                 : (
                   <table className="w-full text-xs">
