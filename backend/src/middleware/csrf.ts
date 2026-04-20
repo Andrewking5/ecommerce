@@ -48,9 +48,15 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  // Skip CSRF for public quiz endpoints — cross-origin cookies unreliable on mobile/Safari,
-  // and these endpoints have no user session or financial data (just analytics + email collection)
-  if (req.path === '/quiz/results' || req.path === '/quiz/share-email') {
+  // Skip CSRF for public endpoints — cross-origin SameSite=None cookies are unreliable
+  // on mobile Safari (ITP). These paths have no user session or financial data.
+  const publicPaths = [
+    '/quiz/results',
+    '/quiz/share-email',
+    '/newsletter',
+    '/contact',
+  ];
+  if (publicPaths.some(p => req.path === p) || req.path.startsWith('/registrations/submit')) {
     next();
     return;
   }
