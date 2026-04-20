@@ -58,7 +58,7 @@ export class EventController {
         res.status(404).json({ success: false, error: 'Event not found' });
         return;
       }
-      if (!event.isActive && event.status === 'DRAFT') {
+      if (!event.isActive) {
         const role = (req as AuthRequest).user ? String((req as AuthRequest).user!.role).toUpperCase() : null;
         if (role !== 'ADMIN') {
           res.status(403).json({ success: false, error: 'TEST_MODE' });
