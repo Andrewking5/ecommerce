@@ -583,6 +583,49 @@ export default function SoulGuitarInfo() {
         </div>
       </section>
 
+      {/* ═══════════ 示範影片 ═══════════ */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <h3 className="text-xl sm:text-2xl font-bold text-center mb-2">示範影片</h3>
+        <p className="text-center text-gray-400 text-sm mb-8">參考影片，了解如何參賽</p>
+
+        {/* 桌機：等高並排，寬度比 = 16:9 vs 9:16 的自然比例（256:81）；手機：垂直堆疊 */}
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start">
+          {/* 規則影片 — 橫式 16:9 */}
+          <div className="w-full sm:flex-[256] min-w-0">
+            <div className="aspect-video rounded-2xl overflow-hidden bg-black">
+              <iframe
+                src="https://www.youtube.com/embed/t_AKjJfAzGU"
+                title="規則說明影片"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="px-1 pt-3">
+              <p className="text-sm font-bold text-gray-800">規則說明影片</p>
+              <p className="text-xs text-gray-400 mt-0.5">了解完整參賽規則與注意事項</p>
+            </div>
+          </div>
+
+          {/* 口白示範 — 直式 9:16 */}
+          <div className="w-full sm:flex-[81] min-w-0">
+            <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-black">
+              <iframe
+                src="https://www.youtube.com/embed/P1IiYH3ePUU"
+                title="口白示範影片"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="px-1 pt-3">
+              <p className="text-sm font-bold text-gray-800">口白示範 ／ 人數示範</p>
+              <p className="text-xs text-gray-400 mt-0.5">影片開頭口白說法與組別人數示範</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════ 規則 ═══════════ */}
       <section className="bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
