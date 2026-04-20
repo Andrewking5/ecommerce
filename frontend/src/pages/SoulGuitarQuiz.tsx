@@ -397,6 +397,13 @@ function CoverPage({ onStart, isDesktop }: { onStart: () => void; isDesktop: boo
       ) : (
         <video className="absolute inset-0 w-full h-full object-cover" src="/videos/soul-guitar-cover.mp4" autoPlay loop muted playsInline />
       )}
+      {/* SEO-visible text block — hidden visually but readable by crawlers */}
+      <div className="sr-only">
+        <h1>Ayers 吉他靈魂測驗 — 測出你的音樂性格</h1>
+        <p>透過 8 個問題，發現你內心深處的吉他靈魂類型。共有火焰、煙火、太陽、微光、海浪、深海、月光、夢月八種結果，每種結果都對應一把專屬的 Ayers 吉他。</p>
+        <p>測驗結束後，你可以用影片記錄你的演奏，報名 2026 Ayers 靈魂吉他手大賽，獎項總值超過 NT$200,000。</p>
+        <p>評審陣容：四分衛樂團虎神、PiA 吳蓓雅、JOYCE 就以斯、林小歐、張仲麟。報名截止：2026/05/31。</p>
+      </div>
       <motion.button type="button" onClick={onStart}
         className="absolute z-10 left-1/2 -translate-x-1/2 bottom-[12%] w-[50%] max-w-[260px] md:w-[20%] md:max-w-[300px] active:scale-95 transition-transform"
         initial={{ opacity: 0, y: 10 }}

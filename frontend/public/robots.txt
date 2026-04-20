@@ -3,18 +3,32 @@
 User-agent: *
 Allow: /
 
-# Block private/authenticated pages from crawling
+# Private / authenticated pages
 Disallow: /*/account
 Disallow: /*/admin
 Disallow: /*/checkout
 Disallow: /*/login
+Disallow: /*/forgot-password
+Disallow: /*/reset-password
+Disallow: /*/verify-email
+Disallow: /*/order-tracking
 Disallow: /*/orders/
 
-# Block API routes (served from different origin but just in case)
+# API & internal
 Disallow: /api/
-
-# Optimized images (Googlebot should find these via <picture> srcset)
 Disallow: /images-opt/
+
+# Duplicate auth-callback page (no SEO value)
+Disallow: /*/auth-callback
+
+# Allow Googlebot to access JS/CSS for rendering
+User-agent: Googlebot
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.webp$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
 
 # Sitemap
 Sitemap: https://www.ayersguitars.com/sitemap.xml

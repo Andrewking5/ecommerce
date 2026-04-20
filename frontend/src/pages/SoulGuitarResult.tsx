@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import quizService, { type LayoutConfig, type AssetKey, DEFAULT_LAYOUT } from '../services/quizService';
 import api from '../services/api';
+import SEO from '../components/SEO';
 
 /* ──────────────────────────────────────
    Soul Guitar — 結果頁
@@ -1116,6 +1117,10 @@ export default function SoulGuitarResult() {
     ? `${BASE}/result/${folder}/${encodeURIComponent(resultData.stripeFile)}${CACHE_V}`
     : null;
 
+  const ogImage = folder
+    ? `https://www.ayersguitars.com/images/events/quiz/result/${folder}/char.webp`
+    : 'https://www.ayersguitars.com/images/events/soul-guitar-poster.webp';
+
   return (
     <div
       className="w-full flex flex-col items-center overflow-x-hidden"
@@ -1131,6 +1136,25 @@ export default function SoulGuitarResult() {
         }),
       }}
     >
+      <SEO
+        title={`我的吉他靈魂是「${resultData.soulTitle}」— Ayers 靈魂吉他測驗`}
+        description={`${resultData.tag}。${resultData.description.slice(0, 80)}⋯ 來測出你的吉他靈魂，參加 2026 Ayers 靈魂吉他手大賽！`}
+        ogImage={ogImage}
+        ogType="website"
+        noHreflang
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebPage',
+          name: `${resultData.soulTitle} — Ayers 靈魂吉他測驗結果`,
+          description: resultData.description,
+          url: `https://www.ayersguitars.com/e/soul-guitar/${slug}`,
+          isPartOf: {
+            '@type': 'Event',
+            name: '2026 Ayers 靈魂吉他手大賽',
+            url: 'https://www.ayersguitars.com/zh-TW/soul-guitar',
+          },
+        }}
+      />
       <AnimatePresence>
         {isLoading && <ResultLoadingScreen key="result-loading" progress={loadProgress} />}
       </AnimatePresence>

@@ -173,7 +173,7 @@ function HeroBannerCarousel() {
               >
                 <OptimizedImage
                   src={banner.guitar}
-                  alt=""
+                  alt={`Ayers ${banner.title} 手工原聲吉他`}
                   className="h-[40vh] lg:h-[48vh] object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
                   priority
                   sizes="30vw"
@@ -428,19 +428,57 @@ export default function Collections() {
   return (
     <div className="bg-ayers-cream min-h-screen">
       <SEO
-        title={t('collections.seoTitle', '吉他系列 — 探索所有 Ayers 手工吉他')}
-        description={t('collections.seoDesc', '瀏覽 Ayers 全系列手工吉他：Wave 濤系列、Sun 日系列、Light 光系列、Uluru 烏克麗麗系列。')}
+        title={activeSeries
+          ? `${activeSeries} 系列 — Ayers 手工吉他`
+          : t('collections.seoTitle', '吉他系列 — 探索所有 Ayers 手工吉他')}
+        description={currentSeriesData
+          ? `Ayers ${currentSeriesData.nameZh}：${currentSeriesData.descFallback} 1996年台灣品牌，越南手工製造，全單板頂級原聲吉他。`
+          : t('collections.seoDesc', '瀏覽 Ayers 全系列手工吉他：Wave 濤系列（全單板）、Sun 日系列（SUNWAVE技術）、Light 光系列（輕量化）。台灣品牌，越南手工製造，頂級原聲吉他。')}
+        ogImage={currentSeriesData?.img || '/images/products/wave/d09-wave-front.png'}
         breadcrumbs={[
-          { name: 'Home', url: '/' },
-          { name: t('collections.pageTitle', 'Collections'), url: '/collections' },
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: t('collections.pageTitle', 'Collections'), url: '/zh-TW/collections' },
+          ...(activeSeries ? [{ name: `${activeSeries} Series`, url: `/zh-TW/collections?series=${activeSeries.toLowerCase()}` }] : []),
         ]}
-        jsonLd={{
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          name: 'Ayers Guitars Collections',
-          description: 'Browse all Ayers handcrafted acoustic guitar series.',
-          url: 'https://www.ayersguitars.com/zh-TW/collections',
-        }}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: activeSeries ? `Ayers ${activeSeries} Series` : 'Ayers Guitars Collections',
+            description: 'Browse all Ayers handcrafted acoustic guitar series: Wave, Sun, Light.',
+            url: `https://www.ayersguitars.com/zh-TW/collections${activeSeries ? `?series=${activeSeries.toLowerCase()}` : ''}`,
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'Ayers Wave 系列吉他有什麼特色？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Wave 濤系列採用全單板設計，以 SUNWAVE 力木結構讓音板振動如海浪層疊，音色飽滿厚實、動態層次分明，適合彈唱與伴奏。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers Light 系列有什麼不同？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Light 光系列以輕量化結構為核心，琴身薄而共鳴佳，適合喜歡清澈純淨音色的演奏者，也是錄音的熱門選擇。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他全單板和夾板有什麼差別？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '全單板吉他使用整塊實木，音色會隨時間越彈越好，共鳴更豐富自然；夾板吉他穩定性高、價格較低，適合初學者或需要高耐候性的場合。Ayers 旗艦系列均採全單板設計。',
+                },
+              },
+            ],
+          },
+        ]}
       />
       {/* ── Page Intro — Sound hole rosette reveal ── */}
       <AnimatePresence>
