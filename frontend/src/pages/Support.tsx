@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import { Search, MessageCircle, Mail, Phone, ChevronRight, HelpCircle, Truck, Shield, Wrench, Play } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import SEO from '../components/SEO';
 
 export default function Support() {
   const { t } = useTranslation();
@@ -22,6 +23,60 @@ export default function Support() {
 
   return (
     <div className="bg-ayers-cream min-h-screen py-12">
+      <SEO
+        title={t('support.title', '客戶支援中心')}
+        description={t('support.desc', 'Ayers Guitars 客戶支援 — 樂器保養、保固、運送退換貨與客製化指南。')}
+        breadcrumbs={[
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: t('support.title', '客戶支援'), url: '/zh-TW/support' },
+        ]}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: [
+            {
+              '@type': 'Question',
+              name: 'Ayers 吉他的保固期限是多久？',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: 'Ayers Guitars 提供吉他本體有限終身保固（製造工藝缺陷），電子零件與配件則依產品類別另有規定。詳情請參閱保固頁面。',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: '如何保養 Ayers 全單板吉他？',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: '建議將濕度控制在 45–55%，避免陽光直射與劇烈溫差。定期使用吉他專用保養油擦拭指板，並在乾燥季節使用吉他加濕器保護琴身。',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Ayers 吉他可以退換貨嗎？',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: '購買後 14 天內，若商品未受損且包裝完整，可申請退換貨。客製化商品及特賣商品不在退換貨範圍。詳情請參閱退換貨政策頁面。',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: 'Ayers 吉他的運送時間需要多久？',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: '台灣本島一般訂單約 3–5 個工作天，海外訂單視地區不同約 7–21 個工作天。訂單確認後將寄送追蹤號碼。',
+              },
+            },
+            {
+              '@type': 'Question',
+              name: '如何使用 Ayers 3D Custom Lab 客製化吉他？',
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: '進入官網 Customizer 頁面，選擇吉他型號後可依序調整面板木材、背側板、音孔裝飾環、弦釘、琴頸、外框鑲邊等細節，完成後提交訂單即可。',
+              },
+            },
+          ],
+        }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <header className="text-center mb-16 bg-ayers-dark text-white p-8 sm:p-16 rounded-2xl sm:rounded-[3rem] relative overflow-hidden">

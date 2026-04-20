@@ -113,7 +113,32 @@ export default function EventDetail() {
 
   return (
     <div className="bg-ayers-cream min-h-screen">
-      <SEO title={event.title} description={event.description} />
+      <SEO
+        title={event.title}
+        description={event.description}
+        ogImage={event.coverImage || undefined}
+        ogType="event"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Event',
+          name: event.title,
+          description: event.description,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          eventStatus: isOngoing
+            ? 'https://schema.org/EventScheduled'
+            : isUpcoming
+              ? 'https://schema.org/EventScheduled'
+              : 'https://schema.org/EventPast',
+          eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+          organizer: {
+            '@type': 'Organization',
+            name: 'Ayers Guitars',
+            url: 'https://www.ayersguitars.com',
+          },
+          ...(event.coverImage ? { image: event.coverImage.startsWith('http') ? event.coverImage : `https://www.ayersguitars.com${event.coverImage}` } : {}),
+        }}
+      />
 
       {/* Hero */}
       <section className="relative h-[50vh] flex items-end overflow-hidden bg-ayers-dark text-white">

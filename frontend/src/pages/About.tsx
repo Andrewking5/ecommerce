@@ -28,10 +28,68 @@ export default function About() {
     <div className="bg-ayers-cream min-h-screen">
       <SEO
         title={t('about.heroTitle', '關於 Ayers Guitars')}
-        description={t('about.storyP1', 'Ayers 是世界知名的高端手工吉他品牌，由擁有數十年經驗的匠人打造。')}
+        description="Ayers Guitars 自 1996 年創立，台灣品牌、越南製造，結合國際製琴師顧問，以全手工工藝打造頂級原聲吉他。"
+        ogImage="https://www.ayersguitars.com/images/ayers/about-01.png"
         breadcrumbs={[
-          { name: 'Home', url: `/${t('lang', 'zh-TW')}` },
-          { name: t('about.heroTitle', 'About'), url: `/${t('lang', 'zh-TW')}/about` },
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: t('about.heroTitle', '關於我們'), url: '/zh-TW/about' },
+        ]}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Ayers Guitars',
+            alternateName: 'Ayers',
+            url: 'https://www.ayersguitars.com',
+            logo: 'https://www.ayersguitars.com/favicon.svg',
+            foundingDate: '1996',
+            foundingLocation: {
+              '@type': 'Place',
+              name: 'Đồng Nai, Vietnam',
+              addressCountry: 'VN',
+            },
+            description: '自 1996 年起以台灣品牌精神、越南工廠手工打造頂級原聲吉他，結合澳洲與英國製琴師顧問，每年生產逾萬把精品吉他。',
+            numberOfEmployees: { '@type': 'QuantitativeValue', minValue: 50 },
+            sameAs: [
+              'https://www.facebook.com/AyersgtUluruuke',
+              'https://www.instagram.com/ayersguitar/',
+              'https://www.youtube.com/user/AyersGuitar',
+            ],
+            employee: [
+              { '@type': 'Person', name: 'Gerard Gilet', jobTitle: 'Technical Advisor', nationality: 'Australian' },
+              { '@type': 'Person', name: 'Balazs Prohaszka', jobTitle: 'Resident Luthier Consultant', nationality: 'British' },
+            ],
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'Ayers Guitars 是什麼時候成立的？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers Guitars 於 1996 年正式創立，工廠設於越南同奈省邊和市，品牌由台灣主導，初期邀請澳洲製琴師 Gerard Gilet 擔任技術顧問。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他為什麼在越南製造？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers 在越南建廠是為了結合當地優秀木工工藝傳統與較低的生產成本，同時由台灣品牌主導設計與品管，並延攬國際製琴師顧問確保品質達到頂級標準。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 與哪些知名音樂人合作過？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '知名指彈演奏家 Andy McKee 於 2005 年使用 Ayers 吉他。品牌也與多位台灣及亞洲地區知名音樂人長期合作推廣。',
+                },
+              },
+            ],
+          },
         ]}
       />
       {/* Hero */}

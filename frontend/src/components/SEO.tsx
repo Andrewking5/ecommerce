@@ -32,7 +32,7 @@ interface SEOProps {
   ogImage?: string;
   ogType?: string;
   canonicalUrl?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** Breadcrumb trail for structured data */
   breadcrumbs?: BreadcrumbItem[];
   /** Disable hreflang for pages that don't have i18n variants (e.g., 404) */
@@ -126,12 +126,12 @@ export default function SEO({
         </script>
       )}
 
-      {/* Custom JSON-LD */}
-      {jsonLd && (
-        <script type="application/ld+json">
-          {JSON.stringify(jsonLd)}
+      {/* Custom JSON-LD (single object or array of schemas) */}
+      {jsonLd && (Array.isArray(jsonLd) ? jsonLd : [jsonLd]).map((schema, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(schema)}
         </script>
-      )}
+      ))}
     </Helmet>
   );
 }

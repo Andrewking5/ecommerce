@@ -253,21 +253,83 @@ export default function Home() {
       <SEO
         title={t('home.seoTitle', '手工吉他品牌 — 台灣製造頂級原聲吉他')}
         description={t('home.seoDesc', 'Ayers Guitars — 自1996年起，以匠心手工打造頂級原聲吉他。SUNWAVE 聲學技術，為您帶來卓越音色與共鳴。')}
-        jsonLd={{
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: 'Ayers Guitars',
-          url: 'https://www.ayersguitars.com',
-          logo: 'https://www.ayersguitars.com/favicon.svg',
-          foundingDate: '1996',
-          foundingLocation: { '@type': 'Place', name: 'Taiwan' },
-          description: 'Premium handcrafted acoustic guitars from Taiwan since 1996.',
-          sameAs: [
-            'https://www.facebook.com/AyersgtUluruuke',
-            'https://www.instagram.com/ayersguitar/',
-            'https://www.youtube.com/user/AyersGuitar',
-          ],
-        }}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Ayers Guitars',
+            url: 'https://www.ayersguitars.com',
+            logo: 'https://www.ayersguitars.com/favicon.svg',
+            foundingDate: '1996',
+            foundingLocation: { '@type': 'Place', name: 'Taiwan' },
+            description: 'Premium handcrafted acoustic guitars from Taiwan since 1996.',
+            sameAs: [
+              'https://www.facebook.com/AyersgtUluruuke',
+              'https://www.instagram.com/ayersguitar/',
+              'https://www.youtube.com/user/AyersGuitar',
+            ],
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Ayers Guitars',
+            url: 'https://www.ayersguitars.com',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: 'https://www.ayersguitars.com/zh-TW/collections?search={search_term_string}',
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'Ayers Guitars 是哪個國家的品牌？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers Guitars 是台灣品牌，自 1996 年起在越南設廠生產，由台灣主導設計，並與澳洲、英國等國際製琴師顧問合作，手工打造每一把吉他。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '什麼是 Ayers SUNWAVE 聲學系統？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'SUNWAVE 是 Ayers Guitars 於 2025 年發表的全新聲學技術，採用仿日出放射狀力木結構，讓音板振動更均勻，帶來更豐富的音色層次與延音。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他有哪些系列？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers 吉他主要系列包含 Wave Series（海浪紋路頂板）、Sun Series（太陽輻射力木）、Light Series（輕量化設計），以及可 3D 客製化的 Custom Lab 服務。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他可以客製化嗎？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: '可以。Ayers 提供 3D Custom Lab 線上客製化服務，讓你自由選擇木材、音孔裝飾、弦釘、外框鑲邊等細節，打造屬於自己的吉他。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他在哪裡可以購買？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers 吉他可透過官網線上商店購買，並在台灣、日本、越南、中國等地設有授權經銷商。可前往 Store Locator 頁面查詢最近的實體店面。',
+                },
+              },
+            ],
+          },
+        ]}
       />
       <FretboardProgress sections={FRETBOARD_SECTIONS} />
 

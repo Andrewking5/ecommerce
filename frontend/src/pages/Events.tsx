@@ -45,7 +45,22 @@ export default function Events() {
     <div className="bg-ayers-cream min-h-screen">
       <SEO
         title={t('events.title', '活動與推廣')}
-        description={t('events.description', '探索 Ayers Guitars 最新活動、展覽與限定推廣。')}
+        description={t('events.description', '探索 Ayers Guitars 最新活動、展覽與限定推廣。包含靈魂吉他手大賽、展覽、特賣與音樂活動。')}
+        breadcrumbs={[
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: t('events.title', '活動與推廣'), url: '/zh-TW/events' },
+        ]}
+        jsonLd={events.length > 0 ? {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Ayers Guitars 活動列表',
+          itemListElement: events.map((ev, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: ev.title,
+            url: `https://www.ayersguitars.com/zh-TW/events/${ev.slug}`,
+          })),
+        } : undefined}
       />
 
       {/* Hero */}

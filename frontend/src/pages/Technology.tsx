@@ -11,10 +11,65 @@ export default function Technology() {
     <div className="bg-ayers-cream min-h-screen">
       <SEO
         title={t('tech.heroTitle', 'AYERS 2.0 — 重新定義聲學卓越')}
-        description={t('tech.feature1Desc', 'SUNWAVE 系統、T-Line 無縫延音技術、Awesome 弦釘系統 — Ayers 三大核心聲學技術。')}
+        description={t('tech.feature1Desc', 'SUNWAVE 系統、T-Line 無縫延音技術、Awesome 弦釘系統 — Ayers 三大核心聲學技術，為頂級手工吉他帶來卓越音色。')}
+        ogImage="https://www.ayersguitars.com/images/products/ayers-tech-1.png"
         breadcrumbs={[
-          { name: 'Home', url: '/' },
-          { name: t('tech.heroTitle', 'Technology'), url: '/technology' },
+          { name: 'Ayers Guitars', url: '/zh-TW' },
+          { name: t('tech.heroTitle', 'Technology'), url: '/zh-TW/technology' },
+        ]}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'TechArticle',
+            headline: 'AYERS 2.0 — 三大核心聲學技術',
+            description: 'Ayers Guitars 的三大專利聲學技術：SUNWAVE 系統、T-Line 無縫延音技術、Awesome 弦釘系統。',
+            image: 'https://www.ayersguitars.com/images/products/ayers-tech-1.png',
+            author: { '@type': 'Organization', name: 'Ayers Guitars' },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Ayers Guitars',
+              logo: { '@type': 'ImageObject', url: 'https://www.ayersguitars.com/favicon.svg' },
+            },
+            url: 'https://www.ayersguitars.com/zh-TW/technology',
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: '什麼是 Ayers SUNWAVE 聲學系統？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'SUNWAVE 是 Ayers 於 2025 年發表的專利力木結構技術，採用仿日出放射狀排列，讓音板振動面積更均勻，帶來更豐富的泛音與更長的延音。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '什麼是 Ayers T-Line 技術？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'T-Line 是 Ayers 的無縫延音技術，透過特殊的側板支撐結構設計，消除音板與側板之間的能量損耗，讓吉他的延音更飽滿流暢。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: '什麼是 Ayers Awesome 弦釘系統？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Awesome 弦釘系統是 Ayers 自主研發的快速換弦裝置，省去傳統弦釘的麻煩，讓換弦更快速簡便，同時優化弦的張力傳導。',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Ayers 吉他使用什麼木材？',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Ayers 頂級系列使用全單板設計，常見木材包含雲杉（Spruce）、杉木（Cedar）面板，搭配玫瑰木（Rosewood）或桃花心木（Mahogany）背側板。',
+                },
+              },
+            ],
+          },
         ]}
       />
       {/* Hero Section */}
