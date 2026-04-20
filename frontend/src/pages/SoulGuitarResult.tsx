@@ -432,7 +432,8 @@ function FullResultPage({ resultKey, folder, layout }: {
           await navigator.share({ title: shareText, text: shareText, url: shareUrl });
         }
         // resolve = 使用者選了分享目標
-        if (!localStorage.getItem('soulGuitar_shareEmail_v2')) setShowEmailModal(true);
+        setEmailDone(!!localStorage.getItem('soulGuitar_shareEmail_v2'));
+        setShowEmailModal(true);
         return;
       } catch {
         return;
@@ -443,7 +444,8 @@ function FullResultPage({ resultKey, folder, layout }: {
     await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
-    if (!localStorage.getItem('soulGuitar_shareEmail_v2')) setShowEmailModal(true);
+    setEmailDone(!!localStorage.getItem('soulGuitar_shareEmail_v2'));
+    setShowEmailModal(true);
   };
 
   const handleEmailSubmit = async () => {
@@ -762,8 +764,8 @@ function FullResultPage({ resultKey, folder, layout }: {
               {emailDone ? (
                 <div className="flex flex-col items-center gap-3 py-4">
                   <div className="text-4xl">🎸</div>
-                  <p className="text-lg font-bold text-gray-800">報名成功！</p>
-                  <p className="text-sm text-gray-500 text-center">抽獎結果將寄送至您的 Email<br />祝您好運！</p>
+                  <p className="text-lg font-bold text-gray-800">{emailVal ? '報名成功！' : '您已報名過抽獎'}</p>
+                  <p className="text-sm text-gray-500 text-center">{emailVal ? '抽獎結果將寄送至您的 Email\n祝您好運！' : '您的 Email 已登記在抽獎名單中\n感謝參與！'}</p>
                   <button
                     type="button"
                     onClick={() => setShowEmailModal(false)}
