@@ -537,16 +537,15 @@ export default function SoulGuitarInfo() {
                       <h4 className="text-xl font-black">{a.title}</h4>
                     </div>
                   </div>
-                  <div className="space-y-2 mb-5">
-                    <p className="text-sm text-orange-400">AYERS {a.type}</p>
-                    <p className="text-xs text-orange-400/60">{a.guitar}</p>
+                  <div className="mb-5">
+                    <p className="text-sm text-orange-400">AYERS {a.type} {a.guitar}</p>
                   </div>
                   <div className="flex flex-wrap items-end gap-x-1.5 gap-y-1">
                     <span className="text-[10px] text-orange-400/50">NT$</span>
                     <span className="text-2xl sm:text-3xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
                     <span className="text-xs sm:text-sm text-orange-400/70">+ 獎金 NT${a.bonus}</span>
                   </div>
-                  <p className="text-[10px] text-orange-400/50 mt-3">{a.method}</p>
+                  <p className={`text-[10px] mt-3 ${a.method === '五位評審共同評分' ? 'text-orange-400 font-bold' : 'text-orange-400/50'}`}>{a.method}</p>
                 </div>
               </div>
             ))}
@@ -564,13 +563,12 @@ export default function SoulGuitarInfo() {
                 <div className="p-5 bg-white/[0.03] border border-t-0 border-white/[0.06] rounded-b-2xl">
                   <span className="text-2xl block mb-2">{a.icon}</span>
                   <h4 className="text-base font-bold mb-2">{a.title}</h4>
-                  <p className="text-xs text-orange-400/80 mb-0.5">AYERS {a.guitar}</p>
-                  {a.extra && <p className="text-[10px] text-orange-400/60">{a.extra}</p>}
+                  <p className="text-xs text-orange-400/80 mb-0.5">AYERS {a.guitar}{a.extra ? ` ${a.extra}` : ''}</p>
                   <div className="flex items-end gap-1 mt-3 mb-1">
                     <span className="text-[9px] text-orange-400/50">NT$</span>
                     <span className="text-xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
                   </div>
-                  <p className="text-[9px] text-orange-400/50">{a.method}</p>
+                  <p className="text-[9px] text-orange-400 font-bold">{a.method}</p>
                 </div>
               </div>
             ))}
@@ -590,7 +588,7 @@ export default function SoulGuitarInfo() {
                     <span className="text-[8px] px-1.5 py-0.5 rounded-full border border-white/10 text-white/30">{a.n}</span>
                   </div>
                   <p className="text-xs text-orange-400/80">{a.prize}</p>
-                  <p className="text-[10px] text-orange-400/50 mt-0.5">{a.note}</p>
+                  <p className="text-[10px] mt-0.5 text-orange-400 font-bold">{a.note}</p>
                 </div>
               </div>
             ))}
