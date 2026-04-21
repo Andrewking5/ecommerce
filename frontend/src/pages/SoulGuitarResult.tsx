@@ -1081,17 +1081,28 @@ export default function SoulGuitarResult() {
 
     const RF = `${BASE}/result/${folder}`;
     // Preload all above-fold assets before dismissing the loading screen.
-    // Progress is tracked individually so the user sees meaningful feedback.
-    // NOTE: char.webp can be up to 63MB (animated WebP). Once converted to
-    // mp4/webm by the designer the total payload drops ~90% and this is fast.
-    const filesToPreload = ['hero-card.webp', 'bg.webp'];
+    // Use webm on Android (150–730KB), webp on iOS (1–6MB after compression).
+    const isIOS = /iP(hone|ad|od)/i.test(navigator.userAgent);
+    const canWebm = !isIOS && document.createElement('video').canPlayType('video/webm; codecs=vp9') === 'probably';
+    const filesToPreload = ['hero-card.webp', 'bg.webp', canWebm ? 'char.webm' : 'char.webp'];
     let loaded = 0;
+    const tick = () => { loaded++; setLoadProgress(Math.round((loaded / filesToPreload.length) * 100)); };
     const assets = filesToPreload.map(f => {
-      const img = new Image();
-      img.src = `${RF}/${f}${CACHE_V}`;
-      return (img.decode ? img.decode() : new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); }))
-        .catch(() => {})
-        .then(() => { loaded++; setLoadProgress(Math.round((loaded / filesToPreload.length) * 100)); });
+      const src = `${RF}/${f}${CACHE_V}`;
+      const p = f.endsWith('.webm')
+        ? new Promise<void>(res => {
+            const v = document.createElement('video');
+            v.preload = 'auto';
+            v.oncanplaythrough = () => res();
+            v.onerror = () => res();
+            v.src = src;
+          })
+        : (() => {
+            const img = new Image();
+            img.src = src;
+            return (img.decode ? img.decode() : new Promise<void>(res => { img.onload = () => res(); img.onerror = () => res(); }));
+          })();
+      return p.catch(() => {}).then(tick);
     });
     Promise.allSettled(assets).then(() => setIsLoading(false));
   }, [folder, resultKey, slug]);
