@@ -554,9 +554,9 @@ export default function SoulGuitarInfo() {
           {/* 三個獎 — 中卡片 */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-6">
             {[
-              { icon: '🌟', title: '最佳吉他手', guitar: 'A07c Sun 全單吉他', extra: '+ 雲聲錄音電容麥克風', money: '42,000', method: '評審評分', color: GOLD },
-              { icon: '🎤', title: '最佳 Vocal', guitar: 'A02c Sun 全單吉他', extra: '+ 聲潮麥克風', money: '26,000', method: '評審評分', color: '#3b82f6' },
-              { icon: '❤️', title: '最佳人氣獎', guitar: 'ST2-Color Light 面單彩色吉他', extra: '', money: '15,500', method: 'FB/IG 讚數最高', color: '#ef4444' },
+              { icon: '🌟', title: '最佳吉他手', guitar: 'A07c Sun 全單吉他', extra: '+ 雲聲錄音電容麥克風', micDetail: 'SonoFlex 樂器麥克風　NT$9,990', money: '42,000', method: '評審評分', color: GOLD },
+              { icon: '🎤', title: '最佳 Vocal', guitar: 'A02c Sun 全單吉他', extra: '+ 聲潮錄音電容麥克風', micDetail: 'ST-K8　NT$9,800', money: '26,000', method: '評審評分', color: '#3b82f6' },
+              { icon: '❤️', title: '最佳人氣獎', guitar: 'ST2-Color Light 面單彩色吉他', extra: '', micDetail: '', money: '15,500', method: 'FB/IG 讚數最高', color: '#ef4444' },
             ].map((a) => (
               <div key={a.title} className="rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300">
                 <div className="h-1" style={{ backgroundColor: a.color }} />
@@ -564,9 +564,10 @@ export default function SoulGuitarInfo() {
                   <span className="text-2xl block mb-2">{a.icon}</span>
                   <h4 className="text-base font-bold mb-2">{a.title}</h4>
                   <p className="text-xs text-white/70 mb-0.5">AYERS {a.guitar}{a.extra ? ` ${a.extra}` : ''}</p>
-                  <div className="flex items-end gap-1 mt-3 mb-1">
+                  <div className="flex flex-wrap items-end gap-x-1.5 gap-y-1 mt-3 mb-1">
                     <span className="text-[9px] text-white/40">NT$</span>
                     <span className="text-xl font-black font-mono leading-none" style={{ color: GOLD }}>{a.money}</span>
+                    {a.micDetail && <span className="text-[10px] text-white/50">{a.micDetail}</span>}
                   </div>
                   <p className="text-[9px] text-orange-400 font-bold">{a.method}</p>
                 </div>
@@ -864,7 +865,7 @@ export default function SoulGuitarInfo() {
             <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/[0.04] border border-white/[0.07] rounded-2xl p-6 sm:p-8">
               <img src="/images/events/sponsors/ayers.png" alt="Ayers Guitars" className="h-12 object-contain shrink-0" />
               <div className="text-center sm:text-left w-full">
-                <p className="text-sm font-bold text-white mb-2">Ayers Guitars</p>
+                <p className="text-sm font-bold text-white mb-2">Ayers Guitar</p>
                 {isEdit ? (
                   <textarea
                     className="w-full text-xs bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white/80 leading-relaxed resize-none focus:outline-none focus:border-yellow-500/50"
