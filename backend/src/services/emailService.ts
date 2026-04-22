@@ -365,7 +365,7 @@ export class EmailService {
   }
 
   /** 靈魂吉他手大賽報名確認信 */
-  static async sendSoulGuitarRegistration(to: string, name: string): Promise<void> {
+  static async sendSoulGuitarRegistration(to: string): Promise<void> {
     const couponPath = path.join(__dirname, '../assets/soul-guitar-coupon.png');
     const html = `
       <!DOCTYPE html>
@@ -399,14 +399,16 @@ export class EmailService {
           <div class="content">
 
             <!-- 中文 -->
-            <p>親愛的 ${name} 您好：</p>
+            <p>親愛的參賽者 您好：</p>
             <p>感謝您報名參加【靈魂吉他手大賽】<br>我們已成功收到您的報名資料，期待欣賞您的精彩演出！</p>
-            <p>以下為本次賽事重要時程與資訊，請務必留意：</p>
+            <p>以下為本次賽事的重要時程與資訊，請務必留意：</p>
             <div class="schedule">
               <p>▸ <strong>評審時間：</strong>6/08 – 6/17</p>
-              <p>▸ <strong>得獎公布：</strong>6/29（21:00）</p>
+              <p>▸ <strong>得獎公布：</strong>6/29</p>
             </div>
-            <p>請確認您的參賽影片符合規範，並於截止日前完成提交。<br>並請在三個工作天內確認是否有在靈魂吉他手大賽播放清單內。</p>
+            <p>請確認您的參賽影片是否符合相關規範。<br>若提交後發現內容需要修改，請於收件期間（4/22 – 6/07）聯繫我們協助處理。</p>
+            <p>另外，也請您於提交後三個工作天內，確認您的影片是否已加入 Ayers 官方 YouTube「靈魂吉他手大賽」播放清單：<br>
+            <a href="https://www.youtube.com/playlist?list=PLw6S60T2GSOx13l5eFQOME5Hd9TVzfRuw" style="color:#C8A96E;">https://www.youtube.com/playlist?list=PLw6S60T2GSOx13l5eFQOME5Hd9TVzfRuw</a></p>
 
             <hr class="divider">
 
@@ -418,30 +420,32 @@ export class EmailService {
 
             <hr class="divider">
 
-            <p>再次感謝您的參與，<br>願您的音樂被世界聽見。</p>
-            <p><strong>Ayers Guitars 敬上</strong><br><em>Crafted by Masters with Heart and Soul.</em></p>
+            <p>再次感謝您的支持，祝您比賽順利！</p>
+            <p><strong>Ayers Guitars 敬上</strong></p>
 
             <hr class="lang-divider">
 
             <!-- English -->
-            <p>Dear ${name},</p>
-            <p>Thank you for registering for the <strong>"Soul Guitarist Competition."</strong><br>We have successfully received your application and look forward to your performance!</p>
-            <p>Please take note of the important schedule and information below:</p>
+            <p>Dear Participant,</p>
+            <p>Thank you for registering for the Soul Guitar Competition.<br>We have successfully received your submission and look forward to your performance!</p>
+            <p>Please take note of the following important dates:</p>
             <div class="schedule">
               <p>▸ <strong>Judging Period:</strong> June 8 – June 17</p>
-              <p>▸ <strong>Winner Announcement:</strong> June 29 (21:00)</p>
+              <p>▸ <strong>Results Announcement:</strong> June 29</p>
             </div>
-            <p>Please ensure your submission video meets all requirements and is uploaded before the deadline.<br>Kindly check within three working days whether your video has been added to the official playlist.</p>
+            <p>Kindly ensure that your submitted video complies with all competition guidelines.<br>If you need to make any changes after submission, please contact us within the submission period (April 22 – June 7).</p>
+            <p>Additionally, please check within three working days whether your video has been added to the official Ayers YouTube playlist:<br>
+            <a href="https://www.youtube.com/playlist?list=PLw6S60T2GSOx13l5eFQOME5Hd9TVzfRuw" style="color:#C8A96E;">Soul Guitar Competition Playlist</a></p>
 
             <hr class="divider">
 
             <p class="section-title">Participant Exclusive Offer</p>
-            <p>As a token of our appreciation, a special discount coupon is included in this email. Feel free to use it within the valid period.</p>
+            <p>As a token of appreciation, we have included a special discount voucher in this email. Feel free to use it within the designated period.</p>
 
             <hr class="divider">
 
-            <p>Thank you again for your participation.<br>May your music be heard by the world.</p>
-            <p><strong>Ayers Guitars</strong><br><em>Crafted by Masters with Heart and Soul.</em></p>
+            <p>Thank you again for your participation, and we wish you the best of luck!</p>
+            <p><strong>Sincerely,<br>Ayers Guitars</strong></p>
 
           </div>
           <div class="footer">

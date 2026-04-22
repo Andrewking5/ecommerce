@@ -83,7 +83,7 @@ export class RegistrationController {
       res.status(201).json({ success: true, data: { id: registration.id } });
 
       // 非同步寄信，不阻塞 response
-      EmailService.sendSoulGuitarRegistration(registration.email, registration.name).catch((err) =>
+      EmailService.sendSoulGuitarRegistration(registration.email).catch((err) =>
         console.error('Failed to send registration email:', err)
       );
     } catch (error) {
@@ -191,7 +191,7 @@ export class RegistrationController {
       return;
     }
     try {
-      await EmailService.sendSoulGuitarRegistration(to, '測試 Test');
+      await EmailService.sendSoulGuitarRegistration(to);
       res.json({ success: true, message: `Email sent to ${to}` });
     } catch (err: any) {
       console.error('Test email error:', err);
