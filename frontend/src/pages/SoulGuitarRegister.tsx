@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
 import SEO from '../components/SEO';
 import registrationService from '../services/registrationService';
+import eventService from '../services/eventService';
 
 /* ═══════════════════════════════════════════════════
    2026 Ayers 靈魂吉他手大賽 — 報名頁
@@ -152,6 +153,9 @@ export default function SoulGuitarRegister() {
       if (s) { setRegOpen(s.open); setRegCount(s.count); setRegLimit(s.limit); }
       else setRegOpen(false);
     }).catch(() => setRegOpen(false));
+    eventService.getEventBySlug(EVENT_SLUG).then((event) => {
+      if (event?.referralCode) eventService.trackClick(event.referralCode).catch(() => {});
+    }).catch(() => {});
   }, []);
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {

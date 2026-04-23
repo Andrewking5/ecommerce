@@ -3,7 +3,7 @@ import {
   Plus, Trash2, RefreshCw, Edit, Eye, EyeOff, CalendarDays, MapPin, QrCode, Link, Copy, Check,
   ExternalLink, FileText, X, Save, ChevronDown, ChevronRight, ChevronLeft, Users, Download, AlertTriangle, BarChart3, TrendingUp, Mail,
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { cn } from '@/src/lib/utils';
 import { GuitarSunLoader } from '@/src/components/guitar';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -84,7 +84,7 @@ const SOUL_GROUP: Record<string, { label: string; emoji: string; color: string; 
 
 /* ─── Types ─── */
 
-type QuizTab = 'analytics' | 'registrations' | 'emails';
+type QuizTab = 'analytics' | 'registrations' | 'emails' | 'clicks';
 
 /* ─── StatCard ─── */
 
@@ -140,7 +140,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   }, [activeTab]);
 
   useEffect(() => {
-    if (activeTab !== 'analytics' || soulEvents.length === 0) return;
+    if ((activeTab !== 'analytics' && activeTab !== 'clicks') || soulEvents.length === 0) return;
     soulEvents.forEach(ev => {
       if (pageStats[ev.id] !== undefined) return;
       setPageStats(prev => ({ ...prev, [ev.id]: null }));
@@ -210,7 +210,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
 
       {/* ── Tab bar ── */}
       <div className="flex border-b border-white/5 -mt-4">
-        {([['analytics', '📊 測驗分析'], ['registrations', '👥 報名名單'], ['emails', '📧 抽獎 Email']] as [QuizTab, string][]).map(([tab, label]) => (
+        {([['analytics', '📊 測驗分析'], ['registrations', '👥 報名名單'], ['emails', '📧 抽獎 Email'], ['clicks', '📈 點擊數據']] as [QuizTab, string][]).map(([tab, label]) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={cn('px-5 py-3 text-[11px] font-bold uppercase tracking-widest transition-colors border-b-2 -mb-px',
               activeTab === tab ? 'text-ayers-gold border-ayers-gold' : 'text-white/30 hover:text-white/60 border-transparent')}>
@@ -373,31 +373,60 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
             )}
           </Card>
 
-          <Card title="頁面流量 — 各子頁面點擊數">
-            <div className="divide-y divide-white/5">
-              {soulEvents.length === 0 ? <EmptyChart icon={<BarChart3 size={40} />} message="無頁面資料" /> : soulEvents.map(ev => {
-                const st = pageStats[ev.id];
-                return (
-                  <div key={ev.id} className="flex items-center gap-4 px-5 py-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-white/70 font-medium truncate">{ev.title}</p>
-                      <p className="text-[10px] text-white/30 font-mono">/e/{ev.slug}</p>
-                    </div>
-                    {st === null ? <Spinner /> : st === undefined ? <span className="text-[10px] text-white/20">—</span> : (
-                      <div className="flex items-center gap-5 shrink-0 text-right">
-                        <div><p className="text-sm font-bold text-ayers-gold">{st.totalScans}</p><p className="text-[9px] text-white/25">掃描</p></div>
-                        <div><p className="text-sm font-bold text-white/70">{st.totalClicks}</p><p className="text-[9px] text-white/25">點擊</p></div>
-                        <div><p className="text-sm font-bold text-white/40">{st.uniqueVisitors}</p><p className="text-[9px] text-white/25">不重複</p></div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-
         </>
       ))}
+
+      {/* ── Clicks tab ── */}
+      {activeTab === 'clicks' && (
+        <div className="space-y-6">
+          {/* Summary row */}
+          <div className="grid grid-cols-3 gap-4">
+            {soulEvents.map(ev => {
+              const st = pageStats[ev.id];
+              return (
+                <div key={ev.id} className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
+                  <p className="text-xs font-bold text-white/70 truncate mb-0.5">{ev.title}</p>
+                  <p className="text-[10px] text-white/25 font-mono mb-4">/e/{ev.slug}</p>
+                  {st === null ? <Spinner /> : st === undefined ? <span className="text-[10px] text-white/20">—</span> : (
+                    <div className="flex gap-4">
+                      <div><p className="text-2xl font-bold text-ayers-gold">{st.totalScans}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">掃描</p></div>
+                      <div><p className="text-2xl font-bold text-white/60">{st.totalClicks}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">點擊</p></div>
+                      <div><p className="text-2xl font-bold text-white/30">{st.uniqueVisitors}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">不重複</p></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Line charts — one per sub-page */}
+          {soulEvents.map(ev => {
+            const st = pageStats[ev.id];
+            return (
+              <Card key={ev.id} title={`${ev.title} — 每日點擊趨勢`}>
+                {st === null || st === undefined ? (
+                  <div className="py-16 flex justify-center">{st === null ? <Spinner /> : <EmptyChart icon={<TrendingUp size={36} />} message="無數據" />}</div>
+                ) : st.dailyClicks.length === 0 ? (
+                  <EmptyChart icon={<TrendingUp size={36} />} message="尚無每日資料" />
+                ) : (
+                  <div className="px-4 py-4">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={st.dailyClicks} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                        <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
+                        <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                        <Tooltip contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+                        <Legend wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }} />
+                        <Line type="monotone" dataKey="count" name="點擊次數" stroke="#c5a059" strokeWidth={2} dot={{ r: 3, fill: '#c5a059' }} activeDot={{ r: 5 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Registrations tab ── */}
       {activeTab === 'registrations' && (

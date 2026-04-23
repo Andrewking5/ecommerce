@@ -12,7 +12,12 @@ export function useEventGate(slug: string): EventGate {
 
   useEffect(() => {
     eventService.getEventBySlug(slug)
-      .then(() => setChecking(false))
+      .then((event) => {
+        if (event?.referralCode) {
+          eventService.trackClick(event.referralCode).catch(() => {});
+        }
+        setChecking(false);
+      })
       .catch((err: any) => {
         if (err?.response?.status === 403 && err?.response?.data?.error === 'TEST_MODE') {
           setBlocked(true);
