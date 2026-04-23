@@ -394,16 +394,18 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
           { ev: regEv,   color: '#34d399', label: '活動報名' },
         ] as const;
 
-        // funnel data
-        const infoScans  = infoEv  ? (pageStats[infoEv.id]?.totalScans  ?? null) : null;
-        const quizTotal  = data?.total ?? null;
-        const regCount   = regTotal;
+        // funnel — all from EventClick (consistent data source / time period)
+        const infoScans = infoEv ? (pageStats[infoEv.id]?.totalScans ?? null) : null;
+        const quizScans = quizEv ? (pageStats[quizEv.id]?.totalScans  ?? null) : null;
+        const regScans  = regEv  ? (pageStats[regEv.id]?.totalScans   ?? null) : null;
         const funnelSteps = [
-          { label: '活動簡章瀏覽', value: infoScans,  color: '#c5a059' },
-          { label: '測驗完成',     value: quizTotal,  color: '#818cf8' },
-          { label: '成功報名',     value: regCount,   color: '#34d399' },
+          { label: '活動簡章瀏覽',  value: infoScans, color: '#c5a059' },
+          { label: '心理測驗主頁',  value: quizScans, color: '#818cf8' },
+          { label: '報名頁瀏覽',    value: regScans,  color: '#34d399' },
+          { label: '成功報名',      value: regTotal,  color: '#4ade80' },
         ];
-        const funnelBase = infoScans ?? 1;
+        // bar widths relative to the max value (not always step 1)
+        const funnelMax = Math.max(...funnelSteps.map(s => s.value ?? 0), 1);
 
         // date range filter
         const cutoff = clicksDays === 0 ? null : (() => {
@@ -444,7 +446,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               {PAGE_CFG.map(({ ev, color, label }) => {
                 const st = ev ? pageStats[ev.id] : undefined;
                 return (
@@ -468,43 +470,56 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                   </div>
                 );
               })}
+              {/* Quiz completions — separate data source, shown as standalone KPI */}
+              <div className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-yellow-400" />
+                  <p className="text-xs font-bold text-white/70">測驗完成</p>
+                </div>
+                {data === null ? <Spinner /> : (
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-yellow-400">{data?.total ?? '—'}</p>
+                    <p className="text-[9px] text-white/25 uppercase tracking-widest mt-1">累計完成次數</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Funnel */}
-            <Card title="轉換漏斗 — 簡章 → 測驗 → 報名">
+            {/* Funnel — all steps use EventClick page views, consistent data source */}
+            <Card title="轉換漏斗 — 頁面瀏覽（同一資料來源）">
               <div className="px-6 py-5 flex flex-col gap-3">
                 {funnelSteps.map((step, i) => {
-                  const pct = step.value === null ? null : Math.round((step.value / funnelBase) * 100);
-                  const cvr = i > 0 && step.value !== null && funnelSteps[i - 1].value
-                    ? ((step.value / funnelSteps[i - 1].value!) * 100).toFixed(1)
+                  const barPct = step.value === null ? 0 : Math.round((step.value / funnelMax) * 100);
+                  const prev = funnelSteps[i - 1];
+                  const cvr = i > 0 && step.value !== null && prev?.value
+                    ? (step.value / prev.value) * 100
                     : null;
                   return (
                     <div key={step.label}>
                       {i > 0 && (
-                        <div className="flex items-center gap-2 my-1 pl-2">
-                          <div className="w-px h-5 bg-white/10 ml-3" />
+                        <div className="flex items-center gap-2 my-1 ml-[88px]">
+                          <div className="w-px h-4 bg-white/10" />
                           {cvr !== null && (
                             <span className="text-[10px] text-white/30">
-                              轉換率 <span className="font-bold" style={{ color: step.color }}>{cvr}%</span>
+                              轉換率 <span className="font-bold" style={{ color: step.color }}>{cvr.toFixed(1)}%</span>
                             </span>
                           )}
                         </div>
                       )}
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] text-white/30 w-20 shrink-0 text-right">{step.label}</span>
-                        <div className="flex-1 bg-white/5 rounded-full h-6 overflow-hidden relative">
-                          <div className="h-full rounded-full transition-all duration-700 flex items-center px-3"
-                            style={{ width: `${pct ?? 0}%`, background: step.color + '44', border: `1px solid ${step.color}66` }}>
-                          </div>
+                        <span className="text-[10px] text-white/40 w-20 shrink-0 text-right leading-tight">{step.label}</span>
+                        <div className="flex-1 bg-white/5 rounded-full h-6 overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${barPct}%`, background: step.color + '44', border: `1px solid ${step.color}66` }} />
                         </div>
-                        <span className="text-sm font-bold w-12 shrink-0 text-right" style={{ color: step.color }}>
+                        <span className="text-sm font-bold w-14 shrink-0 text-right" style={{ color: step.color }}>
                           {step.value === null ? '—' : step.value.toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-white/25 w-10 shrink-0">{pct === null ? '' : `${pct}%`}</span>
                       </div>
                     </div>
                   );
                 })}
+                <p className="text-[10px] text-white/20 mt-2">* 頁面瀏覽數從追蹤啟用後開始累計；測驗完成數見上方摘要卡</p>
               </div>
             </Card>
 
