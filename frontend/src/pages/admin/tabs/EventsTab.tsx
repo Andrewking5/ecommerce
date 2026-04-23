@@ -117,6 +117,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   const [shareEmailsLoading, setShareEmailsLoading] = useState(false);
   const [shareEmailsError, setShareEmailsError] = useState('');
   const [pageStats, setPageStats] = useState<Record<string, EventAnalytics | null>>({});
+  const [clicksDays, setClicksDays] = useState<7 | 30 | 0>(30);
 
   const registerEvent = events.find(e => e.slug === 'soul-guitar/register');
   const soulEvents = events.filter(e => e.slug.startsWith('soul-guitar'));
@@ -377,56 +378,206 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
       ))}
 
       {/* ── Clicks tab ── */}
-      {activeTab === 'clicks' && (
-        <div className="space-y-6">
-          {/* Summary row */}
-          <div className="grid grid-cols-3 gap-4">
-            {soulEvents.map(ev => {
-              const st = pageStats[ev.id];
-              return (
-                <div key={ev.id} className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
-                  <p className="text-xs font-bold text-white/70 truncate mb-0.5">{ev.title}</p>
-                  <p className="text-[10px] text-white/25 font-mono mb-4">/e/{ev.slug}</p>
-                  {st === null ? <Spinner /> : st === undefined ? <span className="text-[10px] text-white/20">—</span> : (
-                    <div className="flex gap-4">
-                      <div><p className="text-2xl font-bold text-ayers-gold">{st.totalScans}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">掃描</p></div>
-                      <div><p className="text-2xl font-bold text-white/60">{st.totalClicks}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">點擊</p></div>
-                      <div><p className="text-2xl font-bold text-white/30">{st.uniqueVisitors}</p><p className="text-[9px] text-white/30 uppercase tracking-widest mt-0.5">不重複</p></div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+      {activeTab === 'clicks' && (() => {
+        const infoEv  = soulEvents.find(e => e.slug === 'soul-guitar/info');
+        const quizEv  = soulEvents.find(e => e.slug === 'soul-guitar');
+        const regEv   = soulEvents.find(e => e.slug === 'soul-guitar/register');
+        const PAGE_CFG = [
+          { ev: infoEv,  color: '#c5a059', label: '活動簡章' },
+          { ev: quizEv,  color: '#818cf8', label: '心理測驗' },
+          { ev: regEv,   color: '#34d399', label: '活動報名' },
+        ] as const;
 
-          {/* Line charts — one per sub-page */}
-          {soulEvents.map(ev => {
-            const st = pageStats[ev.id];
-            return (
-              <Card key={ev.id} title={`${ev.title} — 每日點擊趨勢`}>
-                {st === null || st === undefined ? (
-                  <div className="py-16 flex justify-center">{st === null ? <Spinner /> : <EmptyChart icon={<TrendingUp size={36} />} message="無數據" />}</div>
-                ) : st.dailyClicks.length === 0 ? (
-                  <EmptyChart icon={<TrendingUp size={36} />} message="尚無每日資料" />
-                ) : (
-                  <div className="px-4 py-4">
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={st.dailyClicks} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                        <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
-                        <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
-                        <Tooltip contentStyle={{ background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8 }} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
-                        <Legend wrapperStyle={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }} />
-                        <Line type="monotone" dataKey="count" name="點擊次數" stroke="#c5a059" strokeWidth={2} dot={{ r: 3, fill: '#c5a059' }} activeDot={{ r: 5 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
+        // funnel data
+        const infoScans  = infoEv  ? (pageStats[infoEv.id]?.totalScans  ?? null) : null;
+        const quizTotal  = data?.total ?? null;
+        const regCount   = regTotal;
+        const funnelSteps = [
+          { label: '活動簡章瀏覽', value: infoScans,  color: '#c5a059' },
+          { label: '測驗完成',     value: quizTotal,  color: '#818cf8' },
+          { label: '成功報名',     value: regCount,   color: '#34d399' },
+        ];
+        const funnelBase = infoScans ?? 1;
+
+        // date range filter
+        const cutoff = clicksDays === 0 ? null : (() => {
+          const d = new Date(); d.setDate(d.getDate() - clicksDays); return d.toISOString().slice(0, 10);
+        })();
+        const filterDates = (clicks: { date: string; count: number }[]) =>
+          cutoff ? clicks.filter(d => d.date >= cutoff) : clicks;
+
+        // merged daily line chart data
+        const allDates = new Set<string>();
+        PAGE_CFG.forEach(({ ev }) => {
+          if (!ev) return;
+          filterDates(pageStats[ev.id]?.dailyClicks ?? []).forEach(d => allDates.add(d.date));
+        });
+        const mergedDaily = Array.from(allDates).sort().map(date => {
+          const row: Record<string, number | string> = { date };
+          PAGE_CFG.forEach(({ ev, label }) => {
+            if (!ev) return;
+            const entry = filterDates(pageStats[ev.id]?.dailyClicks ?? []).find(d => d.date === date);
+            row[label] = entry?.count ?? 0;
+          });
+          return row;
+        });
+        const anyMergedData = mergedDaily.length > 0;
+        const tooltipStyle = { background: CARD_BG, border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, fontSize: 12 };
+
+        return (
+          <div className="space-y-6">
+            {/* Date range selector */}
+            <div className="flex items-center gap-1 self-end justify-end">
+              {([['7日', 7], ['30天', 30], ['全部', 0]] as [string, 7 | 30 | 0][]).map(([lbl, v]) => (
+                <button type="button" key={v} onClick={() => setClicksDays(v)}
+                  className={cn('px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all',
+                    clicksDays === v ? 'bg-ayers-gold/20 text-ayers-gold' : 'text-white/30 hover:text-white/60 hover:bg-white/5')}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+
+            {/* Summary cards */}
+            <div className="grid grid-cols-3 gap-4">
+              {PAGE_CFG.map(({ ev, color, label }) => {
+                const st = ev ? pageStats[ev.id] : undefined;
+                return (
+                  <div key={label} className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                      <p className="text-xs font-bold text-white/70 truncate">{label}</p>
+                    </div>
+                    {!ev || st === undefined ? <span className="text-[10px] text-white/20">—</span>
+                      : st === null ? <Spinner />
+                      : (
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          {[['掃描', st.totalScans, color], ['點擊', st.totalClicks, 'rgba(255,255,255,0.6)'], ['不重複', st.uniqueVisitors, 'rgba(255,255,255,0.3)']].map(([lbl, val, c]) => (
+                            <div key={lbl as string}>
+                              <p className="text-xl font-bold" style={{ color: c as string }}>{val as number}</p>
+                              <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">{lbl as string}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </div>
-                )}
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                );
+              })}
+            </div>
+
+            {/* Funnel */}
+            <Card title="轉換漏斗 — 簡章 → 測驗 → 報名">
+              <div className="px-6 py-5 flex flex-col gap-3">
+                {funnelSteps.map((step, i) => {
+                  const pct = step.value === null ? null : Math.round((step.value / funnelBase) * 100);
+                  const cvr = i > 0 && step.value !== null && funnelSteps[i - 1].value
+                    ? ((step.value / funnelSteps[i - 1].value!) * 100).toFixed(1)
+                    : null;
+                  return (
+                    <div key={step.label}>
+                      {i > 0 && (
+                        <div className="flex items-center gap-2 my-1 pl-2">
+                          <div className="w-px h-5 bg-white/10 ml-3" />
+                          {cvr !== null && (
+                            <span className="text-[10px] text-white/30">
+                              轉換率 <span className="font-bold" style={{ color: step.color }}>{cvr}%</span>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] text-white/30 w-20 shrink-0 text-right">{step.label}</span>
+                        <div className="flex-1 bg-white/5 rounded-full h-6 overflow-hidden relative">
+                          <div className="h-full rounded-full transition-all duration-700 flex items-center px-3"
+                            style={{ width: `${pct ?? 0}%`, background: step.color + '44', border: `1px solid ${step.color}66` }}>
+                          </div>
+                        </div>
+                        <span className="text-sm font-bold w-12 shrink-0 text-right" style={{ color: step.color }}>
+                          {step.value === null ? '—' : step.value.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-white/25 w-10 shrink-0">{pct === null ? '' : `${pct}%`}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+
+            {/* Multi-line overlay chart */}
+            <Card title="各頁面每日點擊趨勢（疊加比較）">
+              {!anyMergedData ? <EmptyChart icon={<TrendingUp size={36} />} message="尚無每日資料" /> : (
+                <div className="px-4 py-4">
+                  <ResponsiveContainer width="100%" height={240}>
+                    <LineChart data={mergedDaily} margin={{ top: 4, right: 12, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }} />
+                      <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+                      <Legend wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
+                      {PAGE_CFG.map(({ label, color }) => (
+                        <Line key={label} type="monotone" dataKey={label} stroke={color} strokeWidth={2}
+                          dot={{ r: 3, fill: color }} activeDot={{ r: 5 }} connectNulls />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </Card>
+
+            {/* Device breakdown per page */}
+            <Card title="裝置分布 — 各頁面手機 vs 電腦">
+              <div className="divide-y divide-white/5">
+                {PAGE_CFG.map(({ ev, color, label }) => {
+                  const st = ev ? pageStats[ev.id] : undefined;
+                  if (!ev || st === null) return (
+                    <div key={label} className="flex items-center gap-4 px-5 py-3">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                      <span className="text-xs text-white/50 w-20">{label}</span>
+                      <Spinner />
+                    </div>
+                  );
+                  if (!st || st.deviceBreakdown.length === 0) return (
+                    <div key={label} className="flex items-center gap-4 px-5 py-3">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                      <span className="text-xs text-white/50 w-20">{label}</span>
+                      <span className="text-[10px] text-white/20">無資料</span>
+                    </div>
+                  );
+                  const devTotal = st.deviceBreakdown.reduce((s, d) => s + d.count, 0) || 1;
+                  return (
+                    <div key={label} className="px-5 py-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                        <span className="text-xs font-bold text-white/60">{label}</span>
+                        <span className="text-[10px] text-white/25 ml-auto">{devTotal} 次點擊</span>
+                      </div>
+                      <div className="flex gap-1 h-4 rounded-full overflow-hidden mb-2">
+                        {['mobile','desktop','tablet'].map(dev => {
+                          const cnt = st.deviceBreakdown.find(d => d.device === dev)?.count ?? 0;
+                          const pct = (cnt / devTotal) * 100;
+                          if (pct === 0) return null;
+                          const devColor = dev === 'mobile' ? color : dev === 'desktop' ? color + '77' : color + '44';
+                          return <div key={dev} style={{ width: `${pct}%`, background: devColor }} />;
+                        })}
+                      </div>
+                      <div className="flex gap-4 flex-wrap">
+                        {st.deviceBreakdown.map(d => {
+                          const pct = ((d.count / devTotal) * 100).toFixed(1);
+                          const icon = d.device === 'mobile' ? '📱' : d.device === 'tablet' ? '📟' : '💻';
+                          return (
+                            <span key={d.device} className="text-[10px] text-white/40 capitalize">
+                              {icon} {d.device} <span className="font-bold text-white/60">{d.count}</span> ({pct}%)
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </div>
+        );
+      })()}
 
       {/* ── Registrations tab ── */}
       {activeTab === 'registrations' && (
