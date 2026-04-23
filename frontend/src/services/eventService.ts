@@ -1,4 +1,5 @@
 import api from './api';
+import { getVisitorId } from '../utils/visitorId';
 
 export interface Event {
   id: string;
@@ -53,7 +54,7 @@ const eventService = {
   },
 
   async trackClick(code: string): Promise<{ redirectUrl: string } | null> {
-    const { data } = await api.get(`/events/r/${code}`);
+    const { data } = await api.post(`/events/r/${code}`, { visitorId: getVisitorId() });
     return data.success ? data : null;
   },
 

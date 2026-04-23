@@ -123,12 +123,18 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   const soulEvents = events.filter(e => e.slug.startsWith('soul-guitar'));
 
   useEffect(() => {
-    if (activeTab !== 'registrations' || !registerEvent) return;
-    setRegLoading(true);
-    registrationService.list(registerEvent.id)
-      .then(({ registrations: regs, total }) => { setRegistrations(regs); setRegTotal(total); })
-      .catch(() => {})
-      .finally(() => setRegLoading(false));
+    if (!registerEvent) return;
+    if (activeTab === 'registrations') {
+      setRegLoading(true);
+      registrationService.list(registerEvent.id)
+        .then(({ registrations: regs, total }) => { setRegistrations(regs); setRegTotal(total); })
+        .catch(() => {})
+        .finally(() => setRegLoading(false));
+    } else if (activeTab === 'clicks' && regTotal === 0) {
+      registrationService.list(registerEvent.id)
+        .then(({ total }) => setRegTotal(total))
+        .catch(() => {});
+    }
   }, [activeTab]);
 
   useEffect(() => {

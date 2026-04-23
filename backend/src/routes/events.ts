@@ -57,7 +57,7 @@ router.get('/', EventController.getActiveEvents);
 router.get('/slug/*', optionalAuth, EventController.getEventBySlug);
 
 // Track QR code scan / referral click
-router.get('/r/:code', EventController.trackClick);
+router.post('/r/:code', EventController.trackClick);
 
 // ─── Admin Routes ───
 

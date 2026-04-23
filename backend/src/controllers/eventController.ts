@@ -84,6 +84,7 @@ export class EventController {
 
       const ua = req.headers['user-agent'];
       const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || null;
+      const visitorId: string | null = (req.body?.visitorId as string) || null;
 
       await prisma.$transaction([
         prisma.eventClick.create({
@@ -93,6 +94,7 @@ export class EventController {
             userAgent: ua || null,
             referer: req.headers.referer || null,
             device: detectDevice(ua),
+            visitorId,
           },
         }),
         prisma.event.update({
@@ -304,8 +306,12 @@ export class EventController {
         return;
       }
 
-      const [clicks, deviceStats, dailyClicks] = await Promise.all([
+      const [clicks, uniqueVis, deviceStats, dailyClicks] = await Promise.all([
         prisma.eventClick.count({ where: { eventId: id } }),
+        prisma.eventClick.groupBy({
+          by: ['visitorId'],
+          where: { eventId: id, visitorId: { not: null } },
+        }),
         prisma.eventClick.groupBy({
           by: ['device'],
           where: { eventId: id },
@@ -332,7 +338,7 @@ export class EventController {
         data: {
           totalClicks: clicks,
           totalScans: event.totalScans,
-          uniqueVisitors: event.uniqueVisitors,
+          uniqueVisitors: uniqueVis.length,
           deviceBreakdown: deviceStats.map((d) => ({ device: d.device || 'unknown', count: d._count })),
           dailyClicks: daily,
         },

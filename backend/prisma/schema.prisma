@@ -733,6 +733,7 @@ model EventClick {
   country     String?                          // 國家
   city        String?                          // 城市
   device      String?                          // 裝置類型：mobile/desktop/tablet
+  visitorId   String?                          // 瀏覽器端 UUID（localStorage），用於不重複訪客計算
   createdAt   DateTime @default(now())
 
   // 關聯
@@ -741,6 +742,7 @@ model EventClick {
   @@index([eventId])
   @@index([createdAt])
   @@index([eventId, createdAt])
+  @@index([eventId, visitorId])
   @@map("event_clicks")
 }
 
