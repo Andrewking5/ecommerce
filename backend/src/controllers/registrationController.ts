@@ -59,6 +59,16 @@ export class RegistrationController {
 
       const { name, stageName, phone, email, socialId, category, soulColor, youtube, fbIg, rulesOk, message, answers } = req.body;
 
+      // Duplicate check — same email per event
+      const existing = await prisma.eventRegistration.findFirst({
+        where: { eventId: event.id, email: email.trim().toLowerCase() },
+        select: { id: true },
+      });
+      if (existing) {
+        res.status(409).json({ success: false, error: '此 Email 已完成報名，每人限報名一次。' });
+        return;
+      }
+
       const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || null;
 
       const registration = await prisma.eventRegistration.create({

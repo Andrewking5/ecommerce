@@ -717,8 +717,8 @@ model EventRegistration {
 
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+  @@unique([eventId, email])
   @@index([eventId])
-  @@index([email])
   @@index([createdAt])
   @@map("event_registrations")
 }
