@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, AlertCircle, Loader2, Lock } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2, Lock, Edit, Save, X, Plus, Trash2, ChevronDown } from 'lucide-react';
 import SEO from '../components/SEO';
 import registrationService from '../services/registrationService';
-import eventService from '../services/eventService';
+import eventService, { type Event as EventType } from '../services/eventService';
 
 /* ═══════════════════════════════════════════════════
    2026 Ayers 靈魂吉他手大賽 — 報名頁
@@ -141,6 +141,22 @@ function Input({
   );
 }
 
+const RULES_DEFAULT: Array<{ zh: string; en: string }> = [
+  { zh: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Instrumental Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
+  { zh: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Singing & Playing Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
+  { zh: '影片彈唱前需說明　— 「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」', en: 'Before performing, say on camera — "Hello everyone, I am (name/stage name/band). I am joining the 2026 Ayers Soul Guitarist Competition, registering for the (category). My soul is (xx) guitar soul (⚠️ must match the color worn). (One sentence for everyone.) The competition piece is (Song Title) by (Composer)."' },
+  { zh: '若團體內測驗結果不一致，仍需統一穿著同一顏色。　— 同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。', en: 'If group members have different quiz results, they must still wear the same color. — All members of a group must wear the same designated color: orange, yellow, blue, black, white, or red.' },
+  { zh: '影片 30~120 秒　— 影片總時長需為 30 秒至 120 秒。', en: 'Video length 30–120 seconds — The total video duration must be between 30 and 120 seconds.' },
+  { zh: '直式一鏡到底　— 錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。', en: 'Vertical, single continuous take — The recording must be vertical, fixed-camera, one continuous take. Editing, compositing, camera movement, and transitions are prohibited.' },
+  { zh: '露臉 + 完整上半身　— 參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。', en: 'Face + full upper body visible — Participants must clearly show their face and at least their full upper body so both hands are visible while playing.' },
+  { zh: '自選一首中/英文曲　— 限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。', en: 'One chosen piece in Chinese or English — Participants must choose one piece in Chinese (including local languages), English, or instrumental. Arrangements and original compositions are allowed.' },
+  { zh: '禁止效果器 / Loop　— 聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。', en: "No effects / loop — Only the participant's live vocals and the acoustic guitar played on screen may appear in the audio. Vocal harmony effects and loop recording are prohibited." },
+  { zh: '1~5 人，至少一把鋼弦吉他　— 禁止對嘴代彈，如不符合以上規定將取消比賽資格。', en: '1–5 participants, at least one steel-string guitar — Lip-syncing or ghost playing is prohibited. Non-compliance with any of the above rules will result in disqualification.' },
+  { zh: '每人每組限參加一次。　— 各組別限報名一次，但可同時報名不同組別（如同一人可同時報名演奏組與彈唱組）。', en: 'One entry per person per category — Each category may only be entered once, but participants may enter multiple categories simultaneously (e.g., the same person may enter both Instrumental and Singing & Playing).' },
+  { zh: '影片須維持公開　— 參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。', en: 'Video must remain public — Videos must remain public throughout the judging period. Videos made private or deleted will be considered as forfeited.' },
+  { zh: '所有評斷Ayers主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
+];
+
 export default function SoulGuitarRegister() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, boolean>>>({});
@@ -149,6 +165,14 @@ export default function SoulGuitarRegister() {
   const [regCount, setRegCount] = useState(0);
   const [regLimit, setRegLimit] = useState(200);
   const [errorMsg, setErrorMsg] = useState('');
+  const [eventData, setEventData] = useState<EventType | null>(null);
+  const [rules, setRules] = useState<Array<{ zh: string; en: string }>>(RULES_DEFAULT);
+
+  // ?edit mode — admin only
+  const isEditMode = new URLSearchParams(window.location.search).has('edit');
+  const [editItems, setEditItems] = useState<Array<{ zh: string; en: string }>>([]);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editSaved, setEditSaved] = useState(false);
 
   useEffect(() => {
     registrationService.getStatus(EVENT_SLUG).then((s) => {
@@ -156,7 +180,17 @@ export default function SoulGuitarRegister() {
       else setRegOpen(false);
     }).catch(() => setRegOpen(false));
     eventService.getEventBySlug(EVENT_SLUG).then((event) => {
-      if (event?.referralCode) eventService.trackClick(event.referralCode).catch(() => {});
+      if (event) {
+        setEventData(event);
+        if (event.referralCode) eventService.trackClick(event.referralCode).catch(() => {});
+        const saved = event.metadata?.regRules;
+        if (Array.isArray(saved) && saved.length > 0) {
+          setRules(saved);
+          if (isEditMode) setEditItems([...saved]);
+        } else if (isEditMode) {
+          setEditItems([...RULES_DEFAULT]);
+        }
+      }
     }).catch(() => {});
   }, []);
 
@@ -644,21 +678,7 @@ export default function SoulGuitarRegister() {
 
             {/* 規則內容 */}
             <div className="bg-white/[0.04] border border-white/10 rounded-xl p-4 mb-3 max-h-64 overflow-y-auto space-y-3 text-xs text-white/50 leading-relaxed">
-              {[
-                { zh: '演奏組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_演奏組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Instrumental Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Instrumental Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
-                { zh: '彈唱組上傳 YouTube（必須）及 Instagram / Facebook（擇一）　— 並將影片標題命名為「參賽曲名_姓名_彈唱組 #2026Ayers靈魂吉他手大賽」。Instagram / Facebook 貼文亦須加上 #2026Ayers靈魂吉他手大賽。', en: 'Singing & Playing Category: upload to YouTube (required) and Instagram or Facebook (one) — title the video "Song Title_Name_Singing & Playing Category #2026AyersSoulGuitaristCompetition". Posts must also include the hashtag #2026AyersSoulGuitaristCompetition.' },
-                { zh: '影片彈唱前需說明　— 「大家好我是（本名/藝名/團名），今天來參加2026Ayers靈魂吉他手大賽，報名（演奏組/彈唱組），我的靈魂是（xx）吉他魂（⚠️需與身上顏色相同，若不符將失去參賽資格，靈魂與顏色配對請參考下方卡片。），（想帶給大家的一句話）。比賽曲目是（創作者）的（歌名）。」', en: 'Before performing, say on camera — "Hello everyone, I am (name/stage name/band). I am joining the 2026 Ayers Soul Guitarist Competition, registering for the (category). My soul is (xx) guitar soul (⚠️ must match the color worn; failure to match will result in disqualification — please refer to the cards below for soul-color pairings). (One sentence for everyone.) The competition piece is (Song Title) by (Composer)."' },
-                { zh: '若團體內測驗結果不一致，仍需統一穿著同一顏色。　— 同一組別穿著顏色需相同（指定顏色為：橘色、黃色、藍色、黑色、白色或紅色其中一種）。', en: 'If group members have different quiz results, they must still wear the same color. — All members of a group must wear the same designated color: orange, yellow, blue, black, white, or red.' },
-                { zh: '影片 30~120 秒　— 影片總時長需為 30 秒至 120 秒。', en: 'Video length 30–120 seconds — The total video duration must be between 30 and 120 seconds.' },
-                { zh: '直式一鏡到底　— 錄製影像需為直式固定鏡頭一鏡到底，禁止合成、剪輯、運鏡、轉場效果。', en: 'Vertical, single continuous take — The recording must be vertical, fixed-camera, one continuous take. Editing, compositing, camera movement, and transitions are prohibited.' },
-                { zh: '露臉 + 完整上半身　— 參賽者須清楚露臉、至少完整上半身得以看清楚左、右手彈奏姿勢。', en: 'Face + full upper body visible — Participants must clearly show their face and at least their full upper body so both hands are visible while playing.' },
-                { zh: '自選一首中/英文曲　— 限定參賽者自選一首中文（本土語系）、英文或演奏曲目，改編曲及原創曲均可。', en: 'One chosen piece in Chinese or English — Participants must choose one piece in Chinese (including local languages), English, or instrumental. Arrangements and original compositions are allowed.' },
-                { zh: '禁止效果器 / Loop　— 聲音呈現，只能出現收錄當下參賽者本人歌聲、畫面中彈奏的木吉他聲。禁止人聲合音效果器、Loop 錄音循環。', en: 'No effects / loop — Only the participant\'s live vocals and the acoustic guitar played on screen may appear in the audio. Vocal harmony effects and loop recording are prohibited.' },
-                { zh: '1~5 人，至少一把鋼弦吉他　— 禁止對嘴代彈，如不符合以上規定將取消比賽資格。', en: '1–5 participants, at least one steel-string guitar — Lip-syncing or ghost playing is prohibited. Non-compliance with any of the above rules will result in disqualification.' },
-                { zh: '每人每組限參加一次。　— 各組別限報名一次，但可同時報名不同組別（如同一人可同時報名演奏組與彈唱組）。', en: 'One entry per person per category — Each category may only be entered once, but participants may enter multiple categories simultaneously (e.g., the same person may enter both Instrumental and Singing & Playing).' },
-                { zh: '影片須維持公開　— 參賽影片須於評審期間維持公開狀態，如因刪除或隱藏導致無法評分，視同放棄資格。', en: 'Video must remain public — Videos must remain public throughout the judging period. Videos made private or deleted will be considered as forfeited.' },
-                { zh: '所有評斷Ayers主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
-              ].map((r, i) => (
+              {rules.map((r, i) => (
                 <div key={i} className="flex gap-2.5">
                   <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5" style={{ backgroundColor: '#c5a05920', color: GOLD }}>{i + 1}</span>
                   <div>
@@ -734,6 +754,60 @@ export default function SoulGuitarRegister() {
         />
         <p className="text-[9px] text-white/10">&copy; 2026 Ayers Guitars. All rights reserved.</p>
       </footer>
+
+      {/* ── ?edit 模式：條款編輯器 ── */}
+      {isEditMode && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="rounded-t-2xl sm:rounded-2xl w-full max-w-2xl mx-0 sm:mx-4 flex flex-col" style={{ background: '#1a1a1a', maxHeight: '90vh' }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: GOLD }}>條款編輯</h3>
+                <p className="text-[10px] text-white/30 mt-0.5">共 {editItems.length} 條 · 儲存後立即生效</p>
+              </div>
+              <a href={window.location.pathname} title="關閉編輯器" className="p-2 rounded-lg hover:bg-white/10 text-white/30 hover:text-white transition-colors"><X size={16} /></a>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+              {editItems.length === 0 && <p className="text-center text-white/20 text-xs py-8">尚無條款，點擊下方「新增」開始</p>}
+              {editItems.map((rule, idx) => (
+                <div key={idx} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="shrink-0 w-5 h-5 rounded-full text-[9px] font-bold flex items-center justify-center mt-1" style={{ backgroundColor: '#c5a05920', color: GOLD }}>{idx + 1}</span>
+                    <div className="flex-1 space-y-2 min-w-0">
+                      <textarea aria-label="中文" value={rule.zh} rows={2} onChange={e => setEditItems(prev => prev.map((r, i) => i === idx ? { ...r, zh: e.target.value } : r))} placeholder="中文條款"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 focus:outline-none focus:border-yellow-500/40 transition-all resize-none" />
+                      <textarea aria-label="English" value={rule.en} rows={2} onChange={e => setEditItems(prev => prev.map((r, i) => i === idx ? { ...r, en: e.target.value } : r))} placeholder="English translation"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/40 focus:outline-none focus:border-yellow-500/40 transition-all resize-none" />
+                    </div>
+                    <div className="flex flex-col gap-1 shrink-0">
+                      <button type="button" title="上移" onClick={() => setEditItems(prev => { const n = [...prev]; if (idx > 0) [n[idx], n[idx-1]] = [n[idx-1], n[idx]]; return n; })} disabled={idx === 0} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronDown size={12} className="rotate-180" /></button>
+                      <button type="button" title="下移" onClick={() => setEditItems(prev => { const n = [...prev]; if (idx < n.length-1) [n[idx], n[idx+1]] = [n[idx+1], n[idx]]; return n; })} disabled={idx === editItems.length - 1} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronDown size={12} /></button>
+                      <button type="button" title="刪除" onClick={() => setEditItems(prev => prev.filter((_, i) => i !== idx))} className="p-1 rounded hover:bg-red-500/10 text-white/20 hover:text-red-400 transition-all"><Trash2 size={12} /></button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={() => setEditItems(prev => [...prev, { zh: '', en: '' }])} className="w-full py-2.5 rounded-xl border border-dashed border-white/10 text-white/30 hover:text-white hover:border-white/20 text-xs flex items-center justify-center gap-1.5 transition-all">
+                <Plus size={12} /> 新增條款
+              </button>
+            </div>
+            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 shrink-0">
+              <button type="button" onClick={() => setEditItems([...RULES_DEFAULT])} className="text-[10px] text-white/30 hover:text-white transition-colors">重置為預設</button>
+              <button type="button" disabled={editSaving} onClick={async () => {
+                if (!eventData) return;
+                setEditSaving(true);
+                try {
+                  await eventService.updateEvent(eventData.id, { metadata: { ...eventData.metadata, regRules: editItems } } as any);
+                  setRules([...editItems]);
+                  setEditSaved(true);
+                  setTimeout(() => setEditSaved(false), 2000);
+                } catch { alert('儲存失敗，請確認已登入管理員帳號'); } finally { setEditSaving(false); }
+              }} className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest disabled:opacity-40 transition-all" style={{ background: GOLD, color: '#000' }}>
+                <Save size={12} /> {editSaved ? '已儲存！' : editSaving ? '儲存中...' : '儲存條款'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

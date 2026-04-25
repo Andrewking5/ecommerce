@@ -26,6 +26,7 @@ export interface Event {
   registrationLimit: number;
   metadata?: {
     rules?: Array<{ short: string; full: string }>;
+    regRules?: Array<{ zh: string; en: string }>;
     sponsors?: Record<string, string>;
   } | null;
   createdAt: string;
