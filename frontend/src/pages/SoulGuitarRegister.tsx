@@ -78,6 +78,7 @@ interface FormState {
   soulColor: string;
   youtube: string;
   fbIg: string;
+  handsVisible: boolean;
   copyright: boolean;
   rulesOk: '' | typeof RULES_YES | typeof RULES_NO;
   message: string;
@@ -95,6 +96,7 @@ const INITIAL: FormState = {
   soulColor: '',
   youtube: '',
   fbIg: '',
+  handsVisible: false,
   copyright: false,
   rulesOk: '',
   message: '',
@@ -174,6 +176,7 @@ export default function SoulGuitarRegister() {
     if (!form.soulColor) e.soulColor = true;
     if (!form.youtube.trim()) e.youtube = true;
     if (!form.fbIg.trim()) e.fbIg = true;
+    if (!form.handsVisible) e.handsVisible = true;
     if (!form.copyright) e.copyright = true;
     if (!form.rulesOk) e.rulesOk = true;
     setErrors(e);
@@ -502,6 +505,39 @@ export default function SoulGuitarRegister() {
           {/* ── Section: 影片連結 ── */}
           <SectionTitle>影片連結</SectionTitle>
 
+          {/* 雙手入鏡示範照片 */}
+          <Field>
+            <div className="rounded-xl border border-white/10 bg-white/3 overflow-hidden">
+              <div className="px-4 pt-4 pb-3">
+                <p className="text-xs font-bold text-white/70 tracking-wide mb-1">影片拍攝示範</p>
+                <p className="text-xs text-white/35">1 人 / 3 人 / 5 人 示範圖</p>
+              </div>
+              <div className="grid grid-cols-3 gap-0.5 px-0.5 pb-0.5">
+                {[
+                  { src: '/images/events/video-example-1.jpg', label: '1 人' },
+                  { src: '/images/events/video-example-3.jpg', label: '3 人' },
+                  { src: '/images/events/video-example-5.jpg', label: '5 人' },
+                ].map(({ src, label }) => (
+                  <div key={label} className="relative aspect-9/16 overflow-hidden rounded-sm bg-white/5">
+                    <img src={src} alt={label} className="w-full h-full object-cover" />
+                    <div className="absolute bottom-0 inset-x-0 bg-black/50 py-1 text-center">
+                      <span className="text-[10px] font-semibold text-white/70">{label}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="px-4 py-3 flex items-start gap-2 border-t border-white/6 mt-0.5">
+                <span className="shrink-0 text-base leading-none mt-0.5">⚠️</span>
+                <p className="text-xs font-semibold leading-relaxed text-ayers-gold">
+                  影片畫面彈奏雙手必須入鏡，避免假彈爭議
+                  <span className="block mt-0.5 font-normal text-white/35">
+                    Both hands must be visible while playing to prevent disputes over authentic performance.
+                  </span>
+                </p>
+              </div>
+            </div>
+          </Field>
+
           {/* YouTube */}
           <Field>
             <Label required>YouTube 影片網址</Label>
@@ -530,6 +566,40 @@ export default function SoulGuitarRegister() {
 
           {/* ── Section: 同意條款 ── */}
           <SectionTitle>同意條款</SectionTitle>
+
+          {/* 雙手入鏡確認 */}
+          <Field>
+            <button
+              type="button"
+              onClick={() => set('handsVisible', !form.handsVisible)}
+              className={`w-full flex items-start gap-3 text-left p-4 rounded-xl border-2 transition-all ${
+                form.handsVisible
+                  ? 'border-[#c5a059]/50 bg-[#c5a059]/5'
+                  : errors.handsVisible
+                  ? 'border-red-500/40 bg-red-500/5'
+                  : 'border-white/10 hover:border-white/20'
+              }`}
+            >
+              <div
+                className={`shrink-0 w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center transition-all ${
+                  form.handsVisible ? 'border-ayers-gold bg-ayers-gold' : 'border-white/30'
+                }`}
+              >
+                {form.handsVisible && (
+                  <svg viewBox="0 0 10 8" className="w-3 h-3" fill="none">
+                    <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+              <span className="text-sm text-white/60 leading-relaxed">
+                我了解影片畫面彈奏雙手必須入鏡，避免假彈爭議
+                <span className="block mt-1 text-white/30 text-xs">
+                  I understand that both hands must be visible while playing to prevent disputes over authentic performance.
+                </span>
+              </span>
+            </button>
+            {errors.handsVisible && <FieldError text="請勾選確認雙手入鏡規定" />}
+          </Field>
 
           {/* 版權同意 */}
           <Field>

@@ -24,7 +24,7 @@ export class QuizController {
   /** POST /api/quiz/results — track one quiz completion (public, no auth) */
   static async trackResult(req: Request, res: Response): Promise<void> {
     try {
-      const { slug, resultKey } = req.body as { slug?: string; resultKey?: string };
+      const { slug, resultKey, visitorId } = req.body as { slug?: string; resultKey?: string; visitorId?: string };
 
       if (!slug || !VALID_SLUGS.has(slug)) {
         res.status(400).json({ success: false, error: 'Invalid slug' });
@@ -39,7 +39,7 @@ export class QuizController {
       }
 
       await prisma.quizResult.create({
-        data: { slug, resultKey: resultKey || slug, device },
+        data: { slug, resultKey: resultKey || slug, device, visitorId: visitorId || null },
       });
 
       res.json({ success: true });
@@ -167,7 +167,7 @@ export class QuizController {
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {
-      const [total, bySlug, byDevice, daily] = await Promise.all([
+      const [total, bySlug, byDevice, daily, uniqueVis] = await Promise.all([
         // Total completions
         prisma.quizResult.count(),
 
@@ -192,6 +192,12 @@ export class QuizController {
           },
           orderBy: { createdAt: 'asc' },
         }),
+
+        // Unique visitors (distinct visitorId)
+        prisma.quizResult.groupBy({
+          by: ['visitorId'],
+          where: { visitorId: { not: null } },
+        }),
       ]);
 
       // Aggregate by day
@@ -205,6 +211,7 @@ export class QuizController {
         success: true,
         data: {
           total,
+          uniqueVisitors: uniqueVis.length,
           byResult: bySlug.map((r: { slug: string; _count: number }) => ({
             slug: r.slug,
             label: SLUG_LABEL[r.slug] || r.slug,

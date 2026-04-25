@@ -71,6 +71,12 @@ const registrationService = {
     URL.revokeObjectURL(url);
   },
 
+  async updateOne(id: string, payload: Partial<RegistrationPayload>): Promise<Registration> {
+    const { data } = await api.patch(`/registrations/admin/${id}`, payload);
+    if (!data.success) throw new Error(data.error || '更新失敗');
+    return data.data;
+  },
+
   async deleteOne(id: string): Promise<void> {
     await api.delete(`/registrations/admin/${id}`);
   },

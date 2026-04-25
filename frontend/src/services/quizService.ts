@@ -1,4 +1,5 @@
 import api from './api';
+import { getVisitorId } from '../utils/visitorId';
 
 /** 每個素材的版面設定 */
 export interface AssetConfig {
@@ -65,6 +66,7 @@ export interface QuizShareEmail {
 
 export interface QuizAnalytics {
   total: number;
+  uniqueVisitors: number;
   byResult: { slug: string; label: string; count: number }[];
   byDevice: { device: string; count: number }[];
   daily: { date: string; count: number }[];
@@ -73,9 +75,9 @@ export interface QuizAnalytics {
 const quizService = {
   async trackResult(slug: string, resultKey: string): Promise<void> {
     try {
-      await api.post('/quiz/results', { slug, resultKey });
-    } catch {
-      // Analytics errors should never interrupt the user experience
+      await api.post('/quiz/results', { slug, resultKey, visitorId: getVisitorId() });
+    } catch (err) {
+      console.error('[quizService] trackResult failed:', err);
     }
   },
 

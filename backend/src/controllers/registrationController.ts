@@ -175,6 +175,46 @@ export class RegistrationController {
     }
   }
 
+  /** Update a single registration (admin) */
+  static async updateOne(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const existing = await prisma.eventRegistration.findUnique({ where: { id } });
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Registration not found' });
+        return;
+      }
+
+      const { name, phone, email, stageName, socialId, category, soulColor, youtube, fbIg, rulesOk, message } = req.body;
+
+      const updated = await prisma.eventRegistration.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name: name.trim() }),
+          ...(phone !== undefined && { phone: phone.trim() }),
+          ...(email !== undefined && { email: email.trim().toLowerCase() }),
+          ...(stageName !== undefined && { stageName: stageName?.trim() || null }),
+          ...(socialId !== undefined && { socialId: socialId?.trim() || null }),
+          ...(category !== undefined && { category: category || null }),
+          ...(soulColor !== undefined && { soulColor: soulColor || null }),
+          ...(youtube !== undefined && { youtube: youtube?.trim() || null }),
+          ...(fbIg !== undefined && { fbIg: fbIg?.trim() || null }),
+          ...(rulesOk !== undefined && { rulesOk: Boolean(rulesOk) }),
+          ...(message !== undefined && { message: message?.trim() || null }),
+        },
+      });
+
+      res.json({ success: true, data: updated });
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        res.status(409).json({ success: false, error: '此 Email 已被其他報名使用' });
+        return;
+      }
+      console.error('Failed to update registration:', error);
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
+  }
+
   /** Delete a single registration */
   static async deleteOne(req: Request, res: Response): Promise<void> {
     try {

@@ -762,11 +762,13 @@ model QuizResult {
   slug      String                           // URL slug: fire / fireworks / sun / glow / wave / deep-sea / moon / dream-moon
   resultKey String                           // 計分 key: FIRE_自由、FIRE_故事 …
   device    String?                          // mobile / desktop / tablet
+  visitorId String?                          // 瀏覽器端 UUID（localStorage），用於不重複訪客計算
   createdAt DateTime @default(now())
 
   @@index([slug])
   @@index([resultKey])
   @@index([createdAt])
+  @@index([visitorId])
   @@map("quiz_results")
 }
 

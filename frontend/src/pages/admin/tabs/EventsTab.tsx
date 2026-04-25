@@ -111,6 +111,8 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   const [regTotal, setRegTotal] = useState(0);
   const [regLoading, setRegLoading] = useState(false);
   const [regDetailId, setRegDetailId] = useState<string | null>(null);
+  const [regEditMode, setRegEditMode] = useState(false);
+  const [regEditDraft, setRegEditDraft] = useState<Partial<Registration> | null>(null);
   const [regSettingsSaving, setRegSettingsSaving] = useState(false);
   const [shareEmails, setShareEmails] = useState<QuizShareEmail[]>([]);
   const [shareEmailsTotal, setShareEmailsTotal] = useState(0);
@@ -163,6 +165,16 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   const handleDeleteReg = async (id: string) => {
     if (!window.confirm('確定要刪除這筆報名嗎？')) return;
     try { await registrationService.deleteOne(id); setRegistrations(prev => prev.filter(r => r.id !== id)); setRegTotal(n => n - 1); } catch { alert('刪除失敗'); }
+  };
+
+  const handleUpdateReg = async () => {
+    if (!regEditDraft || !regDetailId) return;
+    try {
+      const updated = await registrationService.updateOne(regDetailId, regEditDraft as any);
+      setRegistrations(prev => prev.map(r => r.id === regDetailId ? updated : r));
+      setRegEditMode(false);
+      setRegEditDraft(null);
+    } catch (err: any) { alert(err?.message || '更新失敗'); }
   };
 
   const handleDeleteShareEmail = async (email: string, slug: string) => {
@@ -470,16 +482,23 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                   </div>
                 );
               })}
-              {/* Quiz completions — separate data source, shown as standalone KPI */}
+              {/* Quiz completions — QuizResult table (independent of EventClick) */}
               <div className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2">
                   <span className="w-2 h-2 rounded-full shrink-0 bg-yellow-400" />
                   <p className="text-xs font-bold text-white/70">測驗完成</p>
                 </div>
+                <p className="text-[9px] text-white/20 mb-3">來源：QuizResult（獨立於點擊統計）</p>
                 {data === null ? <Spinner /> : (
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-yellow-400">{data?.total ?? '—'}</p>
-                    <p className="text-[9px] text-white/25 uppercase tracking-widest mt-1">累計完成次數</p>
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div>
+                      <p className="text-xl font-bold text-yellow-400">{data?.total ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">完成次數</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white/60">{data?.uniqueVisitors ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">不重複</p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -648,7 +667,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                           </thead>
                           <tbody className="divide-y divide-white/[0.04]">
                             {registrations.map((r, i) => (
-                              <tr key={r.id} onClick={() => setRegDetailId(regDetailId === r.id ? null : r.id)} className={cn('transition-colors cursor-pointer group', regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
+                              <tr key={r.id} onClick={() => { const next = regDetailId === r.id ? null : r.id; setRegDetailId(next); if (!next) { setRegEditMode(false); setRegEditDraft(null); } }} className={cn('transition-colors cursor-pointer group', regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
                                 <td className="px-4 py-3 text-white/25">{i + 1}</td>
                                 <td className="px-4 py-3"><p className="text-white/80 font-medium">{r.name}</p>{r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}</td>
                                 <td className="px-4 py-3 text-white/50 max-w-[160px] truncate">{r.email}</td>
@@ -669,19 +688,56 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                           <div className="w-1/2 overflow-y-auto p-5 space-y-3 max-h-[600px]">
                             <div className="flex items-center justify-between mb-1">
                               <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">詳細資料</p>
-                              <button onClick={() => setRegDetailId(null)} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                              <div className="flex items-center gap-2">
+                                {!regEditMode && <button type="button" onClick={() => { setRegEditMode(true); setRegEditDraft({ ...dr }); }} className="p-1 rounded-lg hover:bg-white/10 text-white/30 hover:text-ayers-gold transition-all" title="編輯"><Edit size={12} /></button>}
+                                <button type="button" title="關閉" onClick={() => { setRegDetailId(null); setRegEditMode(false); setRegEditDraft(null); }} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                              </div>
                             </div>
-                            {[{ label: '姓名', value: dr.name }, { label: '藝名', value: dr.stageName }, { label: '手機', value: dr.phone }, { label: 'Email', value: dr.email }].map(({ label, value }) => value ? (
-                              <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
-                            ) : null)}
-                            {hasSoulFields && [{ label: '社群帳號', value: dr.socialId }, { label: '組別', value: dr.category }, { label: '靈魂顏色', value: dr.soulColor }].map(({ label, value }) => value ? (
-                              <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
-                            ) : null)}
-                            {dr.youtube && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p><a href={dr.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.youtube}</a></div>}
-                            {dr.fbIg && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p><a href={dr.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.fbIg}</a></div>}
-                            {answerKeys.map(key => { const val = dr.answers?.[key]; return val !== undefined && val !== null && val !== '' ? (<div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p><p className="text-xs text-white/70">{String(val)}</p></div>) : null; })}
-                            {dr.message && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p><p className="text-xs text-white/70 whitespace-pre-line">{dr.message}</p></div>}
-                            <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(dr.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                            {regEditMode && regEditDraft ? (
+                              <div className="space-y-2">
+                                {([['name', '姓名', true], ['stageName', '藝名', false], ['phone', '手機', true], ['email', 'Email', true]] as [keyof Registration, string, boolean][]).map(([key, label, required]) => (
+                                  <div key={key}>
+                                    <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}{required && ' *'}</p>
+                                    <input aria-label={label} value={(regEditDraft[key] as string) ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, [key]: e.target.value } : prev)}
+                                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" />
+                                  </div>
+                                ))}
+                                {hasSoulFields && <>
+                                  <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">社群帳號</p>
+                                    <input aria-label="社群帳號" value={regEditDraft.socialId ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, socialId: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                                  <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">組別</p>
+                                    <select aria-label="組別" value={regEditDraft.category ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, category: e.target.value || null } : prev)} className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all">
+                                      <option value="">—</option><option value="彈唱組">彈唱組</option><option value="演奏組">演奏組</option>
+                                    </select></div>
+                                  <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">靈魂顏色</p>
+                                    <select aria-label="靈魂顏色" value={regEditDraft.soulColor ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, soulColor: e.target.value || null } : prev)} className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all">
+                                      <option value="">—</option>{['紅色', '橘色', '黃色', '藍色', '黑色', '白色'].map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select></div>
+                                  <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p>
+                                    <input aria-label="YouTube" value={regEditDraft.youtube ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, youtube: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                                  <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p>
+                                    <input aria-label="FB / IG" value={regEditDraft.fbIg ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, fbIg: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                                </>}
+                                <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p>
+                                  <textarea aria-label="留言" value={regEditDraft.message ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, message: e.target.value } : prev)} rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all resize-none" /></div>
+                                <div className="flex gap-2 pt-1">
+                                  <button type="button" onClick={handleUpdateReg} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-ayers-gold/20 hover:bg-ayers-gold/30 text-xs text-ayers-gold font-bold uppercase tracking-widest transition-all"><Save size={11} /> 儲存</button>
+                                  <button type="button" onClick={() => { setRegEditMode(false); setRegEditDraft(null); }} className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/40 hover:text-white transition-all">取消</button>
+                                </div>
+                              </div>
+                            ) : <>
+                              {[{ label: '姓名', value: dr.name }, { label: '藝名', value: dr.stageName }, { label: '手機', value: dr.phone }, { label: 'Email', value: dr.email }].map(({ label, value }) => value ? (
+                                <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                              ) : null)}
+                              {hasSoulFields && [{ label: '社群帳號', value: dr.socialId }, { label: '組別', value: dr.category }, { label: '靈魂顏色', value: dr.soulColor }].map(({ label, value }) => value ? (
+                                <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                              ) : null)}
+                              {dr.youtube && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p><a href={dr.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.youtube}</a></div>}
+                              {dr.fbIg && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p><a href={dr.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{dr.fbIg}</a></div>}
+                              {answerKeys.map(key => { const val = dr.answers?.[key]; return val !== undefined && val !== null && val !== '' ? (<div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p><p className="text-xs text-white/70">{String(val)}</p></div>) : null; })}
+                              {dr.message && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p><p className="text-xs text-white/70 whitespace-pre-line">{dr.message}</p></div>}
+                              <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(dr.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                            </>}
                           </div>
                         );
                       })()}
@@ -761,6 +817,8 @@ export default function EventsTab() {
   const [regLoading, setRegLoading] = useState(false);
   const [regSettingsSaving, setRegSettingsSaving] = useState(false);
   const [regDetailId, setRegDetailId] = useState<string | null>(null);
+  const [regEditMode, setRegEditMode] = useState(false);
+  const [regEditDraft, setRegEditDraft] = useState<Partial<Registration> | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
 
   const fetchEvents = useCallback(async () => {
@@ -872,13 +930,23 @@ export default function EventsTab() {
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-TW') : '—';
 
   const handleOpenRegPanel = async (eventId: string) => {
-    setRegPanelEventId(eventId); setRegLoading(true); setRegistrations([]);
+    setRegPanelEventId(eventId); setRegLoading(true); setRegistrations([]); setRegDetailId(null); setRegEditMode(false); setRegEditDraft(null);
     try { const { registrations: regs, total } = await registrationService.list(eventId); setRegistrations(regs); setRegTotal(total); } catch { /* silent */ } finally { setRegLoading(false); }
   };
 
   const handleDeleteReg = async (id: string) => {
     if (!window.confirm('確定要刪除這筆報名嗎？')) return;
     try { await registrationService.deleteOne(id); setRegistrations((prev) => prev.filter((r) => r.id !== id)); setRegTotal((n) => n - 1); } catch { alert('刪除失敗'); }
+  };
+
+  const handleUpdateReg = async () => {
+    if (!regEditDraft || !regDetailId) return;
+    try {
+      const updated = await registrationService.updateOne(regDetailId, regEditDraft as any);
+      setRegistrations(prev => prev.map(r => r.id === regDetailId ? updated : r));
+      setRegEditMode(false);
+      setRegEditDraft(null);
+    } catch (err: any) { alert(err?.message || '更新失敗'); }
   };
 
   const handleRegSettings = async (eventId: string, open: boolean, limit: number) => {
@@ -1011,7 +1079,7 @@ export default function EventsTab() {
                         </thead>
                         <tbody className="divide-y divide-white/[0.04]">
                           {registrations.map((r, i) => (
-                            <tr key={r.id} onClick={() => setRegDetailId(regDetailId === r.id ? null : r.id)} className={cn('transition-colors cursor-pointer group', regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
+                            <tr key={r.id} onClick={() => { const next = regDetailId === r.id ? null : r.id; setRegDetailId(next); if (!next) { setRegEditMode(false); setRegEditDraft(null); } }} className={cn('transition-colors cursor-pointer group', regDetailId === r.id ? 'bg-ayers-gold/5' : 'hover:bg-white/[0.02]')}>
                               <td className="px-4 py-3 text-white/25">{i + 1}</td>
                               <td className="px-4 py-3"><p className="text-white/80 font-medium">{r.name}</p>{r.stageName && <p className="text-white/30 text-[10px]">{r.stageName}</p>}</td>
                               <td className="px-4 py-3 text-white/50 max-w-[160px] truncate">{r.email}</td>
@@ -1028,19 +1096,56 @@ export default function EventsTab() {
                   <div className="w-1/2 overflow-y-auto p-5 space-y-3">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">詳細資料</p>
-                      <button onClick={() => setRegDetailId(null)} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                      <div className="flex items-center gap-2">
+                        {!regEditMode && <button type="button" onClick={() => { setRegEditMode(true); setRegEditDraft({ ...detailReg }); }} className="p-1 rounded-lg hover:bg-white/10 text-white/30 hover:text-ayers-gold transition-all" title="編輯"><Edit size={12} /></button>}
+                        <button type="button" title="關閉" onClick={() => { setRegDetailId(null); setRegEditMode(false); setRegEditDraft(null); }} className="text-white/20 hover:text-white/50 transition-colors"><X size={12} /></button>
+                      </div>
                     </div>
-                    {[{ label: '姓名', value: detailReg.name }, { label: '藝名', value: detailReg.stageName }, { label: '手機', value: detailReg.phone }, { label: 'Email', value: detailReg.email }].map(({ label, value }) => value ? (
-                      <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
-                    ) : null)}
-                    {hasSoulFields && [{ label: '社群帳號', value: detailReg.socialId }, { label: '組別', value: detailReg.category }, { label: '靈魂顏色', value: detailReg.soulColor }].map(({ label, value }) => value ? (
-                      <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
-                    ) : null)}
-                    {detailReg.youtube && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p><a href={detailReg.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.youtube}</a></div>}
-                    {detailReg.fbIg && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p><a href={detailReg.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.fbIg}</a></div>}
-                    {answerKeys.map(key => { const val = detailReg.answers?.[key]; return val !== undefined && val !== null && val !== '' ? (<div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p><p className="text-xs text-white/70">{String(val)}</p></div>) : null; })}
-                    {detailReg.message && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p><p className="text-xs text-white/70 whitespace-pre-line">{detailReg.message}</p></div>}
-                    <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(detailReg.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                    {regEditMode && regEditDraft ? (
+                      <div className="space-y-2">
+                        {([['name', '姓名', true], ['stageName', '藝名', false], ['phone', '手機', true], ['email', 'Email', true]] as [keyof Registration, string, boolean][]).map(([key, label, required]) => (
+                          <div key={key}>
+                            <p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}{required && ' *'}</p>
+                            <input aria-label={label} value={(regEditDraft[key] as string) ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, [key]: e.target.value } : prev)}
+                              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" />
+                          </div>
+                        ))}
+                        {hasSoulFields && <>
+                          <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">社群帳號</p>
+                            <input aria-label="社群帳號" value={regEditDraft.socialId ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, socialId: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                          <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">組別</p>
+                            <select aria-label="組別" value={regEditDraft.category ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, category: e.target.value || null } : prev)} className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all">
+                              <option value="">—</option><option value="彈唱組">彈唱組</option><option value="演奏組">演奏組</option>
+                            </select></div>
+                          <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">靈魂顏色</p>
+                            <select aria-label="靈魂顏色" value={regEditDraft.soulColor ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, soulColor: e.target.value || null } : prev)} className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all">
+                              <option value="">—</option>{['紅色', '橘色', '黃色', '藍色', '黑色', '白色'].map(c => <option key={c} value={c}>{c}</option>)}
+                            </select></div>
+                          <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p>
+                            <input aria-label="YouTube" value={regEditDraft.youtube ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, youtube: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                          <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p>
+                            <input aria-label="FB / IG" value={regEditDraft.fbIg ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, fbIg: e.target.value } : prev)} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all" /></div>
+                        </>}
+                        <div><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p>
+                          <textarea aria-label="留言" value={regEditDraft.message ?? ''} onChange={e => setRegEditDraft(prev => prev ? { ...prev, message: e.target.value } : prev)} rows={3} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold/40 transition-all resize-none" /></div>
+                        <div className="flex gap-2 pt-1">
+                          <button type="button" onClick={handleUpdateReg} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-ayers-gold/20 hover:bg-ayers-gold/30 text-xs text-ayers-gold font-bold uppercase tracking-widest transition-all"><Save size={11} /> 儲存</button>
+                          <button type="button" onClick={() => { setRegEditMode(false); setRegEditDraft(null); }} className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/40 hover:text-white transition-all">取消</button>
+                        </div>
+                      </div>
+                    ) : <>
+                      {[{ label: '姓名', value: detailReg.name }, { label: '藝名', value: detailReg.stageName }, { label: '手機', value: detailReg.phone }, { label: 'Email', value: detailReg.email }].map(({ label, value }) => value ? (
+                        <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                      ) : null)}
+                      {hasSoulFields && [{ label: '社群帳號', value: detailReg.socialId }, { label: '組別', value: detailReg.category }, { label: '靈魂顏色', value: detailReg.soulColor }].map(({ label, value }) => value ? (
+                        <div key={label} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{label}</p><p className="text-xs text-white/70">{value}</p></div>
+                      ) : null)}
+                      {detailReg.youtube && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">YouTube</p><a href={detailReg.youtube} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.youtube}</a></div>}
+                      {detailReg.fbIg && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">FB / IG</p><a href={detailReg.fbIg} target="_blank" rel="noreferrer" className="text-xs text-ayers-gold/70 hover:text-ayers-gold transition-colors truncate block">{detailReg.fbIg}</a></div>}
+                      {answerKeys.map(key => { const val = detailReg.answers?.[key]; return val !== undefined && val !== null && val !== '' ? (<div key={key} className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">{key}</p><p className="text-xs text-white/70">{String(val)}</p></div>) : null; })}
+                      {detailReg.message && <div className="rounded-xl bg-white/[0.03] px-4 py-3"><p className="text-[9px] text-white/25 uppercase tracking-widest mb-1">留言</p><p className="text-xs text-white/70 whitespace-pre-line">{detailReg.message}</p></div>}
+                      <p className="text-[9px] text-white/20 pt-1">報名時間：{new Date(detailReg.createdAt).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}</p>
+                    </>}
                   </div>
                 )}
               </div>
