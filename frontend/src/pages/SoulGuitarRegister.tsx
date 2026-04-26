@@ -563,9 +563,9 @@ export default function SoulGuitarRegister() {
               <div className="px-4 py-3 flex items-start gap-2 border-t border-white/6 mt-0.5">
                 <span className="shrink-0 text-base leading-none mt-0.5">⚠️</span>
                 <p className="text-xs font-semibold leading-relaxed text-ayers-gold">
-                  影片畫面彈奏雙手必須入鏡，避免假彈爭議
+                  參賽正確影像參考：影片中彈奏的左右手與所有成員臉部都需入鏡，避免產生假彈、假唱的疑慮。
                   <span className="block mt-0.5 font-normal text-white/35">
-                    Both hands must be visible while playing to prevent disputes over authentic performance.
+                    Both hands and the faces of all members must be visible in the video to avoid any disputes over authentic playing or singing.
                   </span>
                 </p>
               </div>
@@ -626,9 +626,9 @@ export default function SoulGuitarRegister() {
                 )}
               </div>
               <span className="text-sm text-white/60 leading-relaxed">
-                我了解影片畫面彈奏雙手必須入鏡，避免假彈爭議
+                我了解影片中彈奏的左右手與所有成員臉部都需入鏡，避免產生假彈、假唱的疑慮。
                 <span className="block mt-1 text-white/30 text-xs">
-                  I understand that both hands must be visible while playing to prevent disputes over authentic performance.
+                  I understand that both hands and the faces of all members must be visible in the video to avoid any disputes over authentic playing or singing.
                 </span>
               </span>
             </button>
