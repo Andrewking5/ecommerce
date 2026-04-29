@@ -110,7 +110,7 @@ export class RegistrationController {
       const { eventId } = req.params;
       const registrations = await prisma.eventRegistration.findMany({
         where: { eventId },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: 'asc' },
       });
       const total = registrations.length;
       res.json({ success: true, data: registrations, total });
