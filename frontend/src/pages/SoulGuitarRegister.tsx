@@ -56,6 +56,17 @@ const SOCIAL_PLATFORMS = [
   { id: 'X',         label: 'X (Twitter)', placeholder: '@username' },
 ];
 
+const REFERRAL_SOURCES = [
+  'Ayers 官方社群平台（IG / FB）',
+  'Ayers 官網',
+  'Ayers 合作經銷商',
+  '親友介紹',
+  '海馬 91 譜',
+  '其他',
+] as const;
+
+const REFERRAL_OTHER = '其他';
+
 function Strip() {
   return (
     <div className="flex h-1.5">
@@ -74,6 +85,8 @@ interface FormState {
   email: string;
   socialPlatform: string;
   socialId: string;
+  referralSource: '' | typeof REFERRAL_SOURCES[number];
+  referralSourceOther: string;
   category: '' | '彈唱組' | '演奏組';
   soulColor: string;
   youtube: string;
@@ -92,6 +105,8 @@ const INITIAL: FormState = {
   email: '',
   socialPlatform: 'LINE',
   socialId: '',
+  referralSource: '',
+  referralSourceOther: '',
   category: '',
   soulColor: '',
   youtube: '',
@@ -206,6 +221,8 @@ export default function SoulGuitarRegister() {
     if (!form.email.trim() || !form.email.includes('@')) e.email = true;
     if (!form.socialPlatform) e.socialPlatform = true;
     if (!form.socialId.trim()) e.socialId = true;
+    if (!form.referralSource) e.referralSource = true;
+    if (form.referralSource === REFERRAL_OTHER && !form.referralSourceOther.trim()) e.referralSourceOther = true;
     if (!form.category) e.category = true;
     if (!form.soulColor) e.soulColor = true;
     if (!form.youtube.trim()) e.youtube = true;
@@ -223,6 +240,11 @@ export default function SoulGuitarRegister() {
     setStatus('submitting');
     setErrorMsg('');
     try {
+      const referralSourceFinal =
+        form.referralSource === REFERRAL_OTHER && form.referralSourceOther.trim()
+          ? `其他：${form.referralSourceOther.trim()}`
+          : form.referralSource;
+
       await registrationService.submit(EVENT_SLUG, {
         name:      form.name.trim(),
         stageName: form.stageName.trim() || undefined,
@@ -235,6 +257,7 @@ export default function SoulGuitarRegister() {
         fbIg:      form.fbIg.trim(),
         rulesOk:   form.rulesOk === RULES_YES,
         message:   form.message.trim() || undefined,
+        answers:   { 得知管道: referralSourceFinal },
       });
       setStatus('success');
     } catch (err: any) {
@@ -468,6 +491,55 @@ export default function SoulGuitarRegister() {
               error={errors.socialId}
             />
             {errors.socialId && <FieldError />}
+          </Field>
+
+          {/* 如何得知此活動 */}
+          <Field>
+            <Label required>如何得知此活動 How did you hear about us?</Label>
+            <p className="text-xs text-white/25 mb-3">
+              請選擇一項，協助我們了解您是從哪個管道得知本次比賽
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {REFERRAL_SOURCES.map((src) => {
+                const selected = form.referralSource === src;
+                return (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => {
+                      set('referralSource', src);
+                      if (src !== REFERRAL_OTHER) set('referralSourceOther', '');
+                    }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left text-sm transition-all ${
+                      selected
+                        ? 'border-[#c5a059]/50 bg-[#c5a059]/5 text-white/85'
+                        : 'border-white/10 text-white/45 hover:border-white/20 hover:text-white/70'
+                    }`}
+                  >
+                    <div
+                      className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
+                        selected ? 'border-[#c5a059]' : 'border-white/30'
+                      }`}
+                    >
+                      {selected && <div className="w-2 h-2 rounded-full" style={{ backgroundColor: GOLD }} />}
+                    </div>
+                    <span>{src}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {form.referralSource === REFERRAL_OTHER && (
+              <div className="mt-3">
+                <Input
+                  value={form.referralSourceOther}
+                  onChange={(v) => set('referralSourceOther', v)}
+                  placeholder="請說明（例如：YouTube 影片、學校老師…）"
+                  error={errors.referralSourceOther}
+                />
+                {errors.referralSourceOther && <FieldError text="請填寫其他來源" />}
+              </div>
+            )}
+            {errors.referralSource && <FieldError text="請選擇一項" />}
           </Field>
 
           {/* ── Section: 參賽資訊 ── */}
