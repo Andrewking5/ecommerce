@@ -62,7 +62,8 @@ const REFERRAL_SOURCES = [
   'Ayers 合作經銷商',
   '親友介紹',
   '海馬 91 譜',
-  'YouTube 白董影片',
+  'YouTube 白懂影片',
+  '心理測驗',
   '其他',
 ] as const;
 

@@ -392,6 +392,57 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
             </Card>
           </div>
 
+          <Card title="互動轉換 — 從測驗結果頁的下一步">
+            <div className="p-5 space-y-5">
+              {[
+                {
+                  label: '👉 點擊「了解比賽」跳轉簡章',
+                  desc: '完成測驗後直接前往活動簡章',
+                  count: data.brochureClicks,
+                  unique: data.brochureUniqueVisitors,
+                  color: '#c5a059',
+                },
+                {
+                  label: '🔗 點擊「分享」按鈕',
+                  desc: '不論是否完成分享流程',
+                  count: data.shareClicks,
+                  unique: data.shareUniqueVisitors,
+                  color: '#818cf8',
+                },
+                {
+                  label: '📧 分享後留 Email 抽獎',
+                  desc: '已成功登記抽獎名單',
+                  count: data.totalShareEmails,
+                  unique: null as number | null,
+                  color: '#34d399',
+                },
+              ].map((d) => {
+                const pct = total > 0 ? (d.count / total) * 100 : 0;
+                return (
+                  <div key={d.label}>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-sm text-white/70">
+                        {d.label}
+                        <span className="text-white/30 text-xs"> · {d.desc}</span>
+                      </span>
+                      <span className="text-xs text-white/50">
+                        {d.count}
+                        {d.unique != null && <span className="text-white/30"> ({d.unique} 不重複)</span>}
+                        <span className="text-white/30"> · {pct.toFixed(1)}% 完成者</span>
+                      </span>
+                    </div>
+                    <div className="bg-white/5 rounded-full h-3 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${Math.min(pct, 100)}%`, background: d.color }} />
+                    </div>
+                  </div>
+                );
+              })}
+              <p className="text-[10px] text-white/30 mt-2">
+                百分比 = 點擊數 ÷ 完成測驗總數，可估算結果頁的下一步轉換率
+              </p>
+            </div>
+          </Card>
+
           <Card title="每日完成趨勢（近 30 天）">
             {data.daily.length === 0 ? <EmptyChart icon={<TrendingUp size={40} />} message="近 30 天無數據" /> : (
               <div className="px-4 py-4">
@@ -427,10 +478,12 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
         const quizScans = quizEv ? (pageStats[quizEv.id]?.totalScans  ?? null) : null;
         const regScans  = regEv  ? (pageStats[regEv.id]?.totalScans   ?? null) : null;
         const funnelSteps = [
-          { label: '活動簡章瀏覽',  value: infoScans, color: '#c5a059' },
-          { label: '心理測驗主頁',  value: quizScans, color: '#818cf8' },
-          { label: '報名頁瀏覽',    value: regScans,  color: '#34d399' },
-          { label: '成功報名',      value: regTotal,  color: '#4ade80' },
+          { label: '心理測驗主頁',     value: quizScans,                   color: '#818cf8' },
+          { label: '完成測驗',         value: data?.total ?? null,         color: '#facc15' },
+          { label: '結果頁→簡章',      value: data?.brochureClicks ?? null, color: '#c5a059' },
+          { label: '活動簡章瀏覽',     value: infoScans,                   color: '#d4a84b' },
+          { label: '報名頁瀏覽',       value: regScans,                    color: '#34d399' },
+          { label: '成功報名',         value: regTotal,                    color: '#4ade80' },
         ];
         // bar widths relative to the max value (not always step 1)
         const funnelMax = Math.max(...funnelSteps.map(s => s.value ?? 0), 1);
@@ -514,6 +567,58 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                     <div>
                       <p className="text-xl font-bold text-white/60">{data?.uniqueVisitors ?? '—'}</p>
                       <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">不重複</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Interaction metrics — quiz result page CTAs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: '#c5a059' }} />
+                  <p className="text-xs font-bold text-white/70">結果頁 → 點擊「了解比賽」跳轉簡章</p>
+                </div>
+                <p className="text-[9px] text-white/20 mb-3">來源：QuizEvent / brochure_click</p>
+                {data === null ? <Spinner /> : (
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xl font-bold" style={{ color: '#c5a059' }}>{data?.brochureClicks ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">點擊次數</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white/60">{data?.brochureUniqueVisitors ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">不重複</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white/40">
+                        {data && data.total > 0 ? `${((data.brochureClicks / data.total) * 100).toFixed(1)}%` : '—'}
+                      </p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">完成 → 簡章</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="rounded-2xl p-5 border border-white/5" style={{ background: CARD_BG }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: '#818cf8' }} />
+                  <p className="text-xs font-bold text-white/70">結果頁 → 點擊「分享」</p>
+                </div>
+                <p className="text-[9px] text-white/20 mb-3">來源：QuizEvent / share_click（含後續留 Email）</p>
+                {data === null ? <Spinner /> : (
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xl font-bold" style={{ color: '#818cf8' }}>{data?.shareClicks ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">分享點擊</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold text-white/60">{data?.shareUniqueVisitors ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">不重複</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold" style={{ color: '#34d399' }}>{data?.totalShareEmails ?? '—'}</p>
+                      <p className="text-[9px] text-white/25 uppercase tracking-widest mt-0.5">留 Email 抽獎</p>
                     </div>
                   </div>
                 )}

@@ -785,3 +785,19 @@ model QuizShareEmail {
   @@index([createdAt])
   @@map("quiz_share_emails")
 }
+
+// 心理測驗互動事件（分享點擊、跳轉簡章）— 用於漏斗分析
+model QuizEvent {
+  id        String   @id @default(cuid())
+  type      String                           // 'brochure_click' | 'share_click'
+  slug      String?                          // 該結果型 slug
+  visitorId String?                          // 瀏覽器端 UUID（用於不重複計算）
+  device    String?                          // mobile / desktop / tablet
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([slug])
+  @@index([createdAt])
+  @@index([visitorId])
+  @@map("quiz_events")
+}

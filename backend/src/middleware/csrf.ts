@@ -52,6 +52,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
   // on mobile Safari (ITP). These paths have no user session or financial data.
   const publicPaths = [
     '/quiz/results',
+    '/quiz/events',
     '/quiz/share-email',
     '/newsletter',
     '/contact',

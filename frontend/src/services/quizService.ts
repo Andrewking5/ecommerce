@@ -70,7 +70,14 @@ export interface QuizAnalytics {
   byResult: { slug: string; label: string; count: number }[];
   byDevice: { device: string; count: number }[];
   daily: { date: string; count: number }[];
+  brochureClicks: number;
+  brochureUniqueVisitors: number;
+  shareClicks: number;
+  shareUniqueVisitors: number;
+  totalShareEmails: number;
 }
+
+export type QuizEventType = 'brochure_click' | 'share_click';
 
 const quizService = {
   async trackResult(slug: string, resultKey: string): Promise<void> {
@@ -78,6 +85,14 @@ const quizService = {
       await api.post('/quiz/results', { slug, resultKey, visitorId: getVisitorId() });
     } catch (err) {
       console.error('[quizService] trackResult failed:', err);
+    }
+  },
+
+  async trackEvent(type: QuizEventType, slug?: string): Promise<void> {
+    try {
+      await api.post('/quiz/events', { type, slug, visitorId: getVisitorId() });
+    } catch (err) {
+      console.error('[quizService] trackEvent failed:', err);
     }
   },
 

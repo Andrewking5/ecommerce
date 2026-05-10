@@ -9,6 +9,8 @@ const VALID_SLUGS = new Set([
   'fire', 'fireworks', 'sun', 'glow', 'wave', 'deep-sea', 'moon', 'dream-moon',
 ]);
 
+const VALID_EVENT_TYPES = new Set(['brochure_click', 'share_click']);
+
 const SLUG_LABEL: Record<string, string> = {
   'fire':       '火焰 (FIRE_自由)',
   'fireworks':  '煙火 (FIRE_故事)',
@@ -45,6 +47,37 @@ export class QuizController {
       res.json({ success: true });
     } catch (error) {
       console.error('Failed to track quiz result:', error);
+      res.status(500).json({ success: false, error: 'Failed to track' });
+    }
+  }
+
+  /** POST /api/quiz/events — 記錄一筆互動事件（分享點擊 / 簡章跳轉，public） */
+  static async trackEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const { type, slug, visitorId } = req.body as { type?: string; slug?: string; visitorId?: string };
+
+      if (!type || !VALID_EVENT_TYPES.has(type)) {
+        res.status(400).json({ success: false, error: 'Invalid event type' });
+        return;
+      }
+      if (slug && !VALID_SLUGS.has(slug)) {
+        res.status(400).json({ success: false, error: 'Invalid slug' });
+        return;
+      }
+
+      const ua = (req.headers['user-agent'] || '').toLowerCase();
+      let device = 'desktop';
+      if (/mobile|android|iphone|ipad|ipod/.test(ua)) {
+        device = /ipad|tablet/.test(ua) ? 'tablet' : 'mobile';
+      }
+
+      await prisma.quizEvent.create({
+        data: { type, slug: slug || null, device, visitorId: visitorId || null },
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to track quiz event:', error);
       res.status(500).json({ success: false, error: 'Failed to track' });
     }
   }
@@ -167,7 +200,12 @@ export class QuizController {
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {
-      const [total, bySlug, byDevice, daily, uniqueVis] = await Promise.all([
+      const [
+        total, bySlug, byDevice, daily, uniqueVis,
+        brochureClicks, shareClicks,
+        brochureUniqueVis, shareUniqueVis,
+        totalShareEmails,
+      ] = await Promise.all([
         // Total completions
         prisma.quizResult.count(),
 
@@ -198,6 +236,27 @@ export class QuizController {
           by: ['visitorId'],
           where: { visitorId: { not: null } },
         }),
+
+        // 從測驗結果頁點擊「了解比賽」按鈕（跳轉簡章）總次數
+        prisma.quizEvent.count({ where: { type: 'brochure_click' } }),
+
+        // 從測驗結果頁點擊「分享」按鈕總次數
+        prisma.quizEvent.count({ where: { type: 'share_click' } }),
+
+        // brochure 點擊不重複訪客
+        prisma.quizEvent.groupBy({
+          by: ['visitorId'],
+          where: { type: 'brochure_click', visitorId: { not: null } },
+        }),
+
+        // share 點擊不重複訪客
+        prisma.quizEvent.groupBy({
+          by: ['visitorId'],
+          where: { type: 'share_click', visitorId: { not: null } },
+        }),
+
+        // 已留 email 參加抽獎的人數（去重 by email/slug）
+        prisma.quizShareEmail.count(),
       ]);
 
       // Aggregate by day
@@ -222,6 +281,11 @@ export class QuizController {
             count: d._count,
           })),
           daily: Array.from(dailyMap.entries()).map(([date, count]) => ({ date, count })),
+          brochureClicks,
+          brochureUniqueVisitors: brochureUniqueVis.length,
+          shareClicks,
+          shareUniqueVisitors: shareUniqueVis.length,
+          totalShareEmails,
         },
       });
     } catch (error) {

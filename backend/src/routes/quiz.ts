@@ -19,6 +19,9 @@ function requireQuizKey(req: Request, res: Response, next: NextFunction): void {
 // Public — record a quiz result
 router.post('/results', QuizController.trackResult);
 
+// Public — record interaction event (share click / brochure click)
+router.post('/events', QuizController.trackEvent);
+
 // Public — record share email for lottery
 router.post('/share-email', QuizController.trackShareEmail);
 
