@@ -249,6 +249,40 @@ export class RegistrationController {
     }
   }
 
+  /** GET /api/registrations/admin/:eventId/referral-stats — count registrations per 得知管道 */
+  static async referralStats(req: Request, res: Response): Promise<void> {
+    try {
+      const { eventId } = req.params;
+      const registrations = await prisma.eventRegistration.findMany({
+        where: { eventId },
+        select: { answers: true },
+      });
+
+      const counts = new Map<string, number>();
+      let unknown = 0;
+      for (const r of registrations) {
+        const ans = (r.answers && typeof r.answers === 'object' ? r.answers : null) as Record<string, unknown> | null;
+        const raw = ans?.['得知管道'];
+        if (typeof raw !== 'string' || !raw.trim()) {
+          unknown += 1;
+          continue;
+        }
+        // 「其他：xxx」自由填寫的歸到「其他」一個桶
+        const label = raw.startsWith('其他：') || raw === '其他' ? '其他' : raw;
+        counts.set(label, (counts.get(label) || 0) + 1);
+      }
+
+      const data = Array.from(counts.entries())
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count);
+
+      res.json({ success: true, total: registrations.length, unknown, data });
+    } catch (error) {
+      console.error('Failed to compute referral stats:', error);
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
+  }
+
   /** Update registration settings on an event (open/limit) */
   static async updateSettings(req: Request, res: Response): Promise<void> {
     try {

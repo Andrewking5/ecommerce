@@ -25,6 +25,12 @@ export interface RegistrationStatus {
   full: boolean;
 }
 
+export interface ReferralStats {
+  total: number;
+  unknown: number;
+  data: { source: string; count: number }[];
+}
+
 export interface RegistrationPayload {
   name: string;
   phone: string;
@@ -59,6 +65,13 @@ const registrationService = {
   async list(eventId: string): Promise<{ registrations: Registration[]; total: number }> {
     const { data } = await api.get(`/registrations/admin/${eventId}`);
     return { registrations: data.data ?? [], total: data.total ?? 0 };
+  },
+
+  async referralStats(eventId: string): Promise<ReferralStats> {
+    const { data } = await api.get(`/registrations/admin/${eventId}/referral-stats`);
+    return data.success
+      ? { total: data.total ?? 0, unknown: data.unknown ?? 0, data: data.data ?? [] }
+      : { total: 0, unknown: 0, data: [] };
   },
 
   async exportCsv(eventId: string, filename: string): Promise<void> {

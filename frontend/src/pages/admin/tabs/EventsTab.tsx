@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { QRCode } from 'react-qrcode-logo';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
 import quizService, { type QuizAnalytics, type QuizShareEmail } from '@/src/services/quizService';
-import registrationService, { type Registration } from '@/src/services/registrationService';
+import registrationService, { type Registration, type ReferralStats } from '@/src/services/registrationService';
 import { CARD_BG } from '../constants';
 import { toLocalDatetimeValue, toSlug } from '../utils';
 import Card from '../components/Card';
@@ -136,6 +136,7 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   const [shareEmailsError, setShareEmailsError] = useState('');
   const [pageStats, setPageStats] = useState<Record<string, EventAnalytics | null>>({});
   const [clicksDays, setClicksDays] = useState<7 | 30 | 0>(30);
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
 
   const registerEvent = events.find(e => e.slug === 'soul-guitar/register');
   const soulEvents = events.filter(e => e.slug.startsWith('soul-guitar'));
@@ -172,6 +173,14 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
       eventService.getEventAnalytics(ev.id).then(a => setPageStats(prev => ({ ...prev, [ev.id]: a }))).catch(() => {});
     });
   }, [activeTab, soulEvents.length]);
+
+  useEffect(() => {
+    if (activeTab !== 'analytics' || !registerEvent) return;
+    if (referralStats !== null) return;
+    registrationService.referralStats(registerEvent.id)
+      .then((s) => setReferralStats(s))
+      .catch(() => setReferralStats({ total: 0, unknown: 0, data: [] }));
+  }, [activeTab, registerEvent?.id]);
 
   const handleClear = async () => {
     setClearing(true);
@@ -441,6 +450,42 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                 百分比 = 點擊數 ÷ 完成測驗總數，可估算結果頁的下一步轉換率
               </p>
             </div>
+          </Card>
+
+          <Card title="報名 — 得知本活動的管道分布">
+            {referralStats === null ? (
+              <div className="py-12 text-center"><Spinner /></div>
+            ) : referralStats.total === 0 ? (
+              <EmptyChart icon={<BarChart3 size={40} />} message="尚無報名資料" />
+            ) : (
+              <div className="px-4 py-4">
+                <div className="flex items-center justify-between px-2 mb-3">
+                  <span className="text-[11px] text-white/40">共 {referralStats.total} 筆報名</span>
+                  {referralStats.unknown > 0 && (
+                    <span className="text-[11px] text-white/30">{referralStats.unknown} 筆未填寫</span>
+                  )}
+                </div>
+                <ResponsiveContainer width="100%" height={Math.max(referralStats.data.length * 36 + 40, 200)}>
+                  <BarChart data={referralStats.data} layout="vertical" margin={{ top: 4, right: 32, left: 8, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" horizontal={false} />
+                    <XAxis type="number" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} allowDecimals={false} />
+                    <YAxis
+                      type="category"
+                      dataKey="source"
+                      tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 11 }}
+                      width={170}
+                      interval={0}
+                    />
+                    <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+                    <Bar dataKey="count" name="人數" fill="#c5a059" radius={[0, 4, 4, 0]}>
+                      {referralStats.data.map((_, i) => (
+                        <Cell key={i} fill={['#c5a059', '#818cf8', '#34d399', '#f472b6', '#facc15', '#60a5fa', '#fb923c', '#a78bfa', '#94a3b8'][i % 9]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </Card>
 
           <Card title="每日完成趨勢（近 30 天）">

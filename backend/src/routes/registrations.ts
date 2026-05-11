@@ -51,9 +51,10 @@ router.post('/submit/*', validateRequest(submitSchema), RegistrationController.s
 // ─── Admin ───
 // TODO: TEMP TEST — delete this route when email is confirmed working
 router.post('/admin/test-email',       authenticateToken, requireAdmin, RegistrationController.testEmail);
-router.get('/admin/:eventId',          authenticateToken, requireAdmin, RegistrationController.list);
-router.get('/admin/:eventId/export',   authenticateToken, requireAdmin, RegistrationController.exportCsv);
-router.patch('/admin/:id',             authenticateToken, requireAdmin, validateRequest(updateRegSchema), RegistrationController.updateOne);
+router.get('/admin/:eventId',                authenticateToken, requireAdmin, RegistrationController.list);
+router.get('/admin/:eventId/export',         authenticateToken, requireAdmin, RegistrationController.exportCsv);
+router.get('/admin/:eventId/referral-stats', authenticateToken, requireAdmin, RegistrationController.referralStats);
+router.patch('/admin/:id',                   authenticateToken, requireAdmin, validateRequest(updateRegSchema), RegistrationController.updateOne);
 router.delete('/admin/:id',            authenticateToken, requireAdmin, RegistrationController.deleteOne);
 router.patch('/admin/:eventId/settings', authenticateToken, requireAdmin, validateRequest(settingsSchema), RegistrationController.updateSettings);
 
