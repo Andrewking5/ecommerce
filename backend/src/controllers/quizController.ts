@@ -200,12 +200,7 @@ export class QuizController {
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {
-      const [
-        total, bySlug, byDevice, daily, uniqueVis,
-        brochureClicks, shareClicks,
-        brochureUniqueVis, shareUniqueVis,
-        totalShareEmails,
-      ] = await Promise.all([
+      const [total, bySlug, byDevice, daily, uniqueVis, totalShareEmails] = await Promise.all([
         // Total completions
         prisma.quizResult.count(),
 
@@ -237,27 +232,31 @@ export class QuizController {
           where: { visitorId: { not: null } },
         }),
 
-        // 從測驗結果頁點擊「了解比賽」按鈕（跳轉簡章）總次數
-        prisma.quizEvent.count({ where: { type: 'brochure_click' } }),
-
-        // 從測驗結果頁點擊「分享」按鈕總次數
-        prisma.quizEvent.count({ where: { type: 'share_click' } }),
-
-        // brochure 點擊不重複訪客
-        prisma.quizEvent.groupBy({
-          by: ['visitorId'],
-          where: { type: 'brochure_click', visitorId: { not: null } },
-        }),
-
-        // share 點擊不重複訪客
-        prisma.quizEvent.groupBy({
-          by: ['visitorId'],
-          where: { type: 'share_click', visitorId: { not: null } },
-        }),
-
-        // 已留 email 參加抽獎的人數（去重 by email/slug）
+        // 已留 email 參加抽獎的人數
         prisma.quizShareEmail.count(),
       ]);
+
+      // QuizEvent table may not exist yet (post-deploy, pre-migration). Fail soft to 0.
+      let brochureClicks = 0;
+      let shareClicks = 0;
+      let brochureUniqueVis: { visitorId: string | null }[] = [];
+      let shareUniqueVis: { visitorId: string | null }[] = [];
+      try {
+        [brochureClicks, shareClicks, brochureUniqueVis, shareUniqueVis] = await Promise.all([
+          prisma.quizEvent.count({ where: { type: 'brochure_click' } }),
+          prisma.quizEvent.count({ where: { type: 'share_click' } }),
+          prisma.quizEvent.groupBy({
+            by: ['visitorId'],
+            where: { type: 'brochure_click', visitorId: { not: null } },
+          }),
+          prisma.quizEvent.groupBy({
+            by: ['visitorId'],
+            where: { type: 'share_click', visitorId: { not: null } },
+          }),
+        ]);
+      } catch (eventErr) {
+        console.warn('[QuizAnalytics] quiz_events query failed (table may not exist yet); defaulting to 0:', (eventErr as Error)?.message);
+      }
 
       // Aggregate by day
       const dailyMap = new Map<string, number>();
