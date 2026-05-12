@@ -59,7 +59,6 @@ const SOCIAL_PLATFORMS = [
 const REFERRAL_SOURCES = [
   'Ayers 官方社群平台（IG）',
   'Ayers 官方社群平台（FB）',
-  'Ayers 官網',
   'Ayers 合作經銷商',
   '親友介紹',
   '海馬 91 譜',
