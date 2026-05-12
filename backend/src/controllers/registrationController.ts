@@ -59,15 +59,8 @@ export class RegistrationController {
 
       const { name, stageName, phone, email, socialId, category, soulColor, youtube, fbIg, rulesOk, message, answers } = req.body;
 
-      // Duplicate check — same email per event
-      const existing = await prisma.eventRegistration.findFirst({
-        where: { eventId: event.id, email: email.trim().toLowerCase() },
-        select: { id: true },
-      });
-      if (existing) {
-        res.status(409).json({ success: false, error: '此 Email 已完成報名，每人限報名一次。' });
-        return;
-      }
+      // 不擋重複報名：允許同 email 在同一場活動內報多筆（不同組別 / 重複試填皆放行），
+      // 由後台人工依規則處理。
 
       const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || null;
 

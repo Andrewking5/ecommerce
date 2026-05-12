@@ -717,7 +717,8 @@ model EventRegistration {
 
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@unique([eventId, email])
+  // 不限制重複報名（同 email 可多筆），由後台人工處理重複
+  @@index([eventId, email])
   @@index([eventId])
   @@index([createdAt])
   @@map("event_registrations")
