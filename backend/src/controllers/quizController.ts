@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../app';
-
-const VALID_SHARE_SLUGS = new Set([
-  'fire', 'fireworks', 'sun', 'glow', 'wave', 'deep-sea', 'moon', 'dream-moon',
-]);
+import { detectDevice } from '../utils/userAgent';
+import { toTaipeiDayString } from '../utils/date';
 
 const VALID_SLUGS = new Set([
   'fire', 'fireworks', 'sun', 'glow', 'wave', 'deep-sea', 'moon', 'dream-moon',
@@ -33,12 +31,7 @@ export class QuizController {
         return;
       }
 
-      // Simple device detection from User-Agent
-      const ua = (req.headers['user-agent'] || '').toLowerCase();
-      let device = 'desktop';
-      if (/mobile|android|iphone|ipad|ipod/.test(ua)) {
-        device = /ipad|tablet/.test(ua) ? 'tablet' : 'mobile';
-      }
+      const device = detectDevice(req.headers['user-agent']);
 
       await prisma.quizResult.create({
         data: { slug, resultKey: resultKey || slug, device, visitorId: visitorId || null },
@@ -65,11 +58,7 @@ export class QuizController {
         return;
       }
 
-      const ua = (req.headers['user-agent'] || '').toLowerCase();
-      let device = 'desktop';
-      if (/mobile|android|iphone|ipad|ipod/.test(ua)) {
-        device = /ipad|tablet/.test(ua) ? 'tablet' : 'mobile';
-      }
+      const device = detectDevice(req.headers['user-agent']);
 
       await prisma.quizEvent.create({
         data: { type, slug: slug || null, device, visitorId: visitorId || null },
@@ -91,7 +80,7 @@ export class QuizController {
         res.status(400).json({ success: false, error: 'Invalid email' });
         return;
       }
-      if (!slug || !VALID_SHARE_SLUGS.has(slug)) {
+      if (!slug || !VALID_SLUGS.has(slug)) {
         res.status(400).json({ success: false, error: 'Invalid slug' });
         return;
       }
@@ -200,24 +189,20 @@ export class QuizController {
   /** GET /api/quiz/admin/analytics — full analytics (admin only) */
   static async getAnalytics(req: Request, res: Response): Promise<void> {
     try {
-      const [total, bySlug, byDevice, daily, uniqueVis, totalShareEmails] = await Promise.all([
-        // Total completions
+      const [total, bySlug, byDevice, daily, uniqueVisCount, totalShareEmails] = await Promise.all([
         prisma.quizResult.count(),
 
-        // Count per slug
         prisma.quizResult.groupBy({
           by: ['slug'],
           _count: true,
           orderBy: { _count: { slug: 'desc' } },
         }),
 
-        // Count per device
         prisma.quizResult.groupBy({
           by: ['device'],
           _count: true,
         }),
 
-        // Daily completions (last 30 days)
         prisma.quizResult.findMany({
           select: { createdAt: true },
           where: {
@@ -226,43 +211,46 @@ export class QuizController {
           orderBy: { createdAt: 'asc' },
         }),
 
-        // Unique visitors (distinct visitorId)
-        prisma.quizResult.groupBy({
-          by: ['visitorId'],
-          where: { visitorId: { not: null } },
-        }),
+        prisma.$queryRaw<[{ c: bigint }]>`
+          SELECT COUNT(DISTINCT "visitorId") AS c
+          FROM "quiz_results"
+          WHERE "visitorId" IS NOT NULL
+        `.then((r) => Number(r[0]?.c ?? 0)),
 
-        // 已留 email 參加抽獎的人數
         prisma.quizShareEmail.count(),
       ]);
 
       // QuizEvent table may not exist yet (post-deploy, pre-migration). Fail soft to 0.
       let brochureClicks = 0;
       let shareClicks = 0;
-      let brochureUniqueVis: { visitorId: string | null }[] = [];
-      let shareUniqueVis: { visitorId: string | null }[] = [];
+      let brochureUniqueVisitors = 0;
+      let shareUniqueVisitors = 0;
       try {
-        [brochureClicks, shareClicks, brochureUniqueVis, shareUniqueVis] = await Promise.all([
+        const [bc, sc, buv, suv] = await Promise.all([
           prisma.quizEvent.count({ where: { type: 'brochure_click' } }),
           prisma.quizEvent.count({ where: { type: 'share_click' } }),
-          prisma.quizEvent.groupBy({
-            by: ['visitorId'],
-            where: { type: 'brochure_click', visitorId: { not: null } },
-          }),
-          prisma.quizEvent.groupBy({
-            by: ['visitorId'],
-            where: { type: 'share_click', visitorId: { not: null } },
-          }),
+          prisma.$queryRaw<[{ c: bigint }]>`
+            SELECT COUNT(DISTINCT "visitorId") AS c
+            FROM "quiz_events"
+            WHERE type = 'brochure_click' AND "visitorId" IS NOT NULL
+          `.then((r) => Number(r[0]?.c ?? 0)),
+          prisma.$queryRaw<[{ c: bigint }]>`
+            SELECT COUNT(DISTINCT "visitorId") AS c
+            FROM "quiz_events"
+            WHERE type = 'share_click' AND "visitorId" IS NOT NULL
+          `.then((r) => Number(r[0]?.c ?? 0)),
         ]);
+        brochureClicks = bc;
+        shareClicks = sc;
+        brochureUniqueVisitors = buv;
+        shareUniqueVisitors = suv;
       } catch (eventErr) {
         console.warn('[QuizAnalytics] quiz_events query failed (table may not exist yet); defaulting to 0:', (eventErr as Error)?.message);
       }
 
-      // Aggregate by day — bucket by Asia/Taipei calendar day (UTC+8, no DST),
-      // otherwise everything before 08:00 local time gets credited to the previous day.
       const dailyMap = new Map<string, number>();
       daily.forEach((r: { createdAt: Date }) => {
-        const day = new Date(r.createdAt.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        const day = toTaipeiDayString(r.createdAt);
         dailyMap.set(day, (dailyMap.get(day) || 0) + 1);
       });
 
@@ -270,7 +258,7 @@ export class QuizController {
         success: true,
         data: {
           total,
-          uniqueVisitors: uniqueVis.length,
+          uniqueVisitors: uniqueVisCount,
           byResult: bySlug.map((r: { slug: string; _count: number }) => ({
             slug: r.slug,
             label: SLUG_LABEL[r.slug] || r.slug,
@@ -282,9 +270,9 @@ export class QuizController {
           })),
           daily: Array.from(dailyMap.entries()).map(([date, count]) => ({ date, count })),
           brochureClicks,
-          brochureUniqueVisitors: brochureUniqueVis.length,
+          brochureUniqueVisitors,
           shareClicks,
-          shareUniqueVisitors: shareUniqueVis.length,
+          shareUniqueVisitors,
           totalShareEmails,
         },
       });

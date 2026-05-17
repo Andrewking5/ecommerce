@@ -2,15 +2,11 @@ import { Request, Response } from 'express';
 import { prisma } from '../app';
 import { AuthRequest } from '../middleware/auth';
 import crypto from 'crypto';
+import { detectDevice } from '../utils/userAgent';
+import { toTaipeiDayString } from '../utils/date';
 
 function generateReferralCode(): string {
   return crypto.randomBytes(4).toString('hex').toUpperCase();
-}
-
-function detectDevice(ua: string | undefined): string {
-  if (!ua) return 'unknown';
-  if (/mobile|android|iphone|ipad/i.test(ua)) return /ipad|tablet/i.test(ua) ? 'tablet' : 'mobile';
-  return 'desktop';
 }
 
 export class EventController {
@@ -325,11 +321,9 @@ export class EventController {
         }),
       ]);
 
-      // Aggregate daily clicks — bucket by Asia/Taipei calendar day (UTC+8, no DST),
-      // otherwise everything before 08:00 local time gets credited to the previous day.
       const dailyMap = new Map<string, number>();
       dailyClicks.forEach((row) => {
-        const day = new Date(new Date(row.createdAt).getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+        const day = toTaipeiDayString(new Date(row.createdAt));
         dailyMap.set(day, (dailyMap.get(day) || 0) + row._count);
       });
       const daily = Array.from(dailyMap.entries())

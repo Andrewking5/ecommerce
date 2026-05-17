@@ -12,7 +12,7 @@ import { QRCode } from 'react-qrcode-logo';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
 import quizService, { type QuizAnalytics, type QuizShareEmail } from '@/src/services/quizService';
 import registrationService, { type Registration, type ReferralStats } from '@/src/services/registrationService';
-import { CARD_BG } from '../constants';
+import { CARD_BG, CHART_PALETTE } from '../constants';
 import { toLocalDatetimeValue, toSlug } from '../utils';
 import Card from '../components/Card';
 import Spinner from '../components/Spinner';
@@ -176,10 +176,12 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
 
   useEffect(() => {
     if (activeTab !== 'analytics' || !registerEvent) return;
-    if (referralStats !== null) return;
+    let cancelled = false;
+    setReferralStats(null);
     registrationService.referralStats(registerEvent.id)
-      .then((s) => setReferralStats(s))
-      .catch(() => setReferralStats({ total: 0, unknown: 0, data: [] }));
+      .then((s) => { if (!cancelled) setReferralStats(s); })
+      .catch(() => { if (!cancelled) setReferralStats({ total: 0, unknown: 0, data: [] }); });
+    return () => { cancelled = true; };
   }, [activeTab, registerEvent?.id]);
 
   const handleClear = async () => {
@@ -477,9 +479,9 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
                       interval={0}
                     />
                     <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: '#d4a84b' }} itemStyle={{ color: 'rgba(255,255,255,0.7)' }} />
-                    <Bar dataKey="count" name="人數" fill="#c5a059" radius={[0, 4, 4, 0]}>
+                    <Bar dataKey="count" name="人數" fill={CHART_PALETTE[0]} radius={[0, 4, 4, 0]}>
                       {referralStats.data.map((_, i) => (
-                        <Cell key={i} fill={['#c5a059', '#818cf8', '#34d399', '#f472b6', '#facc15', '#60a5fa', '#fb923c', '#a78bfa', '#94a3b8'][i % 9]} />
+                        <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
                       ))}
                     </Bar>
                   </BarChart>

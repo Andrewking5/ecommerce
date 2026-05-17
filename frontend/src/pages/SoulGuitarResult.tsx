@@ -349,7 +349,7 @@ function FullResultPage({ resultKey, folder, layout }: {
   };
 
   const handleShare = async () => {
-    quizService.trackEvent('share_click', folder);
+    void quizService.trackEvent('share_click', folder);
     const shareUrl = `${window.location.origin}/e/soul-guitar/${folder}`;
     const shareText = `我的吉他靈魂是「${result.soulTitle}」！快來測測你的 🎸測驗完成再來報名「靈魂吉他手大賽」，總獎金高達20萬元！`;
 
@@ -673,7 +673,7 @@ function FullResultPage({ resultKey, folder, layout }: {
 
               <Link
                 to="/e/soul-guitar/info"
-                onClick={() => quizService.trackEvent('brochure_click', folder)}
+                onClick={() => void quizService.trackEvent('brochure_click', folder)}
                 style={fs('btnContest')}
                 className="active:scale-95 transition-transform"
               >

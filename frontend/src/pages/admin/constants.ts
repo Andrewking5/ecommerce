@@ -17,6 +17,11 @@ export const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-red-500/10 text-red-500',
 };
 
+export const CHART_PALETTE = [
+  '#c5a059', '#818cf8', '#34d399', '#f472b6', '#facc15',
+  '#60a5fa', '#fb923c', '#a78bfa', '#94a3b8',
+] as const;
+
 export type Tab = 'dashboard' | 'orders' | 'products' | 'categories' | 'inventory' | 'customers' | 'banners' | 'reviews' | 'coupons' | 'events';
 
 export type SidebarItem =
