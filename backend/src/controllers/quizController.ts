@@ -258,10 +258,11 @@ export class QuizController {
         console.warn('[QuizAnalytics] quiz_events query failed (table may not exist yet); defaulting to 0:', (eventErr as Error)?.message);
       }
 
-      // Aggregate by day
+      // Aggregate by day — bucket by Asia/Taipei calendar day (UTC+8, no DST),
+      // otherwise everything before 08:00 local time gets credited to the previous day.
       const dailyMap = new Map<string, number>();
       daily.forEach((r: { createdAt: Date }) => {
-        const day = r.createdAt.toISOString().slice(0, 10);
+        const day = new Date(r.createdAt.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
         dailyMap.set(day, (dailyMap.get(day) || 0) + 1);
       });
 

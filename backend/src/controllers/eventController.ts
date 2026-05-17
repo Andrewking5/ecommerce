@@ -325,13 +325,16 @@ export class EventController {
         }),
       ]);
 
-      // Aggregate daily clicks
+      // Aggregate daily clicks — bucket by Asia/Taipei calendar day (UTC+8, no DST),
+      // otherwise everything before 08:00 local time gets credited to the previous day.
       const dailyMap = new Map<string, number>();
       dailyClicks.forEach((row) => {
-        const day = new Date(row.createdAt).toISOString().slice(0, 10);
+        const day = new Date(new Date(row.createdAt).getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
         dailyMap.set(day, (dailyMap.get(day) || 0) + row._count);
       });
-      const daily = Array.from(dailyMap.entries()).map(([date, count]) => ({ date, count }));
+      const daily = Array.from(dailyMap.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([date, count]) => ({ date, count }));
 
       res.json({
         success: true,
