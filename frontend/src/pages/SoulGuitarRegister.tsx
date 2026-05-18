@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, AlertCircle, Loader2, Lock, Edit, Save, X, Plus, Trash2, ChevronDown } from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2, Lock, Edit, Save, X, Plus, Trash2, ChevronDown, Download } from 'lucide-react';
 import SEO from '../components/SEO';
 import registrationService from '../services/registrationService';
 import eventService, { type Event as EventType } from '../services/eventService';
@@ -642,6 +642,96 @@ export default function SoulGuitarRegister() {
                     Both hands and the faces of all members must be visible in the video to avoid any disputes over authentic playing or singing.
                   </span>
                 </p>
+              </div>
+            </div>
+          </Field>
+
+          {/* 版權問題說明（非原創－彈唱組必看） */}
+          <Field>
+            <div className="rounded-xl border border-red-500/30 bg-red-500/[0.04] overflow-hidden">
+              {/* Header bar */}
+              <div className="px-4 py-3 border-b border-red-500/20 bg-red-500/5 flex items-center gap-2 flex-wrap">
+                <AlertCircle size={14} className="text-red-300 shrink-0" />
+                <p className="text-xs font-bold tracking-wide text-red-200">版權問題說明</p>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-200 tracking-wide">非原創 · 彈唱組必看</span>
+              </div>
+
+              {/* Body text */}
+              <div className="px-4 py-4 space-y-3">
+                <p className="text-xs text-white/65 leading-relaxed">
+                  由於 YouTube Shorts 對「非原創音樂」的版權審查較嚴格，
+                  若影片被系統判定為 Shorts 形式，可能會出現
+                  <span className="text-red-300 font-semibold">無法觀看、限制曝光</span>等情況。
+                </p>
+                <p className="text-xs text-white/65 leading-relaxed">
+                  因此我們建議<span className="font-semibold text-white">非原創 ─ 彈唱組</span>參賽者，
+                  可使用我們提供的「<span className="text-ayers-gold font-semibold">官方黑色畫面</span>」接在影片後方，
+                  讓影片總長超過 <span className="text-ayers-gold font-bold">3 分鐘</span>，以提高被判定為「一般影片」的機率。
+                  <span className="block mt-1 text-white/35">（僅需更改上傳 YT 的影片）</span>
+                </p>
+              </div>
+
+              {/* Reference images */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5 px-0.5">
+                <div className="overflow-hidden rounded-sm bg-white/5">
+                  <img
+                    src="/images/events/copyright-solution.webp"
+                    alt="影片組合方式：有效畫面 + 黑色畫面 大於 3 分鐘"
+                    className="w-full h-auto block"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="overflow-hidden rounded-sm bg-white/5">
+                  <img
+                    src="/images/events/copyright-problem.webp"
+                    alt="YouTube Shorts 版權封鎖示意"
+                    className="w-full h-auto block"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+
+              {/* Usage steps */}
+              <div className="px-4 py-4 border-t border-red-500/15 space-y-2.5">
+                <p className="text-[11px] font-bold text-white/70 tracking-widest uppercase">使用方式</p>
+                <ul className="space-y-1.5 text-xs text-white/65 leading-relaxed">
+                  <li className="flex gap-2">
+                    <span className="shrink-0 font-bold text-ayers-gold">①</span>
+                    <span>有效演奏畫面仍需維持 <span className="text-white font-semibold">30 ～ 120 秒</span></span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="shrink-0 font-bold text-ayers-gold">②</span>
+                    <span>將官方提供的黑色畫面<span className="text-white font-semibold">接在影片最後方</span></span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="shrink-0 font-bold text-ayers-gold">③</span>
+                    <span>讓整體影片長度<span className="text-white font-semibold">超過 3 分鐘</span>即可</span>
+                  </li>
+                </ul>
+                <div className="pt-1 space-y-1">
+                  <p className="text-[11px] text-red-300/85 flex items-start gap-1.5">
+                    <span className="shrink-0">⚠️</span>
+                    <span>黑色畫面僅限使用官方提供版本</span>
+                  </p>
+                  <p className="text-[11px] text-red-300/85 flex items-start gap-1.5">
+                    <span className="shrink-0">⚠️</span>
+                    <span>請勿自行製作黑畫面或修改內容</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Download CTA */}
+              <div className="px-4 pb-4">
+                <a
+                  href="https://drive.google.com/drive/folders/1Oggs5BM6373ZXAgTjcsTRiyA4NFt6mMC"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-ayers-gold/50 text-ayers-gold bg-ayers-gold/5 hover:bg-ayers-gold/15 hover:border-ayers-gold/70 transition-all"
+                >
+                  <Download size={14} />
+                  下載官方黑色畫面
+                  <span className="text-[10px] font-normal opacity-50">Google Drive</span>
+                </a>
               </div>
             </div>
           </Field>
