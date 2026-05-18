@@ -720,17 +720,25 @@ export default function SoulGuitarRegister() {
                 </div>
               </div>
 
-              {/* Download CTA */}
-              <div className="px-4 pb-4">
+              {/* Download CTAs */}
+              <div className="px-4 pb-4 flex flex-wrap gap-2">
                 <a
-                  href="https://drive.google.com/drive/folders/1Oggs5BM6373ZXAgTjcsTRiyA4NFt6mMC"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/videos/ayers-blackscreen.mp4"
+                  download="Ayers官方黑畫面.mp4"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-ayers-gold/50 text-ayers-gold bg-ayers-gold/5 hover:bg-ayers-gold/15 hover:border-ayers-gold/70 transition-all"
                 >
                   <Download size={14} />
-                  下載官方黑色畫面
-                  <span className="text-[10px] font-normal opacity-50">Google Drive</span>
+                  下載官方黑畫面
+                  <span className="text-[10px] font-normal opacity-60">MP4</span>
+                </a>
+                <a
+                  href="/images/events/ayers-blackscreen.jpg"
+                  download="Ayers官方黑畫面.jpg"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-white/15 text-white/70 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all"
+                >
+                  <Download size={14} />
+                  下載黑畫面圖片
+                  <span className="text-[10px] font-normal opacity-60">JPG</span>
                 </a>
               </div>
             </div>
