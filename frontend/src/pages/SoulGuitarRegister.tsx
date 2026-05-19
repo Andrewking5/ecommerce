@@ -174,6 +174,39 @@ const RULES_DEFAULT: Array<{ zh: string; en: string }> = [
   { zh: '所有評斷Ayers主辦官方保有最終決策權。', en: 'All judging decisions are subject to the final determination of Ayers, the organizer.' },
 ];
 
+async function saveOrShareFile(
+  fetchUrl: string,
+  downloadUrl: string,
+  filename: string,
+  mime: string,
+) {
+  // Prefer native share sheet (iOS/Android) so user can pick "儲存到相簿/照片".
+  if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try {
+      const res = await fetch(fetchUrl);
+      if (res.ok) {
+        const blob = await res.blob();
+        const file = new File([blob], filename, { type: mime });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'Ayers 官方黑畫面' });
+          return;
+        }
+      }
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return; // user cancelled
+      // any other failure → fall through to download
+    }
+  }
+  // Fallback: trigger native download
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 export default function SoulGuitarRegister() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, boolean>>>({});
@@ -184,6 +217,7 @@ export default function SoulGuitarRegister() {
   const [errorMsg, setErrorMsg] = useState('');
   const [eventData, setEventData] = useState<EventType | null>(null);
   const [rules, setRules] = useState<Array<{ zh: string; en: string }>>(RULES_DEFAULT);
+  const [savingAsset, setSavingAsset] = useState<'mp4' | 'jpg' | null>(null);
 
   // ?edit mode — admin only
   const isEditMode = new URLSearchParams(window.location.search).has('edit');
@@ -736,38 +770,68 @@ export default function SoulGuitarRegister() {
               <div className="px-4 pb-3 space-y-1.5">
                 <p className="text-[11px] text-white/55 leading-relaxed flex items-start gap-1.5">
                   <span className="shrink-0">📱</span>
-                  <span><span className="text-white/85 font-semibold">iPhone</span>：長按上方影片 →「<span className="text-ayers-gold">儲存到相簿</span>」</span>
+                  <span><span className="text-white/85 font-semibold">手機</span>：點下方按鈕 → 系統會跳出儲存選單，選「<span className="text-ayers-gold">儲存影像／儲存到相簿</span>」即可</span>
                 </p>
                 <p className="text-[11px] text-white/55 leading-relaxed flex items-start gap-1.5">
-                  <span className="shrink-0">🤖</span>
-                  <span><span className="text-white/85 font-semibold">Android</span>：點下方下載鈕 → 至下載資料夾 → 移到相簿</span>
+                  <span className="shrink-0">💻</span>
+                  <span><span className="text-white/85 font-semibold">電腦</span>：點下方按鈕直接下載到本機</span>
                 </p>
                 <p className="text-[11px] text-white/40 leading-relaxed flex items-start gap-1.5">
                   <span className="shrink-0">⚠️</span>
-                  <span>若使用 IG／FB／LINE 內建瀏覽器無法下載，請點右上選單「<span className="text-white/70">用 Safari／Chrome 開啟</span>」</span>
+                  <span>若使用 IG／FB／LINE 內建瀏覽器無法操作，請點右上選單「<span className="text-white/70">用 Safari／Chrome 開啟</span>」</span>
                 </p>
               </div>
 
-              {/* Download CTAs */}
+              {/* Save / Download CTAs */}
               <div className="px-4 pb-4 flex flex-wrap gap-2">
-                <a
-                  href="/download/blackscreen.mp4"
-                  download="Ayers官方黑畫面.mp4"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-ayers-gold/50 text-ayers-gold bg-ayers-gold/5 hover:bg-ayers-gold/15 hover:border-ayers-gold/70 transition-all"
+                <button
+                  type="button"
+                  disabled={savingAsset === 'mp4'}
+                  onClick={async () => {
+                    setSavingAsset('mp4');
+                    try {
+                      await saveOrShareFile(
+                        '/videos/ayers-blackscreen.mp4',
+                        '/download/blackscreen.mp4',
+                        'Ayers官方黑畫面.mp4',
+                        'video/mp4',
+                      );
+                    } finally { setSavingAsset(null); }
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-ayers-gold/50 text-ayers-gold bg-ayers-gold/5 hover:bg-ayers-gold/15 hover:border-ayers-gold/70 disabled:opacity-50 disabled:cursor-wait transition-all"
                 >
-                  <Download size={14} />
-                  下載官方黑畫面
+                  {savingAsset === 'mp4' ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  儲存官方黑畫面
                   <span className="text-[10px] font-normal opacity-60">MP4</span>
-                </a>
-                <a
-                  href="/download/blackscreen.jpg"
-                  download="Ayers官方黑畫面.jpg"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-white/15 text-white/70 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all"
+                </button>
+                <button
+                  type="button"
+                  disabled={savingAsset === 'jpg'}
+                  onClick={async () => {
+                    setSavingAsset('jpg');
+                    try {
+                      await saveOrShareFile(
+                        '/images/events/ayers-blackscreen.jpg',
+                        '/download/blackscreen.jpg',
+                        'Ayers官方黑畫面.jpg',
+                        'image/jpeg',
+                      );
+                    } finally { setSavingAsset(null); }
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-white/15 text-white/70 bg-white/5 hover:bg-white/10 hover:border-white/30 disabled:opacity-50 disabled:cursor-wait transition-all"
                 >
-                  <Download size={14} />
-                  下載黑畫面圖片
+                  {savingAsset === 'jpg' ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Download size={14} />
+                  )}
+                  儲存黑畫面圖片
                   <span className="text-[10px] font-normal opacity-60">JPG</span>
-                </a>
+                </button>
               </div>
             </div>
           </Field>

@@ -1083,8 +1083,9 @@ export default function EventsTab() {
     if (!rulesEvent) return;
     setRulesSaving(true);
     try {
-      const res = await eventService.updateEvent(rulesEvent.id, { metadata: { rules: rulesItems } } as any);
-      if (res.success) { setEvents((prev) => prev.map((e) => e.id === rulesEvent.id ? { ...e, metadata: { rules: rulesItems } } : e)); setRulesEvent(null); }
+      const mergedMeta = { ...(rulesEvent.metadata ?? {}), rules: rulesItems };
+      const res = await eventService.updateEvent(rulesEvent.id, { metadata: mergedMeta } as any);
+      if (res.success) { setEvents((prev) => prev.map((e) => e.id === rulesEvent.id ? { ...e, metadata: mergedMeta } : e)); setRulesEvent(null); }
       else alert(`儲存失敗：${res.error || '未知錯誤'}`);
     } catch { alert('儲存失敗'); } finally { setRulesSaving(false); }
   };
