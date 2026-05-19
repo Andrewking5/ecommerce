@@ -720,10 +720,38 @@ export default function SoulGuitarRegister() {
                 </div>
               </div>
 
+              {/* Inline preview — iPhone users can long-press to save to Photos */}
+              <div className="px-4 pb-3">
+                <video
+                  src="/videos/ayers-blackscreen.mp4"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster="/images/events/ayers-blackscreen.jpg"
+                  className="block w-full max-w-[220px] mx-auto rounded-lg bg-black aspect-9/16"
+                />
+              </div>
+
+              {/* Platform hints */}
+              <div className="px-4 pb-3 space-y-1.5">
+                <p className="text-[11px] text-white/55 leading-relaxed flex items-start gap-1.5">
+                  <span className="shrink-0">📱</span>
+                  <span><span className="text-white/85 font-semibold">iPhone</span>：長按上方影片 →「<span className="text-ayers-gold">儲存到相簿</span>」</span>
+                </p>
+                <p className="text-[11px] text-white/55 leading-relaxed flex items-start gap-1.5">
+                  <span className="shrink-0">🤖</span>
+                  <span><span className="text-white/85 font-semibold">Android</span>：點下方下載鈕 → 至下載資料夾 → 移到相簿</span>
+                </p>
+                <p className="text-[11px] text-white/40 leading-relaxed flex items-start gap-1.5">
+                  <span className="shrink-0">⚠️</span>
+                  <span>若使用 IG／FB／LINE 內建瀏覽器無法下載，請點右上選單「<span className="text-white/70">用 Safari／Chrome 開啟</span>」</span>
+                </p>
+              </div>
+
               {/* Download CTAs */}
               <div className="px-4 pb-4 flex flex-wrap gap-2">
                 <a
-                  href="/videos/ayers-blackscreen.mp4"
+                  href="/download/blackscreen.mp4"
                   download="Ayers官方黑畫面.mp4"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-ayers-gold/50 text-ayers-gold bg-ayers-gold/5 hover:bg-ayers-gold/15 hover:border-ayers-gold/70 transition-all"
                 >
@@ -732,7 +760,7 @@ export default function SoulGuitarRegister() {
                   <span className="text-[10px] font-normal opacity-60">MP4</span>
                 </a>
                 <a
-                  href="/images/events/ayers-blackscreen.jpg"
+                  href="/download/blackscreen.jpg"
                   download="Ayers官方黑畫面.jpg"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border-2 border-white/15 text-white/70 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all"
                 >
