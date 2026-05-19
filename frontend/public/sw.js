@@ -9,7 +9,7 @@
  *  - Fonts: Cache-first
  */
 
-const CACHE_VERSION = 'ayers-v1';
+const CACHE_VERSION = 'ayers-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const API_CACHE = `${CACHE_VERSION}-api`;
@@ -57,6 +57,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension, etc.
   if (!url.protocol.startsWith('http')) return;
+
+  // Skip explicit download endpoints — let the browser handle natively.
+  // SW interception breaks Content-Disposition: attachment in Chrome
+  // ("無法在網站上擷取檔案" / "Failed - No file" download error).
+  if (url.pathname.startsWith('/download/')) return;
 
   // API requests → Network-first
   if (url.pathname.startsWith('/api/')) {
