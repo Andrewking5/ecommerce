@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { X, ZoomIn, Star } from 'lucide-react';
+import { X, ZoomIn, Star, Youtube } from 'lucide-react';
 import SEO from '../components/SEO';
 import eventService from '../services/eventService';
 import { useEventGate } from '../hooks/useEventGate';
@@ -816,6 +816,20 @@ export default function SoulGuitarInfo() {
             <p className="text-[10px] text-gray-300 text-center mt-5">點擊卡片前往心理測驗，測出你的靈魂顏色</p>
           </div>
         </div>
+      </section>
+
+      {/* ═══════════ 參賽者作品播放清單 ═══════════ */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
+        <p className="text-xs sm:text-sm text-gray-500 mb-4">看看其他參賽者的精彩演出</p>
+        <a
+          href="https://youtube.com/playlist?list=PLw6S60T2GSOx13l5eFQOME5Hd9TVzfRuw"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/25 hover:shadow-red-600/40 transition-all hover:-translate-y-0.5"
+        >
+          <Youtube size={20} className="shrink-0" />
+          【點我看參賽者作品】
+        </a>
       </section>
 
       {/* ═══════════ 注意事項 ═══════════ */}
