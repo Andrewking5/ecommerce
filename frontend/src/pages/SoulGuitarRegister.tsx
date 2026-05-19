@@ -646,14 +646,14 @@ export default function SoulGuitarRegister() {
             </div>
           </Field>
 
-          {/* 版權問題說明（非原創－彈唱組必看） */}
+          {/* 版權問題說明（非原創參賽者） */}
           <Field>
             <div className="rounded-xl border border-red-500/30 bg-red-500/[0.04] overflow-hidden">
               {/* Header bar */}
               <div className="px-4 py-3 border-b border-red-500/20 bg-red-500/5 flex items-center gap-2 flex-wrap">
                 <AlertCircle size={14} className="text-red-300 shrink-0" />
                 <p className="text-xs font-bold tracking-wide text-red-200">版權問題說明</p>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-200 tracking-wide">非原創 · 彈唱組必看</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-200 tracking-wide">非原創參賽者</span>
               </div>
 
               {/* Body text */}
@@ -664,7 +664,7 @@ export default function SoulGuitarRegister() {
                   <span className="text-red-300 font-semibold">無法觀看、限制曝光</span>等情況。
                 </p>
                 <p className="text-xs text-white/65 leading-relaxed">
-                  因此我們建議<span className="font-semibold text-white">非原創 ─ 彈唱組</span>參賽者，
+                  因此我們建議<span className="font-semibold text-white">非原創</span>參賽者，
                   可使用我們提供的「<span className="text-ayers-gold font-semibold">官方黑色畫面</span>」接在影片後方，
                   讓影片總長超過 <span className="text-ayers-gold font-bold">3 分鐘</span>，以提高被判定為「一般影片」的機率。
                   <span className="block mt-1 text-white/35">（僅需更改上傳 YT 的影片）</span>
