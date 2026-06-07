@@ -1,17 +1,18 @@
 import { motion } from 'motion/react';
 import {
   Plus, Trash2, RefreshCw, Edit, Eye, EyeOff, CalendarDays, MapPin, QrCode, Link, Copy, Check,
-  ExternalLink, FileText, X, Save, ChevronDown, ChevronRight, ChevronLeft, Users, Download, AlertTriangle, BarChart3, TrendingUp, Mail,
+  ExternalLink, FileText, X, Save, ChevronDown, ChevronRight, ChevronLeft, Users, Download, AlertTriangle, BarChart3, TrendingUp, Mail, Newspaper,
 } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { cn } from '@/src/lib/utils';
 import { GuitarSunLoader } from '@/src/components/guitar';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCode } from 'react-qrcode-logo';
 import eventService, { type Event as EventType, type EventAnalytics } from '@/src/services/eventService';
 import quizService, { type QuizAnalytics, type QuizShareEmail } from '@/src/services/quizService';
 import registrationService, { type Registration, type ReferralStats } from '@/src/services/registrationService';
+import { mergeInfoContent, type InfoContent } from '@/src/data/soulGuitarInfoContent';
 import { CARD_BG, CHART_PALETTE } from '../constants';
 import { toLocalDatetimeValue, toSlug } from '../utils';
 import Card from '../components/Card';
@@ -958,6 +959,361 @@ function QuizFullPage({ data, onBack, onRefresh, events, initialTab = 'analytics
   );
 }
 
+/* ─── 簡章內容編輯器（soul-guitar/info）─── */
+
+const CONTENT_INPUT = 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-ayers-gold transition-all';
+
+function CField({ label, value, onChange, area, placeholder }: { label: string; value: string; onChange: (v: string) => void; area?: boolean; placeholder?: string }) {
+  return (
+    <label className="block min-w-0">
+      <span className="text-[9px] text-white/30 uppercase tracking-widest">{label}</span>
+      {area
+        ? <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={4} placeholder={placeholder} className={cn(CONTENT_INPUT, 'resize-none mt-1')} />
+        : <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={cn(CONTENT_INPUT, 'mt-1')} />}
+    </label>
+  );
+}
+
+function CColorInline({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex items-center gap-1.5 shrink-0">
+      <input type="color" aria-label="顏色" value={value} onChange={(e) => onChange(e.target.value)} className="w-8 h-8 rounded border border-white/10 bg-transparent cursor-pointer shrink-0" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} aria-label="色碼" className={cn(CONTENT_INPUT, 'w-20')} />
+    </div>
+  );
+}
+
+function CSection({ title, desc, children }: { title: string; desc?: string; children: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/[0.02] p-4 space-y-3">
+      <div>
+        <h4 className="text-xs font-bold uppercase tracking-widest text-ayers-gold">{title}</h4>
+        {desc && <p className="text-[10px] text-white/25 mt-0.5">{desc}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function CList<T,>({ items, onChange, newItem, render, addLabel = '新增一項' }: {
+  items: T[];
+  onChange: (next: T[]) => void;
+  newItem: () => T;
+  render: (item: T, setItem: (v: T) => void, idx: number) => ReactNode;
+  addLabel?: string;
+}) {
+  const move = (idx: number, dir: -1 | 1) => {
+    const t = idx + dir; if (t < 0 || t >= items.length) return;
+    const next = [...items]; [next[idx], next[t]] = [next[t], next[idx]]; onChange(next);
+  };
+  return (
+    <div className="space-y-2">
+      {items.map((item, idx) => (
+        <div key={idx} className="rounded-xl border border-white/8 bg-white/[0.03] p-3 flex items-start gap-2">
+          <span className="shrink-0 w-5 h-5 rounded-full bg-ayers-gold/10 text-ayers-gold text-[9px] font-bold flex items-center justify-center mt-1">{idx + 1}</span>
+          <div className="flex-1 space-y-2 min-w-0">{render(item, (v) => onChange(items.map((it, i) => i === idx ? v : it)), idx)}</div>
+          <div className="flex flex-col gap-1 shrink-0">
+            <button type="button" title="上移" onClick={() => move(idx, -1)} disabled={idx === 0} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronDown size={12} className="rotate-180" /></button>
+            <button type="button" title="下移" onClick={() => move(idx, 1)} disabled={idx === items.length - 1} className="p-1 rounded hover:bg-white/10 text-white/30 hover:text-white disabled:opacity-20 transition-all"><ChevronDown size={12} /></button>
+            <button type="button" title="刪除" onClick={() => onChange(items.filter((_, i) => i !== idx))} className="p-1 rounded hover:bg-red-500/10 text-white/20 hover:text-red-400 transition-all"><Trash2 size={12} /></button>
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange([...items, newItem()])} className="w-full py-2 rounded-xl border border-dashed border-white/10 text-white/30 hover:text-white hover:border-white/20 text-xs flex items-center justify-center gap-1.5 transition-all"><Plus size={12} /> {addLabel}</button>
+    </div>
+  );
+}
+
+function InfoContentModal({ event, onClose, onSaved }: { event: EventType; onClose: () => void; onSaved: (meta: Record<string, unknown>) => void }) {
+  const [draft, setDraft] = useState<InfoContent>(() => mergeInfoContent((event.metadata as { content?: unknown } | null | undefined)?.content));
+  const [saving, setSaving] = useState(false);
+
+  const patch = (p: Partial<InfoContent>) => setDraft((d) => ({ ...d, ...p }));
+  const upHero = (p: Partial<InfoContent['hero']>) => setDraft((d) => ({ ...d, hero: { ...d.hero, ...p } }));
+  const upPurpose = (p: Partial<InfoContent['purpose']>) => setDraft((d) => ({ ...d, purpose: { ...d.purpose, ...p } }));
+  const upSteps = (p: Partial<InfoContent['steps']>) => setDraft((d) => ({ ...d, steps: { ...d.steps, ...p } }));
+  const upJudges = (p: Partial<InfoContent['judges']>) => setDraft((d) => ({ ...d, judges: { ...d.judges, ...p } }));
+  const upScoring = (p: Partial<InfoContent['scoring']>) => setDraft((d) => ({ ...d, scoring: { ...d.scoring, ...p } }));
+  const upAwards = (p: Partial<InfoContent['awards']>) => setDraft((d) => ({ ...d, awards: { ...d.awards, ...p } }));
+  const upVideo = (p: Partial<InfoContent['videoFormat']>) => setDraft((d) => ({ ...d, videoFormat: { ...d.videoFormat, ...p } }));
+  const upDemo = (p: Partial<InfoContent['demoVideos']>) => setDraft((d) => ({ ...d, demoVideos: { ...d.demoVideos, ...p } }));
+  const upPlaylist = (p: Partial<InfoContent['playlist']>) => setDraft((d) => ({ ...d, playlist: { ...d.playlist, ...p } }));
+  const upNotes = (p: Partial<InfoContent['notes']>) => setDraft((d) => ({ ...d, notes: { ...d.notes, ...p } }));
+  const upCta = (p: Partial<InfoContent['cta']>) => setDraft((d) => ({ ...d, cta: { ...d.cta, ...p } }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const mergedMeta = { ...((event.metadata as Record<string, unknown>) ?? {}), content: draft };
+      const res = await eventService.updateEvent(event.id, { metadata: mergedMeta } as any);
+      if (res.success) onSaved(mergedMeta);
+      else alert(`儲存失敗：${res.error || '未知錯誤'}`);
+    } catch { alert('儲存失敗'); } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl w-full max-w-3xl mx-4 flex flex-col max-h-[90vh]" style={{ background: CARD_BG }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-ayers-gold">頁面內容編輯</h3>
+            <p className="text-[10px] text-white/30 mt-0.5">{event.title} · 簡章頁所有區塊</p>
+          </div>
+          <button type="button" onClick={onClose} className="text-white/30 hover:text-white transition-colors"><X size={14} /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          {/* Hero */}
+          <CSection title="主視覺 Hero" desc="頁首大標、日期、倒數計時、按鈕文字">
+            <CField label="小標 Badge" value={draft.hero.badge} onChange={(v) => upHero({ badge: v })} />
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="主標題 第一行" value={draft.hero.title1} onChange={(v) => upHero({ title1: v })} />
+              <CField label="主標題 第二行" value={draft.hero.title2} onChange={(v) => upHero({ title2: v })} />
+            </div>
+            <CField label="副標說明" value={draft.hero.subtitle} onChange={(v) => upHero({ subtitle: v })} area />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <CField label="開始 標籤" value={draft.hero.startLabel} onChange={(v) => upHero({ startLabel: v })} />
+              <CField label="開始 日期" value={draft.hero.startValue} onChange={(v) => upHero({ startValue: v })} />
+              <CField label="截止 標籤" value={draft.hero.endLabel} onChange={(v) => upHero({ endLabel: v })} />
+              <CField label="截止 日期" value={draft.hero.endValue} onChange={(v) => upHero({ endValue: v })} />
+            </div>
+            <CField label="倒數計時目標（ISO，例 2026-06-07T23:59:00+08:00）" value={draft.hero.countdownTarget} onChange={(v) => upHero({ countdownTarget: v })} />
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="報名按鈕文字" value={draft.hero.registerText} onChange={(v) => upHero({ registerText: v })} />
+              <CField label="測驗按鈕文字" value={draft.hero.quizText} onChange={(v) => upHero({ quizText: v })} />
+            </div>
+            <CField label="橘色提示 1" value={draft.hero.note1} onChange={(v) => upHero({ note1: v })} />
+            <CField label="橘色提示 2" value={draft.hero.note2} onChange={(v) => upHero({ note2: v })} />
+            <CField label="海報圖片路徑" value={draft.hero.poster} onChange={(v) => upHero({ poster: v })} />
+          </CSection>
+
+          {/* Info strip */}
+          <CSection title="快速資訊帶" desc="頁首下方四格資訊">
+            <CList items={draft.infoStrip} onChange={(v) => patch({ infoStrip: v })} newItem={() => ({ label: '', value: '' })}
+              render={(it, set) => (
+                <div className="grid grid-cols-2 gap-2">
+                  <input value={it.label} onChange={(e) => set({ ...it, label: e.target.value })} placeholder="標籤" className={CONTENT_INPUT} />
+                  <input value={it.value} onChange={(e) => set({ ...it, value: e.target.value })} placeholder="內容" className={CONTENT_INPUT} />
+                </div>
+              )} />
+          </CSection>
+
+          {/* Purpose */}
+          <CSection title="大賽宗旨">
+            <CField label="標題" value={draft.purpose.title} onChange={(v) => upPurpose({ title: v })} />
+            <CField label="重點句" value={draft.purpose.lead} onChange={(v) => upPurpose({ lead: v })} />
+            <CField label="內文（可換行）" value={draft.purpose.body} onChange={(v) => upPurpose({ body: v })} area />
+          </CSection>
+
+          {/* Steps */}
+          <CSection title="活動參賽流程">
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.steps.title} onChange={(v) => upSteps({ title: v })} />
+              <CField label="英文副標" value={draft.steps.subtitle} onChange={(v) => upSteps({ subtitle: v })} />
+            </div>
+            <CList items={draft.steps.items} onChange={(v) => upSteps({ items: v })} newItem={() => ({ title: '', desc: '' })}
+              render={(it, set) => (
+                <>
+                  <input value={it.title} onChange={(e) => set({ ...it, title: e.target.value })} placeholder="步驟標題" className={CONTENT_INPUT} />
+                  <input value={it.desc} onChange={(e) => set({ ...it, desc: e.target.value })} placeholder="步驟說明" className={CONTENT_INPUT} />
+                </>
+              )} />
+          </CSection>
+
+          {/* Judges */}
+          <CSection title="評審陣容">
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.judges.title} onChange={(v) => upJudges({ title: v })} />
+              <CField label="副標" value={draft.judges.subtitle} onChange={(v) => upJudges({ subtitle: v })} />
+            </div>
+            <CList items={draft.judges.items} onChange={(v) => upJudges({ items: v })} newItem={() => ({ name: '', title: '', photo: '', link: '', posClass: 'object-center' })}
+              render={(it, set) => (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={it.name} onChange={(e) => set({ ...it, name: e.target.value })} placeholder="姓名" className={CONTENT_INPUT} />
+                    <input value={it.title} onChange={(e) => set({ ...it, title: e.target.value })} placeholder="頭銜" className={CONTENT_INPUT} />
+                  </div>
+                  <input value={it.photo} onChange={(e) => set({ ...it, photo: e.target.value })} placeholder="照片路徑" className={CONTENT_INPUT} />
+                  <div className="grid grid-cols-[1fr_auto] gap-2">
+                    <input value={it.link} onChange={(e) => set({ ...it, link: e.target.value })} placeholder="連結 (IG 等)" className={CONTENT_INPUT} />
+                    <select aria-label="照片對齊" value={it.posClass} onChange={(e) => set({ ...it, posClass: e.target.value })} className={cn(CONTENT_INPUT, 'bg-[#1a1a1a]')}>
+                      <option value="object-center">置中</option>
+                      <option value="object-top">靠上</option>
+                      <option value="object-bottom">靠下</option>
+                    </select>
+                  </div>
+                </>
+              )} />
+          </CSection>
+
+          {/* Scoring */}
+          <CSection title="評分標準">
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.scoring.title} onChange={(v) => upScoring({ title: v })} />
+              <CField label="英文副標" value={draft.scoring.subtitle} onChange={(v) => upScoring({ subtitle: v })} />
+            </div>
+            <CField label="彈唱組 標題" value={draft.scoring.singingTitle} onChange={(v) => upScoring({ singingTitle: v })} />
+            <CList items={draft.scoring.singing} onChange={(v) => upScoring({ singing: v })} newItem={() => ({ label: '', desc: '', pct: 0 })}
+              render={(it, set) => (
+                <div className="grid grid-cols-[1fr_1.4fr_auto] gap-2 items-center">
+                  <input value={it.label} onChange={(e) => set({ ...it, label: e.target.value })} placeholder="項目" className={CONTENT_INPUT} />
+                  <input value={it.desc} onChange={(e) => set({ ...it, desc: e.target.value })} placeholder="說明" className={CONTENT_INPUT} />
+                  <div className="flex items-center gap-1"><input type="number" aria-label="百分比" value={it.pct} onChange={(e) => set({ ...it, pct: Number(e.target.value) })} className={cn(CONTENT_INPUT, 'w-16 text-center')} /><span className="text-white/30 text-xs">%</span></div>
+                </div>
+              )} />
+            <CField label="演奏組 標題" value={draft.scoring.playingTitle} onChange={(v) => upScoring({ playingTitle: v })} />
+            <CList items={draft.scoring.playing} onChange={(v) => upScoring({ playing: v })} newItem={() => ({ label: '', desc: '', pct: 0 })}
+              render={(it, set) => (
+                <div className="grid grid-cols-[1fr_1.4fr_auto] gap-2 items-center">
+                  <input value={it.label} onChange={(e) => set({ ...it, label: e.target.value })} placeholder="項目" className={CONTENT_INPUT} />
+                  <input value={it.desc} onChange={(e) => set({ ...it, desc: e.target.value })} placeholder="說明" className={CONTENT_INPUT} />
+                  <div className="flex items-center gap-1"><input type="number" aria-label="百分比" value={it.pct} onChange={(e) => set({ ...it, pct: Number(e.target.value) })} className={cn(CONTENT_INPUT, 'w-16 text-center')} /><span className="text-white/30 text-xs">%</span></div>
+                </div>
+              )} />
+            <CField label="備註" value={draft.scoring.note} onChange={(v) => upScoring({ note: v })} area />
+          </CSection>
+
+          {/* Awards */}
+          <CSection title="獎項">
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.awards.title} onChange={(v) => upAwards({ title: v })} />
+              <CField label="副標" value={draft.awards.subtitle} onChange={(v) => upAwards({ subtitle: v })} />
+            </div>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest pt-1">大獎（兩張大卡片）</p>
+            <CList items={draft.awards.big} onChange={(v) => upAwards({ big: v })} newItem={() => ({ icon: '🏆', title: '', type: '', guitar: '', money: '', bonus: '', method: '', color: '#facc15' })}
+              render={(it, set) => (
+                <>
+                  <div className="grid grid-cols-[auto_1fr] gap-2">
+                    <input value={it.icon} onChange={(e) => set({ ...it, icon: e.target.value })} placeholder="圖示" className={cn(CONTENT_INPUT, 'w-14 text-center')} />
+                    <input value={it.title} onChange={(e) => set({ ...it, title: e.target.value })} placeholder="獎項名稱" className={CONTENT_INPUT} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={it.type} onChange={(e) => set({ ...it, type: e.target.value })} placeholder="吉他類型" className={CONTENT_INPUT} />
+                    <input value={it.guitar} onChange={(e) => set({ ...it, guitar: e.target.value })} placeholder="吉他型號" className={CONTENT_INPUT} />
+                  </div>
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                    <input value={it.money} onChange={(e) => set({ ...it, money: e.target.value })} placeholder="價值 NT$" className={CONTENT_INPUT} />
+                    <input value={it.bonus} onChange={(e) => set({ ...it, bonus: e.target.value })} placeholder="獎金 NT$" className={CONTENT_INPUT} />
+                    <CColorInline value={it.color} onChange={(c) => set({ ...it, color: c })} />
+                  </div>
+                  <input value={it.method} onChange={(e) => set({ ...it, method: e.target.value })} placeholder="評選方式" className={CONTENT_INPUT} />
+                </>
+              )} />
+            <p className="text-[10px] text-white/30 uppercase tracking-widest pt-1">中獎（三張中卡片）</p>
+            <CList items={draft.awards.mid} onChange={(v) => upAwards({ mid: v })} newItem={() => ({ icon: '🌟', title: '', guitar: '', extra: '', micDetail: '', money: '', method: '', color: '#c5a059' })}
+              render={(it, set) => (
+                <>
+                  <div className="grid grid-cols-[auto_1fr] gap-2">
+                    <input value={it.icon} onChange={(e) => set({ ...it, icon: e.target.value })} placeholder="圖示" className={cn(CONTENT_INPUT, 'w-14 text-center')} />
+                    <input value={it.title} onChange={(e) => set({ ...it, title: e.target.value })} placeholder="獎項名稱" className={CONTENT_INPUT} />
+                  </div>
+                  <input value={it.guitar} onChange={(e) => set({ ...it, guitar: e.target.value })} placeholder="吉他" className={CONTENT_INPUT} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={it.extra} onChange={(e) => set({ ...it, extra: e.target.value })} placeholder="附加（選填）" className={CONTENT_INPUT} />
+                    <input value={it.micDetail} onChange={(e) => set({ ...it, micDetail: e.target.value })} placeholder="麥克風細節（選填）" className={CONTENT_INPUT} />
+                  </div>
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                    <input value={it.money} onChange={(e) => set({ ...it, money: e.target.value })} placeholder="價值 NT$" className={CONTENT_INPUT} />
+                    <input value={it.method} onChange={(e) => set({ ...it, method: e.target.value })} placeholder="評選方式" className={CONTENT_INPUT} />
+                    <CColorInline value={it.color} onChange={(c) => set({ ...it, color: c })} />
+                  </div>
+                </>
+              )} />
+            <p className="text-[10px] text-white/30 uppercase tracking-widest pt-1">特別獎</p>
+            <CList items={draft.awards.special} onChange={(v) => upAwards({ special: v })} newItem={() => ({ icon: '🏅', title: '', n: '', prize: '', note: '' })}
+              render={(it, set) => (
+                <>
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-2">
+                    <input value={it.icon} onChange={(e) => set({ ...it, icon: e.target.value })} placeholder="圖示" className={cn(CONTENT_INPUT, 'w-14 text-center')} />
+                    <input value={it.title} onChange={(e) => set({ ...it, title: e.target.value })} placeholder="獎項名稱" className={CONTENT_INPUT} />
+                    <input value={it.n} onChange={(e) => set({ ...it, n: e.target.value })} placeholder="名額" className={cn(CONTENT_INPUT, 'w-20 text-center')} />
+                  </div>
+                  <input value={it.prize} onChange={(e) => set({ ...it, prize: e.target.value })} placeholder="獎品" className={CONTENT_INPUT} />
+                  <input value={it.note} onChange={(e) => set({ ...it, note: e.target.value })} placeholder="說明" className={CONTENT_INPUT} />
+                </>
+              )} />
+          </CSection>
+
+          {/* Video format */}
+          <CSection title="影片格式" desc="開頭說明改為純文字，原本的粗體標示不再顯示">
+            <CField label="標題" value={draft.videoFormat.title} onChange={(v) => upVideo({ title: v })} />
+            <CList items={draft.videoFormat.groups} onChange={(v) => upVideo({ groups: v })} newItem={() => ({ name: '', num: '', accent: '#f97316', ytTitle: '', hashtag: '#2026Ayers靈魂吉他手大賽' })}
+              render={(it, set) => (
+                <>
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-2">
+                    <input value={it.num} onChange={(e) => set({ ...it, num: e.target.value })} placeholder="序號" className={cn(CONTENT_INPUT, 'w-14 text-center')} />
+                    <input value={it.name} onChange={(e) => set({ ...it, name: e.target.value })} placeholder="組別名稱" className={CONTENT_INPUT} />
+                    <CColorInline value={it.accent} onChange={(c) => set({ ...it, accent: c })} />
+                  </div>
+                  <input value={it.ytTitle} onChange={(e) => set({ ...it, ytTitle: e.target.value })} placeholder="YouTube 影片標題命名" className={CONTENT_INPUT} />
+                  <input value={it.hashtag} onChange={(e) => set({ ...it, hashtag: e.target.value })} placeholder="Hashtag" className={CONTENT_INPUT} />
+                </>
+              )} />
+            <CField label="開頭說明 標題" value={draft.videoFormat.openingTitle} onChange={(v) => upVideo({ openingTitle: v })} />
+            <CField label="開頭說明 內容" value={draft.videoFormat.opening} onChange={(v) => upVideo({ opening: v })} area />
+          </CSection>
+
+          {/* Demo videos */}
+          <CSection title="示範影片">
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.demoVideos.title} onChange={(v) => upDemo({ title: v })} />
+              <CField label="副標" value={draft.demoVideos.subtitle} onChange={(v) => upDemo({ subtitle: v })} />
+            </div>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest pt-1">橫式影片（16:9）</p>
+            <CField label="嵌入網址 (youtube embed)" value={draft.demoVideos.landscape.embedUrl} onChange={(v) => upDemo({ landscape: { ...draft.demoVideos.landscape, embedUrl: v } })} />
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.demoVideos.landscape.title} onChange={(v) => upDemo({ landscape: { ...draft.demoVideos.landscape, title: v } })} />
+              <CField label="說明" value={draft.demoVideos.landscape.desc} onChange={(v) => upDemo({ landscape: { ...draft.demoVideos.landscape, desc: v } })} />
+            </div>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest pt-1">直式影片（9:16）</p>
+            <CField label="嵌入網址 (youtube embed)" value={draft.demoVideos.portrait.embedUrl} onChange={(v) => upDemo({ portrait: { ...draft.demoVideos.portrait, embedUrl: v } })} />
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="標題" value={draft.demoVideos.portrait.title} onChange={(v) => upDemo({ portrait: { ...draft.demoVideos.portrait, title: v } })} />
+              <CField label="說明" value={draft.demoVideos.portrait.desc} onChange={(v) => upDemo({ portrait: { ...draft.demoVideos.portrait, desc: v } })} />
+            </div>
+          </CSection>
+
+          {/* Playlist */}
+          <CSection title="參賽者作品播放清單">
+            <CField label="說明文字" value={draft.playlist.text} onChange={(v) => upPlaylist({ text: v })} />
+            <CField label="按鈕文字" value={draft.playlist.buttonText} onChange={(v) => upPlaylist({ buttonText: v })} />
+            <CField label="播放清單網址" value={draft.playlist.url} onChange={(v) => upPlaylist({ url: v })} />
+          </CSection>
+
+          {/* Notes */}
+          <CSection title="注意事項">
+            <CField label="標題" value={draft.notes.title} onChange={(v) => upNotes({ title: v })} />
+            <CList items={draft.notes.items} onChange={(v) => upNotes({ items: v })} newItem={() => ''}
+              render={(it, set) => (
+                <input value={it} onChange={(e) => set(e.target.value)} placeholder="注意事項" className={CONTENT_INPUT} />
+              )} />
+          </CSection>
+
+          {/* CTA */}
+          <CSection title="頁尾 CTA / 社群">
+            <CField label="標題" value={draft.cta.title} onChange={(v) => upCta({ title: v })} />
+            <CField label="副標" value={draft.cta.subtitle} onChange={(v) => upCta({ subtitle: v })} />
+            <div className="grid grid-cols-2 gap-2">
+              <CField label="Instagram 連結" value={draft.cta.igUrl} onChange={(v) => upCta({ igUrl: v })} />
+              <CField label="Facebook 連結" value={draft.cta.fbUrl} onChange={(v) => upCta({ fbUrl: v })} />
+            </div>
+          </CSection>
+        </div>
+
+        <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 shrink-0">
+          <p className="text-[10px] text-white/20">儲存後重新整理簡章頁即可看到</p>
+          <div className="flex gap-3">
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">取消</button>
+            <button type="button" onClick={save} disabled={saving} className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-ayers-gold text-black text-[10px] font-bold uppercase tracking-widest hover:bg-ayers-gold/90 disabled:opacity-40 transition-all">
+              <Save size={12} /> {saving ? '儲存中...' : '儲存內容'}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 /* ─── EventsTab ─── */
 
 export default function EventsTab() {
@@ -976,6 +1332,7 @@ export default function EventsTab() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [rulesEvent, setRulesEvent] = useState<EventType | null>(null);
+  const [contentEvent, setContentEvent] = useState<EventType | null>(null);
   const [rulesItems, setRulesItems] = useState<Array<{ short: string; full: string }>>([]);
   const [rulesSaving, setRulesSaving] = useState(false);
   const [regRulesEvent, setRegRulesEvent] = useState<EventType | null>(null);
@@ -1190,6 +1547,7 @@ export default function EventsTab() {
         )}
         {event.eventType === 'QUIZ' && event.slug.startsWith('soul-guitar') && <button onClick={() => openSoulGuitarPage('emails')} title="抽獎 Email 管理" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><Mail size={14} /></button>}
         {event.eventType === 'INFO' && <button onClick={() => handleOpenRules(event)} title="編輯比賽規則" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><FileText size={14} /></button>}
+        {event.slug === 'soul-guitar/info' && <button onClick={() => setContentEvent(event)} title="編輯頁面內容" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><Newspaper size={14} /></button>}
         {event.slug === 'soul-guitar/register' && <button type="button" onClick={() => handleOpenRegRules(event)} title="編輯報名條款" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><FileText size={14} /></button>}
         <button onClick={() => setViewingQr(event)} title="QR Code" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all"><QrCode size={14} /></button>
         <button onClick={() => handleCopyLink(event)} title="複製連結" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-ayers-gold transition-all">
@@ -1440,6 +1798,15 @@ export default function EventsTab() {
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* ── 簡章內容編輯 Modal ── */}
+      {contentEvent && (
+        <InfoContentModal
+          event={contentEvent}
+          onClose={() => setContentEvent(null)}
+          onSaved={(meta) => { setEvents((prev) => prev.map((e) => e.id === contentEvent.id ? { ...e, metadata: meta as unknown as EventType['metadata'] } : e)); setContentEvent(null); }}
+        />
       )}
 
       {/* ── QR Code Modal ── */}
