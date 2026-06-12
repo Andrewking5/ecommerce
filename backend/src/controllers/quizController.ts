@@ -113,9 +113,10 @@ export class QuizController {
         const csv = ['email,slug,resultKey,createdAt', ...rows.map((r: { email: string; slug: string; resultKey: string | null; createdAt: Date }) =>
           `${r.email},${r.slug},${r.resultKey ?? ''},${r.createdAt.toISOString()}`
         )].join('\n');
-        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
         res.setHeader('Content-Disposition', 'attachment; filename="quiz-share-emails.csv"');
-        res.send(csv);
+        // Prepend UTF-8 BOM so Excel (Big5 default on zh Windows) reads Chinese correctly
+        res.send(String.fromCharCode(0xFEFF) + csv);
         return;
       }
 
