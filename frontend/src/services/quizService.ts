@@ -129,12 +129,17 @@ const quizService = {
     await api.delete('/quiz/admin/share-emails', { data: { email, slug } });
   },
 
-  exportShareEmailsCsv(filename = 'quiz-share-emails.csv'): void {
-    const url = `${(api.defaults.baseURL || '').replace(/\/$/, '')}/quiz/admin/share-emails?format=csv`;
+  async exportShareEmailsCsv(filename = 'quiz-share-emails.csv'): Promise<void> {
+    // Must go through axios so the Authorization token is attached — a raw
+    // anchor href hits the auth-protected endpoint with no token and returns
+    // {"success":false,"message":"Access token required"}.
+    const res = await api.get('/quiz/admin/share-emails?format=csv', { responseType: 'blob' });
+    const url = URL.createObjectURL(res.data);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
+    URL.revokeObjectURL(url);
   },
 };
 
