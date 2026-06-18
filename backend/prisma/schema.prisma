@@ -802,3 +802,33 @@ model QuizEvent {
   @@index([visitorId])
   @@map("quiz_events")
 }
+
+// ── 訃聞系統（家族告別式弔唁登記）─────────────────────────────
+// 整包以 memorial_* 命名，獨立於電商主功能，方便日後一鍵移除。
+
+// 親友弔唁登記
+model MemorialEntry {
+  id           String   @id @default(cuid())
+  name         String                           // 姓名（必填）
+  relationship String?                          // 與往生者關係
+  phone        String?                          // 聯絡電話
+  email        String?                          // Email
+  attending    Boolean?                         // 是否出席告別式（true=出席 / false=不克出席 / null=未填）
+  headcount    Int?                             // 出席人數
+  giftAmount   Int?                             // 奠儀/白包金額
+  note         String?                          // 備註
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("memorial_entries")
+}
+
+// 訃聞內容設定（單列 key=notice，value 為 JSON，方便彈性擴充欄位）
+model MemorialConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("memorial_config")
+}

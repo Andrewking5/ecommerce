@@ -54,6 +54,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
     '/quiz/results',
     '/quiz/events',
     '/quiz/share-email',
+    '/memorial/entries',
     '/newsletter',
     '/contact',
   ];

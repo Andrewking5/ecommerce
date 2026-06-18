@@ -77,6 +77,8 @@ const SoulGuitarInfo = lazyWithRetry(() => import('./pages/SoulGuitarInfo'));
 const SoulGuitarQuiz = lazyWithRetry(() => import('./pages/SoulGuitarQuiz'));
 const SoulGuitarResult = lazyWithRetry(() => import('./pages/SoulGuitarResult'));
 const SoulGuitarRegister = lazyWithRetry(() => import('./pages/SoulGuitarRegister'));
+const Memorial = lazyWithRetry(() => import('./pages/Memorial'));
+const MemorialManage = lazyWithRetry(() => import('./pages/MemorialManage'));
 
 function PageLoader() {
   return <FullPageLoader size={48} />;
@@ -142,10 +144,30 @@ function EventLandingLayout() {
   const isSoulGuitarQuiz = location.pathname === '/e/soul-guitar';
   const isSoulGuitarResult =
     location.pathname.startsWith('/e/soul-guitar/') && !isSoulGuitarInfo && !isSoulGuitarRegister;
+  const isMemorialManage = location.pathname === '/e/memorial/manage';
+  const isMemorial = location.pathname === '/e/memorial';
 
   useEffect(() => {
     if (i18n.language !== 'zh-TW') i18n.changeLanguage('zh-TW');
   }, []);
+
+  // 訃聞管理頁 — 獨立全螢幕，無導覽列／頁尾
+  if (isMemorialManage) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <MemorialManage />
+      </Suspense>
+    );
+  }
+
+  // 訃聞登記頁 — 獨立全螢幕，無導覽列／頁尾
+  if (isMemorial) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Memorial />
+      </Suspense>
+    );
+  }
 
   // Soul Guitar quiz — fullscreen, no navbar/footer
   if (isSoulGuitarQuiz) {
