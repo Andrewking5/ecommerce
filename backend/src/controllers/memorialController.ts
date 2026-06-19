@@ -66,11 +66,21 @@ export class MemorialController {
         return;
       }
 
+      // 重複偵測：同姓名 + 同電話視為同一人，擋下避免重複登記
+      const phone = (body.phone || '').trim();
+      if (phone) {
+        const dup = await prisma.memorialEntry.findFirst({ where: { name, phone } });
+        if (dup) {
+          res.status(409).json({ success: false, error: '您已登記過了，無需重複填寫', duplicate: true });
+          return;
+        }
+      }
+
       await prisma.memorialEntry.create({
         data: {
           name,
           relationship: (body.relationship || '').trim() || null,
-          phone: (body.phone || '').trim() || null,
+          phone: phone || null,
           email: (body.email || '').trim() || null,
           address,
           attending: typeof body.attending === 'boolean' ? body.attending : null,

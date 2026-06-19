@@ -102,8 +102,12 @@ export default function Memorial() {
       });
       setDone(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch {
-      setError('送出失敗，請稍後再試一次');
+    } catch (err: any) {
+      if (err?.response?.status === 409) {
+        setError('您（相同姓名與電話）已登記過了，無需重複填寫，感謝您的心意 🙏');
+      } else {
+        setError('送出失敗，請稍後再試一次');
+      }
     } finally {
       setSubmitting(false);
     }
