@@ -17,6 +17,7 @@ interface FormState {
   relationship: string;
   phone: string;
   email: string;
+  address: string;
   attending: 'yes' | 'no' | '';
   headcount: string;
   giftAmount: string;
@@ -24,7 +25,7 @@ interface FormState {
 }
 
 const EMPTY: FormState = {
-  name: '', relationship: '', phone: '', email: '',
+  name: '', relationship: '', phone: '', email: '', address: '',
   attending: '', headcount: '', giftAmount: '', note: '',
 };
 
@@ -82,6 +83,10 @@ export default function Memorial() {
       setError('請填寫姓名');
       return;
     }
+    if (!form.address.trim()) {
+      setError('請填寫地址');
+      return;
+    }
     setSubmitting(true);
     try {
       await memorialService.submitEntry({
@@ -89,6 +94,7 @@ export default function Memorial() {
         relationship: form.relationship.trim() || undefined,
         phone: form.phone.trim() || undefined,
         email: form.email.trim() || undefined,
+        address: form.address.trim(),
         attending: form.attending === 'yes' ? true : form.attending === 'no' ? false : null,
         headcount: form.attending === 'yes' && form.headcount ? Number(form.headcount) : null,
         giftAmount: form.giftAmount ? Number(form.giftAmount) : null,
@@ -236,6 +242,17 @@ export default function Memorial() {
                   inputMode="email"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className={labelCls}>地址 <span className="text-[#b08d57]">*</span></label>
+              <input
+                className={inputCls}
+                value={form.address}
+                onChange={(e) => set('address', e.target.value)}
+                placeholder="您的聯絡地址"
+                required
+              />
             </div>
 
             <div>

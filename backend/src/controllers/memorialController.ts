@@ -32,6 +32,7 @@ interface EntryInput {
   relationship?: string;
   phone?: string;
   email?: string;
+  address?: string;
   attending?: boolean | null;
   headcount?: number | string | null;
   giftAmount?: number | string | null;
@@ -59,6 +60,11 @@ export class MemorialController {
         res.status(400).json({ success: false, error: '姓名過長' });
         return;
       }
+      const address = (body.address || '').trim();
+      if (!address) {
+        res.status(400).json({ success: false, error: '地址為必填' });
+        return;
+      }
 
       await prisma.memorialEntry.create({
         data: {
@@ -66,6 +72,7 @@ export class MemorialController {
           relationship: (body.relationship || '').trim() || null,
           phone: (body.phone || '').trim() || null,
           email: (body.email || '').trim() || null,
+          address,
           attending: typeof body.attending === 'boolean' ? body.attending : null,
           headcount: toIntOrNull(body.headcount),
           giftAmount: toIntOrNull(body.giftAmount),
@@ -91,13 +98,14 @@ export class MemorialController {
       });
 
       if (format === 'csv') {
-        const header = '姓名,與往生者關係,電話,Email,是否出席,人數,奠儀金額,備註,登記時間';
+        const header = '姓名,與往生者關係,電話,Email,地址,是否出席,人數,奠儀金額,備註,登記時間';
         const lines = rows.map((r) =>
           [
             r.name,
             r.relationship ?? '',
             r.phone ?? '',
             r.email ?? '',
+            r.address ?? '',
             r.attending === true ? '出席' : r.attending === false ? '不克出席' : '',
             r.headcount ?? '',
             r.giftAmount ?? '',
@@ -150,6 +158,7 @@ export class MemorialController {
           relationship: (body.relationship || '').trim() || null,
           phone: (body.phone || '').trim() || null,
           email: (body.email || '').trim() || null,
+          address: (body.address || '').trim() || null,
           attending: typeof body.attending === 'boolean' ? body.attending : null,
           headcount: toIntOrNull(body.headcount),
           giftAmount: toIntOrNull(body.giftAmount),

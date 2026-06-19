@@ -813,6 +813,7 @@ model MemorialEntry {
   relationship String?                          // 與往生者關係
   phone        String?                          // 聯絡電話
   email        String?                          // Email
+  address      String?                          // 地址（公開表單必填；舊資料可能為空）
   attending    Boolean?                         // 是否出席告別式（true=出席 / false=不克出席 / null=未填）
   headcount    Int?                             // 出席人數
   giftAmount   Int?                             // 奠儀/白包金額

@@ -83,7 +83,7 @@ export default function MemorialManage() {
       if (filter === 'yes' && e.attending !== true) return false;
       if (filter === 'no' && e.attending !== false) return false;
       if (!q) return true;
-      return [e.name, e.relationship, e.phone, e.email, e.note]
+      return [e.name, e.relationship, e.phone, e.email, e.address, e.note]
         .some((v) => (v || '').toLowerCase().includes(q));
     });
     const byTime = (a: MemorialEntry, b: MemorialEntry) => b.createdAt.localeCompare(a.createdAt);
@@ -274,6 +274,7 @@ export default function MemorialManage() {
                         {e.email && <span>✉️ {e.email}</span>}
                         {e.giftAmount != null && <span className="text-gray-700">奠儀 {NTD(e.giftAmount)}</span>}
                       </div>
+                      {e.address && <p className="mt-1 text-sm text-gray-500">🏠 {e.address}</p>}
                       {e.note && <p className="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">{e.note}</p>}
                       <p className="mt-2 text-xs text-gray-300">{fmtTime(e.createdAt)}</p>
                     </div>
@@ -345,6 +346,7 @@ function EntryEditor({
     relationship: entry.relationship || '',
     phone: entry.phone || '',
     email: entry.email || '',
+    address: entry.address || '',
     attending: entry.attending === true ? 'yes' : entry.attending === false ? 'no' : '',
     headcount: entry.headcount != null ? String(entry.headcount) : '',
     giftAmount: entry.giftAmount != null ? String(entry.giftAmount) : '',
@@ -364,6 +366,7 @@ function EntryEditor({
         relationship: f.relationship.trim() || undefined,
         phone: f.phone.trim() || undefined,
         email: f.email.trim() || undefined,
+        address: f.address.trim() || undefined,
         attending: f.attending === 'yes' ? true : f.attending === 'no' ? false : null,
         headcount: f.attending === 'yes' && f.headcount ? Number(f.headcount) : null,
         giftAmount: f.giftAmount ? Number(f.giftAmount) : null,
@@ -396,6 +399,10 @@ function EntryEditor({
         <div>
           <label className="mb-1 block text-xs text-gray-500">Email</label>
           <input className={cls} value={f.email} onChange={(e) => set('email', e.target.value)} inputMode="email" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1 block text-xs text-gray-500">地址</label>
+          <input className={cls} value={f.address} onChange={(e) => set('address', e.target.value)} />
         </div>
         <div>
           <label className="mb-1 block text-xs text-gray-500">是否出席</label>

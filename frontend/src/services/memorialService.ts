@@ -18,6 +18,7 @@ export interface MemorialEntry {
   relationship: string | null;
   phone: string | null;
   email: string | null;
+  address: string | null;
   attending: boolean | null;
   headcount: number | null;
   giftAmount: number | null;
@@ -38,6 +39,7 @@ export interface MemorialEntryInput {
   relationship?: string;
   phone?: string;
   email?: string;
+  address?: string;
   attending?: boolean | null;
   headcount?: number | null;
   giftAmount?: number | null;
