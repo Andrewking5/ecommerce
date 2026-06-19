@@ -36,6 +36,13 @@ interface EventMeta {
 }
 
 const EVENTS: EventMeta[] = [
+  // ── 訃聞追思（獨立預覽，不帶吉他品牌字樣）──
+  {
+    urlPath: 'e/memorial',
+    title: '追思 黃林熟女士 · 弔唁登記',
+    description: '謹此追思 黃林熟女士。敬邀親友留下您的資訊，以表追思之意，並協助家屬聯繫與記錄。',
+    image: `${DOMAIN}/images/events/memorial-og.png`,
+  },
   {
     urlPath: 'e/soul-guitar',
     title: '2026 Ayers 靈魂吉他手大賽 | 測出你的吉他靈魂',
