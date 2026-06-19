@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle, Loader2, Heart } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import memorialService, { type MemorialNotice } from '../services/memorialService';
 
 /* ═══════════════════════════════════════════════════
    訃聞 — 親友弔唁登記（公開頁）
-   獨立全螢幕頁面，無站台導覽列／頁尾。
+   獨立全螢幕頁面，無站台導覽列／頁尾。莊重雅緻的追思版面。
    ═══════════════════════════════════════════════════ */
 
-const INK = '#2b2b2b';
-const PAPER = '#f5f3ee';
-const ACCENT = '#6b7280';
+const INK = '#3a352f';
+const GOLD = '#b08d57';
 
 interface FormState {
   name: string;
@@ -28,6 +27,39 @@ const EMPTY: FormState = {
   name: '', relationship: '', phone: '', email: '',
   attending: '', headcount: '', giftAmount: '', note: '',
 };
+
+/** 菊花紋飾（傳統追思花卉）— 純線稿 SVG */
+function Chrysanthemum({ className = '' }: { className?: string }) {
+  const petals = Array.from({ length: 12 });
+  return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <g stroke={GOLD} strokeWidth="1.3" opacity="0.85">
+        {petals.map((_, i) => (
+          <ellipse key={`o${i}`} cx="50" cy="26" rx="6.4" ry="17"
+            transform={`rotate(${i * 30} 50 50)`} fill="#ffffff" />
+        ))}
+      </g>
+      <g stroke={GOLD} strokeWidth="1.1" opacity="0.7">
+        {petals.map((_, i) => (
+          <ellipse key={`i${i}`} cx="50" cy="35" rx="5" ry="12"
+            transform={`rotate(${i * 30 + 15} 50 50)`} fill="#fbf6ec" />
+        ))}
+      </g>
+      <circle cx="50" cy="50" r="6.5" fill="#ecdfc6" stroke={GOLD} strokeWidth="1.1" />
+    </svg>
+  );
+}
+
+/** 細緻分隔線（中央菱形） */
+function Divider() {
+  return (
+    <div className="my-8 flex items-center justify-center gap-3" aria-hidden="true">
+      <span className="h-px w-16 bg-gradient-to-r from-transparent" style={{ backgroundImage: `linear-gradient(to right, transparent, ${GOLD}66)` }} />
+      <span className="h-1.5 w-1.5 rotate-45" style={{ background: GOLD, opacity: 0.6 }} />
+      <span className="h-px w-16" style={{ backgroundImage: `linear-gradient(to left, transparent, ${GOLD}66)` }} />
+    </div>
+  );
+}
 
 export default function Memorial() {
   const [notice, setNotice] = useState<MemorialNotice | null>(null);
@@ -63,6 +95,7 @@ export default function Memorial() {
         note: form.note.trim() || undefined,
       });
       setDone(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('送出失敗，請稍後再試一次');
     } finally {
@@ -71,73 +104,97 @@ export default function Memorial() {
   };
 
   const inputCls =
-    'w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[15px] text-gray-800 outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-400';
-  const labelCls = 'mb-1.5 block text-sm font-medium text-gray-700';
+    'w-full rounded-xl border border-[#e3dccf] bg-[#fdfbf7] px-4 py-3 text-[15px] text-[#3a352f] outline-none transition placeholder:text-gray-400 focus:border-[#b08d57] focus:ring-2 focus:ring-[#b08d57]/20';
+  const labelCls = 'mb-1.5 block text-sm font-medium text-[#6b6253]';
+
+  const hasNotice = !!(notice?.ceremonyTime || notice?.ceremonyPlace || notice?.message || notice?.familyName);
 
   return (
-    <div className="min-h-screen w-full" style={{ background: PAPER, color: INK }}>
+    <div
+      className="min-h-screen w-full"
+      style={{ color: INK, background: 'linear-gradient(180deg,#f8f5ef 0%,#efe8da 100%)' }}
+    >
       <SEO title="追思弔唁登記" description="親友追思弔唁登記" />
 
-      <div className="mx-auto max-w-xl px-5 py-10 sm:py-14">
+      <div className="mx-auto max-w-xl px-5 py-12 sm:py-16">
         {/* ── 訃聞內容 ───────────────────────── */}
-        <header className="mb-10 text-center">
-          <p className="mb-3 text-sm tracking-[0.4em] text-gray-400">敬 輓</p>
-          <h1 className="font-serif text-3xl font-semibold tracking-wide sm:text-4xl">
-            {notice?.deceasedName ? `${notice.deceasedName} 追思` : '追思紀念'}
+        <motion.header
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="text-center"
+        >
+          <Chrysanthemum className="mx-auto h-16 w-16 sm:h-20 sm:w-20" />
+
+          <p className="mt-5 text-xs tracking-[0.5em] text-[#b08d57]">追 思 紀 念</p>
+
+          <h1 className="mt-3 font-serif text-[2rem] font-semibold leading-tight tracking-wide sm:text-[2.5rem]">
+            {notice?.deceasedName ? (
+              <>{notice.deceasedName}<span className="ml-1 text-[0.6em] font-normal text-[#6b6253]"> 女士 千古</span></>
+            ) : '追思紀念'}
           </h1>
 
           {(notice?.bornDate || notice?.passedDate) && (
-            <p className="mt-3 text-[15px] text-gray-500">
-              {notice?.bornDate && <span>生於 {notice.bornDate}</span>}
-              {notice?.bornDate && notice?.passedDate && <span className="mx-2">·</span>}
-              {notice?.passedDate && <span>卒於 {notice.passedDate}</span>}
+            <p className="mt-3 text-[15px] tracking-wide text-[#8a8070]">
+              {notice?.bornDate && <span>{notice.bornDate}</span>}
+              {notice?.bornDate && notice?.passedDate && <span className="mx-2 text-[#b08d57]">—</span>}
+              {notice?.passedDate && <span>{notice.passedDate}</span>}
             </p>
           )}
 
-          {(notice?.ceremonyTime || notice?.ceremonyPlace || notice?.message || notice?.familyName) && (
-            <div className="mx-auto mt-6 max-w-md space-y-1.5 rounded-2xl bg-white/70 px-6 py-5 text-[15px] leading-relaxed text-gray-600 shadow-sm">
-              {notice?.message && <p className="whitespace-pre-wrap">{notice.message}</p>}
-              {notice?.ceremonyTime && (
-                <p><span className="text-gray-400">告別式時間　</span>{notice.ceremonyTime}</p>
-              )}
-              {notice?.ceremonyPlace && (
-                <p><span className="text-gray-400">告別式地點　</span>{notice.ceremonyPlace}</p>
-              )}
+          {hasNotice && (
+            <div className="mx-auto mt-7 max-w-md rounded-2xl border border-[#ece3d3] bg-white/70 px-6 py-6 text-[15px] leading-loose text-[#5c5347] shadow-[0_2px_20px_rgba(176,141,87,0.08)] backdrop-blur-sm">
+              {notice?.message && <p className="mb-3 whitespace-pre-wrap text-center">{notice.message}</p>}
+              <div className="space-y-1.5">
+                {notice?.ceremonyTime && (
+                  <p className="flex justify-center gap-2"><span className="text-[#a89a82]">告別式時間</span>{notice.ceremonyTime}</p>
+                )}
+                {notice?.ceremonyPlace && (
+                  <p className="flex justify-center gap-2"><span className="text-[#a89a82]">告別式地點</span>{notice.ceremonyPlace}</p>
+                )}
+              </div>
               {notice?.familyName && (
-                <p className="pt-1 text-right text-gray-500">{notice.familyName} 　敬啟</p>
+                <p className="mt-4 text-right text-[#8a8070]">{notice.familyName} 　敬啟</p>
               )}
             </div>
           )}
-        </header>
+        </motion.header>
+
+        <Divider />
 
         {/* ── 登記表單 / 完成狀態 ─────────────── */}
         {done ? (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl bg-white px-6 py-12 text-center shadow-sm"
+            className="rounded-2xl border border-[#ece3d3] bg-white px-6 py-14 text-center shadow-[0_4px_30px_rgba(176,141,87,0.1)]"
           >
-            <CheckCircle className="mx-auto mb-4 h-14 w-14" style={{ color: ACCENT }} />
+            <CheckCircle className="mx-auto mb-4 h-14 w-14" style={{ color: GOLD }} />
             <h2 className="font-serif text-2xl font-semibold">已收到您的心意</h2>
-            <p className="mt-3 text-gray-500">感謝您的追思與關懷。</p>
+            <p className="mt-3 leading-relaxed text-[#6b6253]">
+              感謝您撥冗前來追思與關懷，<br />謹代表家屬向您致上謝意。
+            </p>
             <button
               onClick={() => { setForm(EMPTY); setDone(false); }}
-              className="mt-8 text-sm text-gray-400 underline underline-offset-4 hover:text-gray-600"
+              className="mt-8 text-sm text-[#a89a82] underline underline-offset-4 transition hover:text-[#6b6253]"
             >
               再填一筆
             </button>
           </motion.div>
         ) : (
-          <form
+          <motion.form
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
             onSubmit={handleSubmit}
-            className="space-y-5 rounded-2xl bg-white px-6 py-8 shadow-sm"
+            className="space-y-5 rounded-2xl border border-[#ece3d3] bg-white px-6 py-8 shadow-[0_4px_30px_rgba(176,141,87,0.1)] sm:px-8"
           >
-            <p className="-mt-1 mb-2 text-center text-sm text-gray-400">
-              請留下您的資訊，以表追思之意
+            <p className="-mt-1 mb-1 text-center text-sm text-[#a89a82]">
+              敬請留下您的資訊，以表追思之意
             </p>
 
             <div>
-              <label className={labelCls}>姓名 <span className="text-red-400">*</span></label>
+              <label className={labelCls}>姓名 <span className="text-[#b08d57]">*</span></label>
               <input
                 className={inputCls}
                 value={form.name}
@@ -154,7 +211,7 @@ export default function Memorial() {
                 className={inputCls}
                 value={form.relationship}
                 onChange={(e) => set('relationship', e.target.value)}
-                placeholder="例如：好友、同事、晚輩…"
+                placeholder="例如：孫子、好友、晚輩…"
               />
             </div>
 
@@ -189,10 +246,10 @@ export default function Memorial() {
                     key={val}
                     type="button"
                     onClick={() => set('attending', form.attending === val ? '' : val)}
-                    className={`flex-1 rounded-lg border px-4 py-3 text-[15px] transition ${
+                    className={`flex-1 rounded-xl border px-4 py-3 text-[15px] transition ${
                       form.attending === val
-                        ? 'border-gray-700 bg-gray-700 text-white'
-                        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'
+                        ? 'border-[#b08d57] bg-[#b08d57] text-white shadow-sm'
+                        : 'border-[#e3dccf] bg-[#fdfbf7] text-[#6b6253] hover:border-[#cbb791]'
                     }`}
                   >
                     {txt}
@@ -202,7 +259,7 @@ export default function Memorial() {
             </div>
 
             {form.attending === 'yes' && (
-              <div>
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
                 <label className={labelCls}>出席人數</label>
                 <input
                   className={inputCls}
@@ -211,7 +268,7 @@ export default function Memorial() {
                   placeholder="含您本人共幾位"
                   inputMode="numeric"
                 />
-              </div>
+              </motion.div>
             )}
 
             <div>
@@ -226,9 +283,9 @@ export default function Memorial() {
             </div>
 
             <div>
-              <label className={labelCls}>備註 / 留言</label>
+              <label className={labelCls}>追思留言（選填）</label>
               <textarea
-                className={`${inputCls} min-h-[88px] resize-y`}
+                className={`${inputCls} min-h-[96px] resize-y`}
                 value={form.note}
                 onChange={(e) => set('note', e.target.value)}
                 placeholder="想對家屬或往生者說的話…"
@@ -240,25 +297,25 @@ export default function Memorial() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg py-3.5 text-[15px] font-medium text-white transition disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-[15px] font-medium tracking-wide text-white transition hover:brightness-110 disabled:opacity-60"
               style={{ background: INK }}
             >
               {submitting ? (
                 <><Loader2 className="h-5 w-5 animate-spin" /> 送出中…</>
               ) : (
-                <><Heart className="h-4 w-4" /> 送出</>
+                '送出追思'
               )}
             </button>
-          </form>
+          </motion.form>
         )}
 
-        <p className="mt-8 text-center text-xs text-gray-400">
+        <p className="mt-10 text-center text-xs leading-relaxed text-[#a89a82]">
           您填寫的資訊僅供治喪家屬聯繫與記錄之用
         </p>
         <p className="mt-3 text-center">
           <a
             href="/e/memorial/manage"
-            className="text-[11px] text-gray-300 underline-offset-2 transition hover:text-gray-500 hover:underline"
+            className="text-[11px] text-[#c8bca5] underline-offset-2 transition hover:text-[#8a8070] hover:underline"
           >
             家屬管理登入
           </a>

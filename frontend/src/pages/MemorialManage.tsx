@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Loader2, Lock, Search, Download, Trash2, RefreshCw,
-  AlertTriangle, Edit3, Save, X, Pencil, ExternalLink, LogOut,
+  AlertTriangle, Edit3, Save, X, Pencil, LogOut, ArrowUpDown,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import memorialService, {
@@ -17,6 +17,15 @@ const KEY_STORE = 'memorial_admin_key';
 const INK = '#2b2b2b';
 
 type Filter = 'all' | 'yes' | 'no';
+type Sort = 'new' | 'old' | 'name' | 'gift' | 'head';
+
+const SORT_LABEL: Record<Sort, string> = {
+  new: '最新登記在前',
+  old: '最早登記在前',
+  name: '依姓名排序',
+  gift: '奠儀金額高→低',
+  head: '出席人數多→少',
+};
 
 const NTD = (n: number) => `NT$ ${n.toLocaleString('en-US')}`;
 const fmtTime = (iso: string) => {
@@ -36,6 +45,7 @@ export default function MemorialManage() {
   const [summary, setSummary] = useState<MemorialSummary>({ total: 0, attendingCount: 0, totalHeadcount: 0, totalGift: 0 });
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const [sort, setSort] = useState<Sort>('new');
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = useCallback(async (k: string) => {
@@ -69,14 +79,25 @@ export default function MemorialManage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return entries.filter((e) => {
+    const rows = entries.filter((e) => {
       if (filter === 'yes' && e.attending !== true) return false;
       if (filter === 'no' && e.attending !== false) return false;
       if (!q) return true;
       return [e.name, e.relationship, e.phone, e.email, e.note]
         .some((v) => (v || '').toLowerCase().includes(q));
     });
-  }, [entries, query, filter]);
+    const byTime = (a: MemorialEntry, b: MemorialEntry) => b.createdAt.localeCompare(a.createdAt);
+    rows.sort((a, b) => {
+      switch (sort) {
+        case 'old': return a.createdAt.localeCompare(b.createdAt);
+        case 'name': return a.name.localeCompare(b.name, 'zh-Hant') || byTime(a, b);
+        case 'gift': return (b.giftAmount ?? 0) - (a.giftAmount ?? 0) || byTime(a, b);
+        case 'head': return (b.headcount ?? 0) - (a.headcount ?? 0) || byTime(a, b);
+        default: return byTime(a, b);
+      }
+    });
+    return rows;
+  }, [entries, query, filter, sort]);
 
   const handleDelete = async (e: MemorialEntry) => {
     if (!confirm(`確定刪除「${e.name}」這筆登記？`)) return;
@@ -141,14 +162,6 @@ export default function MemorialManage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-gray-800">弔唁登記管理</h1>
           <div className="flex flex-wrap gap-2">
-            <a
-              href="/e/memorial"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
-            >
-              <ExternalLink className="h-4 w-4" /> 查看公開頁
-            </a>
             <button
               onClick={() => load(key)}
               className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
@@ -204,7 +217,23 @@ export default function MemorialManage() {
               </button>
             ))}
           </div>
+          <div className="relative">
+            <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as Sort)}
+              className="appearance-none rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-8 text-sm text-gray-600 outline-none focus:border-gray-500"
+            >
+              {(Object.keys(SORT_LABEL) as Sort[]).map((s) => (
+                <option key={s} value={s}>{SORT_LABEL[s]}</option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        <p className="mb-3 text-sm text-gray-400">
+          顯示 {filtered.length} 筆{filtered.length !== entries.length ? `（共 ${entries.length} 筆）` : ''}
+        </p>
 
         {/* 列表 */}
         {loading ? (
