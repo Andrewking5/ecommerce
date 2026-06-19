@@ -12,7 +12,7 @@ const NOTICE_KEY = 'notice';
 
 /** 驗證管理金鑰；未通過時回 401 並回傳 false。 */
 function checkKey(req: Request, res: Response): boolean {
-  const secret = process.env.MEMORIAL_KEY || 'ayers-memorial';
+  const secret = process.env.MEMORIAL_KEY || '20260613MOM';
   const provided = req.headers['x-memorial-key'];
   if (provided !== secret) {
     res.status(401).json({ success: false, error: 'Unauthorized' });
