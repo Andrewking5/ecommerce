@@ -127,6 +127,43 @@ export class MemorialController {
     }
   }
 
+  /** PUT /api/memorial/entries/:id — 更新單筆（金鑰保護） */
+  static async updateEntry(req: Request, res: Response): Promise<void> {
+    if (!checkKey(req, res)) return;
+    try {
+      const { id } = req.params;
+      const body = req.body as EntryInput;
+      const name = (body.name || '').trim();
+      if (!name) {
+        res.status(400).json({ success: false, error: '姓名為必填' });
+        return;
+      }
+      if (name.length > 100) {
+        res.status(400).json({ success: false, error: '姓名過長' });
+        return;
+      }
+
+      await prisma.memorialEntry.update({
+        where: { id },
+        data: {
+          name,
+          relationship: (body.relationship || '').trim() || null,
+          phone: (body.phone || '').trim() || null,
+          email: (body.email || '').trim() || null,
+          attending: typeof body.attending === 'boolean' ? body.attending : null,
+          headcount: toIntOrNull(body.headcount),
+          giftAmount: toIntOrNull(body.giftAmount),
+          note: (body.note || '').trim() || null,
+        },
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Failed to update memorial entry:', error);
+      res.status(500).json({ success: false, error: 'Failed to update' });
+    }
+  }
+
   /** DELETE /api/memorial/entries/:id — 刪除單筆（金鑰保護） */
   static async deleteEntry(req: Request, res: Response): Promise<void> {
     if (!checkKey(req, res)) return;

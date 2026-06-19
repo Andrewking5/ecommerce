@@ -255,6 +255,14 @@ export default function Memorial() {
         <p className="mt-8 text-center text-xs text-gray-400">
           您填寫的資訊僅供治喪家屬聯繫與記錄之用
         </p>
+        <p className="mt-3 text-center">
+          <a
+            href="/e/memorial/manage"
+            className="text-[11px] text-gray-300 underline-offset-2 transition hover:text-gray-500 hover:underline"
+          >
+            家屬管理登入
+          </a>
+        </p>
       </div>
     </div>
   );

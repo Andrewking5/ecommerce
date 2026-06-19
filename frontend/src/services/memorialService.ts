@@ -70,6 +70,10 @@ const memorialService = {
     };
   },
 
+  async updateEntry(id: string, input: MemorialEntryInput, key: string): Promise<void> {
+    await api.put(`/memorial/entries/${id}`, input, keyHeader(key));
+  },
+
   async deleteEntry(id: string, key: string): Promise<void> {
     await api.delete(`/memorial/entries/${id}`, keyHeader(key));
   },

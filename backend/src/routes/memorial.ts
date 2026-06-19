@@ -11,6 +11,7 @@ router.get('/notice', MemorialController.getNotice);
 
 // 管理（x-memorial-key 金鑰保護）
 router.get('/entries', MemorialController.listEntries);        // 列表 / 匯出 CSV
+router.put('/entries/:id', MemorialController.updateEntry);    // 更新單筆
 router.delete('/entries/:id', MemorialController.deleteEntry); // 刪除單筆
 router.delete('/entries', MemorialController.clearEntries);    // 一鍵清空全部
 router.put('/notice', MemorialController.saveNotice);          // 編輯訃聞內容

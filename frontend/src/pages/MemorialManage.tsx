@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Loader2, Lock, Search, Download, Trash2, RefreshCw,
-  AlertTriangle, Edit3, Save, X,
+  AlertTriangle, Edit3, Save, X, Pencil, ExternalLink, LogOut,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import memorialService, {
@@ -36,6 +36,7 @@ export default function MemorialManage() {
   const [summary, setSummary] = useState<MemorialSummary>({ total: 0, attendingCount: 0, totalHeadcount: 0, totalGift: 0 });
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = useCallback(async (k: string) => {
     setLoading(true);
@@ -90,6 +91,13 @@ export default function MemorialManage() {
     load(key);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem(KEY_STORE);
+    setKey('');
+    setKeyInput('');
+    setAuthed(false);
+  };
+
   // ── 金鑰登入畫面 ─────────────────────────
   if (!authed) {
     return (
@@ -132,7 +140,15 @@ export default function MemorialManage() {
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-gray-800">弔唁登記管理</h1>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="/e/memorial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+            >
+              <ExternalLink className="h-4 w-4" /> 查看公開頁
+            </a>
             <button
               onClick={() => load(key)}
               className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
@@ -144,6 +160,12 @@ export default function MemorialManage() {
               className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
             >
               <Download className="h-4 w-4" /> 匯出 CSV
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
+            >
+              <LogOut className="h-4 w-4" /> 登出
             </button>
           </div>
         </div>
@@ -193,40 +215,59 @@ export default function MemorialManage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map((e) => (
-              <div key={e.id} className="rounded-xl bg-white p-4 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-base font-semibold text-gray-800">{e.name}</span>
-                      {e.relationship && <span className="text-sm text-gray-500">· {e.relationship}</span>}
-                      {e.attending === true && (
-                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-600">
-                          出席{e.headcount ? ` ${e.headcount} 位` : ''}
-                        </span>
-                      )}
-                      {e.attending === false && (
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">不克出席</span>
-                      )}
+            {filtered.map((e) =>
+              editingId === e.id ? (
+                <EntryEditor
+                  key={e.id}
+                  entry={e}
+                  authKey={key}
+                  onDone={() => { setEditingId(null); load(key); }}
+                  onCancel={() => setEditingId(null)}
+                />
+              ) : (
+                <div key={e.id} className="rounded-xl bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-base font-semibold text-gray-800">{e.name}</span>
+                        {e.relationship && <span className="text-sm text-gray-500">· {e.relationship}</span>}
+                        {e.attending === true && (
+                          <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-600">
+                            出席{e.headcount ? ` ${e.headcount} 位` : ''}
+                          </span>
+                        )}
+                        {e.attending === false && (
+                          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">不克出席</span>
+                        )}
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+                        {e.phone && <span>📞 {e.phone}</span>}
+                        {e.email && <span>✉️ {e.email}</span>}
+                        {e.giftAmount != null && <span className="text-gray-700">奠儀 {NTD(e.giftAmount)}</span>}
+                      </div>
+                      {e.note && <p className="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">{e.note}</p>}
+                      <p className="mt-2 text-xs text-gray-300">{fmtTime(e.createdAt)}</p>
                     </div>
-                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-                      {e.phone && <span>📞 {e.phone}</span>}
-                      {e.email && <span>✉️ {e.email}</span>}
-                      {e.giftAmount != null && <span className="text-gray-700">奠儀 {NTD(e.giftAmount)}</span>}
+                    <div className="flex shrink-0 gap-1">
+                      <button
+                        onClick={() => setEditingId(e.id)}
+                        title="編輯這筆"
+                        className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(e)}
+                        title="刪除這筆"
+                        className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
-                    {e.note && <p className="mt-2 whitespace-pre-wrap rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">{e.note}</p>}
-                    <p className="mt-2 text-xs text-gray-300">{fmtTime(e.createdAt)}</p>
                   </div>
-                  <button
-                    onClick={() => handleDelete(e)}
-                    title="刪除這筆"
-                    className="shrink-0 rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-500"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         )}
 
@@ -257,6 +298,136 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="rounded-xl bg-white p-4 shadow-sm">
       <p className="text-xs text-gray-400">{label}</p>
       <p className="mt-1 text-xl font-semibold text-gray-800">{value}</p>
+    </div>
+  );
+}
+
+/* ── 單筆編輯表單 ──────────────────────── */
+function EntryEditor({
+  entry, authKey, onDone, onCancel,
+}: {
+  entry: MemorialEntry;
+  authKey: string;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
+  const [f, setF] = useState({
+    name: entry.name,
+    relationship: entry.relationship || '',
+    phone: entry.phone || '',
+    email: entry.email || '',
+    attending: entry.attending === true ? 'yes' : entry.attending === false ? 'no' : '',
+    headcount: entry.headcount != null ? String(entry.headcount) : '',
+    giftAmount: entry.giftAmount != null ? String(entry.giftAmount) : '',
+    note: entry.note || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+  const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
+
+  const save = async () => {
+    if (!f.name.trim()) { setErr('姓名為必填'); return; }
+    setSaving(true);
+    setErr('');
+    try {
+      await memorialService.updateEntry(entry.id, {
+        name: f.name.trim(),
+        relationship: f.relationship.trim() || undefined,
+        phone: f.phone.trim() || undefined,
+        email: f.email.trim() || undefined,
+        attending: f.attending === 'yes' ? true : f.attending === 'no' ? false : null,
+        headcount: f.attending === 'yes' && f.headcount ? Number(f.headcount) : null,
+        giftAmount: f.giftAmount ? Number(f.giftAmount) : null,
+        note: f.note.trim() || undefined,
+      }, authKey);
+      onDone();
+    } catch {
+      setErr('儲存失敗，請稍後再試');
+      setSaving(false);
+    }
+  };
+
+  const cls = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500';
+
+  return (
+    <div className="rounded-xl border border-gray-700/30 bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">姓名 *</label>
+          <input className={cls} value={f.name} onChange={(e) => set('name', e.target.value)} maxLength={100} />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">與往生者關係</label>
+          <input className={cls} value={f.relationship} onChange={(e) => set('relationship', e.target.value)} />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">電話</label>
+          <input className={cls} value={f.phone} onChange={(e) => set('phone', e.target.value)} inputMode="tel" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">Email</label>
+          <input className={cls} value={f.email} onChange={(e) => set('email', e.target.value)} inputMode="email" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">是否出席</label>
+          <div className="flex gap-2">
+            {([['', '未填'], ['yes', '出席'], ['no', '不克出席']] as const).map(([v, t]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => set('attending', v)}
+                className={`flex-1 rounded-lg border px-2 py-2 text-sm transition ${
+                  f.attending === v ? 'border-gray-700 bg-gray-700 text-white' : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">出席人數</label>
+          <input
+            className={`${cls} disabled:bg-gray-50 disabled:text-gray-300`}
+            value={f.attending === 'yes' ? f.headcount : ''}
+            disabled={f.attending !== 'yes'}
+            onChange={(e) => set('headcount', e.target.value.replace(/\D/g, ''))}
+            inputMode="numeric"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs text-gray-500">奠儀／白包金額</label>
+          <input
+            className={cls}
+            value={f.giftAmount}
+            onChange={(e) => set('giftAmount', e.target.value.replace(/\D/g, ''))}
+            inputMode="numeric"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="mb-1 block text-xs text-gray-500">備註</label>
+          <textarea className={`${cls} min-h-[64px] resize-y`} value={f.note} onChange={(e) => set('note', e.target.value)} />
+        </div>
+      </div>
+
+      {err && <p className="mt-2 text-sm text-red-500">{err}</p>}
+
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          style={{ background: INK }}
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} 儲存
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+        >
+          <X className="h-4 w-4" /> 取消
+        </button>
+      </div>
     </div>
   );
 }
